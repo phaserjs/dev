@@ -61,7 +61,7 @@ const endLog = (message) =>
 startTimer();
 
 const buildResults = esbuild.buildSync({
-    entryPoints: [ './src/index.ts' ],
+    entryPoints: [ './src/index-bundle.ts' ],
     outfile: './public/index.js',
     target: 'es6',
     sourcemap: true,

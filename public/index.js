@@ -1,15 +1,11 @@
 (() => {
-  // ../phaser-genesis/dist/Phaser.js
   var __defProp = Object.defineProperty;
   var __export = (target, all) => {
     for (var name in all)
       __defProp(target, name, {get: all[name], enumerable: true});
   };
-  var camera_exports = {};
-  __export(camera_exports, {
-    Camera: () => Camera,
-    StaticCamera: () => StaticCamera
-  });
+
+  // node_modules/@phaserjs/phaser/GameInstance.js
   var instance;
   var frame = 0;
   var elapsed = 0;
@@ -33,6 +29,8 @@
       elapsed = current;
     }
   };
+
+  // node_modules/@phaserjs/phaser/math/mat4/index.js
   var mat4_exports = {};
   __export(mat4_exports, {
     GetMat4Determinant: () => GetMat4Determinant,
@@ -83,6 +81,8 @@
     Mat4Zero: () => Mat4Zero,
     Matrix4: () => Matrix4
   });
+
+  // node_modules/@phaserjs/phaser/math/mat4/GetMat4Determinant.js
   function GetMat4Determinant(matrix2) {
     const [m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33] = matrix2.data;
     const det22x33 = m22 * m33 - m32 * m23;
@@ -97,20 +97,30 @@
     const cofact03 = -(m10 * det21x32 - m11 * det20x32 + m12 * det20x31);
     return m00 * cofact00 + m01 * cofact01 + m02 * cofact02 + m03 * cofact03;
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/GetMat4Frobenius.js
   function GetMat4Frobenius(matrix2) {
     const [m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33] = matrix2.data;
     return Math.hypot(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33);
   }
+
+  // node_modules/@phaserjs/phaser/math/RoundAwayFromZero.js
   function RoundAwayFromZero(value) {
     return value > 0 ? Math.ceil(value) : Math.floor(value);
   }
+
+  // node_modules/@phaserjs/phaser/utils/base64/Base64ToArrayBuffer.js
   var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
   var lookup = new Uint8Array(256);
   for (let i = 0; i < chars.length; i++) {
     lookup[chars.charCodeAt(i)] = i;
   }
+
+  // node_modules/@phaserjs/phaser/utils/NOOP.js
   function NOOP() {
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Matrix4.js
   var Matrix4 = class {
     constructor(src) {
       const data = new Float32Array(16);
@@ -173,11 +183,15 @@
       this.data = null;
     }
   };
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4Add.js
   function Mat4Add(a, b, out = new Matrix4()) {
     const [a00, a01, a02, a03, a10, a11, a12, a13, a20, a21, a22, a23, a30, a31, a32, a33] = a.data;
     const [b00, b01, b02, b03, b10, b11, b12, b13, b20, b21, b22, b23, b30, b31, b32, b33] = b.data;
     return out.set(a00 + b00, a01 + b01, a02 + b02, a03 + b03, a10 + b10, a11 + b11, a12 + b12, a13 + b13, a20 + b20, a21 + b21, a22 + b22, a23 + b23, a30 + b30, a31 + b31, a32 + b32, a33 + b33);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4AddTranslationFromFloats.js
   function Mat4AddTranslationFromFloats(matrix2, x, y, z) {
     const data = matrix2.data;
     data[12] += x;
@@ -186,6 +200,8 @@
     matrix2.onChange(matrix2);
     return matrix2;
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4Adjoint.js
   function Mat4Adjoint(matrix2, out = new Matrix4()) {
     const [a00, a01, a02, a03, a10, a11, a12, a13, a20, a21, a22, a23, a30, a31, a32, a33] = matrix2.data;
     const b00 = a00 * a11 - a01 * a10;
@@ -202,12 +218,18 @@
     const b11 = a22 * a33 - a23 * a32;
     return out.set(a11 * b11 - a12 * b10 + a13 * b09, a02 * b10 - a01 * b11 - a03 * b09, a31 * b05 - a32 * b04 + a33 * b03, a22 * b04 - a21 * b05 - a23 * b03, a12 * b08 - a10 * b11 - a13 * b07, a00 * b11 - a02 * b08 + a03 * b07, a32 * b02 - a30 * b05 - a33 * b01, a20 * b05 - a22 * b02 + a23 * b01, a10 * b10 - a11 * b08 + a13 * b06, a01 * b08 - a00 * b10 - a03 * b06, a30 * b04 - a31 * b02 + a33 * b00, a21 * b02 - a20 * b04 - a23 * b00, a11 * b07 - a10 * b09 - a12 * b06, a00 * b09 - a01 * b07 + a02 * b06, a31 * b01 - a30 * b03 - a32 * b00, a20 * b03 - a21 * b01 + a22 * b00);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4Clone.js
   function Mat4Clone(src) {
     return new Matrix4(src);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4CopyFrom.js
   function Mat4CopyFrom(src, dest) {
     return dest.fromArray(src.data);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4CopyPosition.js
   function Mat4CopyPosition(src, dest) {
     const srcData = src.data;
     const destData = dest.data;
@@ -217,11 +239,15 @@
     dest.onChange(dest);
     return dest;
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4Equals.js
   function Mat4Equals(a, b) {
     const [a00, a01, a02, a03, a10, a11, a12, a13, a20, a21, a22, a23, a30, a31, a32, a33] = a.data;
     const [b00, b01, b02, b03, b10, b11, b12, b13, b20, b21, b22, b23, b30, b31, b32, b33] = b.data;
     return a00 === b00 && a01 === b01 && a02 === b02 && a03 === b03 && a10 === b10 && a11 === b11 && a12 === b12 && a13 === b13 && a20 === b20 && a21 === b21 && a22 === b22 && a23 === b23 && a30 === b30 && a31 === b31 && a32 === b32 && a33 === b33;
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4FromQuat.js
   function Mat4FromQuat(q, out = new Matrix4()) {
     const {x, y, z, w} = q;
     const x2 = x + x;
@@ -238,6 +264,8 @@
     const wz = w * z2;
     return out.set(1 - yy - zz, yx + wz, zx - wy, 0, yx - wz, 1 - xx - zz, zy + wx, 0, zx + wy, zy - wx, 1 - xx - yy, 0, 0, 0, 0, 1);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4FromRotation.js
   function Mat4FromRotation(angle, axis, out = new Matrix4()) {
     let {x, y, z} = axis;
     let len = Math.hypot(x, y, z);
@@ -253,6 +281,8 @@
     const t = 1 - c;
     return out.set(x * x * t + c, y * x * t + z * s, z * x * t - y * s, 0, x * y * t - z * s, y * y * t + c, z * y * t + x * s, 0, x * z * t + y * s, y * z * t - x * s, z * z * t + c, 0, 0, 0, 0, 1);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4FromRotationTranslation.js
   function Mat4FromRotationTranslation(q, v, out = new Matrix4()) {
     const {x, y, z, w} = q;
     const x2 = x + x;
@@ -270,6 +300,8 @@
     const {x: vx, y: vy, z: vz} = v;
     return out.set(1 - (yy + zz), xy + wz, xz - wy, 0, xy - wz, 1 - (xx + zz), yz + wx, 0, xz + wy, yz - wx, 1 - (xx + yy), 0, vx, vy, vz, 1);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4FromRotationTranslationScale.js
   function Mat4FromRotationTranslationScale(q, v, s, out = new Matrix4()) {
     const {x, y, z, w} = q;
     const x2 = x + x;
@@ -288,6 +320,8 @@
     const {x: vx, y: vy, z: vz} = v;
     return out.set((1 - (yy + zz)) * sx, (xy + wz) * sx, (xz - wy) * sx, 0, (xy - wz) * sy, (1 - (xx + zz)) * sy, (yz + wx) * sy, 0, (xz + wy) * sz, (yz - wx) * sz, (1 - (xx + yy)) * sz, 0, vx, vy, vz, 1);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4FromRotationTranslationScaleOrigin.js
   function Mat4FromRotationTranslationScaleOrigin(q, v, s, o, out = new Matrix4()) {
     const {x, y, z, w} = q;
     const x2 = x + x;
@@ -316,6 +350,8 @@
     const out10 = (1 - (xx + yy)) * sz;
     return out.set(out0, out1, out2, 0, out4, out5, out6, 0, out8, out9, out10, 0, vx + ox - (out0 * ox + out4 * oy + out8 * oz), vy + oy - (out1 * ox + out5 * oy + out9 * oz), vz + oz - (out2 * ox + out6 * oy + out10 * oz), 1);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4FromRotationXYTranslation.js
   function Mat4FromRotationXYTranslation(rotation, position, translateFirst = true, out = new Matrix4()) {
     const {x, y, z} = position;
     const sx = Math.sin(rotation.x);
@@ -337,35 +373,49 @@
     }
     return out.set(cy, c01, c02, 0, 0, cx, sx, 0, sy, c21, c22, 0, a30, a31, a32, 1);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4FromScaling.js
   function Mat4FromScaling(vec3, out = new Matrix4()) {
     const {x, y, z} = vec3;
     return out.set(x, 0, 0, 0, 0, y, 0, 0, 0, 0, z, 0, 0, 0, 0, 1);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4FromTranslation.js
   function Mat4FromTranslation(vec3, out = new Matrix4()) {
     const {x, y, z} = vec3;
     return out.set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, x, y, z, 1);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4FromXRotation.js
   function Mat4FromXRotation(angle, out = new Matrix4()) {
     const c = Math.cos(angle);
     const s = Math.sin(angle);
     return out.set(1, 0, 0, 0, 0, c, s, 0, 0, -s, c, 0, 0, 0, 0, 1);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4FromYRotation.js
   function Mat4FromYRotation(angle, out = new Matrix4()) {
     const c = Math.cos(angle);
     const s = Math.sin(angle);
     return out.set(c, 0, -s, 0, 0, 1, 0, 0, s, 0, c, 0, 0, 0, 0, 1);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4FromZRotation.js
   function Mat4FromZRotation(angle, out = new Matrix4()) {
     const c = Math.cos(angle);
     const s = Math.sin(angle);
     return out.set(c, s, 0, 0, -s, c, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4Frustum.js
   function Mat4Frustum(left, right, bottom, top, near, far, out = new Matrix4()) {
     const rl = 1 / (right - left);
     const tb = 1 / (top - bottom);
     const nf = 1 / (near - far);
     return out.set(near * 2 * rl, 0, 0, 0, 0, near * 2 * tb, 0, 0, (right + left) * rl, (top + bottom) * tb, (far + near) * nf, -1, 0, 0, far * near * 2 * nf, 0);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3.js
   var Vec3 = class {
     constructor(x = 0, y = 0, z = 0) {
       this.set(x, y, z);
@@ -391,10 +441,14 @@
       return `{ x=${x}, y=${y}, z=${z} }`;
     }
   };
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4GetScaling.js
   function Mat4GetScaling(matrix2, out = new Vec3()) {
     const [m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22] = matrix2.data;
     return out.set(Math.hypot(m00, m01, m02), Math.hypot(m10, m11, m12), Math.hypot(m20, m21, m22));
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/Quaternion.js
   var Quaternion = class {
     constructor(x = 0, y = 0, z = 0, w = 1) {
       this._x = x;
@@ -470,6 +524,8 @@
       return `{ x=${x}, y=${y}, z=${z}, w=${w} }`;
     }
   };
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4GetRotation.js
   function Mat4GetRotation(matrix2, out = new Quaternion()) {
     const scaling = Mat4GetScaling(matrix2);
     const is1 = 1 / scaling.x;
@@ -501,13 +557,19 @@
       return out.set((sm31 + sm13) / S, (sm23 + sm32) / S, 0.25 * S, (sm12 - sm21) / S);
     }
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4GetTranslation.js
   function Mat4GetTranslation(matrix2, out = new Vec3()) {
     const data = matrix2.data;
     return out.set(data[12], data[13], data[14]);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4Identity.js
   function Mat4Identity(matrix2 = new Matrix4()) {
     return matrix2.set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4Invert.js
   function Mat4Invert(matrix2, out = new Matrix4()) {
     const [m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33] = matrix2.data;
     const det22x33 = m22 * m33 - m32 * m23;
@@ -551,6 +613,8 @@
     const cofact33 = +(m00 * det11x22 - m01 * det10x22 + m02 * det10x21);
     return out.set(cofact00 * detInv, cofact10 * detInv, cofact20 * detInv, cofact30 * detInv, cofact01 * detInv, cofact11 * detInv, cofact21 * detInv, cofact31 * detInv, cofact02 * detInv, cofact12 * detInv, cofact22 * detInv, cofact32 * detInv, cofact03 * detInv, cofact13 * detInv, cofact23 * detInv, cofact33 * detInv);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4LookAt.js
   function Mat4LookAt(eye, center, up, out = new Matrix4()) {
     const {x: eyex, y: eyey, z: eyez} = eye;
     const {x: upx, y: upy, z: upz} = up;
@@ -595,26 +659,36 @@
     }
     return out.set(x0, y0, z0, 0, x1, y1, z1, 0, x2, y2, z2, 0, -(x0 * eyex + x1 * eyey + x2 * eyez), -(y0 * eyex + y1 * eyey + y2 * eyez), -(z0 * eyex + z1 * eyey + z2 * eyez), 1);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4Multiply.js
   function Mat4Multiply(a, b, out = new Matrix4()) {
     const [a00, a01, a02, a03, a10, a11, a12, a13, a20, a21, a22, a23, a30, a31, a32, a33] = a.data;
     const [b00, b01, b02, b03, b10, b11, b12, b13, b20, b21, b22, b23, b30, b31, b32, b33] = b.data;
     return out.set(b00 * a00 + b01 * a10 + b02 * a20 + b03 * a30, b01 * a01 + b01 * a11 + b02 * a21 + b03 * a31, b02 * a02 + b01 * a12 + b02 * a22 + b03 * a32, b03 * a03 + b01 * a13 + b02 * a23 + b03 * a33, b10 * a00 + b11 * a10 + b12 * a20 + b13 * a30, b10 * a01 + b11 * a11 + b12 * a21 + b13 * a31, b10 * a02 + b11 * a12 + b12 * a22 + b13 * a32, b10 * a03 + b11 * a13 + b12 * a23 + b13 * a33, b20 * a00 + b21 * a10 + b22 * a20 + b23 * a30, b20 * a01 + b21 * a11 + b22 * a21 + b23 * a31, b20 * a02 + b21 * a12 + b22 * a22 + b23 * a32, b20 * a03 + b21 * a13 + b22 * a23 + b23 * a33, b30 * a00 + b31 * a10 + b32 * a20 + b33 * a30, b30 * a01 + b31 * a11 + b32 * a21 + b33 * a31, b30 * a02 + b31 * a12 + b32 * a22 + b33 * a32, b30 * a03 + b31 * a13 + b32 * a23 + b33 * a33);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4MultiplyScalar.js
   function Mat4MultiplyScalar(matrix2, scalar, out = new Matrix4()) {
     const [a00, a01, a02, a03, a10, a11, a12, a13, a20, a21, a22, a23, a30, a31, a32, a33] = matrix2.data;
     return out.set(a00 * scalar, a01 * scalar, a02 * scalar, a03 * scalar, a10 * scalar, a11 * scalar, a12 * scalar, a13 * scalar, a20 * scalar, a21 * scalar, a22 * scalar, a23 * scalar, a30 * scalar, a31 * scalar, a32 * scalar, a33 * scalar);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4MultiplyScalarAndAdd.js
   function Mat4MultiplyScalarAndAdd(a, b, scalar, out = new Matrix4()) {
     const [a00, a01, a02, a03, a10, a11, a12, a13, a20, a21, a22, a23, a30, a31, a32, a33] = a.data;
     const [b00, b01, b02, b03, b10, b11, b12, b13, b20, b21, b22, b23, b30, b31, b32, b33] = b.data;
     return out.set(a00 + b00 * scalar, a01 + b01 * scalar, a02 + b02 * scalar, a03 + b03 * scalar, a10 + b10 * scalar, a11 + b11 * scalar, a12 + b12 * scalar, a13 + b13 * scalar, a20 + b20 * scalar, a21 + b21 * scalar, a22 + b22 * scalar, a23 + b23 * scalar, a30 + b30 * scalar, a31 + b31 * scalar, a32 + b32 * scalar, a33 + b33 * scalar);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4Ortho.js
   function Mat4Ortho(left, right, bottom, top, near, far, out = new Matrix4()) {
     const lr = 1 / (left - right);
     const bt = 1 / (bottom - top);
     const nf = 1 / (near - far);
     return out.set(-2 * lr, 0, 0, 0, 0, -2 * bt, 0, 0, 0, 0, 2 * nf, 0, (left + right) * lr, (top + bottom) * bt, (far + near) * nf, 1);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4Perspective.js
   function Mat4Perspective(fovY, aspect, near, far, out = new Matrix4()) {
     const f = 1 / Math.tan(fovY / 2);
     let m22 = -1;
@@ -626,6 +700,8 @@
     }
     return out.set(f / aspect, 0, 0, 0, 0, f, 0, 0, 0, 0, m22, -1, 0, 0, m32, 0);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4PerspectiveFromFieldOfView.js
   function Mat4PerspectiveFromFieldOfView(fov, near, far, out = new Matrix4()) {
     const upTan = Math.tan(fov.upDegrees * Math.PI / 180);
     const downTan = Math.tan(fov.downDegrees * Math.PI / 180);
@@ -635,6 +711,8 @@
     const yScale = 2 / (upTan + downTan);
     return out.set(xScale, 0, 0, 0, 0, yScale, 0, 0, -((leftTan - rightTan) * xScale * 0.5), (upTan - downTan) * yScale * 0.5, far / (near - far), -1, 0, 0, far * near / (near - far), 0);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4Rotate.js
   function Mat4Rotate(matrix2, angle, axis, out = new Matrix4()) {
     let {x, y, z} = axis;
     let len = Math.hypot(x, y, z);
@@ -660,29 +738,39 @@
     const b22 = z * z * t + c;
     return out.set(a00 * b00 + a10 * b01 + a20 * b02, a01 * b00 + a11 * b01 + a21 * b02, a02 * b00 + a12 * b01 + a22 * b02, a03 * b00 + a13 * b01 + a23 * b02, a00 * b10 + a10 * b11 + a20 * b12, a01 * b10 + a11 * b11 + a21 * b12, a02 * b10 + a12 * b11 + a22 * b12, a03 * b10 + a13 * b11 + a23 * b12, a00 * b20 + a10 * b21 + a20 * b22, a01 * b20 + a11 * b21 + a21 * b22, a02 * b20 + a12 * b21 + a22 * b22, a03 * b20 + a13 * b21 + a23 * b22, a30, a31, a32, a33);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4RotateX.js
   function Mat4RotateX(matrix2, angle, out = new Matrix4()) {
     const s = Math.sin(angle);
     const c = Math.cos(angle);
     const [a00, a01, a02, a03, a10, a11, a12, a13, a20, a21, a22, a23, a30, a31, a32, a33] = matrix2.data;
     return out.set(a00, a01, a02, a03, a10 * c + a20 * s, a11 * c + a21 * s, a12 * c + a22 * s, a13 * c + a23 * s, a20 * c - a10 * s, a21 * c - a11 * s, a22 * c - a12 * s, a23 * c - a13 * s, a30, a31, a32, a33);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4RotateY.js
   function Mat4RotateY(matrix2, angle, out = new Matrix4()) {
     const s = Math.sin(angle);
     const c = Math.cos(angle);
     const [a00, a01, a02, a03, a10, a11, a12, a13, a20, a21, a22, a23, a30, a31, a32, a33] = matrix2.data;
     return out.set(a00 * c - a20 * s, a01 * c - a21 * s, a02 * c - a22 * s, a03 * c - a23 * s, a10, a11, a12, a13, a00 * s + a20 * c, a01 * s + a21 * c, a02 * s + a22 * c, a03 * s + a23 * c, a30, a31, a32, a33);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4RotateZ.js
   function Mat4RotateZ(matrix2, angle, out = new Matrix4()) {
     const s = Math.sin(angle);
     const c = Math.cos(angle);
     const [a00, a01, a02, a03, a10, a11, a12, a13, a20, a21, a22, a23, a30, a31, a32, a33] = matrix2.data;
     return out.set(a00 * c + a10 * s, a01 * c + a11 * s, a02 * c + a12 * s, a03 * c + a13 * s, a10 * c - a00 * s, a11 * c - a01 * s, a12 * c - a02 * s, a13 * c - a03 * s, a20, a21, a22, a23, a30, a31, a32, a33);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4Scale.js
   function Mat4Scale(matrix2, v, out = new Matrix4()) {
     const [m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33] = matrix2.data;
     const {x, y, z} = v;
     return out.set(m00 * x, m01 * x, m02 * x, m03 * x, m10 * y, m11 * y, m12 * y, m13 * y, m20 * z, m21 * z, m22 * z, m23 * z, m30, m31, m32, m33);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4SetTranslation.js
   function Mat4SetTranslation(matrix2, vec3) {
     const data = matrix2.data;
     const {x, y, z} = vec3;
@@ -692,6 +780,8 @@
     matrix2.onChange(matrix2);
     return matrix2;
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4SetTranslationFromFloats.js
   function Mat4SetTranslationFromFloats(matrix2, x, y, z) {
     const data = matrix2.data;
     data[12] = x;
@@ -700,11 +790,15 @@
     matrix2.onChange(matrix2);
     return matrix2;
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4Subtract.js
   function Mat4Subtract(a, b, out = new Matrix4()) {
     const [a00, a01, a02, a03, a10, a11, a12, a13, a20, a21, a22, a23, a30, a31, a32, a33] = a.data;
     const [b00, b01, b02, b03, b10, b11, b12, b13, b20, b21, b22, b23, b30, b31, b32, b33] = b.data;
     return out.set(a00 - b00, a01 - b01, a02 - b02, a03 - b03, a10 - b10, a11 - b11, a12 - b12, a13 - b13, a20 - b20, a21 - b21, a22 - b22, a23 - b23, a30 - b30, a31 - b31, a32 - b32, a33 - b33);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4TargetTo.js
   function Mat4TargetTo(eye, target, up, out = new Matrix4()) {
     const {x: eyex, y: eyey, z: eyez} = eye;
     const {x: upx, y: upy, z: upz} = up;
@@ -731,6 +825,8 @@
     }
     return out.set(x0, x1, x2, 0, z1 * x2 - z2 * x1, z2 * x0 - z0 * x2, z0 * x1 - z1 * x0, 0, z0, z1, z2, 0, eyex, eyey, eyez, 1);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4Translate.js
   function Mat4Translate(matrix2, vec3, out = new Matrix4()) {
     const {x, y, z} = vec3;
     const data = matrix2.data;
@@ -745,6 +841,8 @@
     }
     return out;
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4TranslateFromFloats.js
   function Mat4TranslateFromFloats(matrix2, x, y, z, out = new Matrix4()) {
     const data = matrix2.data;
     const [a00, a01, a02, a03, a10, a11, a12, a13, a20, a21, a22, a23, a30, a31, a32, a33] = data;
@@ -758,13 +856,19 @@
     }
     return out;
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4Transpose.js
   function Mat4Transpose(matrix2, out = new Matrix4()) {
     const [m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33] = matrix2.data;
     return out.set(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat4/Mat4Zero.js
   function Mat4Zero(matrix2) {
     return matrix2.set(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat2d/Matrix2D.js
   var Matrix2D = class {
     constructor(a = 1, b = 0, c = 0, d = 1, tx = 0, ty = 0) {
       this.set(a, b, c, d, tx, ty);
@@ -789,12 +893,16 @@
       return this.set(src[0], src[1], src[2], src[3], src[4], src[5]);
     }
   };
+
+  // node_modules/@phaserjs/phaser/geom/rectangle/RectangleContains.js
   function RectangleContains(rect, x, y) {
     if (rect.width <= 0 || rect.height <= 0) {
       return false;
     }
     return rect.x <= x && rect.x + rect.width >= x && rect.y <= y && rect.y + rect.height >= y;
   }
+
+  // node_modules/@phaserjs/phaser/geom/rectangle/Rectangle.js
   var Rectangle = class {
     constructor(x = 0, y = 0, width = 0, height = 0) {
       this.set(x, y, width, height);
@@ -830,6 +938,8 @@
       return this.y + this.height;
     }
   };
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2Callback.js
   var Vec2Callback = class {
     constructor(onChange, x = 0, y = 0) {
       this._x = x;
@@ -881,6 +991,8 @@
       return `{ x=${x}, y=${y} }`;
     }
   };
+
+  // node_modules/@phaserjs/phaser/math/angle/index.js
   var angle_exports = {};
   __export(angle_exports, {
     AngleBetween: () => AngleBetween,
@@ -893,12 +1005,18 @@
     WrapAngle: () => WrapAngle,
     WrapAngleDegrees: () => WrapAngleDegrees
   });
+
+  // node_modules/@phaserjs/phaser/math/angle/AngleBetween.js
   function AngleBetween(x1, y1, x2, y2) {
     return Math.atan2(y2 - y1, x2 - x1);
   }
+
+  // node_modules/@phaserjs/phaser/math/angle/AngleBetweenY.js
   function AngleBetweenY(x1, y1, x2, y2) {
     return Math.atan2(x2 - x1, y2 - y1);
   }
+
+  // node_modules/@phaserjs/phaser/math/const.js
   var MATH_CONST = {
     PI2: Math.PI * 2,
     HALF_PI: Math.PI * 0.5,
@@ -908,12 +1026,16 @@
     MIN_SAFE_INTEGER: Number.MIN_SAFE_INTEGER || -9007199254740991,
     MAX_SAFE_INTEGER: Number.MAX_SAFE_INTEGER || 9007199254740991
   };
+
+  // node_modules/@phaserjs/phaser/math/angle/CounterClockwise.js
   function CounterClockwise(angle) {
     if (angle > Math.PI) {
       angle -= MATH_CONST.PI2;
     }
     return Math.abs(((angle + MATH_CONST.HALF_PI) % MATH_CONST.PI2 - MATH_CONST.PI2) % MATH_CONST.PI2);
   }
+
+  // node_modules/@phaserjs/phaser/math/angle/NormalizeAngle.js
   function NormalizeAngle(angle) {
     angle = angle % MATH_CONST.PI2;
     if (angle >= 0) {
@@ -922,9 +1044,13 @@
       return angle + MATH_CONST.PI2;
     }
   }
+
+  // node_modules/@phaserjs/phaser/math/angle/ReverseAngle.js
   function ReverseAngle(angle) {
     return NormalizeAngle(angle + Math.PI);
   }
+
+  // node_modules/@phaserjs/phaser/math/angle/RotateAngleTo.js
   function RotateAngleTo(currentAngle, targetAngle, lerp = 0.05) {
     if (currentAngle === targetAngle) {
       return currentAngle;
@@ -947,6 +1073,8 @@
     }
     return currentAngle;
   }
+
+  // node_modules/@phaserjs/phaser/math/angle/ShortestAngleBetween.js
   function ShortestAngleBetween(angle1, angle2) {
     const difference = angle2 - angle1;
     if (difference === 0) {
@@ -955,16 +1083,24 @@
     const times = Math.floor((difference - -180) / 360);
     return difference - times * 360;
   }
+
+  // node_modules/@phaserjs/phaser/math/Wrap.js
   function Wrap(value, min, max) {
     const range = max - min;
     return min + ((value - min) % range + range) % range;
   }
+
+  // node_modules/@phaserjs/phaser/math/angle/WrapAngle.js
   function WrapAngle(angle) {
     return Wrap(angle, -Math.PI, Math.PI);
   }
+
+  // node_modules/@phaserjs/phaser/math/angle/WrapAngleDegrees.js
   function WrapAngleDegrees(angle) {
     return Wrap(angle, -180, 180);
   }
+
+  // node_modules/@phaserjs/phaser/camera/Camera.js
   var Camera = class {
     constructor() {
       this._rotation = 0;
@@ -1036,6 +1172,8 @@
       this.bounds = null;
     }
   };
+
+  // node_modules/@phaserjs/phaser/camera/StaticCamera.js
   var StaticCamera = class {
     constructor() {
       this.type = "StaticCamera";
@@ -1065,10 +1203,8 @@
       this.bounds = null;
     }
   };
-  var camera3d_exports = {};
-  __export(camera3d_exports, {
-    Camera3D: () => Camera3D
-  });
+
+  // node_modules/@phaserjs/phaser/math/quaternion/index.js
   var quaternion_exports = {};
   __export(quaternion_exports, {
     GetQuatAngle: () => GetQuatAngle,
@@ -1111,22 +1247,34 @@
     QuatZero: () => QuatZero,
     Quaternion: () => Quaternion
   });
+
+  // node_modules/@phaserjs/phaser/math/quaternion/QuatDot.js
   function QuatDot(a, b) {
     return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/GetQuatAngle.js
   function GetQuatAngle(a, b) {
     const dot = QuatDot(a, b);
     return Math.acos(2 * dot * dot - 1);
   }
+
+  // node_modules/@phaserjs/phaser/math/Clamp.js
   function Clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/GetQuatAngleTo.js
   function GetQuatAngleTo(a, b) {
     return 2 * Math.acos(Math.abs(Clamp(QuatDot(a, b), -1, 1)));
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/GetQuatAreClose.js
   function GetQuatAreClose(a, b) {
     return QuatDot(a, b) >= 0;
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/GetQuatAxisAngle.js
   function GetQuatAxisAngle(a, out = new Quaternion()) {
     const rad = Math.acos(a.w) * 2;
     const s = Math.sin(rad / 2);
@@ -1138,35 +1286,53 @@
     }
     return rad;
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/GetQuatLength.js
   function GetQuatLength(a) {
     const {x, y, z, w} = a;
     return Math.sqrt(x * x + y * y + z * z + w * w);
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/GetQuatLengthSquared.js
   function GetQuatLengthSquared(a) {
     const {x, y, z, w} = a;
     return x * x + y * y + z * z + w * w;
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/QuatAdd.js
   function QuatAdd(a, b, out = new Quaternion()) {
     return out.set(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/QuatAddScalar.js
   function QuatAddScalar(a, scalar, out = new Quaternion()) {
     return out.set(a.x + scalar, a.y + scalar, a.z + scalar, a.w + scalar);
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/QuatClone.js
   function QuatClone(source) {
     const {x, y, z, w} = source;
     return new Quaternion(x, y, z, w);
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/QuatConjugate.js
   function QuatConjugate(a, out = new Quaternion()) {
     const {x, y, z, w} = a;
     return out.set(x * -1, y * -1, z * -1, w);
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/QuatCopyFrom.js
   function QuatCopyFrom(source, dest) {
     const {x, y, z, w} = source;
     return dest.set(x, y, z, w);
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/QuatEquals.js
   function QuatEquals(a, b) {
     return a.x === b.x && a.y === b.y && a.z === b.z && a.w === b.w;
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/QuatRotationYawPitchRoll.js
   function QuatRotationYawPitchRoll(yaw, pitch, roll, out = new Quaternion()) {
     const halfRoll = roll * 0.5;
     const halfPitch = pitch * 0.5;
@@ -1179,12 +1345,18 @@
     const cosYaw = Math.cos(halfYaw);
     return out.set(cosYaw * sinPitch * cosRoll + sinYaw * cosPitch * sinRoll, sinYaw * cosPitch * cosRoll - cosYaw * sinPitch * sinRoll, cosYaw * cosPitch * sinRoll - sinYaw * sinPitch * cosRoll, cosYaw * cosPitch * cosRoll + sinYaw * sinPitch * sinRoll);
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/QuatFromEulerAngles.js
   function QuatFromEulerAngles(x, y, z, out = new Quaternion()) {
     return QuatRotationYawPitchRoll(y, x, z, out);
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/QuatFromEulerVector.js
   function QuatFromEulerVector(v, out = new Quaternion()) {
     return QuatRotationYawPitchRoll(v.y, v.x, v.z, out);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/index.js
   var vec3_exports = {};
   __export(vec3_exports, {
     BACKWARD: () => BACKWARD,
@@ -1263,27 +1435,43 @@
     Vec3Zero: () => Vec3Zero,
     ZERO: () => ZERO
   });
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Backward.js
   function Vec3Backward() {
     return new Vec3(0, 0, -1);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Down.js
   function Vec3Down() {
     return new Vec3(0, -1, 0);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Forward.js
   function Vec3Forward() {
     return new Vec3(0, 0, 1);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Left.js
   function Vec3Left() {
     return new Vec3(-1, 0, 0);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Right.js
   function Vec3Right() {
     return new Vec3(1, 0, 0);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Up.js
   function Vec3Up() {
     return new Vec3(0, 1, 0);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Zero.js
   function Vec3Zero() {
     return new Vec3(0, 0, 0);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/const.js
   var UP = Vec3Up();
   var DOWN = Vec3Down();
   var LEFT = Vec3Left();
@@ -1291,9 +1479,13 @@
   var FORWARD = Vec3Forward();
   var BACKWARD = Vec3Backward();
   var ZERO = Vec3Zero();
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Dot.js
   function Vec3Dot(a, b) {
     return a.x * b.x + a.y * b.y + a.z * b.z;
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/GetVec3Angle.js
   function GetVec3Angle(a, b) {
     const {x: ax, y: ay, z: az} = a;
     const {x: bx, y: by, z: bz} = b;
@@ -1303,29 +1495,43 @@
     const c = mag && Vec3Dot(a, b) / mag;
     return Math.acos(Math.min(Math.max(c, -1), 1));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/GetVec3DistanceSquared.js
   function GetVec3DistanceSquared(a, b) {
     const x = a.x - b.x;
     const y = a.y - b.y;
     const z = a.z - b.z;
     return x * x + y * y + z * z;
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/GetVec3Distance.js
   function GetVec3Distance(a, b) {
     return Math.sqrt(GetVec3DistanceSquared(a, b));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/GetVec3Length.js
   function GetVec3Length(a) {
     const {x, y, z} = a;
     return Math.sqrt(x * x + y * y + z * z);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/GetVec3LengthSquared.js
   function GetVec3LengthSquared(a) {
     const {x, y, z} = a;
     return x * x + y * y + z * z;
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/GetVec3ManhattanDistance.js
   function GetVec3ManhattanDistance(a, b) {
     return Math.abs(a.x - b.x) + Math.abs(a.y - b.y) + Math.abs(a.z - b.z);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/GetVec3ManhattanLength.js
   function GetVec3ManhattanLength(a) {
     return Math.abs(a.x) + Math.abs(a.y) + Math.abs(a.z);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Callback.js
   var Vec3Callback = class {
     constructor(onChange, x = 0, y = 0, z = 0) {
       this._x = x;
@@ -1390,6 +1596,8 @@
       return `{ x=${x}, y=${y}, z=${z} }`;
     }
   };
+
+  // node_modules/@phaserjs/phaser/math/vec3/RGBCallback.js
   var RGBCallback = class extends Vec3Callback {
     constructor(onChange, r = 0, g = 0, b = 0) {
       super(onChange, r, g, b);
@@ -1417,15 +1625,23 @@
       return `[ r=${x}, g=${y}, b=${z} ]`;
     }
   };
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Abs.js
   function Vec3Abs(a, out = new Vec3()) {
     return out.set(Math.abs(a.x), Math.abs(a.y), Math.abs(a.z));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Add.js
   function Vec3Add(a, b, out = new Vec3()) {
     return out.set(a.x + b.x, a.y + b.y, a.z + b.z);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3AddScalar.js
   function Vec3AddScalar(a, scalar, out = new Vec3()) {
     return out.set(a.x + scalar, a.y + scalar, a.z + scalar);
   }
+
+  // node_modules/@phaserjs/phaser/math/Bezier.js
   function Bezier(a, b, c, d, t) {
     const inverseFactor = 1 - t;
     const inverseFactorTimesTwo = inverseFactor * inverseFactor;
@@ -1436,9 +1652,13 @@
     const factor4 = factorTimes2 * t;
     return a * factor1 + b * factor2 + c * factor3 + d * factor4;
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Bezier.js
   function Vec3Bezier(a, b, c, d, t, out = new Vec3()) {
     return out.set(Bezier(t, a.x, b.x, c.x, d.x), Bezier(t, a.y, b.y, c.y, d.y), Bezier(t, a.z, b.z, c.z, d.z));
   }
+
+  // node_modules/@phaserjs/phaser/math/CatmullRom.js
   function CatmullRom(t, p0, p1, p2, p3) {
     const v0 = (p2 - p0) * 0.5;
     const v1 = (p3 - p1) * 0.5;
@@ -1446,47 +1666,71 @@
     const t3 = t * t2;
     return (2 * p1 - 2 * p2 + v0 + v1) * t3 + (-3 * p1 + 3 * p2 - 2 * v0 - v1) * t2 + v0 * t + p1;
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3CatmullRom.js
   function Vec3CatmullRom(p1, p2, p3, p4, t, out = new Vec3()) {
     return out.set(CatmullRom(t, p1.x, p2.x, p3.x, p4.x), CatmullRom(t, p1.y, p2.y, p3.y, p4.y), CatmullRom(t, p1.z, p2.z, p3.z, p4.z));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Ceil.js
   function Vec3Ceil(a, out = new Vec3()) {
     return out.set(Math.ceil(a.x), Math.ceil(a.y), Math.ceil(a.z));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Scale.js
   function Vec3Scale(a, scalar, out = new Vec3()) {
     return out.set(a.x * scalar, a.y * scalar, a.z * scalar);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Center.js
   function Vec3Center(a, b, out = new Vec3()) {
     Vec3Add(a, b, out);
     return Vec3Scale(out, 0.5, out);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Clamp.js
   function Vec3Clamp(a, min, max, out = new Vec3()) {
     return out.set(Clamp(a.x, min.x, max.x), Clamp(a.y, min.y, max.y), Clamp(a.z, min.z, max.z));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3DivideScalar.js
   function Vec3DivideScalar(a, scalar, out = new Vec3()) {
     const {x, y, z} = a;
     return out.set(x / scalar, y / scalar, z / scalar);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3ClampLength.js
   function Vec3ClampLength(a, min, max, out = new Vec3()) {
     const length = GetVec3Length(a);
     Vec3DivideScalar(a, length || 1, out);
     return Vec3Scale(out, Clamp(min, max, length), out);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3ClampScalar.js
   function Vec3ClampScalar(a, min, max, out = new Vec3()) {
     return out.set(Clamp(a.x, min, max), Clamp(a.y, min, max), Clamp(a.z, min, max));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Clone.js
   function Vec3Clone(source) {
     const {x, y, z} = source;
     return new Vec3(x, y, z);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3CopyFrom.js
   function Vec3CopyFrom(source, dest) {
     const {x, y, z} = source;
     return dest.set(x, y, z);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Cross.js
   function Vec3Cross(a, b, out = new Vec3()) {
     const {x: ax, y: ay, z: az} = a;
     const {x: bx, y: by, z: bz} = b;
     return out.set(ay * bz - az * by, az * bx - ax * bz, ax * by - ay * bx);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3CrossNormalize.js
   function Vec3CrossNormalize(a, b, out = new Vec3()) {
     const {x: ax, y: ay, z: az} = a;
     const {x: bx, y: by, z: bz} = b;
@@ -1499,31 +1743,49 @@
     }
     return out.set(x * len, y * len, z * len);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Divide.js
   function Vec3Divide(a, b, out = new Vec3()) {
     return out.set(a.x / b.x, a.y / b.y, a.z / b.z);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Equals.js
   function Vec3Equals(a, b) {
     return a.x === b.x && a.y === b.y && a.z === b.z;
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Floor.js
   function Vec3Floor(a, out = new Vec3()) {
     return out.set(Math.floor(a.x), Math.floor(a.y), Math.floor(a.z));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Fract.js
   function Vec3Fract(a, out = new Vec3()) {
     return out.set(a.x - Math.floor(a.x), a.y - Math.floor(a.y), a.z - Math.floor(a.z));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3FromCylindricalCoords.js
   function Vec3FromCylindricalCoords(radius, theta, y, out = new Vec3()) {
     return out.set(radius * Math.sin(theta), y, radius * Math.cos(theta));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3FromSphericalCoords.js
   function Vec3FromSphericalCoords(radius, phi, theta, out = new Vec3()) {
     const sinPhiRadius = Math.sin(phi) * radius;
     return out.set(sinPhiRadius * Math.sin(theta), Math.cos(phi) * radius, sinPhiRadius * Math.cos(theta));
   }
+
+  // node_modules/@phaserjs/phaser/math/fuzzy/FuzzyEqual.js
   function FuzzyEqual(a, b, epsilon = 1e-4) {
     return Math.abs(a - b) < epsilon;
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3FuzzyEquals.js
   function Vec3FuzzyEquals(a, b, epsilon = 1e-4) {
     return FuzzyEqual(a.x, b.x, epsilon) && FuzzyEqual(a.y, b.y, epsilon) && FuzzyEqual(a.z, b.z, epsilon);
   }
+
+  // node_modules/@phaserjs/phaser/math/Hermite.js
   function Hermite(a, b, c, d, t) {
     const squared = t * t;
     const factor1 = squared * (2 * t - 3) + 1;
@@ -1532,41 +1794,61 @@
     const factor4 = squared * (3 - 2 * t);
     return a * factor1 + b * factor2 + c * factor3 + d * factor4;
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Hermite.js
   function Vec3Hermite(a, b, c, d, t, out = new Vec3()) {
     return out.set(Hermite(t, a.x, b.x, c.x, d.x), Hermite(t, a.y, b.y, c.y, d.y), Hermite(t, a.z, b.z, c.z, d.z));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Inverse.js
   function Vec3Inverse(a, out = new Vec3()) {
     return out.set(1 / a.x, 1 / a.y, 1 / a.z);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3IsNonUniform.js
   function Vec3IsNonUniform(a) {
     const absX = Math.abs(a.x);
     const absY = Math.abs(a.y);
     const absZ = Math.abs(a.z);
     return absX !== absY || absX !== absZ || absY !== absZ;
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Lerp.js
   function Vec3Lerp(a, b, t, out = new Vec3()) {
     const {x, y, z} = a;
     return out.set(x + t * (b.x - x), y + t * (b.y - y), z + t * (b.z - z));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Max.js
   function Vec3Max(a, b, out = new Vec3()) {
     const {x: ax, y: ay, z: az} = a;
     const {x: bx, y: by, z: bz} = b;
     return out.set(Math.max(ax, bx), Math.max(ay, by), Math.max(az, bz));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Min.js
   function Vec3Min(a, b, out = new Vec3()) {
     const {x: ax, y: ay, z: az} = a;
     const {x: bx, y: by, z: bz} = b;
     return out.set(Math.min(ax, bx), Math.min(ay, by), Math.min(az, bz));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Multiply.js
   function Vec3Multiply(a, b, out = new Vec3()) {
     return out.set(a.x * b.x, a.y * b.y, a.z * b.z);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3MultiplyByFloats.js
   function Vec3MultiplyByFloats(a, x, y, z, out = new Vec3()) {
     return out.set(a.x * x, a.y * y, a.z * z);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Negate.js
   function Vec3Negate(a, out = new Vec3()) {
     return out.set(-a.x, -a.y, -a.z);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Normalize.js
   function Vec3Normalize(a, out = new Vec3()) {
     const {x, y, z} = a;
     let len = x * x + y * y + z * z;
@@ -1575,9 +1857,13 @@
     }
     return out.set(x * len, y * len, z * len);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3One.js
   function Vec3One() {
     return new Vec3(1, 1, 1);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3TransformMat4.js
   function Vec3TransformMat4(a, m, out = new Vec3()) {
     const [m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33] = m.data;
     const {x, y, z} = a;
@@ -1585,6 +1871,8 @@
     w = w || 1;
     return out.set((m00 * x + m10 * y + m20 * z + m30) / w, (m01 * x + m11 * y + m21 * z + m31) / w, (m02 * x + m12 * y + m22 * z + m32) / w);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Project.js
   var tempMatrix1 = new Matrix4();
   var tempMatrix2 = new Matrix4();
   function Vec3Project(v, world, transform, viewport, out = new Vec3()) {
@@ -1594,19 +1882,27 @@
     Mat4Multiply(tempMatrix2, tempMatrix1, tempMatrix2);
     return Vec3TransformMat4(v, tempMatrix2, out);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Random.js
   function Vec3Random(a, scale = 1, out = new Vec3()) {
     const r = Math.random() * 2 * Math.PI;
     const z = Math.random() * 2 - 1;
     const zScale = Math.sqrt(1 - z * z) * scale;
     return out.set(Math.cos(r) * zScale, Math.sin(r) * zScale, z * scale);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Subtract.js
   function Vec3Subtract(a, b, out = new Vec3()) {
     return out.set(a.x - b.x, a.y - b.y, a.z - b.z);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Reflect.js
   function Vec3Reflect(a, normal, out = new Vec3()) {
     Vec3Scale(normal, 2 * Vec3Dot(a, normal), out);
     return Vec3Subtract(a, out, out);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3RotateX.js
   function Vec3RotateX(a, origin, angle, out = new Vec3()) {
     const {x: ax, y: ay, z: az} = a;
     const {x: bx, y: by, z: bz} = origin;
@@ -1618,6 +1914,8 @@
     const rz = py * Math.sin(angle) + pz * Math.cos(angle);
     return out.set(rx + bx, ry + by, rz + bz);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3RotateY.js
   function Vec3RotateY(a, origin, angle, out = new Vec3()) {
     const {x: ax, y: ay, z: az} = a;
     const {x: bx, y: by, z: bz} = origin;
@@ -1629,6 +1927,8 @@
     const rz = pz * Math.cos(angle) - px * Math.sin(angle);
     return out.set(rx + bx, ry + by, rz + bz);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3RotateZ.js
   function Vec3RotateZ(a, origin, angle, out = new Vec3()) {
     const {x: ax, y: ay, z: az} = a;
     const {x: bx, y: by, z: bz} = origin;
@@ -1640,27 +1940,41 @@
     const rz = pz;
     return out.set(rx + bx, ry + by, rz + bz);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Round.js
   function Vec3Round(a, out = new Vec3()) {
     return out.set(Math.round(a.x), Math.round(a.y), Math.round(a.z));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3RoundToZero.js
   function Vec3RoundToZero(a, out = new Vec3()) {
     return out.set(a.x < 0 ? Math.ceil(a.x) : Math.floor(a.x), a.y < 0 ? Math.ceil(a.y) : Math.floor(a.y), a.z < 0 ? Math.ceil(a.z) : Math.floor(a.z));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3ScaleAndAdd.js
   function Vec3ScaleAndAdd(a, b, scalar, out = new Vec3()) {
     return out.set(a.x + b.x * scalar, a.y + b.y * scalar, a.z + b.z * scalar);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3SetLength.js
   function Vec3SetLength(a, length, out = new Vec3()) {
     Vec3Normalize(a, out);
     return Vec3Scale(out, length, out);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3SubtractScalar.js
   function Vec3SubtractScalar(a, scalar, out = new Vec3()) {
     return out.set(a.x - scalar, a.y - scalar, a.z - scalar);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3TransformMat4Zero.js
   function Vec3TransformMat4Zero(a, m, out = new Vec3()) {
     const [m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22] = m.data;
     const {x, y, z} = a;
     return out.set(m00 * x + m10 * y + m20 * z, m01 * x + m11 * y + m21 * z, m02 * x + m12 * y + m22 * z);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3TransformQuat.js
   function Vec3TransformQuat(a, q, out = new Vec3()) {
     const {x: qx, y: qy, z: qz, w: qw} = q;
     const {x, y, z} = a;
@@ -1679,6 +1993,8 @@
     uuvz *= 2;
     return out.set(x + uvx + uuvx, y + uvy + uuvy, z + uvz + uuvz);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec3/Vec3Unproject.js
   var matrix = new Matrix4();
   var screenSource = new Vec3();
   function Vec3Unproject(v, viewportWidth, viewportHeight, world, view, projection, out = new Vec3()) {
@@ -1692,12 +2008,16 @@
     const num = screenSource.x * data[3] + screenSource.y * data[7] + screenSource.z * data[11] + data[15];
     return Vec3Scale(out, 1 / num, out);
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/QuatFromRotationAxis.js
   function QuatFromRotationAxis(axis, angle, out = new Quaternion()) {
     const sin = Math.sin(angle / 2);
     Vec3Normalize(axis, axis);
     const {x, y, z} = axis;
     return out.set(x * sin, y * sin, z * sin, Math.cos(angle / 2));
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/QuatFromRotationMatrix.js
   function QuatFromRotationMatrix(matrix2, out = new Quaternion()) {
     const [m11, m21, m31, m41, m12, m22, m32, m42, m13, m23, m33] = matrix2.data;
     const trace = m11 + m22 + m33;
@@ -1716,30 +2036,44 @@
       return out.set((m13 + m31) / s, (m23 + m32) / s, 0.25 * s, (m21 - m12) / s);
     }
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/QuatFuzzyEquals.js
   function QuatFuzzyEquals(a, b, epsilon = 1e-4) {
     return FuzzyEqual(a.x, b.x, epsilon) && FuzzyEqual(a.y, b.y, epsilon) && FuzzyEqual(a.z, b.z, epsilon) && FuzzyEqual(a.w, b.w, epsilon);
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/QuatHermite.js
   function QuatHermite(a, b, c, d, t, out = new Quaternion()) {
     return out.set(Hermite(t, a.x, b.x, c.x, d.x), Hermite(t, a.y, b.y, c.y, d.y), Hermite(t, a.z, b.z, c.z, d.z), Hermite(t, a.w, b.w, c.w, d.w));
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/QuatInvert.js
   function QuatInvert(a, out = new Quaternion()) {
     const {x, y, z, w} = a;
     const dot = x * x + y * y + z * z + w * w;
     const invDot = dot ? 1 / dot : 0;
     return out.set(-x * invDot, -y * invDot, -z * invDot, w * invDot);
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/QuatMultiply.js
   function QuatMultiply(a, b, out = new Quaternion()) {
     const {x: ax, y: ay, z: az, w: aw} = a;
     const {x: bx, y: by, z: bz, w: bw} = b;
     return out.set(ax * bw + aw * bx + ay * bz - az * by, ay * bw + aw * by + az * bx - ax * bz, az * bw + aw * bz + ax * by - ay * bx, aw * bw - ax * bx - ay * by - az * bz);
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/QuatMultiplyByFloats.js
   function QuatMultiplyByFloats(a, x, y, z, w, out = new Quaternion()) {
     return out.set(a.x * x, a.y * y, a.z * z, a.w * w);
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/QuatScale.js
   function QuatScale(a, scalar, out = new Quaternion()) {
     const {x, y, z, w} = a;
     return out.set(x * scalar, y * scalar, z * scalar, w * scalar);
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/QuatNormalize.js
   function QuatNormalize(a, out = new Quaternion()) {
     const length = GetQuatLength(a);
     if (length === 0) {
@@ -1748,6 +2082,8 @@
       return QuatScale(a, length, out);
     }
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/QuatSlerp.js
   function QuatSlerp(a, b, t, out = new Quaternion()) {
     if (t === 0) {
       return QuatCopyFrom(a, out);
@@ -1778,6 +2114,8 @@
     const ratioB = Math.sin(t * halfTheta) / sinHalfTheta;
     return out.set(x * ratioA + out.x * ratioB, y * ratioA + out.y * ratioB, z * ratioA + out.z * ratioB, w * ratioA + out.w * ratioB);
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/QuatRotateTowards.js
   function QuatRotateTowards(a, b, step, out = new Quaternion()) {
     const angle = GetQuatAngle(a, b);
     if (angle === 0) {
@@ -1786,6 +2124,8 @@
     const t = Math.min(1, step / angle);
     return QuatSlerp(a, b, t, out);
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/QuatRotateX.js
   function QuatRotateX(a, angle, out = new Quaternion()) {
     angle *= 0.5;
     const {x, y, z, w} = a;
@@ -1793,6 +2133,8 @@
     const bw = Math.cos(angle);
     return out.set(x * bw + w * bx, y * bw + z * bx, z * bw - y * bx, w * bw - x * bx);
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/QuatRotateY.js
   function QuatRotateY(a, angle, out = new Quaternion()) {
     angle *= 0.5;
     const {x, y, z, w} = a;
@@ -1800,6 +2142,8 @@
     const bw = Math.cos(angle);
     return out.set(x * bw - z * by, y * bw + w * by, z * bw + x * by, w * bw - y * by);
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/QuatRotateZ.js
   function QuatRotateZ(a, angle, out = new Quaternion()) {
     angle *= 0.5;
     const {x, y, z, w} = a;
@@ -1807,21 +2151,29 @@
     const bw = Math.cos(angle);
     return out.set(x * bw + y * bz, y * bw - x * bz, z * bw + w * bz, w * bw - z * bz);
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/QuatRotationAlphaBetaGamma.js
   function QuatRotationAlphaBetaGamma(alpha, beta, gamma, out = new Quaternion()) {
     const halfGammaPlusAlpha = (gamma + alpha) * 0.5;
     const halfGammaMinusAlpha = (gamma - alpha) * 0.5;
     const halfBeta = beta * 0.5;
     return out.set(Math.cos(halfGammaMinusAlpha) * Math.sin(halfBeta), Math.sin(halfGammaMinusAlpha) * Math.sin(halfBeta), Math.sin(halfGammaPlusAlpha) * Math.cos(halfBeta), Math.cos(halfGammaPlusAlpha) * Math.cos(halfBeta));
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/QuatScaleAndAdd.js
   function QuatScaleAndAdd(a, b, scalar, out = new Quaternion()) {
     return out.set(a.x + b.x * scalar, a.y + b.y * scalar, a.z + b.z * scalar, a.w + b.w * scalar);
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/QuatSetAxisAngle.js
   function QuatSetAxisAngle(axis, angle, out = new Quaternion()) {
     const {x, y, z} = axis;
     angle *= 0.5;
     const s = Math.sin(angle);
     return out.set(x * s, y * s, z * s, Math.cos(angle));
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/QuatSetFromUnitVectors.js
   function QuatSetFromUnitVectors(a, from, to, out = new Quaternion()) {
     const {x: fx, y: fy, z: fz} = from;
     const {x: tx, y: ty, z: tz} = to;
@@ -1838,13 +2190,19 @@
       return out.set(fy * tz - fz * ty, fz * tx - fx * tz, fx * ty - fy * tx, r);
     }
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/QuatSubtract.js
   function QuatSubtract(a, b, out = new Quaternion()) {
     return out.set(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/QuatSubtractScalar.js
   function QuatSubtractScalar(a, scalar, out = new Quaternion()) {
     const {x, y, z, w} = a;
     return out.set(x - scalar, y - scalar, z - scalar, w - scalar);
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/QuatToEulerAngles.js
   function QuatToEulerAngles(q, out = new Vec3()) {
     const {x, y, z, w} = q;
     const sqw = w * w;
@@ -1861,9 +2219,13 @@
       return out.set(Math.asin(-2 * (z * y - x * w)), Math.atan2(2 * (z * x + y * w), sqz - sqx - sqy + sqw), Math.atan2(2 * (x * y + z * w), -sqz - sqx + sqy + sqw));
     }
   }
+
+  // node_modules/@phaserjs/phaser/math/quaternion/QuatZero.js
   function QuatZero() {
     return new Quaternion(0, 0, 0, 0);
   }
+
+  // node_modules/@phaserjs/phaser/math/index.js
   var math_exports = {};
   __export(math_exports, {
     Angle: () => angle_exports,
@@ -1907,6 +2269,8 @@
     Within: () => Within,
     Wrap: () => Wrap
   });
+
+  // node_modules/@phaserjs/phaser/math/easing/index.js
   var easing_exports = {};
   __export(easing_exports, {
     Back: () => back_exports,
@@ -1923,15 +2287,21 @@
     Sine: () => sine_exports,
     Stepped: () => Stepped_exports
   });
+
+  // node_modules/@phaserjs/phaser/math/easing/back/index.js
   var back_exports = {};
   __export(back_exports, {
     In: () => In,
     InOut: () => InOut,
     Out: () => Out
   });
+
+  // node_modules/@phaserjs/phaser/math/easing/back/In.js
   function In(v, overshoot = 1.70158) {
     return v * v * ((overshoot + 1) * v - overshoot);
   }
+
+  // node_modules/@phaserjs/phaser/math/easing/back/InOut.js
   function InOut(v, overshoot = 1.70158) {
     const s = overshoot * 1.525;
     if ((v *= 2) < 1) {
@@ -1940,15 +2310,21 @@
       return 0.5 * ((v -= 2) * v * ((s + 1) * v + s) + 2);
     }
   }
+
+  // node_modules/@phaserjs/phaser/math/easing/back/Out.js
   function Out(v, overshoot = 1.70158) {
     return --v * v * ((overshoot + 1) * v + overshoot) + 1;
   }
+
+  // node_modules/@phaserjs/phaser/math/easing/bounce/index.js
   var bounce_exports = {};
   __export(bounce_exports, {
     In: () => In2,
     InOut: () => InOut2,
     Out: () => Out2
   });
+
+  // node_modules/@phaserjs/phaser/math/easing/bounce/In.js
   function In2(v) {
     v = 1 - v;
     if (v < 1 / 2.75) {
@@ -1961,6 +2337,8 @@
       return 1 - (7.5625 * (v -= 2.625 / 2.75) * v + 0.984375);
     }
   }
+
+  // node_modules/@phaserjs/phaser/math/easing/bounce/InOut.js
   function InOut2(v) {
     let reverse = false;
     if (v < 0.5) {
@@ -1984,6 +2362,8 @@
       return v * 0.5 + 0.5;
     }
   }
+
+  // node_modules/@phaserjs/phaser/math/easing/bounce/Out.js
   function Out2(v) {
     if (v < 1 / 2.75) {
       return 7.5625 * v * v;
@@ -1995,15 +2375,21 @@
       return 7.5625 * (v -= 2.625 / 2.75) * v + 0.984375;
     }
   }
+
+  // node_modules/@phaserjs/phaser/math/easing/circular/index.js
   var circular_exports = {};
   __export(circular_exports, {
     In: () => In3,
     InOut: () => InOut3,
     Out: () => Out3
   });
+
+  // node_modules/@phaserjs/phaser/math/easing/circular/In.js
   function In3(v) {
     return 1 - Math.sqrt(1 - v * v);
   }
+
+  // node_modules/@phaserjs/phaser/math/easing/circular/InOut.js
   function InOut3(v) {
     if ((v *= 2) < 1) {
       return -0.5 * (Math.sqrt(1 - v * v) - 1);
@@ -2011,18 +2397,26 @@
       return 0.5 * (Math.sqrt(1 - (v -= 2) * v) + 1);
     }
   }
+
+  // node_modules/@phaserjs/phaser/math/easing/circular/Out.js
   function Out3(v) {
     return Math.sqrt(1 - --v * v);
   }
+
+  // node_modules/@phaserjs/phaser/math/easing/cubic/index.js
   var cubic_exports = {};
   __export(cubic_exports, {
     In: () => In4,
     InOut: () => InOut4,
     Out: () => Out4
   });
+
+  // node_modules/@phaserjs/phaser/math/easing/cubic/In.js
   function In4(v) {
     return v * v * v;
   }
+
+  // node_modules/@phaserjs/phaser/math/easing/cubic/InOut.js
   function InOut4(v) {
     if ((v *= 2) < 1) {
       return 0.5 * v * v * v;
@@ -2030,15 +2424,21 @@
       return 0.5 * ((v -= 2) * v * v + 2);
     }
   }
+
+  // node_modules/@phaserjs/phaser/math/easing/cubic/Out.js
   function Out4(v) {
     return --v * v * v + 1;
   }
+
+  // node_modules/@phaserjs/phaser/math/easing/elastic/index.js
   var elastic_exports = {};
   __export(elastic_exports, {
     In: () => In5,
     InOut: () => InOut5,
     Out: () => Out5
   });
+
+  // node_modules/@phaserjs/phaser/math/easing/elastic/In.js
   function In5(v, amplitude = 0.1, period = 0.1) {
     if (v === 0) {
       return 0;
@@ -2054,6 +2454,8 @@
       return -(amplitude * Math.pow(2, 10 * (v -= 1)) * Math.sin((v - s) * (2 * Math.PI) / period));
     }
   }
+
+  // node_modules/@phaserjs/phaser/math/easing/elastic/InOut.js
   function InOut5(v, amplitude = 0.1, period = 0.1) {
     if (v === 0) {
       return 0;
@@ -2073,6 +2475,8 @@
       }
     }
   }
+
+  // node_modules/@phaserjs/phaser/math/easing/elastic/Out.js
   function Out5(v, amplitude = 0.1, period = 0.1) {
     if (v === 0) {
       return 0;
@@ -2088,15 +2492,21 @@
       return amplitude * Math.pow(2, -10 * v) * Math.sin((v - s) * (2 * Math.PI) / period) + 1;
     }
   }
+
+  // node_modules/@phaserjs/phaser/math/easing/expo/index.js
   var expo_exports = {};
   __export(expo_exports, {
     In: () => In6,
     InOut: () => InOut6,
     Out: () => Out6
   });
+
+  // node_modules/@phaserjs/phaser/math/easing/expo/In.js
   function In6(v) {
     return Math.pow(2, 10 * (v - 1)) - 1e-3;
   }
+
+  // node_modules/@phaserjs/phaser/math/easing/expo/InOut.js
   function InOut6(v) {
     if (v == 0) {
       return 0;
@@ -2110,22 +2520,32 @@
       return 0.5 * (2 - Math.pow(2, -10 * (v - 1)));
     }
   }
+
+  // node_modules/@phaserjs/phaser/math/easing/expo/Out.js
   function Out6(v) {
     return 1 - Math.pow(2, -10 * v);
   }
+
+  // node_modules/@phaserjs/phaser/math/easing/GetEase.js
   var GetEase_exports = {};
   __export(GetEase_exports, {
     GetEase: () => GetEase
   });
+
+  // node_modules/@phaserjs/phaser/math/easing/quadratic/index.js
   var quadratic_exports = {};
   __export(quadratic_exports, {
     In: () => In7,
     InOut: () => InOut7,
     Out: () => Out7
   });
+
+  // node_modules/@phaserjs/phaser/math/easing/quadratic/In.js
   function In7(v) {
     return v * v;
   }
+
+  // node_modules/@phaserjs/phaser/math/easing/quadratic/InOut.js
   function InOut7(v) {
     if ((v *= 2) < 1) {
       return 0.5 * v * v;
@@ -2133,18 +2553,26 @@
       return -0.5 * (--v * (v - 2) - 1);
     }
   }
+
+  // node_modules/@phaserjs/phaser/math/easing/quadratic/Out.js
   function Out7(v) {
     return v * (2 - v);
   }
+
+  // node_modules/@phaserjs/phaser/math/easing/quartic/index.js
   var quartic_exports = {};
   __export(quartic_exports, {
     In: () => In8,
     InOut: () => InOut8,
     Out: () => Out8
   });
+
+  // node_modules/@phaserjs/phaser/math/easing/quartic/In.js
   function In8(v) {
     return v * v * v * v;
   }
+
+  // node_modules/@phaserjs/phaser/math/easing/quartic/InOut.js
   function InOut8(v) {
     if ((v *= 2) < 1) {
       return 0.5 * v * v * v * v;
@@ -2152,18 +2580,26 @@
       return -0.5 * ((v -= 2) * v * v * v - 2);
     }
   }
+
+  // node_modules/@phaserjs/phaser/math/easing/quartic/Out.js
   function Out8(v) {
     return -(--v * v * v * v - 1);
   }
+
+  // node_modules/@phaserjs/phaser/math/easing/quintic/index.js
   var quintic_exports = {};
   __export(quintic_exports, {
     In: () => In9,
     InOut: () => InOut9,
     Out: () => Out9
   });
+
+  // node_modules/@phaserjs/phaser/math/easing/quintic/In.js
   function In9(v) {
     return v * v * v * v * v;
   }
+
+  // node_modules/@phaserjs/phaser/math/easing/quintic/InOut.js
   function InOut9(v) {
     if ((v *= 2) < 1) {
       return 0.5 * v * v * v * v * v;
@@ -2171,15 +2607,21 @@
       return 0.5 * ((v -= 2) * v * v * v * v + 2);
     }
   }
+
+  // node_modules/@phaserjs/phaser/math/easing/quintic/Out.js
   function Out9(v) {
     return (v = v - 1) * v * v * v * v + 1;
   }
+
+  // node_modules/@phaserjs/phaser/math/easing/sine/index.js
   var sine_exports = {};
   __export(sine_exports, {
     In: () => In10,
     InOut: () => InOut10,
     Out: () => Out10
   });
+
+  // node_modules/@phaserjs/phaser/math/easing/sine/In.js
   function In10(v) {
     if (v === 0) {
       return 0;
@@ -2189,6 +2631,8 @@
       return 1 - Math.cos(v * Math.PI / 2);
     }
   }
+
+  // node_modules/@phaserjs/phaser/math/easing/sine/InOut.js
   function InOut10(v) {
     if (v === 0) {
       return 0;
@@ -2198,6 +2642,8 @@
       return 0.5 * (1 - Math.cos(Math.PI * v));
     }
   }
+
+  // node_modules/@phaserjs/phaser/math/easing/sine/Out.js
   function Out10(v) {
     if (v === 0) {
       return 0;
@@ -2207,6 +2653,8 @@
       return Math.sin(v * Math.PI / 2);
     }
   }
+
+  // node_modules/@phaserjs/phaser/math/easing/Linear.js
   var Linear_exports = {};
   __export(Linear_exports, {
     Linear: () => Linear
@@ -2214,6 +2662,8 @@
   function Linear(v) {
     return v;
   }
+
+  // node_modules/@phaserjs/phaser/math/easing/Stepped.js
   var Stepped_exports = {};
   __export(Stepped_exports, {
     Stepped: () => Stepped
@@ -2227,6 +2677,8 @@
       return ((steps * v | 0) + 1) * (1 / steps);
     }
   }
+
+  // node_modules/@phaserjs/phaser/math/easing/GetEase.js
   var EaseMap = new Map([
     ["power0", Linear],
     ["power1", Out7],
@@ -2285,6 +2737,8 @@
       return Linear;
     }
   }
+
+  // node_modules/@phaserjs/phaser/math/fuzzy/index.js
   var fuzzy_exports = {};
   __export(fuzzy_exports, {
     FuzzyCeil: () => FuzzyCeil,
@@ -2293,18 +2747,28 @@
     FuzzyGreaterThan: () => FuzzyGreaterThan,
     FuzzyLessThan: () => FuzzyLessThan
   });
+
+  // node_modules/@phaserjs/phaser/math/fuzzy/FuzzyCeil.js
   function FuzzyCeil(value, epsilon = 1e-4) {
     return Math.ceil(value - epsilon);
   }
+
+  // node_modules/@phaserjs/phaser/math/fuzzy/FuzzyFloor.js
   function FuzzyFloor(value, epsilon = 1e-4) {
     return Math.floor(value + epsilon);
   }
+
+  // node_modules/@phaserjs/phaser/math/fuzzy/FuzzyGreaterThan.js
   function FuzzyGreaterThan(a, b, epsilon = 1e-4) {
     return a > b - epsilon;
   }
+
+  // node_modules/@phaserjs/phaser/math/fuzzy/FuzzyLessThan.js
   function FuzzyLessThan(a, b, epsilon = 1e-4) {
     return a < b + epsilon;
   }
+
+  // node_modules/@phaserjs/phaser/math/interpolation/index.js
   var interpolation_exports = {};
   __export(interpolation_exports, {
     BezierInterpolation: () => BezierInterpolation,
@@ -2315,6 +2779,8 @@
     SmoothStepInterpolation: () => SmoothStepInterpolation,
     SmootherStepInterpolation: () => SmootherStepInterpolation
   });
+
+  // node_modules/@phaserjs/phaser/math/Factorial.js
   function Factorial(value) {
     if (value === 0) {
       return 1;
@@ -2325,9 +2791,13 @@
     }
     return res;
   }
+
+  // node_modules/@phaserjs/phaser/math/Bernstein.js
   function Bernstein(n, i) {
     return Factorial(n) / Factorial(i) / Factorial(n - i);
   }
+
+  // node_modules/@phaserjs/phaser/math/interpolation/BezierInterpolation.js
   function BezierInterpolation(v, k) {
     let b = 0;
     const n = v.length - 1;
@@ -2336,6 +2806,8 @@
     }
     return b;
   }
+
+  // node_modules/@phaserjs/phaser/math/interpolation/CatmullRomInterpolation.js
   function CatmullRomInterpolation(v, k) {
     const m = v.length - 1;
     let f = m * k;
@@ -2355,6 +2827,8 @@
       return CatmullRom(f - i, v[i ? i - 1 : 0], v[i], v[m < i + 1 ? m : i + 1], v[m < i + 2 ? m : i + 2]);
     }
   }
+
+  // node_modules/@phaserjs/phaser/math/interpolation/CubicBezierInterpolation.js
   function P0(t, p) {
     const k = 1 - t;
     return k * k * k * p;
@@ -2372,9 +2846,13 @@
   function CubicBezierInterpolation(t, p0, p1, p2, p3) {
     return P0(t, p0) + P1(t, p1) + P2(t, p2) + P3(t, p3);
   }
+
+  // node_modules/@phaserjs/phaser/math/Linear.js
   function Linear2(p0, p1, t) {
     return (p1 - p0) * t + p0;
   }
+
+  // node_modules/@phaserjs/phaser/math/interpolation/LinearInterpolation.js
   function LinearInterpolation(v, k) {
     const m = v.length - 1;
     const f = m * k;
@@ -2387,6 +2865,8 @@
       return Linear2(v[i], v[i + 1 > m ? m : i + 1], f - i);
     }
   }
+
+  // node_modules/@phaserjs/phaser/math/interpolation/QuadraticBezierInterpolation.js
   function P02(t, p) {
     const k = 1 - t;
     return k * k * p;
@@ -2400,6 +2880,8 @@
   function QuadraticBezierInterpolation(t, p0, p1, p2) {
     return P02(t, p0) + P12(t, p1) + P22(t, p2);
   }
+
+  // node_modules/@phaserjs/phaser/math/SmoothStep.js
   function SmoothStep(x, min, max) {
     if (x <= min) {
       return 0;
@@ -2410,16 +2892,24 @@
     x = (x - min) / (max - min);
     return x * x * (3 - 2 * x);
   }
+
+  // node_modules/@phaserjs/phaser/math/interpolation/SmoothStepInterpolation.js
   function SmoothStepInterpolation(t, min, max) {
     return min + (max - min) * SmoothStep(t, 0, 1);
   }
+
+  // node_modules/@phaserjs/phaser/math/SmootherStep.js
   function SmootherStep(x, min, max) {
     x = Math.max(0, Math.min(1, (x - min) / (max - min)));
     return x * x * x * (x * (x * 6 - 15) + 10);
   }
+
+  // node_modules/@phaserjs/phaser/math/interpolation/SmootherStepInterpolation.js
   function SmootherStepInterpolation(t, min, max) {
     return min + (max - min) * SmootherStep(t, 0, 1);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat2d/index.js
   var mat2d_exports = {};
   __export(mat2d_exports, {
     GetMat2dDeterminant: () => GetMat2dDeterminant,
@@ -2452,69 +2942,101 @@
     Mat2dZero: () => Mat2dZero,
     Matrix2D: () => Matrix2D
   });
+
+  // node_modules/@phaserjs/phaser/math/mat2d/GetMat2dDeterminant.js
   function GetMat2dDeterminant(src) {
     const {a, b, c, d} = src;
     return a * d - b * c;
   }
+
+  // node_modules/@phaserjs/phaser/math/mat2d/GetMat2dFrobenius.js
   function GetMat2dFrobenius(src) {
     return Math.hypot(src.a, src.b, src.c, src.d, src.tx, src.ty, 1);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat2d/Mat2dAdd.js
   function Mat2dAdd(a, b, out = new Matrix2D()) {
     return out.set(a.a + b.a, a.b + b.b, a.c + b.c, a.d + b.d, a.tx + b.tx, a.ty + b.ty);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat2d/Mat2dAppend.js
   function Mat2dAppend(mat1, mat2, out = new Matrix2D()) {
     const {a: a1, b: b1, c: c1, d: d1, tx: tx1, ty: ty1} = mat1;
     const {a: a2, b: b2, c: c2, d: d2, tx: tx2, ty: ty2} = mat2;
     return out.set(a2 * a1 + b2 * c1, a2 * b1 + b2 * d1, c2 * a1 + d2 * c1, c2 * b1 + d2 * d1, tx2 * a1 + ty2 * c1 + tx1, tx2 * b1 + ty2 * d1 + ty1);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat2d/Mat2dClone.js
   function Mat2dClone(src) {
     return new Matrix2D(src.a, src.b, src.c, src.d, src.tx, src.ty);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat2d/Mat2dCopyFrom.js
   function Mat2dCopyFrom(src, target) {
     const {a, b, c, d, tx, ty} = src;
     return target.set(a, b, c, d, tx, ty);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat2d/Mat2dCopyToContext.js
   function Mat2dCopyToContext(src, context) {
     const {a, b, c, d, tx, ty} = src;
     context.transform(a, b, c, d, tx, ty);
     return context;
   }
+
+  // node_modules/@phaserjs/phaser/math/mat2d/Mat2dEquals.js
   function Mat2dEquals(a, b) {
     return a.a === b.a && a.b === b.b && a.c === b.c && a.d === b.d && a.tx === b.tx && a.ty === b.ty;
   }
+
+  // node_modules/@phaserjs/phaser/math/mat2d/Mat2dRotate.js
   function Mat2dRotate(target, angle, out = new Matrix2D()) {
     const {a, b, c, d, tx, ty} = target;
     const sin = Math.sin(angle);
     const cos = Math.cos(angle);
     return out.set(a * cos + c * sin, b * cos + d * sin, a * -sin + c * cos, b * -sin + d * cos, tx, ty);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat2d/Mat2dFromRotation.js
   function Mat2dFromRotation(angle) {
     const target = new Matrix2D();
     return Mat2dRotate(target, angle, target);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat2d/Mat2dScale.js
   function Mat2dScale(target, scaleX, scaleY, out = new Matrix2D()) {
     const {a, b, c, d, tx, ty} = target;
     return out.set(a * scaleX, b * scaleX, c * scaleY, d * scaleY, tx, ty);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat2d/Mat2dFromScaling.js
   function Mat2dFromScaling(scaleX, scaleY = scaleX) {
     const target = new Matrix2D();
     return Mat2dScale(target, scaleX, scaleY, target);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat2d/Mat2dTranslate.js
   function Mat2dTranslate(target, x, y, out = new Matrix2D()) {
     const {a, b, c, d, tx, ty} = target;
     out.tx = a * x + c * y + tx;
     out.ty = b * x + d * y + ty;
     return out;
   }
+
+  // node_modules/@phaserjs/phaser/math/mat2d/Mat2dFromTranslation.js
   function Mat2dFromTranslation(x, y) {
     const target = new Matrix2D();
     return Mat2dTranslate(target, x, y, target);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat2d/Mat2dFuzzyEquals.js
   function Mat2dFuzzyEquals(a, b, epsilon = 1e-6) {
     const {a: a0, b: b0, c: c0, d: d0, tx: tx0, ty: ty0} = a;
     const {a: a1, b: b1, c: c1, d: d1, tx: tx1, ty: ty1} = b;
     return Math.abs(a0 - a1) <= epsilon * Math.max(1, Math.abs(a0), Math.abs(a1)) && Math.abs(b0 - b1) <= epsilon * Math.max(1, Math.abs(b0), Math.abs(b1)) && Math.abs(c0 - c1) <= epsilon * Math.max(1, Math.abs(c0), Math.abs(c1)) && Math.abs(d0 - d1) <= epsilon * Math.max(1, Math.abs(d0), Math.abs(d1)) && Math.abs(tx0 - tx1) <= epsilon * Math.max(1, Math.abs(tx0), Math.abs(tx1)) && Math.abs(ty0 - ty1) <= epsilon * Math.max(1, Math.abs(ty0), Math.abs(ty1));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2.js
   var Vec2 = class {
     constructor(x = 0, y = 0) {
       this.set(x, y);
@@ -2538,11 +3060,15 @@
       return `{ x=${x}, y=${y} }`;
     }
   };
+
+  // node_modules/@phaserjs/phaser/math/mat2d/Mat2dGlobalToLocal.js
   function Mat2dGlobalToLocal(mat, x, y, out = new Vec2()) {
     const {a, b, c, d, tx, ty} = mat;
     const id = 1 / (a * d + c * -b);
     return out.set(d * id * x + -c * id * y + (ty * c - tx * d) * id, a * id * y + -b * id * x + (-ty * a + tx * b) * id);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat2d/Mat2dITRS.js
   function Mat2dITRS(target, x, y, angle, scaleX, scaleY) {
     if (angle === 0) {
       return target.set(1, 0, 0, 1, x, y);
@@ -2552,6 +3078,8 @@
       return target.set(cos * scaleX, sin * scaleX, -sin * scaleY, cos * scaleY, x, y);
     }
   }
+
+  // node_modules/@phaserjs/phaser/math/mat2d/Mat2dITRSS.js
   function Mat2dITRSS(target, x, y, angle = 0, scaleX = 1, scaleY = 1, skewX = 0, skewY = 0) {
     if (angle === 0) {
       return target.set(1, 0, 0, 1, x, y);
@@ -2559,9 +3087,13 @@
       return target.set(Math.cos(angle + skewY) * scaleX, Math.sin(angle + skewY) * scaleX, -Math.sin(angle - skewX) * scaleY, Math.cos(angle - skewX) * scaleY, x, y);
     }
   }
+
+  // node_modules/@phaserjs/phaser/math/mat2d/Mat2dIdentity.js
   function Mat2dIdentity() {
     return new Matrix2D();
   }
+
+  // node_modules/@phaserjs/phaser/math/mat2d/Mat2dInvert.js
   function Mat2dInvert(target, out = new Matrix2D()) {
     const {a, b, c, d, tx, ty} = target;
     let determinant = a * d - b * c;
@@ -2571,64 +3103,92 @@
     }
     return out;
   }
+
+  // node_modules/@phaserjs/phaser/math/mat2d/Mat2dLocalToGlobal.js
   function Mat2dLocalToGlobal(mat, x, y, out = new Vec2()) {
     const {a, b, c, d, tx, ty} = mat;
     return out.set(a * x + c * y + tx, b * x + d * y + ty);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat2d/Mat2dMultiply.js
   function Mat2dMultiply(target, src, out = new Matrix2D()) {
     const {a: a0, b: b0, c: c0, d: d0, tx: tx0, ty: ty0} = target;
     const {a: a1, b: b1, c: c1, d: d1, tx: tx1, ty: ty1} = src;
     return out.set(a0 * a1 + c0 * b1, b0 * a1 + d0 * b1, a0 * c1 + c0 * d1, b0 * c1 + d0 * d1, a0 * tx1 + c0 * ty1 + tx0, b0 * tx1 + d0 * ty1 + ty0);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat2d/Mat2dMultiplyScalar.js
   function Mat2dMultiplyScalar(target, scalar, out = new Matrix2D()) {
     const {a, b, c, d, tx, ty} = target;
     return out.set(a * scalar, b * scalar, c * scalar, d * scalar, tx * scalar, ty * scalar);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat2d/Mat2dMultiplyScalarAndAdd.js
   function Mat2dMultiplyScalarAndAdd(target, src, scalar, out = new Matrix2D()) {
     const {a, b, c, d, tx, ty} = src;
     const {a: ta, b: tb, c: tc, d: td, tx: ttx, ty: tty} = target;
     return out.set(ta + a * scalar, tb + b * scalar, tc + c * scalar, td + d * scalar, ttx + tx * scalar, tty + ty * scalar);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat2d/Mat2dSetToContext.js
   function Mat2dSetToContext(src, context) {
     const {a, b, c, d, tx, ty} = src;
     context.setTransform(a, b, c, d, tx, ty);
     return context;
   }
+
+  // node_modules/@phaserjs/phaser/math/mat2d/Mat2dSkew.js
   function Mat2dSkew(target, angleX, angleY, out = new Matrix2D()) {
     const {a, b, c, d, tx, ty} = target;
     return out.set(a, b + Math.tan(angleX), c + Math.tan(angleY), d, tx, ty);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat2d/Mat2dSubtract.js
   function Mat2dSubtract(a, b, out = new Matrix2D()) {
     return out.set(a.a - b.a, a.b - b.b, a.c - b.c, a.d - b.d, a.tx - b.tx, a.ty - b.ty);
   }
+
+  // node_modules/@phaserjs/phaser/math/mat2d/Mat2dZero.js
   function Mat2dZero(target) {
     return target.set(0, 0, 0, 0, 0, 0);
   }
+
+  // node_modules/@phaserjs/phaser/math/pow2/index.js
   var pow2_exports = {};
   __export(pow2_exports, {
     GetPowerOfTwo: () => GetPowerOfTwo,
     IsSizePowerOfTwo: () => IsSizePowerOfTwo,
     IsValuePowerOfTwo: () => IsValuePowerOfTwo
   });
+
+  // node_modules/@phaserjs/phaser/math/pow2/GetPowerOfTwo.js
   function GetPowerOfTwo(value) {
     const index = Math.log(value) / 0.6931471805599453;
     return 1 << Math.ceil(index);
   }
+
+  // node_modules/@phaserjs/phaser/math/pow2/IsSizePowerOfTwo.js
   function IsSizePowerOfTwo(width, height) {
     if (width < 1 || height < 1) {
       return false;
     }
     return (width & width - 1) === 0 && (height & height - 1) === 0;
   }
+
+  // node_modules/@phaserjs/phaser/math/pow2/IsValuePowerOfTwo.js
   function IsValuePowerOfTwo(value) {
     return value > 0 && (value & value - 1) === 0;
   }
+
+  // node_modules/@phaserjs/phaser/math/snap/index.js
   var snap_exports = {};
   __export(snap_exports, {
     SnapCeil: () => SnapCeil,
     SnapFloor: () => SnapFloor,
     SnapTo: () => SnapTo
   });
+
+  // node_modules/@phaserjs/phaser/math/snap/SnapCeil.js
   function SnapCeil(value, gap, start = 0, divide = false) {
     if (gap === 0) {
       return value;
@@ -2637,6 +3197,8 @@
     value = gap * Math.ceil(value / gap);
     return divide ? (start + value) / gap : start + value;
   }
+
+  // node_modules/@phaserjs/phaser/math/snap/SnapFloor.js
   function SnapFloor(value, gap, start = 0, divide = false) {
     if (gap === 0) {
       return value;
@@ -2645,6 +3207,8 @@
     value = gap * Math.floor(value / gap);
     return divide ? (start + value) / gap : start + value;
   }
+
+  // node_modules/@phaserjs/phaser/math/snap/SnapTo.js
   function SnapTo(value, gap, start = 0, divide = false) {
     if (gap === 0) {
       return value;
@@ -2653,6 +3217,8 @@
     value = gap * Math.round(value / gap);
     return divide ? (start + value) / gap : start + value;
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/index.js
   var vec2_exports = {};
   __export(vec2_exports, {
     GetChebyshevDistance: () => GetChebyshevDistance,
@@ -2714,29 +3280,45 @@
     Vec2TransformMat4: () => Vec2TransformMat4,
     Vec2Zero: () => Vec2Zero
   });
+
+  // node_modules/@phaserjs/phaser/math/vec2/GetChebyshevDistance.js
   function GetChebyshevDistance(a, b) {
     return Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/GetVec2DistanceSquared.js
   function GetVec2DistanceSquared(a, b) {
     const x = a.x - b.x;
     const y = a.y - b.y;
     return x * x + y * y;
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/GetVec2Distance.js
   function GetVec2Distance(a, b) {
     return Math.sqrt(GetVec2DistanceSquared(a, b));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2Add.js
   function Vec2Add(a, b, out = new Vec2()) {
     return out.set(a.x + b.x, a.y + b.y);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2Dot.js
   function Vec2Dot(a, b) {
     return a.x * b.x + a.y * b.y;
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2MultiplyByFloats.js
   function Vec2MultiplyByFloats(a, x, y, out = new Vec2()) {
     return out.set(a.x * x, a.y * y);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2Subtract.js
   function Vec2Subtract(a, b, out = new Vec2()) {
     return out.set(a.x - b.x, a.y - b.y);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/GetDistanceFromSegment.js
   function GetDistanceFromSegment(p, a, b) {
     const d = GetVec2DistanceSquared(a, b);
     if (d === 0) {
@@ -2748,79 +3330,129 @@
     const proj = Vec2Add(a, Vec2MultiplyByFloats(v, t, t, v));
     return GetVec2Distance(p, proj);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/GetVec2Angle.js
   function GetVec2Angle(a, b) {
     return Math.atan2(b.y - a.y, b.x - a.x);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/GetVec2AngleY.js
   function GetVec2AngleY(a, b) {
     return Math.atan2(b.x - a.x, b.y - a.y);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/GetVec2DistancePower.js
   function GetVec2DistancePower(a, b, pow = 2) {
     return Math.sqrt(Math.pow(b.x - a.x, pow) + Math.pow(b.y - a.y, pow));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/GetVec2Length.js
   function GetVec2Length(a) {
     return Math.sqrt(a.x * a.x + a.y * a.y);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/GetVec2LengthSquared.js
   function GetVec2LengthSquared(a) {
     return a.x * a.x + a.y * a.y;
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/GetVec2ManhattanDistance.js
   function GetVec2ManhattanDistance(a, b) {
     return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/GetVec2ManhattanLength.js
   function GetVec2ManhattanLength(a) {
     return Math.abs(a.x) + Math.abs(a.y);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2Abs.js
   function Vec2Abs(a, out = new Vec2()) {
     return out.set(Math.abs(a.x), Math.abs(a.y));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2AddScalar.js
   function Vec2AddScalar(a, scalar, out = new Vec2()) {
     return out.set(a.x + scalar, a.y + scalar);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2Bezier.js
   function Vec2Bezier(a, b, c, d, t, out = new Vec2()) {
     return out.set(Bezier(t, a.x, b.x, c.x, d.x), Bezier(t, a.y, b.y, c.y, d.y));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2CatmullRom.js
   function Vec2CatmullRom(p1, p2, p3, p4, t, out = new Vec2()) {
     return out.set(CatmullRom(t, p1.x, p2.x, p3.x, p4.x), CatmullRom(t, p1.y, p2.y, p3.y, p4.y));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2Ceil.js
   function Vec2Ceil(a, out = new Vec2()) {
     return out.set(Math.ceil(a.x), Math.ceil(a.y));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2Scale.js
   function Vec2Scale(a, scalar, out = new Vec2()) {
     return out.set(a.x * scalar, a.y * scalar);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2Center.js
   function Vec2Center(a, b, out = new Vec2()) {
     Vec2Add(a, b, out);
     return Vec2Scale(out, 0.5, out);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2Clamp.js
   function Vec2Clamp(a, min, max, out = new Vec2()) {
     return out.set(Clamp(a.x, min.x, max.x), Clamp(a.y, min.y, max.y));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2ClampScalar.js
   function Vec2ClampScalar(a, min, max, out = new Vec2()) {
     return out.set(Clamp(a.x, min, max), Clamp(a.y, min, max));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2Clone.js
   function Vec2Clone(source) {
     return new Vec2(source.x, source.y);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2CopyFrom.js
   function Vec2CopyFrom(source, dest) {
     return dest.set(source.x, source.y);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2Cross.js
   function Vec2Cross(a, b) {
     return a.x * b.y - a.y * b.x;
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2Divide.js
   function Vec2Divide(a, b, out = new Vec2()) {
     return out.set(a.x / b.x, a.y / b.y);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2DivideScalar.js
   function Vec2DivideScalar(a, scalar, out = new Vec2()) {
     return out.set(a.x / scalar, a.y / scalar);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2Equals.js
   function Vec2Equals(a, b) {
     return a.x === b.x && a.y === b.y;
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2Floor.js
   function Vec2Floor(a, out = new Vec2()) {
     return out.set(Math.floor(a.x), Math.floor(a.y));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2Fract.js
   function Vec2Fract(a, out = new Vec2()) {
     return out.set(a.x - Math.floor(a.x), a.y - Math.floor(a.y));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2FromGridIndex.js
   function Vec2FromGridIndex(index, width, height, out = new Vec2()) {
     let x = 0;
     let y = 0;
@@ -2836,6 +3468,8 @@
     }
     return out;
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2FromTransform.js
   function Vec2FromTransform(x, y, positionX, positionY, rotation, scaleX, scaleY, out = new Vec2()) {
     const sin = Math.sin(rotation);
     const cos = Math.cos(rotation);
@@ -2846,49 +3480,75 @@
     const id = 1 / (a * d + c * -b);
     return out.set(d * id * x + -c * id * y + (positionY * c - positionX * d) * id, a * id * y + -b * id * x + (-positionY * a + positionX * b) * id);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2FuzzyEquals.js
   function Vec2FuzzyEquals(a, b, epsilon = 1e-4) {
     return FuzzyEqual(a.x, b.x, epsilon) && FuzzyEqual(a.y, b.y, epsilon);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2Hermite.js
   function Vec2Hermite(a, b, c, d, t, out = new Vec2()) {
     return out.set(Hermite(t, a.x, b.x, c.x, d.x), Hermite(t, a.y, b.y, c.y, d.y));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2Inverse.js
   function Vec2Inverse(a, out = new Vec2()) {
     return out.set(1 / a.x, 1 / a.y);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2Lerp.js
   function Vec2Lerp(a, b, t, out = new Vec2()) {
     const x = a.x;
     const y = a.y;
     return out.set(x + t * (b.x - x), y + t * (b.y - y));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2Max.js
   function Vec2Max(a, b, out = new Vec2()) {
     const {x: ax, y: ay} = a;
     const {x: bx, y: by} = b;
     return out.set(Math.max(ax, bx), Math.max(ay, by));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2Min.js
   function Vec2Min(a, b, out = new Vec2()) {
     const {x: ax, y: ay} = a;
     const {x: bx, y: by} = b;
     return out.set(Math.min(ax, bx), Math.min(ay, by));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2Multiply.js
   function Vec2Multiply(a, b, out = new Vec2()) {
     return out.set(a.x * b.x, a.y * b.y);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2Negate.js
   function Vec2Negate(a, out = new Vec2()) {
     return out.set(-a.x, -a.y);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2Normalize.js
   function Vec2Normalize(a, out = new Vec2()) {
     return Vec2DivideScalar(a, GetVec2Length(a) || 1, out);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2One.js
   function Vec2One() {
     return new Vec2(1, 1);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2PerpDot.js
   function Vec2PerpDot(a, b) {
     return a.x * b.y - a.y * b.x;
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2Random.js
   function Vec2Random(a, scale = 1, out = new Vec2()) {
     const r = Math.random() * 2 * Math.PI;
     return out.set(Math.cos(r) * scale, Math.sin(r) * scale);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2Rotate.js
   function Vec2Rotate(a, origin, angle, out = new Vec2()) {
     const s = Math.sin(angle);
     const c = Math.cos(angle);
@@ -2896,36 +3556,56 @@
     const y = a.y - origin.y;
     return out.set(x * c - y * s + origin.x, x * s + y * c + origin.y);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2Round.js
   function Vec2Round(a, out = new Vec2()) {
     return out.set(Math.round(a.x), Math.round(a.y));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2RoundToZero.js
   function Vec2RoundToZero(a, out = new Vec2()) {
     return out.set(a.x < 0 ? Math.ceil(a.x) : Math.floor(a.x), a.y < 0 ? Math.ceil(a.y) : Math.floor(a.y));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2ScaleAndAdd.js
   function Vec2ScaleAndAdd(a, b, scalar, out = new Vec2()) {
     return out.set(a.x + b.x * scalar, a.y + b.y * scalar);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2SetLength.js
   function Vec2SetLength(a, length, out = new Vec2()) {
     Vec2Normalize(a, out);
     return Vec2Scale(out, length, out);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2SubtractScalar.js
   function Vec2SubtractScalar(a, scalar, out = new Vec2()) {
     return out.set(a.x - scalar, a.y - scalar);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2Transform.js
   function Vec2Transform(v, positionX, positionY, rotation, scaleX, scaleY, out = new Vec2()) {
     return Vec2FromTransform(v.x, v.y, positionX, positionY, rotation, scaleX, scaleY, out);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2TransformMat2d.js
   function Vec2TransformMat2d(v, m, out = new Vec2()) {
     const {a, b, c, d, tx, ty} = m;
     return out.set(a * v.x + c * v.y + tx, b * v.x + d * v.y + ty);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2TransformMat4.js
   function Vec2TransformMat4(v, m, out = new Vec2()) {
     const data = m.data;
     return out.set(data[0] * v.x + data[4] * v.y + data[12], data[1] * v.x + data[5] * v.y + data[13]);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec2/Vec2Zero.js
   function Vec2Zero() {
     return new Vec2(0, 0);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/index.js
   var vec4_exports = {};
   __export(vec4_exports, {
     GetVec4Distance: () => GetVec4Distance,
@@ -2977,6 +3657,8 @@
     Vec4TransformMat4: () => Vec4TransformMat4,
     Vec4Zero: () => Vec4Zero
   });
+
+  // node_modules/@phaserjs/phaser/math/vec4/GetVec4DistanceSquared.js
   function GetVec4DistanceSquared(a, b) {
     const x = a.x - b.x;
     const y = a.y - b.y;
@@ -2984,24 +3666,36 @@
     const w = a.w - b.w;
     return x * x + y * y + z * z + w * w;
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/GetVec4Distance.js
   function GetVec4Distance(a, b) {
     return Math.sqrt(GetVec4DistanceSquared(a, b));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/GetVec4Length.js
   function GetVec4Length(a) {
     const {x, y, z, w} = a;
     return Math.sqrt(x * x + y * y + z * z + w * w);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/GetVec4LengthSquared.js
   function GetVec4LengthSquared(a) {
     const {x, y, z, w} = a;
     return x * x + y * y + z * z + w * w;
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/GetVec4ManhattanDistance.js
   function GetVec4ManhattanDistance(a, b) {
     return Math.abs(a.x - b.x) + Math.abs(a.y - b.y) + Math.abs(a.z - b.z) + Math.abs(a.w - b.w);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/GetVec4ManhattanLength.js
   function GetVec4ManhattanLength(a) {
     const {x, y, z, w} = a;
     return Math.abs(x) + Math.abs(y) + Math.abs(z) + Math.abs(w);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4Callback.js
   var Vec4Callback = class {
     constructor(onChange, x = 0, y = 0, z = 0, w = 0) {
       this._x = x;
@@ -3079,6 +3773,8 @@
       return `{ x=${x}, y=${y}, z=${z}, w=${w} }`;
     }
   };
+
+  // node_modules/@phaserjs/phaser/math/vec4/RGBACallback.js
   var RGBACallback = class extends Vec4Callback {
     constructor(onChange, r = 0, g = 0, b = 0, a = 1) {
       super(onChange, r, g, b, a);
@@ -3112,6 +3808,8 @@
       return `[ r=${x}, g=${y}, b=${z}, a=${w} ]`;
     }
   };
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4.js
   var Vec4 = class {
     constructor(x = 0, y = 0, z = 0, w = 1) {
       this.set(x, y, z, w);
@@ -3139,56 +3837,86 @@
       return `{ x=${x}, y=${y}, z=${z}, w=${w} }`;
     }
   };
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4Abs.js
   function Vec4Abs(a, out = new Vec4()) {
     return out.set(Math.abs(a.x), Math.abs(a.y), Math.abs(a.z), Math.abs(a.w));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4Add.js
   function Vec4Add(a, b, out = new Vec4()) {
     return out.set(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4AddScalar.js
   function Vec4AddScalar(a, scalar, out = new Vec4()) {
     return out.set(a.x + scalar, a.y + scalar, a.z + scalar, a.w + scalar);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4Bezier.js
   function Vec4Bezier(a, b, c, d, t, out = new Vec4()) {
     return out.set(Bezier(t, a.x, b.x, c.x, d.x), Bezier(t, a.y, b.y, c.y, d.y), Bezier(t, a.z, b.z, c.z, d.z), Bezier(t, a.w, b.w, c.w, d.w));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4CatmullRom.js
   function Vec4CatmullRom(p1, p2, p3, p4, t, out = new Vec4()) {
     return out.set(CatmullRom(t, p1.x, p2.x, p3.x, p4.x), CatmullRom(t, p1.y, p2.y, p3.y, p4.y), CatmullRom(t, p1.z, p2.z, p3.z, p4.z), CatmullRom(t, p1.w, p2.w, p3.w, p4.w));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4Ceil.js
   function Vec4Ceil(a, out = new Vec4()) {
     const {x, y, z, w} = a;
     return out.set(Math.ceil(x), Math.ceil(y), Math.ceil(z), Math.ceil(w));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4Scale.js
   function Vec4Scale(a, scalar, out = new Vec4()) {
     const {x, y, z, w} = a;
     return out.set(x * scalar, y * scalar, z * scalar, w * scalar);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4Center.js
   function Vec4Center(a, b, out = new Vec4()) {
     Vec4Add(a, b, out);
     return Vec4Scale(out, 0.5, out);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4Clamp.js
   function Vec4Clamp(a, min, max, out = new Vec4()) {
     return out.set(Clamp(a.x, min.x, max.x), Clamp(a.y, min.y, max.y), Clamp(a.z, min.z, max.z), Clamp(a.w, min.w, max.w));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4DivideScalar.js
   function Vec4DivideScalar(a, scalar, out = new Vec4()) {
     const {x, y, z, w} = a;
     return out.set(x / scalar, y / scalar, z / scalar, w / scalar);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4ClampLength.js
   function Vec4ClampLength(a, min, max, out = new Vec4()) {
     const length = GetVec4Length(a);
     Vec4DivideScalar(a, length || 1, out);
     return Vec4Scale(out, Clamp(min, max, length), out);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4ClampScalar.js
   function Vec4ClampScalar(a, min, max, out = new Vec4()) {
     return out.set(Clamp(a.x, min, max), Clamp(a.y, min, max), Clamp(a.z, min, max), Clamp(a.w, min, max));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4Clone.js
   function Vec4Clone(source) {
     const {x, y, z, w} = source;
     return new Vec4(x, y, z, w);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4CopyFrom.js
   function Vec4CopyFrom(source, dest) {
     const {x, y, z, w} = source;
     return dest.set(x, y, z, w);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4Cross.js
   function Vec4Cross(u, v, w, out = new Vec4()) {
     const {x: ux, y: uy, z: uz, w: uw} = u;
     const {x: vx, y: vy, z: vz, w: vw} = v;
@@ -3205,57 +3933,89 @@
     const J = uw;
     return out.set(H * F - I * E + J * D, -(G * F) + I * C - J * B, G * E - H * C + J * A, -(G * D) + H * B - I * A);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4Divide.js
   function Vec4Divide(a, b, out = new Vec4()) {
     return out.set(a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4Dot.js
   function Vec4Dot(a, b) {
     return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4Equals.js
   function Vec4Equals(a, b) {
     return a.x === b.x && a.y === b.y && a.z === b.z && a.w === b.w;
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4Floor.js
   function Vec4Floor(a, out = new Vec4()) {
     const {x, y, z, w} = a;
     return out.set(Math.floor(x), Math.floor(y), Math.floor(z), Math.floor(w));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4Fract.js
   function Vec4Fract(a, out = new Vec4()) {
     return out.set(a.x - Math.floor(a.x), a.y - Math.floor(a.y), a.z - Math.floor(a.z), a.w - Math.floor(a.w));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4FuzzyEquals.js
   function Vec4FuzzyEquals(a, b, epsilon = 1e-4) {
     return FuzzyEqual(a.x, b.x, epsilon) && FuzzyEqual(a.y, b.y, epsilon) && FuzzyEqual(a.z, b.z, epsilon) && FuzzyEqual(a.w, b.w, epsilon);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4Hermite.js
   function Vec4Hermite(a, b, c, d, t, out = new Vec4()) {
     return out.set(Hermite(t, a.x, b.x, c.x, d.x), Hermite(t, a.y, b.y, c.y, d.y), Hermite(t, a.z, b.z, c.z, d.z), Hermite(t, a.w, b.w, c.w, d.w));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4Lerp.js
   function Vec4Lerp(a, b, t, out = new Vec4()) {
     const {x, y, z, w} = a;
     return out.set(x + t * (b.x - x), y + t * (b.y - y), z + t * (b.z - z), w + t * (b.w - w));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4Max.js
   function Vec4Max(a, b, out = new Vec4()) {
     const {x: ax, y: ay, z: az, w: aw} = a;
     const {x: bx, y: by, z: bz, w: bw} = b;
     return out.set(Math.max(ax, bx), Math.max(ay, by), Math.max(az, bz), Math.max(aw, bw));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4Min.js
   function Vec4Min(a, b, out = new Vec4()) {
     const {x: ax, y: ay, z: az, w: aw} = a;
     const {x: bx, y: by, z: bz, w: bw} = b;
     return out.set(Math.min(ax, bx), Math.min(ay, by), Math.min(az, bz), Math.min(aw, bw));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4Multiply.js
   function Vec4Multiply(a, b, out = new Vec4()) {
     return out.set(a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4MultiplyByFloats.js
   function Vec4MultiplyByFloats(a, x, y, z, w, out = new Vec4()) {
     return out.set(a.x * x, a.y * y, a.z * z, a.w * w);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4Negate.js
   function Vec4Negate(a, out = new Vec4()) {
     return out.set(-a.x, -a.y, -a.z, -a.w);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4Normalize.js
   function Vec4Normalize(a, out = new Vec4()) {
     return Vec4DivideScalar(a, GetVec4Length(a) || 1, out);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4One.js
   function Vec4One() {
     return new Vec4(1, 1, 1, 1);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4Random.js
   function Vec4Random(a, scale = 1, out = new Vec4()) {
     let v1;
     let v2;
@@ -3276,36 +4036,54 @@
     const d = Math.sqrt((1 - s1) / s2);
     return out.set(scale * v1, scale * v2, scale * v3 * d, scale * v4 * d);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4Round.js
   function Vec4Round(a, out = new Vec4()) {
     const {x, y, z, w} = a;
     return out.set(Math.round(x), Math.round(y), Math.round(z), Math.round(w));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4RoundToZero.js
   function Vec4RoundToZero(a, out = new Vec4()) {
     const {x, y, z, w} = a;
     return out.set(x < 0 ? Math.ceil(x) : Math.floor(x), y < 0 ? Math.ceil(y) : Math.floor(y), z < 0 ? Math.ceil(z) : Math.floor(z), w < 0 ? Math.ceil(w) : Math.floor(w));
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4ScaleAndAdd.js
   function Vec4ScaleAndAdd(a, b, scalar, out = new Vec4()) {
     return out.set(a.x + b.x * scalar, a.y + b.y * scalar, a.z + b.z * scalar, a.w + b.w * scalar);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4SetLength.js
   function Vec4SetLength(a, length, out = new Vec4()) {
     Vec4Normalize(a, out);
     return Vec4Scale(out, length, out);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4Subtract.js
   function Vec4Subtract(a, b, out = new Vec4()) {
     return out.set(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4SubtractScalar.js
   function Vec4SubtractScalar(a, scalar, out = new Vec4()) {
     const {x, y, z, w} = a;
     return out.set(x - scalar, y - scalar, z - scalar, w - scalar);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4TransformMat4.js
   function Vec4TransformMat4(a, m, out = new Vec4()) {
     const [m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33] = m.data;
     const {x, y, z, w} = a;
     return out.set(m00 * x + m10 * y + m20 * z + m30 * w, m01 * x + m11 * y + m21 * z + m31 * w, m02 * x + m12 * y + m22 * z + m32 * w, m03 * x + m13 * y + m23 * z + m33 * w);
   }
+
+  // node_modules/@phaserjs/phaser/math/vec4/Vec4Zero.js
   function Vec4Zero() {
     return new Vec4(0, 0, 0, 0);
   }
+
+  // node_modules/@phaserjs/phaser/math/Average.js
   function Average(values) {
     let sum = 0;
     for (let i = 0; i < values.length; i++) {
@@ -3313,39 +4091,61 @@
     }
     return sum / values.length;
   }
+
+  // node_modules/@phaserjs/phaser/math/Between.js
   function Between(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
   }
+
+  // node_modules/@phaserjs/phaser/math/CeilTo.js
   function CeilTo(value, place = 0, base = 10) {
     const p = Math.pow(base, -place);
     return Math.ceil(value * p) / p;
   }
+
+  // node_modules/@phaserjs/phaser/math/DegToRad.js
   function DegToRad(degrees) {
     return degrees * MATH_CONST.DEG_TO_RAD;
   }
+
+  // node_modules/@phaserjs/phaser/math/Difference.js
   function Difference(a, b) {
     return Math.abs(a - b);
   }
+
+  // node_modules/@phaserjs/phaser/math/FloatBetween.js
   function FloatBetween(min, max) {
     return Math.random() * (max - min) + min;
   }
+
+  // node_modules/@phaserjs/phaser/math/FloorTo.js
   function FloorTo(value, place = 0, base = 10) {
     const p = Math.pow(base, -place);
     return Math.floor(value * p) / p;
   }
+
+  // node_modules/@phaserjs/phaser/math/FromPercent.js
   function FromPercent(percent, min, max) {
     percent = Clamp(percent, 0, 1);
     return (max - min) * percent;
   }
+
+  // node_modules/@phaserjs/phaser/math/GetSpeed.js
   function GetSpeed(distance, time) {
     return distance / time / 1e3;
   }
+
+  // node_modules/@phaserjs/phaser/math/MaxAdd.js
   function MaxAdd(value, amount, max) {
     return Math.min(value + amount, max);
   }
+
+  // node_modules/@phaserjs/phaser/math/MinSub.js
   function MinSub(value, amount, min) {
     return Math.max(value - amount, min);
   }
+
+  // node_modules/@phaserjs/phaser/math/Percent.js
   function Percent(value, min, max, upperMax) {
     if (max === void 0) {
       max = min + 1;
@@ -3365,13 +4165,19 @@
     }
     return percentage;
   }
+
+  // node_modules/@phaserjs/phaser/math/RadToDeg.js
   function RadToDeg(radians) {
     return radians * MATH_CONST.RAD_TO_DEG;
   }
+
+  // node_modules/@phaserjs/phaser/math/RoundTo.js
   function RoundTo(value, place = 0, base = 10) {
     const p = Math.pow(base, -place);
     return Math.round(value * p) / p;
   }
+
+  // node_modules/@phaserjs/phaser/math/SinCosTableGenerator.js
   function SinCosTableGenerator(length, sinAmp = 1, cosAmp = 1, frequency = 1) {
     frequency *= Math.PI / length;
     const cos = [];
@@ -3388,138 +4194,13 @@
       length
     };
   }
+
+  // node_modules/@phaserjs/phaser/math/Within.js
   function Within(a, b, tolerance) {
     return Math.abs(a - b) <= tolerance;
   }
-  var Camera3D = class {
-    constructor(x = 0, y = 0, z = 0, fov = 45, near = 0.1, far = 1e3) {
-      this.dirtyRender = true;
-      this.type = "Camera3D";
-      const game = GameInstance.get();
-      this.renderer = game.renderer;
-      this.position = new Vec3Callback(() => this.update(), x, y, z);
-      this.direction = new Vec3Callback(() => this.update(), 0, 1, 0);
-      this._lookAtPosition = new Vec3();
-      this._lookAtView = new Matrix4();
-      this._axis = new Quaternion();
-      this.up = Vec3Up();
-      this.left = Vec3Left();
-      this._fov = fov;
-      this._near = near;
-      this._far = far;
-      this.aspectRatio = this.renderer.width / this.renderer.height;
-      this.viewMatrix = new Matrix4();
-      this.projectionMatrix = Mat4Perspective(DegToRad(fov), this.aspectRatio, near, far);
-      this.lookAt(new Vec3());
-    }
-    updateProjectionMatrix() {
-      Mat4Perspective(DegToRad(this._fov), this.aspectRatio, this._near, this._far, this.projectionMatrix);
-      return this;
-    }
-    lookAt(point) {
-      const pos = this.position;
-      const dir = this.direction;
-      const left = this.left;
-      Vec3Subtract(point, pos, dir);
-      Vec3Normalize(dir, dir);
-      Vec3CrossNormalize(UP, dir, left);
-      Vec3CrossNormalize(dir, left, this.up);
-      return this.update();
-    }
-    rotateOnAxis(axisVec, angle) {
-      const dir = this.direction;
-      const left = this.left;
-      const up = this.up;
-      const q = QuatSetAxisAngle(axisVec, angle, this._axis);
-      Vec3TransformQuat(dir, q, dir);
-      Vec3TransformQuat(left, q, left);
-      Vec3TransformQuat(up, q, up);
-      Vec3Normalize(up, up);
-      Vec3Normalize(left, left);
-      Vec3Normalize(dir, dir);
-      return this.update();
-    }
-    yaw(angle) {
-      return this.rotateOnAxis(this.up, angle);
-    }
-    pitch(angle) {
-      return this.rotateOnAxis(this.left, angle);
-    }
-    roll(angle) {
-      return this.rotateOnAxis(this.direction, angle);
-    }
-    forward(s) {
-      const pos = this.position;
-      const {x: px, y: py, z: pz} = pos;
-      const {x: dx, y: dy, z: dz} = this.direction;
-      pos.set(px - s * dx, py - s * dy, pz - s * dz);
-      return this.update();
-    }
-    update() {
-      const lookPosition = this._lookAtPosition;
-      const lookView = this._lookAtView;
-      const pos = this.position;
-      Vec3Add(pos, this.direction, lookPosition);
-      Mat4LookAt(pos, lookPosition, this.up, lookView);
-      Mat4TranslateFromFloats(lookView, -pos.x, -pos.y, -pos.z, this.viewMatrix);
-      return this;
-    }
-    reset() {
-    }
-    destroy() {
-      this.position.destroy();
-      this.direction.destroy();
-      this.up = null;
-      this.left = null;
-      this.viewMatrix = null;
-      this.projectionMatrix = null;
-      this._lookAtPosition = null;
-      this._lookAtView = null;
-      this._axis = null;
-    }
-    get fov() {
-      return this._fov;
-    }
-    set fov(value) {
-      if (value > 0 && value < 180) {
-        this._fov = value;
-        this.updateProjectionMatrix();
-      }
-    }
-    get near() {
-      return this._near;
-    }
-    set near(value) {
-      if (value > 0) {
-        this._near = value;
-        this.updateProjectionMatrix();
-      }
-    }
-    get far() {
-      return this._far;
-    }
-    set far(value) {
-      if (value > 0) {
-        this._far = value;
-        this.updateProjectionMatrix();
-      }
-    }
-  };
-  var config_exports = {};
-  __export(config_exports, {
-    BackgroundColor: () => BackgroundColor,
-    Banner: () => Banner,
-    BatchSize: () => BatchSize,
-    Canvas: () => Canvas,
-    CanvasContext: () => CanvasContext,
-    DefaultOrigin: () => DefaultOrigin,
-    MaxTextures: () => MaxTextures,
-    Parent: () => Parent,
-    Scenes: () => Scenes,
-    Size: () => Size,
-    WebGL: () => WebGL,
-    WebGLContext: () => WebGLContext
-  });
+
+  // node_modules/@phaserjs/phaser/config/const.js
   var CONFIG_DEFAULTS = {
     BACKGROUND_COLOR: "BackgroundColor",
     BATCH_SIZE: "BatchSize",
@@ -3536,51 +4217,56 @@
     CANVAS_CONTEXT: "CanvasContext",
     BANNER: "Banner"
   };
+
+  // node_modules/@phaserjs/phaser/config/ConfigStore.js
   var ConfigStore = new Map();
+
+  // node_modules/@phaserjs/phaser/config/backgroundcolor/SetBackgroundColor.js
   function SetBackgroundColor(color) {
     ConfigStore.set(CONFIG_DEFAULTS.BACKGROUND_COLOR, color);
   }
+
+  // node_modules/@phaserjs/phaser/config/backgroundcolor/BackgroundColor.js
   function BackgroundColor(color) {
     return () => {
       SetBackgroundColor(color);
     };
   }
+
+  // node_modules/@phaserjs/phaser/config/banner/SetBanner.js
   function SetBanner(title = "", version = "", url = "", color = "#fff", background = "linear-gradient(#3e0081 40%, #00bcc3)") {
     ConfigStore.set(CONFIG_DEFAULTS.BANNER, {title, version, url, color, background});
   }
-  function Banner(title, version, url, color, background) {
-    return () => {
-      SetBanner(title, version, url, color, background);
-    };
-  }
+
+  // node_modules/@phaserjs/phaser/config/batchsize/SetBatchSize.js
   function SetBatchSize(size) {
     ConfigStore.set(CONFIG_DEFAULTS.BATCH_SIZE, size);
   }
-  function BatchSize(size) {
-    return () => {
-      SetBatchSize(size);
-    };
-  }
+
+  // node_modules/@phaserjs/phaser/config/size/GetHeight.js
   function GetHeight() {
     return ConfigStore.get(CONFIG_DEFAULTS.SIZE).height;
   }
+
+  // node_modules/@phaserjs/phaser/config/size/GetResolution.js
   function GetResolution() {
     return ConfigStore.get(CONFIG_DEFAULTS.SIZE).resolution;
   }
+
+  // node_modules/@phaserjs/phaser/config/size/GetWidth.js
   function GetWidth() {
     return ConfigStore.get(CONFIG_DEFAULTS.SIZE).width;
   }
+
+  // node_modules/@phaserjs/phaser/config/size/SetSize.js
   function SetSize(width = 800, height = 600, resolution = 1) {
     if (resolution === 0) {
       resolution = window.devicePixelRatio;
     }
     ConfigStore.set(CONFIG_DEFAULTS.SIZE, {width, height, resolution});
   }
-  function Size(width = 800, height = 600, resolution = 1) {
-    return () => {
-      SetSize(width, height, resolution);
-    };
-  }
+
+  // node_modules/@phaserjs/phaser/renderer/BindingQueue.js
   var queue = [];
   var BindingQueue = {
     add: (texture, glConfig) => {
@@ -3593,104 +4279,28 @@
       queue.length = 0;
     }
   };
+
+  // node_modules/@phaserjs/phaser/config/backgroundcolor/GetBackgroundColor.js
   function GetBackgroundColor() {
     return ConfigStore.get(CONFIG_DEFAULTS.BACKGROUND_COLOR);
   }
-  function GetCanvasContext() {
-    return ConfigStore.get(CONFIG_DEFAULTS.CANVAS_CONTEXT);
-  }
-  var CanvasRenderer = class {
-    constructor() {
-      this.clearBeforeRender = true;
-      this.optimizeRedraw = true;
-      this.autoResize = true;
-      this.width = GetWidth();
-      this.height = GetHeight();
-      this.resolution = GetResolution();
-      this.setBackgroundColor(GetBackgroundColor());
-      const canvas = document.createElement("canvas");
-      this.canvas = canvas;
-      this.initContext();
-    }
-    initContext() {
-      const ctx = this.canvas.getContext("2d", GetCanvasContext());
-      this.ctx = ctx;
-      this.resize(this.width, this.height, this.resolution);
-    }
-    resize(width, height, resolution = 1) {
-      this.width = width * resolution;
-      this.height = height * resolution;
-      this.resolution = resolution;
-      const canvas = this.canvas;
-      canvas.width = this.width;
-      canvas.height = this.height;
-      if (this.autoResize) {
-        canvas.style.width = (this.width / resolution).toString() + "px";
-        canvas.style.height = (this.height / resolution).toString() + "px";
-      }
-    }
-    setBackgroundColor(color) {
-      const r = color >> 16 & 255;
-      const g = color >> 8 & 255;
-      const b = color & 255;
-      const a = color > 16777215 ? color >>> 24 : 255;
-      this.clearColor = `rgba(${r}, ${g}, ${b}, ${a})`;
-      return this;
-    }
-    reset() {
-      const ctx = this.ctx;
-      ctx.globalAlpha = 1;
-      ctx.globalCompositeOperation = "source-over";
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-    }
-    render(renderData) {
-      BindingQueue.clear();
-      const ctx = this.ctx;
-      if (this.optimizeRedraw && renderData.numDirtyFrames === 0 && renderData.numDirtyCameras === 0) {
-        return;
-      }
-      this.reset();
-      if (this.clearBeforeRender) {
-        ctx.clearRect(0, 0, this.width, this.height);
-        ctx.fillStyle = this.clearColor;
-        ctx.fillRect(0, 0, this.width, this.height);
-      }
-    }
-    destroy() {
-    }
-  };
+
+  // node_modules/@phaserjs/phaser/config/renderer/SetRenderer.js
   function SetRenderer(renderer) {
     ConfigStore.set(CONFIG_DEFAULTS.RENDERER, renderer);
   }
-  function Canvas() {
-    return () => {
-      SetRenderer(CanvasRenderer);
-    };
-  }
-  function SetCanvasContext(contextAttributes) {
-    ConfigStore.set(CONFIG_DEFAULTS.CANVAS_CONTEXT, contextAttributes);
-  }
-  function CanvasContext(contextAttributes) {
-    return () => {
-      SetCanvasContext(contextAttributes);
-    };
-  }
+
+  // node_modules/@phaserjs/phaser/config/defaultorigin/SetDefaultOrigin.js
   function SetDefaultOrigin(x = 0.5, y = x) {
     ConfigStore.set(CONFIG_DEFAULTS.DEFAULT_ORIGIN, {x, y});
   }
-  function DefaultOrigin(x = 0.5, y = x) {
-    return () => {
-      SetDefaultOrigin(x, y);
-    };
-  }
+
+  // node_modules/@phaserjs/phaser/config/maxtextures/SetMaxTextures.js
   function SetMaxTextures(max) {
     ConfigStore.set(CONFIG_DEFAULTS.MAX_TEXTURES, max);
   }
-  function MaxTextures(max = 0) {
-    return () => {
-      SetMaxTextures(max);
-    };
-  }
+
+  // node_modules/@phaserjs/phaser/dom/GetElement.js
   function GetElement(target) {
     let element;
     if (target) {
@@ -3705,29 +4315,41 @@
     }
     return element;
   }
+
+  // node_modules/@phaserjs/phaser/config/parent/SetParent.js
   function SetParent(parentElement) {
     if (parentElement) {
       ConfigStore.set(CONFIG_DEFAULTS.PARENT, GetElement(parentElement));
     }
   }
+
+  // node_modules/@phaserjs/phaser/config/parent/Parent.js
   function Parent(parentElement) {
     return () => {
       SetParent(parentElement);
     };
   }
+
+  // node_modules/@phaserjs/phaser/config/scenes/SetScenes.js
   function SetScenes(scenes) {
     ConfigStore.set(CONFIG_DEFAULTS.SCENES, [].concat(scenes));
   }
+
+  // node_modules/@phaserjs/phaser/config/scenes/Scenes.js
   function Scenes(scenes) {
     return () => {
       SetScenes(scenes);
     };
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/AddViewport.js
   function AddViewport(renderPass, x = 0, y = 0, width = 0, height = 0) {
     const viewport = new Rectangle(x, y, width, height);
     renderPass.viewportStack.push(viewport);
     return viewport;
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/GL.js
   var gl;
   var GL = {
     get: () => {
@@ -3737,6 +4359,8 @@
       gl = context;
     }
   };
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/BindViewport.js
   function BindViewport(renderPass, viewport) {
     if (!viewport) {
       viewport = renderPass.currentViewport;
@@ -3749,11 +4373,15 @@
       gl.viewport(viewport.x, viewport.y, viewport.width, viewport.height);
     }
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/SetViewport.js
   function SetViewport(renderPass, x = 0, y = 0, width = 0, height = 0) {
     const entry = AddViewport(renderPass, x, y, width, height);
     BindViewport(renderPass, entry);
     renderPass.currentViewport = entry;
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/BindFramebuffer.js
   function BindFramebuffer(renderPass, clear = true, entry) {
     if (!entry) {
       entry = renderPass.currentFramebuffer;
@@ -3768,6 +4396,8 @@
       SetViewport(renderPass, viewport.x, viewport.y, viewport.width, viewport.height);
     }
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/PopViewport.js
   function PopViewport(renderPass) {
     const stack = renderPass.viewportStack;
     if (stack.length > 1) {
@@ -3776,6 +4406,8 @@
     renderPass.currentViewport = stack[stack.length - 1];
     BindViewport(renderPass);
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/PopFramebuffer.js
   function PopFramebuffer(renderPass) {
     const stack = renderPass.framebufferStack;
     if (stack.length > 1) {
@@ -3787,16 +4419,22 @@
     renderPass.currentFramebuffer = stack[stack.length - 1];
     BindFramebuffer(renderPass, false);
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/AddFramebuffer.js
   function AddFramebuffer(renderPass, framebuffer, viewport) {
     const entry = {framebuffer, viewport};
     renderPass.framebufferStack.push(entry);
     return entry;
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/SetFramebuffer.js
   function SetFramebuffer(renderPass, framebuffer, clear = true, viewport) {
     const entry = AddFramebuffer(renderPass, framebuffer, viewport);
     BindFramebuffer(renderPass, clear, entry);
     renderPass.currentFramebuffer = entry;
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/Draw.js
   function Draw(renderPass) {
     const count = renderPass.count;
     if (count === 0) {
@@ -3825,6 +4463,8 @@
       PopFramebuffer(renderPass);
     }
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/Flush.js
   function Flush(renderPass, forceCount) {
     if (forceCount) {
       renderPass.count = forceCount;
@@ -3839,9 +4479,13 @@
     renderPass.flushTotal++;
     return true;
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/End.js
   function End(renderPass) {
     Flush(renderPass);
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/colors/GetRGBArray.js
   function GetRGBArray(color, output = []) {
     const r = color >> 16 & 255;
     const g = color >> 8 & 255;
@@ -3853,9 +4497,13 @@
     output[3] = a / 255;
     return output;
   }
+
+  // node_modules/@phaserjs/phaser/config/webglcontext/GetWebGLContext.js
   function GetWebGLContext() {
     return ConfigStore.get(CONFIG_DEFAULTS.WEBGL_CONTEXT);
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/textures/CreateGLTexture.js
   function CreateGLTexture(binding) {
     const {parent, flipY, unpackPremultiplyAlpha, minFilter, magFilter, wrapS, wrapT, generateMipmap, isPOT} = binding;
     const source = parent.image;
@@ -3883,16 +4531,22 @@
     binding.texture = glTexture;
     return glTexture;
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/fbo/DeleteFramebuffer.js
   function DeleteFramebuffer(framebuffer) {
     if (gl && gl.isFramebuffer(framebuffer)) {
       gl.deleteFramebuffer(framebuffer);
     }
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/textures/DeleteGLTexture.js
   function DeleteGLTexture(texture) {
     if (gl.isTexture(texture)) {
       gl.deleteTexture(texture);
     }
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/textures/SetGLTextureFilterMode.js
   function SetGLTextureFilterMode(texture, linear = true) {
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -3900,6 +4554,8 @@
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, mode);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, mode);
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/textures/UpdateGLTexture.js
   function UpdateGLTexture(binding) {
     const source = binding.parent.image;
     const width = source.width;
@@ -3912,6 +4568,8 @@
     }
     return binding.texture;
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/textures/GLTextureBinding.js
   var GLTextureBinding = class {
     constructor(parent, config = {}) {
       this.index = 0;
@@ -3986,6 +4644,8 @@
       this.framebuffer = null;
     }
   };
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/ProcessBindingQueue.js
   function ProcessBindingQueue() {
     const queue2 = BindingQueue.get();
     queue2.forEach((entry) => {
@@ -3996,9 +4656,13 @@
     });
     BindingQueue.clear();
   }
+
+  // node_modules/@phaserjs/phaser/config/maxtextures/GetMaxTextures.js
   function GetMaxTextures() {
     return ConfigStore.get(CONFIG_DEFAULTS.MAX_TEXTURES);
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/shaders/CheckShaderMaxIfStatements.js
   var fragTemplate = [
     "precision mediump float;",
     "void main(void){",
@@ -4033,6 +4697,8 @@
     }
     return maxIfs;
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/CreateTempTextures.js
   function CreateTempTextures(renderPass) {
     let maxGPUTextures = CheckShaderMaxIfStatements(gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS));
     const maxConfigTextures = GetMaxTextures();
@@ -4060,14 +4726,20 @@
     renderPass.textureIndex = index;
     renderPass.currentActiveTexture = 1;
   }
+
+  // node_modules/@phaserjs/phaser/config/batchsize/GetBatchSize.js
   function GetBatchSize() {
     return ConfigStore.get(CONFIG_DEFAULTS.BATCH_SIZE);
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/buffers/DeleteGLBuffer.js
   function DeleteGLBuffer(buffer) {
     if (gl.isBuffer(buffer)) {
       gl.deleteBuffer(buffer);
     }
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/buffers/VertexBuffer.js
   var VertexBuffer = class {
     constructor(config = {}) {
       this.indexed = false;
@@ -4136,6 +4808,8 @@
       this.vertexBuffer = null;
     }
   };
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/buffers/IndexedVertexBuffer.js
   var IndexedVertexBuffer = class extends VertexBuffer {
     constructor(config = {}) {
       super(config);
@@ -4180,6 +4854,8 @@
       this.indexBuffer = null;
     }
   };
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/shaders/CreateAttributes.js
   function CreateAttributes(program, config) {
     const attributes = new Map();
     const defaultSettings = {
@@ -4210,11 +4886,15 @@
     }
     return attributes;
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/shaders/DeleteShaders.js
   function DeleteShaders(...shaders) {
     shaders.forEach((shader) => {
       gl.deleteShader(shader);
     });
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/shaders/CreateProgram.js
   function CreateProgram(...shaders) {
     const program = gl.createProgram();
     shaders.forEach((shader) => {
@@ -4231,6 +4911,8 @@
     }
     return program;
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/shaders/CreateShader.js
   function CreateShader(source, type) {
     const shader = gl.createShader(type);
     gl.shaderSource(shader, source);
@@ -4247,6 +4929,8 @@
     }
     return shader;
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/shaders/CreateUniformSetter.js
   function CreateUniformSetter(uniform, location, isArray = false) {
     switch (uniform.type) {
       case gl.INT:
@@ -4334,6 +5018,8 @@
       }
     }
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/shaders/CreateUniforms.js
   function CreateUniforms(program) {
     const uniforms = new Map();
     const total = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
@@ -4355,19 +5041,27 @@
     }
     return uniforms;
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/GL_CONST.js
   var UNSIGNED_BYTE = 5121;
   var FLOAT = 5126;
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/shaders/DefaultQuadAttributes.js
   var DefaultQuadAttributes = {
     aVertexPosition: {size: 2, type: FLOAT, normalized: false, offset: 0},
     aTextureCoord: {size: 2, type: FLOAT, normalized: false, offset: 8},
     aTextureId: {size: 1, type: FLOAT, normalized: false, offset: 16},
     aTintColor: {size: 4, type: UNSIGNED_BYTE, normalized: true, offset: 20}
   };
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/shaders/DefaultQuadUniforms.js
   var DefaultQuadUniforms = {
     uProjectionMatrix: new Float32Array(),
     uCameraMatrix: new Float32Array(),
     uTexture: 0
   };
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/fbo/CreateDepthBuffer.js
   function CreateDepthBuffer(framebuffer, textureWidth, textureHeight) {
     gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
     const depthBuffer = gl.createRenderbuffer();
@@ -4377,6 +5071,8 @@
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     return depthBuffer;
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/fbo/CreateFramebuffer.js
   function CreateFramebuffer(texture, attachment) {
     if (!attachment) {
       attachment = gl.COLOR_ATTACHMENT0;
@@ -4387,6 +5083,8 @@
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     return framebuffer;
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/glsl/SINGLE_QUAD_FRAG.js
   var SINGLE_QUAD_FRAG = `#define SHADER_NAME SINGLE_QUAD_FRAG
 
 precision highp float;
@@ -4403,6 +5101,8 @@ void main (void)
 
     gl_FragColor = color * vec4(vTintColor.bgr * vTintColor.a, vTintColor.a);
 }`;
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/glsl/SINGLE_QUAD_VERT.js
   var SINGLE_QUAD_VERT = `#define SHADER_NAME SINGLE_QUAD_VERT
 
 precision highp float;
@@ -4427,6 +5127,8 @@ void main (void)
 
     gl_Position = uProjectionMatrix * uCameraMatrix * vec4(aVertexPosition, 0.0, 1.0);
 }`;
+
+  // node_modules/@phaserjs/phaser/textures/Frame.js
   var Frame = class {
     constructor(texture, key, x, y, width, height) {
       this.trimmed = false;
@@ -4516,6 +5218,8 @@ void main (void)
       this.v1 = (y + height) / baseTextureHeight;
     }
   };
+
+  // node_modules/@phaserjs/phaser/textures/Texture.js
   var Texture = class {
     constructor(image, width, height, glConfig) {
       this.key = "";
@@ -4572,6 +5276,8 @@ void main (void)
       this.firstFrame = null;
     }
   };
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/shaders/Shader.js
   var Shader = class {
     constructor(config) {
       this.renderToFramebuffer = false;
@@ -4673,6 +5379,8 @@ void main (void)
       this.framebuffer = null;
     }
   };
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/shaders/QuadShader.js
   var QuadShader = class extends Shader {
     constructor(config = {}) {
       const shaderConfig = config;
@@ -4686,6 +5394,8 @@ void main (void)
       return super.bind(renderPass);
     }
   };
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/glsl/MULTI_QUAD_FRAG.js
   var MULTI_QUAD_FRAG = `#define SHADER_NAME MULTI_QUAD_FRAG
 
 precision highp float;
@@ -4704,6 +5414,8 @@ void main (void)
 
     gl_FragColor = color * vec4(vTintColor.bgr * vTintColor.a, vTintColor.a);
 }`;
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/shaders/MultiTextureQuadShader.js
   var MultiTextureQuadShader = class extends QuadShader {
     constructor(config = {}) {
       if (!config.fragmentShader) {
@@ -4735,35 +5447,47 @@ void main (void)
       return super.bind(renderPass);
     }
   };
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/SetDefaultBlendMode.js
   function SetDefaultBlendMode(renderPass, enable, sfactor, dfactor) {
     const entry = {enable, sfactor, dfactor};
     renderPass.blendModeStack[0] = entry;
     renderPass.currentBlendMode = entry;
     renderPass.defaultBlendMode = entry;
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/SetDefaultFramebuffer.js
   function SetDefaultFramebuffer(renderPass, framebuffer = null, viewport) {
     const entry = {framebuffer, viewport};
     renderPass.framebufferStack[0] = entry;
     renderPass.currentFramebuffer = entry;
     renderPass.defaultFramebuffer = entry;
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/SetDefaultShader.js
   function SetDefaultShader(renderPass, shader, textureID) {
     const entry = {shader, textureID};
     renderPass.shaderStack[0] = entry;
     renderPass.currentShader = entry;
     renderPass.defaultShader = entry;
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/SetDefaultVertexBuffer.js
   function SetDefaultVertexBuffer(renderPass, buffer) {
     renderPass.vertexBufferStack[0] = buffer;
     renderPass.currentVertexBuffer = buffer;
     renderPass.defaultVertexBuffer = buffer;
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/SetDefaultViewport.js
   function SetDefaultViewport(renderPass, x = 0, y = 0, width = 0, height = 0) {
     const entry = new Rectangle(x, y, width, height);
     renderPass.viewportStack[0] = entry;
     renderPass.currentViewport = entry;
     renderPass.defaultViewport = entry;
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/RenderPass.js
   var RenderPass = class {
     constructor(renderer) {
       this.count = 0;
@@ -4811,15 +5535,21 @@ void main (void)
       SetDefaultViewport(this, 0, 0, width, height);
     }
   };
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/AddShader.js
   function AddShader(renderPass, shader, textureID) {
     const stackEntry = {shader, textureID};
     renderPass.shaderStack.push(stackEntry);
     return stackEntry;
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/AddVertexBuffer.js
   function AddVertexBuffer(renderPass, buffer) {
     renderPass.vertexBufferStack.push(buffer);
     return buffer;
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/BindShader.js
   function BindShader(renderPass, entry) {
     if (!entry) {
       entry = renderPass.currentShader;
@@ -4829,11 +5559,15 @@ void main (void)
       entry.shader.setAttributes(renderPass);
     }
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/Begin.js
   function Begin(renderPass, camera2D) {
     renderPass.current2DCamera = camera2D;
     renderPass.cameraMatrix = camera2D.matrix;
     BindShader(renderPass);
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/BindBlendMode.js
   function BindBlendMode(renderPass, entry) {
     if (!entry) {
       entry = renderPass.currentBlendMode;
@@ -4845,12 +5579,16 @@ void main (void)
       gl.disable(gl.BLEND);
     }
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/BindTexture.js
   function BindTexture(texture, index = 0) {
     const binding = texture.binding;
     binding.setIndex(index);
     gl.activeTexture(gl.TEXTURE0 + index);
     gl.bindTexture(gl.TEXTURE_2D, binding.texture);
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/BindVertexBuffer.js
   function BindVertexBuffer(renderPass, buffer) {
     if (!buffer) {
       buffer = renderPass.currentVertexBuffer;
@@ -4859,6 +5597,8 @@ void main (void)
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer.vertexBuffer);
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/PopVertexBuffer.js
   function PopVertexBuffer(renderPass) {
     const stack = renderPass.vertexBufferStack;
     if (stack.length > 1) {
@@ -4867,18 +5607,15 @@ void main (void)
     renderPass.currentVertexBuffer = stack[stack.length - 1];
     BindVertexBuffer(renderPass);
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/SetVertexBuffer.js
   function SetVertexBuffer(renderPass, buffer) {
     const entry = AddVertexBuffer(renderPass, buffer);
     BindVertexBuffer(renderPass, entry);
     renderPass.currentVertexBuffer = entry;
   }
-  function FlushBuffer(renderPass, buffer) {
-    SetVertexBuffer(renderPass, buffer);
-    renderPass.currentShader.shader.setAttributes(renderPass);
-    const result = Flush(renderPass, buffer.count);
-    PopVertexBuffer(renderPass);
-    return result;
-  }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/GetVertexBufferEntry.js
   function GetVertexBufferEntry(renderPass, addToCount = 0) {
     const buffer = renderPass.currentVertexBuffer;
     if (renderPass.count + addToCount >= buffer.batchSize) {
@@ -4893,6 +5630,8 @@ void main (void)
       offset
     };
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/PopShader.js
   function PopShader(renderPass) {
     const stack = renderPass.shaderStack;
     if (stack.length > 1) {
@@ -4901,11 +5640,15 @@ void main (void)
     renderPass.currentShader = stack[stack.length - 1];
     BindShader(renderPass);
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/SetShader.js
   function SetShader(renderPass, shader, textureID) {
     const entry = AddShader(renderPass, shader, textureID);
     BindShader(renderPass, entry);
     renderPass.currentShader = entry;
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/SetTexture.js
   function SetTexture(renderPass, texture) {
     const binding = texture.binding;
     const currentActiveTexture = renderPass.currentActiveTexture;
@@ -4928,6 +5671,8 @@ void main (void)
     }
     return binding.index;
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/Start.js
   function Start(renderPass) {
     renderPass.current2DCamera = renderPass.quadCamera;
     renderPass.cameraMatrix = renderPass.quadCamera.matrix;
@@ -4938,6 +5683,8 @@ void main (void)
     BindViewport(renderPass, renderPass.defaultViewport);
     BindVertexBuffer(renderPass, renderPass.defaultVertexBuffer);
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/renderpass/UnbindTexture.js
   function UnbindTexture(renderPass, index = 0) {
     gl.activeTexture(gl.TEXTURE0 + index);
     gl.bindTexture(gl.TEXTURE_2D, renderPass.tempTextures[index]);
@@ -4945,6 +5692,8 @@ void main (void)
       renderPass.startActiveTexture++;
     }
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/WebGLRendererInstance.js
   var instance2;
   var WebGLRendererInstance = {
     get: () => {
@@ -4954,6 +5703,8 @@ void main (void)
       instance2 = renderer;
     }
   };
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/WebGLRenderer.js
   var WebGLRenderer = class {
     constructor() {
       this.clearColor = [0, 0, 0, 1];
@@ -5038,32 +5789,22 @@ void main (void)
       WebGLRendererInstance.set(void 0);
     }
   };
+
+  // node_modules/@phaserjs/phaser/config/webgl/WebGL.js
   function WebGL() {
     return () => {
       SetRenderer(WebGLRenderer);
     };
   }
-  function SetWebGLContext(contextAttributes) {
-    ConfigStore.set(CONFIG_DEFAULTS.WEBGL_CONTEXT, contextAttributes);
-  }
-  function WebGLContext(contextAttributes) {
-    return () => {
-      SetWebGLContext(contextAttributes);
-    };
-  }
-  var dom_exports = {};
-  __export(dom_exports, {
-    AddToDOM: () => AddToDOM,
-    DOMContentLoaded: () => DOMContentLoaded,
-    GetElement: () => GetElement,
-    ParseXML: () => ParseXML,
-    RemoveFromDOM: () => RemoveFromDOM
-  });
+
+  // node_modules/@phaserjs/phaser/dom/AddToDOM.js
   function AddToDOM(element, parent) {
     const target = GetElement(parent);
     target.appendChild(element);
     return element;
   }
+
+  // node_modules/@phaserjs/phaser/dom/DOMContentLoaded.js
   function DOMContentLoaded(callback) {
     const readyState = document.readyState;
     if (readyState === "complete" || readyState === "interactive") {
@@ -5085,6 +5826,8 @@ void main (void)
       window.addEventListener("load", check, true);
     }
   }
+
+  // node_modules/@phaserjs/phaser/dom/ParseXML.js
   function ParseXML(data) {
     let xml;
     try {
@@ -5099,401 +5842,8 @@ void main (void)
       return null;
     }
   }
-  function RemoveFromDOM(element) {
-    if (element.parentNode) {
-      element.parentNode.removeChild(element);
-    }
-  }
-  var device_exports = {};
-  __export(device_exports, {
-    Audio: () => audio_exports,
-    Browser: () => browser_exports,
-    CanPlayAudioType: () => CanPlayAudioType,
-    CanPlayH264Video: () => CanPlayH264Video,
-    CanPlayHLSVideo: () => CanPlayHLSVideo,
-    CanPlayM4A: () => CanPlayM4A,
-    CanPlayMP3: () => CanPlayMP3,
-    CanPlayOGG: () => CanPlayOGG,
-    CanPlayOGGVideo: () => CanPlayOGGVideo,
-    CanPlayOpus: () => CanPlayOpus,
-    CanPlayVP9Video: () => CanPlayVP9Video,
-    CanPlayVideoType: () => CanPlayVideoType,
-    CanPlayWAV: () => CanPlayWAV,
-    CanPlayWebM: () => CanPlayWebM,
-    CanPlayWebMVideo: () => CanPlayWebMVideo,
-    GetAudio: () => GetAudio,
-    GetBrowser: () => GetBrowser,
-    GetOS: () => GetOS,
-    GetVideo: () => GetVideo,
-    HasAudio: () => HasAudio,
-    HasWebAudio: () => HasWebAudio,
-    IsAndroid: () => IsAndroid,
-    IsChrome: () => IsChrome,
-    IsChromeOS: () => IsChromeOS,
-    IsCordova: () => IsCordova,
-    IsCrosswalk: () => IsCrosswalk,
-    IsEdge: () => IsEdge,
-    IsEjecta: () => IsEjecta,
-    IsFirefox: () => IsFirefox,
-    IsKindle: () => IsKindle,
-    IsLinux: () => IsLinux,
-    IsMSIE: () => IsMSIE,
-    IsMacOS: () => IsMacOS,
-    IsMobileSafari: () => IsMobileSafari,
-    IsNode: () => IsNode,
-    IsNodeWebkit: () => IsNodeWebkit,
-    IsOpera: () => IsOpera,
-    IsSafari: () => IsSafari,
-    IsSilk: () => IsSilk,
-    IsTrident: () => IsTrident,
-    IsWebApp: () => IsWebApp,
-    IsWindows: () => IsWindows,
-    IsWindowsPhone: () => IsWindowsPhone,
-    IsiOS: () => IsiOS,
-    OS: () => os_exports,
-    Video: () => video_exports
-  });
-  var audio_exports = {};
-  __export(audio_exports, {
-    CanPlayAudioType: () => CanPlayAudioType,
-    CanPlayM4A: () => CanPlayM4A,
-    CanPlayMP3: () => CanPlayMP3,
-    CanPlayOGG: () => CanPlayOGG,
-    CanPlayOpus: () => CanPlayOpus,
-    CanPlayWAV: () => CanPlayWAV,
-    CanPlayWebM: () => CanPlayWebM,
-    GetAudio: () => GetAudio,
-    HasAudio: () => HasAudio,
-    HasWebAudio: () => HasWebAudio
-  });
-  var _audioElement;
-  function CanPlayAudioType(type, audioElement) {
-    if (!audioElement) {
-      if (!_audioElement) {
-        _audioElement = document.createElement("audio");
-      }
-      audioElement = _audioElement;
-    }
-    return audioElement && audioElement.canPlayType(type) !== "";
-  }
-  function CanPlayM4A(audioElement) {
-    return CanPlayAudioType("audio/x-m4a", audioElement) || CanPlayAudioType("audio/aac", audioElement);
-  }
-  function CanPlayMP3(audioElement) {
-    return CanPlayAudioType('audio/mpeg; codecs="mp3"', audioElement);
-  }
-  function CanPlayOGG(audioElement) {
-    return CanPlayAudioType('audio/ogg; codecs="vorbis"', audioElement);
-  }
-  function CanPlayOpus(audioElement) {
-    return CanPlayAudioType('audio/ogg; codecs="opus"', audioElement) || CanPlayAudioType('audio/webm; codecs="opus"', audioElement);
-  }
-  function CanPlayWAV(audioElement) {
-    return CanPlayAudioType('audio/wav; codecs="1"', audioElement);
-  }
-  function CanPlayWebM(audioElement) {
-    return CanPlayAudioType('audio/webm; codecs="vorbis"', audioElement);
-  }
-  function HasAudio() {
-    return window && window.hasOwnProperty("Audio");
-  }
-  function HasWebAudio() {
-    return window && (window.hasOwnProperty("AudioContext") || window.hasOwnProperty("webkitAudioContext"));
-  }
-  function GetAudio() {
-    const result = {
-      audioData: HasAudio(),
-      m4a: false,
-      mp3: false,
-      ogg: false,
-      opus: false,
-      wav: false,
-      webAudio: HasWebAudio(),
-      webm: false
-    };
-    if (result.audioData) {
-      result.m4a = CanPlayM4A();
-      result.mp3 = CanPlayMP3();
-      result.ogg = CanPlayOGG();
-      result.opus = CanPlayOpus();
-      result.wav = CanPlayWAV();
-      result.webm = CanPlayWebM();
-    }
-    return result;
-  }
-  var browser_exports = {};
-  __export(browser_exports, {
-    GetBrowser: () => GetBrowser,
-    IsChrome: () => IsChrome,
-    IsEdge: () => IsEdge,
-    IsFirefox: () => IsFirefox,
-    IsMSIE: () => IsMSIE,
-    IsMobileSafari: () => IsMobileSafari,
-    IsOpera: () => IsOpera,
-    IsSafari: () => IsSafari,
-    IsSilk: () => IsSilk,
-    IsTrident: () => IsTrident
-  });
-  function IsChrome() {
-    const chrome = /Chrome\/(\d+)/.test(navigator.userAgent);
-    const chromeVersion = chrome ? parseInt(RegExp.$1, 10) : 0;
-    return {
-      chrome,
-      chromeVersion
-    };
-  }
-  function IsEdge() {
-    const edge = /Edge\/\d+/.test(navigator.userAgent);
-    return {
-      edge
-    };
-  }
-  function IsFirefox() {
-    const firefox = /Firefox\D+(\d+)/.test(navigator.userAgent);
-    const firefoxVersion = firefox ? parseInt(RegExp.$1, 10) : 0;
-    return {
-      firefox,
-      firefoxVersion
-    };
-  }
-  function IsMSIE() {
-    const ie = /MSIE (\d+\.\d+);/.test(navigator.userAgent);
-    const ieVersion = ie ? parseInt(RegExp.$1, 10) : 0;
-    return {
-      ie,
-      ieVersion
-    };
-  }
-  function IsiOS() {
-    const ua = navigator.userAgent;
-    const result = {
-      iOS: false,
-      iOSVersion: 0,
-      iPhone: false,
-      iPad: false
-    };
-    if (/iP[ao]d|iPhone/i.test(ua)) {
-      const match = /OS (\d+)/.exec(navigator.appVersion);
-      result.iOS = true;
-      result.iOSVersion = parseInt(match[0], 10);
-      result.iPhone = ua.toLowerCase().includes("iphone");
-      result.iPad = ua.toLowerCase().includes("ipad");
-    }
-    return result;
-  }
-  function IsMobileSafari() {
-    const {iOS} = IsiOS();
-    const mobileSafari = navigator.userAgent.includes("AppleWebKit") && iOS;
-    return {
-      mobileSafari
-    };
-  }
-  function IsOpera() {
-    const opera = navigator.userAgent.includes("Opera");
-    return {
-      opera
-    };
-  }
-  function IsWindowsPhone() {
-    const ua = navigator.userAgent;
-    return /Windows Phone/i.test(ua) || /IEMobile/i.test(ua);
-  }
-  function IsSafari() {
-    const ua = navigator.userAgent;
-    const safari = ua.includes("Safari") && !IsWindowsPhone();
-    const safariVersion = /Version\/(\d+)\./.test(ua) ? parseInt(RegExp.$1, 10) : 0;
-    return {
-      safari,
-      safariVersion
-    };
-  }
-  function IsSilk() {
-    const silk = navigator.userAgent.includes("Silk");
-    return {
-      silk
-    };
-  }
-  function IsTrident() {
-    const trident = /Trident\/(\d+\.\d+)(.*)rv:(\d+\.\d+)/.test(navigator.userAgent);
-    const tridentVersion = trident ? parseInt(RegExp.$1, 10) : 0;
-    const tridentIEVersion = trident ? parseInt(RegExp.$3, 10) : 0;
-    return {
-      trident,
-      tridentVersion,
-      tridentIEVersion
-    };
-  }
-  function GetBrowser() {
-    const {chrome, chromeVersion} = IsChrome();
-    const {edge} = IsEdge();
-    const {firefox, firefoxVersion} = IsFirefox();
-    let {ie, ieVersion} = IsMSIE();
-    const {mobileSafari} = IsMobileSafari();
-    const {opera} = IsOpera();
-    const {safari, safariVersion} = IsSafari();
-    const {silk} = IsSilk();
-    const {trident, tridentVersion, tridentIEVersion} = IsTrident();
-    if (trident) {
-      ie = true;
-      ieVersion = tridentIEVersion;
-    }
-    const result = {
-      chrome,
-      chromeVersion,
-      edge,
-      firefox,
-      firefoxVersion,
-      ie,
-      ieVersion,
-      mobileSafari,
-      opera,
-      safari,
-      safariVersion,
-      silk,
-      trident,
-      tridentVersion
-    };
-    return result;
-  }
-  var os_exports = {};
-  __export(os_exports, {
-    GetOS: () => GetOS,
-    IsAndroid: () => IsAndroid,
-    IsChromeOS: () => IsChromeOS,
-    IsCordova: () => IsCordova,
-    IsCrosswalk: () => IsCrosswalk,
-    IsEjecta: () => IsEjecta,
-    IsKindle: () => IsKindle,
-    IsLinux: () => IsLinux,
-    IsMacOS: () => IsMacOS,
-    IsNode: () => IsNode,
-    IsNodeWebkit: () => IsNodeWebkit,
-    IsWebApp: () => IsWebApp,
-    IsWindows: () => IsWindows,
-    IsWindowsPhone: () => IsWindowsPhone,
-    IsiOS: () => IsiOS
-  });
-  function IsAndroid() {
-    return navigator.userAgent.includes("Android");
-  }
-  function IsChromeOS() {
-    return navigator.userAgent.includes("CrOS");
-  }
-  function IsCordova() {
-    return window.hasOwnProperty("cordova");
-  }
-  function IsCrosswalk() {
-    return navigator.userAgent.includes("Crosswalk");
-  }
-  function IsEjecta() {
-    return window.hasOwnProperty("ejecta");
-  }
-  function IsKindle() {
-    const ua = navigator.userAgent;
-    return ua.includes("Kindle") || /\bKF[A-Z][A-Z]+/.test(ua) || /Silk.*Mobile Safari/.test(ua);
-  }
-  function IsLinux() {
-    return navigator.userAgent.includes("Linux");
-  }
-  function IsMacOS() {
-    const ua = navigator.userAgent;
-    return ua.includes("Mac OS") && !ua.includes("like Mac OS");
-  }
-  function IsNode() {
-    return typeof process !== "undefined" && typeof process.versions === "object" && process.versions.hasOwnProperty("node");
-  }
-  function IsNodeWebkit() {
-    return IsNode() && !!process.versions.hasOwnProperty("node-webkit");
-  }
-  function IsWebApp() {
-    return navigator.hasOwnProperty("standalone");
-  }
-  function IsWindows() {
-    return navigator.userAgent.includes("Windows");
-  }
-  function GetOS() {
-    const ua = navigator.userAgent;
-    const {iOS, iOSVersion, iPad, iPhone} = IsiOS();
-    const result = {
-      android: IsAndroid(),
-      chromeOS: IsChromeOS(),
-      cordova: IsCordova(),
-      crosswalk: IsCrosswalk(),
-      desktop: false,
-      ejecta: IsEjecta(),
-      iOS,
-      iOSVersion,
-      iPad,
-      iPhone,
-      kindle: IsKindle(),
-      linux: IsLinux(),
-      macOS: IsMacOS(),
-      node: IsNode(),
-      nodeWebkit: IsNodeWebkit(),
-      pixelRatio: 1,
-      webApp: IsWebApp(),
-      windows: IsWindows(),
-      windowsPhone: IsWindowsPhone()
-    };
-    if (result.windowsPhone) {
-      result.android = false;
-      result.iOS = false;
-      result.macOS = false;
-      result.windows = true;
-    }
-    const silk = ua.includes("Silk");
-    if (result.windows || result.macOS || result.linux && !silk || result.chromeOS) {
-      result.desktop = true;
-    }
-    if (result.windowsPhone || /Windows NT/i.test(ua) && /Touch/i.test(ua)) {
-      result.desktop = false;
-    }
-    return result;
-  }
-  var video_exports = {};
-  __export(video_exports, {
-    CanPlayH264Video: () => CanPlayH264Video,
-    CanPlayHLSVideo: () => CanPlayHLSVideo,
-    CanPlayOGGVideo: () => CanPlayOGGVideo,
-    CanPlayVP9Video: () => CanPlayVP9Video,
-    CanPlayVideoType: () => CanPlayVideoType,
-    CanPlayWebMVideo: () => CanPlayWebMVideo,
-    GetVideo: () => GetVideo
-  });
-  var _videoElement;
-  function CanPlayVideoType(type, videoElement) {
-    if (!videoElement) {
-      if (!_videoElement) {
-        _videoElement = document.createElement("video");
-      }
-      videoElement = _videoElement;
-    }
-    return videoElement && videoElement.canPlayType(type) !== "";
-  }
-  function CanPlayH264Video(videoElement) {
-    return CanPlayVideoType('video/mp4; codecs="avc1.42E01E"', videoElement);
-  }
-  function CanPlayHLSVideo(videoElement) {
-    return CanPlayVideoType('application/x-mpegURL; codecs="avc1.42E01E"', videoElement);
-  }
-  function CanPlayOGGVideo(videoElement) {
-    return CanPlayVideoType('video/ogg; codecs="theora"', videoElement);
-  }
-  function CanPlayVP9Video(videoElement) {
-    return CanPlayVideoType('video/webm; codecs="vp9"', videoElement);
-  }
-  function CanPlayWebMVideo(videoElement) {
-    return CanPlayVideoType('video/webm; codecs="vp8, vorbis"', videoElement);
-  }
-  function GetVideo() {
-    return {
-      h264Video: CanPlayH264Video(),
-      hlsVideo: CanPlayHLSVideo(),
-      oggVideo: CanPlayOGGVideo(),
-      vp9Video: CanPlayVP9Video(),
-      webmVideo: CanPlayWebMVideo()
-    };
-  }
+
+  // node_modules/@phaserjs/phaser/display/index.js
   var display_exports = {};
   __export(display_exports, {
     AddChild: () => AddChild,
@@ -5553,6 +5903,8 @@ void main (void)
     ShuffleChildren: () => ShuffleChildren,
     SwapChildren: () => SwapChildren
   });
+
+  // node_modules/@phaserjs/phaser/display/DepthFirstSearch.js
   function DepthFirstSearch(parent) {
     const stack = [parent];
     const output = [];
@@ -5569,9 +5921,13 @@ void main (void)
     output.shift();
     return output;
   }
+
+  // node_modules/@phaserjs/phaser/display/GetChildIndex.js
   function GetChildIndex(parent, child) {
     return parent.children.indexOf(child);
   }
+
+  // node_modules/@phaserjs/phaser/display/RemoveChildAt.js
   function RemoveChildAt(parent, index) {
     const children = parent.children;
     let child;
@@ -5584,6 +5940,8 @@ void main (void)
     }
     return child;
   }
+
+  // node_modules/@phaserjs/phaser/display/RemoveChild.js
   function RemoveChild(parent, child) {
     const currentIndex = GetChildIndex(parent, child);
     if (currentIndex > -1) {
@@ -5591,11 +5949,23 @@ void main (void)
     }
     return child;
   }
+
+  // node_modules/@phaserjs/phaser/gameobjects/events/AddedToWorldEvent.js
   var AddedToWorldEvent = "addedtoworld";
+
+  // node_modules/@phaserjs/phaser/gameobjects/events/DestroyEvent.js
   var DestroyEvent = "destroy";
+
+  // node_modules/@phaserjs/phaser/gameobjects/events/PostUpdateEvent.js
   var PostUpdateEvent = "postupdate";
+
+  // node_modules/@phaserjs/phaser/gameobjects/events/RemovedFromWorldEvent.js
   var RemovedFromWorldEvent = "removedfromworld";
+
+  // node_modules/@phaserjs/phaser/gameobjects/events/UpdateEvent.js
   var UpdateEvent = "update";
+
+  // node_modules/@phaserjs/phaser/events/Emit.js
   function Emit(emitter, event, ...args) {
     if (emitter.events.size === 0 || !emitter.events.has(event)) {
       return false;
@@ -5612,6 +5982,8 @@ void main (void)
     }
     return true;
   }
+
+  // node_modules/@phaserjs/phaser/display/SetWorld.js
   function SetWorld(world, ...children) {
     children.forEach((child) => {
       if (child.world) {
@@ -5624,6 +5996,8 @@ void main (void)
     });
     return children;
   }
+
+  // node_modules/@phaserjs/phaser/display/SetParent.js
   function SetParent2(parent, ...children) {
     children.forEach((child) => {
       if (child.parent) {
@@ -5637,12 +6011,16 @@ void main (void)
     }
     return children;
   }
+
+  // node_modules/@phaserjs/phaser/display/AddChild.js
   function AddChild(parent, child) {
     parent.children.push(child);
     SetParent2(parent, child);
     child.transform.updateWorld();
     return child;
   }
+
+  // node_modules/@phaserjs/phaser/display/AddChildAt.js
   function AddChildAt(parent, index, child) {
     const children = parent.children;
     if (index >= 0 && index <= children.length) {
@@ -5652,12 +6030,16 @@ void main (void)
     }
     return child;
   }
+
+  // node_modules/@phaserjs/phaser/display/AddChildren.js
   function AddChildren(parent, ...children) {
     children.forEach((child) => {
       AddChild(parent, child);
     });
     return children;
   }
+
+  // node_modules/@phaserjs/phaser/display/AddChildrenAt.js
   function AddChildrenAt(parent, index, ...children) {
     const parentChildren = parent.children;
     if (index >= 0 && index <= parentChildren.length) {
@@ -5669,6 +6051,8 @@ void main (void)
     }
     return children;
   }
+
+  // node_modules/@phaserjs/phaser/display/AddPosition.js
   function AddPosition(x, y, ...children) {
     children.forEach((child) => {
       child.x += x;
@@ -5676,12 +6060,16 @@ void main (void)
     });
     return children;
   }
+
+  // node_modules/@phaserjs/phaser/display/AddRotation.js
   function AddRotation(rotation, ...children) {
     children.forEach((child) => {
       child.rotation += rotation;
     });
     return children;
   }
+
+  // node_modules/@phaserjs/phaser/display/AddScale.js
   function AddScale(scaleX, scaleY, ...children) {
     children.forEach((child) => {
       child.scaleX += scaleX;
@@ -5689,6 +6077,8 @@ void main (void)
     });
     return children;
   }
+
+  // node_modules/@phaserjs/phaser/display/AddSkew.js
   function AddSkew(skewX, skewY, ...children) {
     children.forEach((child) => {
       child.skewX += skewX;
@@ -5696,6 +6086,8 @@ void main (void)
     });
     return children;
   }
+
+  // node_modules/@phaserjs/phaser/gameobjects/DIRTY_CONST.js
   var DIRTY_CONST = {
     CLEAR: 0,
     TRANSFORM: 1,
@@ -5714,6 +6106,8 @@ void main (void)
     USER3: 2147483648,
     USER4: 4294967296
   };
+
+  // node_modules/@phaserjs/phaser/display/BringChildToTop.js
   function BringChildToTop(parent, child) {
     const parentChildren = parent.children;
     const currentIndex = GetChildIndex(parent, child);
@@ -5724,6 +6118,8 @@ void main (void)
     }
     return child;
   }
+
+  // node_modules/@phaserjs/phaser/display/DepthFirstSearchRecursiveNested.js
   function DepthFirstSearchRecursiveNested(parent, output = []) {
     for (let i = 0; i < parent.numChildren; i++) {
       const node = parent.children[i];
@@ -5735,6 +6131,8 @@ void main (void)
     }
     return output;
   }
+
+  // node_modules/@phaserjs/phaser/display/ConsoleTreeChildren.js
   function GetInfo(entry) {
     const legend = entry.numChildren > 0 ? "Parent" : "Child";
     return `${legend} [ type=${entry.type}, name=${entry.name} ]`;
@@ -5766,6 +6164,8 @@ void main (void)
     });
     console.groupEnd();
   }
+
+  // node_modules/@phaserjs/phaser/display/CountMatchingChildren.js
   function CountMatchingChildren(parent, property, value) {
     const children = parent.children;
     let total = 0;
@@ -5777,6 +6177,8 @@ void main (void)
     });
     return total;
   }
+
+  // node_modules/@phaserjs/phaser/display/DepthFirstSearchRecursive.js
   function DepthFirstSearchRecursive(parent, output = []) {
     for (let i = 0; i < parent.numChildren; i++) {
       const child = parent.children[i];
@@ -5787,6 +6189,8 @@ void main (void)
     }
     return output;
   }
+
+  // node_modules/@phaserjs/phaser/display/RemoveChildrenBetween.js
   function RemoveChildrenBetween(parent, beginIndex = 0, endIndex) {
     const children = parent.children;
     if (endIndex === void 0) {
@@ -5803,12 +6207,16 @@ void main (void)
       return [];
     }
   }
+
+  // node_modules/@phaserjs/phaser/display/DestroyChildren.js
   function DestroyChildren(parent, beginIndex = 0, endIndex) {
     const removed = RemoveChildrenBetween(parent, beginIndex, endIndex);
     removed.forEach((child) => {
       child.destroy();
     });
   }
+
+  // node_modules/@phaserjs/phaser/display/FindChildByName.js
   function FindChildByName(parent, searchString) {
     const children = DepthFirstSearch(parent);
     const regex = RegExp(searchString);
@@ -5819,6 +6227,8 @@ void main (void)
       }
     }
   }
+
+  // node_modules/@phaserjs/phaser/display/FindChildrenByName.js
   function FindChildrenByName(parent, searchString) {
     const children = DepthFirstSearch(parent);
     const regex = RegExp(searchString);
@@ -5830,6 +6240,8 @@ void main (void)
     });
     return results;
   }
+
+  // node_modules/@phaserjs/phaser/display/GetAllChildren.js
   function GetAllChildren(parent, property, value) {
     const children = DepthFirstSearch(parent);
     if (!property) {
@@ -5844,6 +6256,8 @@ void main (void)
     });
     return results;
   }
+
+  // node_modules/@phaserjs/phaser/display/GetChildAt.js
   function GetChildAt(parent, index) {
     const children = parent.children;
     if (index < 0 || index > children.length) {
@@ -5851,6 +6265,8 @@ void main (void)
     }
     return children[index];
   }
+
+  // node_modules/@phaserjs/phaser/display/GetChildren.js
   function GetChildren(parent, property, value) {
     const children = parent.children;
     if (!property) {
@@ -5865,6 +6281,8 @@ void main (void)
     });
     return results;
   }
+
+  // node_modules/@phaserjs/phaser/display/GetClosestChild.js
   function GetClosestChild(parent, point) {
     const children = parent.children;
     let closest = null;
@@ -5878,6 +6296,8 @@ void main (void)
     });
     return closest;
   }
+
+  // node_modules/@phaserjs/phaser/display/GetFirstChild.js
   function GetFirstChild(parent, property, value) {
     const children = parent.children;
     for (let i = 0; i < children.length; i++) {
@@ -5888,6 +6308,8 @@ void main (void)
       }
     }
   }
+
+  // node_modules/@phaserjs/phaser/display/GetFurthestChild.js
   function GetFurthestChild(parent, point) {
     const children = parent.children;
     let furthest = null;
@@ -5901,6 +6323,8 @@ void main (void)
     });
     return furthest;
   }
+
+  // node_modules/@phaserjs/phaser/display/GetLastChild.js
   function GetLastChild(parent, property, value) {
     const children = parent.children;
     for (let i = children.length - 1; i >= 0; i--) {
@@ -5911,6 +6335,8 @@ void main (void)
       }
     }
   }
+
+  // node_modules/@phaserjs/phaser/display/GetParents.js
   function GetParents(child) {
     const parents = [];
     while (child.parent) {
@@ -5919,6 +6345,8 @@ void main (void)
     }
     return parents;
   }
+
+  // node_modules/@phaserjs/phaser/display/GetRandomChild.js
   function GetRandomChild(parent, startIndex = 0, length) {
     const children = parent.children;
     if (!length) {
@@ -5927,6 +6355,8 @@ void main (void)
     const randomIndex = startIndex + Math.floor(Math.random() * length);
     return children[randomIndex];
   }
+
+  // node_modules/@phaserjs/phaser/display/MoveChildDown.js
   function MoveChildDown(parent, child) {
     const parentChildren = parent.children;
     const currentIndex = GetChildIndex(parent, child);
@@ -5940,6 +6370,8 @@ void main (void)
     }
     return child;
   }
+
+  // node_modules/@phaserjs/phaser/display/MoveChildTo.js
   function MoveChildTo(parent, child, index) {
     const parentChildren = parent.children;
     const currentIndex = GetChildIndex(parent, child);
@@ -5953,6 +6385,8 @@ void main (void)
     }
     return child;
   }
+
+  // node_modules/@phaserjs/phaser/display/MoveChildUp.js
   function MoveChildUp(parent, child) {
     const parentChildren = parent.children;
     const currentIndex = GetChildIndex(parent, child);
@@ -5966,12 +6400,16 @@ void main (void)
     }
     return child;
   }
+
+  // node_modules/@phaserjs/phaser/geom/intersects/RectangleToRectangle.js
   function RectangleToRectangle(rectA, rectB) {
     if (rectA.width <= 0 || rectA.height <= 0 || rectB.width <= 0 || rectB.height <= 0) {
       return false;
     }
     return !(rectA.right < rectB.x || rectA.bottom < rectB.y || rectA.x > rectB.right || rectA.y > rectB.bottom);
   }
+
+  // node_modules/@phaserjs/phaser/display/Overlap.js
   function Overlap(source, ...targets) {
     const sourceBounds = source.bounds.get();
     for (let i = 0; i < targets.length; i++) {
@@ -5983,12 +6421,16 @@ void main (void)
     }
     return false;
   }
+
+  // node_modules/@phaserjs/phaser/display/RemoveChildren.js
   function RemoveChildren(parent, ...children) {
     children.forEach((child) => {
       RemoveChild(parent, child);
     });
     return children;
   }
+
+  // node_modules/@phaserjs/phaser/display/RemoveChildrenAt.js
   function RemoveChildrenAt(parent, ...index) {
     const removed = [];
     index.sort((a, b) => a - b);
@@ -6000,6 +6442,8 @@ void main (void)
     });
     return removed;
   }
+
+  // node_modules/@phaserjs/phaser/display/ReparentChildren.js
   function ReparentChildren(parent, newParent, beginIndex = 0, endIndex) {
     const moved = RemoveChildrenBetween(parent, beginIndex, endIndex);
     SetParent2(newParent, ...moved);
@@ -6008,6 +6452,8 @@ void main (void)
     });
     return moved;
   }
+
+  // node_modules/@phaserjs/phaser/display/RotateChildrenLeft.js
   function RotateChildrenLeft(parent, total = 1) {
     const parentChildren = parent.children;
     let child = null;
@@ -6018,6 +6464,8 @@ void main (void)
     }
     return child;
   }
+
+  // node_modules/@phaserjs/phaser/display/RotateChildrenRight.js
   function RotateChildrenRight(parent, total = 1) {
     const parentChildren = parent.children;
     let child = null;
@@ -6028,6 +6476,8 @@ void main (void)
     }
     return child;
   }
+
+  // node_modules/@phaserjs/phaser/display/SendChildToBack.js
   function SendChildToBack(parent, child) {
     const parentChildren = parent.children;
     const currentIndex = GetChildIndex(parent, child);
@@ -6038,12 +6488,16 @@ void main (void)
     }
     return child;
   }
+
+  // node_modules/@phaserjs/phaser/display/SetBounds.js
   function SetBounds(x, y, width, height, ...children) {
     children.forEach((child) => {
       child.bounds.set(x, y, width, height);
     });
     return children;
   }
+
+  // node_modules/@phaserjs/phaser/display/SetChildrenValue.js
   function SetChildrenValue(parent, property, value) {
     const children = DepthFirstSearch(parent);
     children.forEach((child) => {
@@ -6054,54 +6508,72 @@ void main (void)
     });
     return children;
   }
+
+  // node_modules/@phaserjs/phaser/display/SetName.js
   function SetName(name, ...children) {
     children.forEach((child) => {
       child.name = name;
     });
     return children;
   }
+
+  // node_modules/@phaserjs/phaser/display/SetOrigin.js
   function SetOrigin(originX, originY, ...children) {
     children.forEach((child) => {
       child.setOrigin(originX, originY);
     });
     return children;
   }
+
+  // node_modules/@phaserjs/phaser/display/SetPosition.js
   function SetPosition(x, y, ...children) {
     children.forEach((child) => {
       child.setPosition(x, y);
     });
     return children;
   }
+
+  // node_modules/@phaserjs/phaser/display/SetRotation.js
   function SetRotation(rotation, ...children) {
     children.forEach((child) => {
       child.rotation = rotation;
     });
     return children;
   }
+
+  // node_modules/@phaserjs/phaser/display/SetScale.js
   function SetScale(scaleX, scaleY, ...children) {
     children.forEach((child) => {
       child.setScale(scaleX, scaleY);
     });
     return children;
   }
+
+  // node_modules/@phaserjs/phaser/display/SetSize.js
   function SetSize2(width, height, ...children) {
     children.forEach((child) => {
       child.setSize(width, height);
     });
     return children;
   }
+
+  // node_modules/@phaserjs/phaser/display/SetSkew.js
   function SetSkew(skewX, skewY, ...children) {
     children.forEach((child) => {
       child.setSkew(skewX, skewY);
     });
     return children;
   }
+
+  // node_modules/@phaserjs/phaser/display/SetType.js
   function SetType(type, ...children) {
     children.forEach((child) => {
       child.type = type;
     });
     return children;
   }
+
+  // node_modules/@phaserjs/phaser/display/SetValue.js
   function SetValue(property, value, ...children) {
     children.forEach((child) => {
       const descriptor = Object.getOwnPropertyDescriptor(child, property);
@@ -6111,12 +6583,16 @@ void main (void)
     });
     return children;
   }
+
+  // node_modules/@phaserjs/phaser/display/SetVisible.js
   function SetVisible(visible, ...children) {
     children.forEach((child) => {
       child.visible = visible;
     });
     return children;
   }
+
+  // node_modules/@phaserjs/phaser/display/ShuffleChildren.js
   function ShuffleChildren(parent) {
     const children = parent.children;
     for (let i = children.length - 1; i > 0; i--) {
@@ -6128,6 +6604,8 @@ void main (void)
     }
     return children;
   }
+
+  // node_modules/@phaserjs/phaser/display/SwapChildren.js
   function SwapChildren(child1, child2) {
     if (child1.parent === child2.parent) {
       const children = child1.parent.children;
@@ -6139,405 +6617,15 @@ void main (void)
       }
     }
   }
-  var display3d_exports = {};
-  __export(display3d_exports, {
-    AddChild3D: () => AddChild3D,
-    AddChild3DAt: () => AddChild3DAt,
-    AddChildren3D: () => AddChildren3D,
-    AddChildren3DAt: () => AddChildren3DAt,
-    ConsoleTreeChildren3D: () => ConsoleTreeChildren3D,
-    CountMatchingChildren3D: () => CountMatchingChildren3D,
-    DepthFirstSearch3D: () => DepthFirstSearch3D,
-    DepthFirstSearchRecursive3D: () => DepthFirstSearchRecursive3D,
-    DepthFirstSearchRecursiveNested3D: () => DepthFirstSearchRecursiveNested3D,
-    DestroyChildren3D: () => DestroyChildren3D,
-    FindChild3DByName: () => FindChild3DByName,
-    FindChildren3DByName: () => FindChildren3DByName,
-    GetAllChildren3D: () => GetAllChildren3D,
-    GetChild3DAt: () => GetChild3DAt,
-    GetChild3DIndex: () => GetChild3DIndex,
-    GetChildren3D: () => GetChildren3D,
-    GetFirstChild3D: () => GetFirstChild3D,
-    GetLastChild3D: () => GetLastChild3D,
-    GetParents3D: () => GetParents3D,
-    GetRandomChild3D: () => GetRandomChild3D,
-    MoveChild3DTo: () => MoveChild3DTo,
-    RemoveChild3D: () => RemoveChild3D,
-    RemoveChild3DAt: () => RemoveChild3DAt,
-    RemoveChildren3D: () => RemoveChildren3D,
-    RemoveChildren3DAt: () => RemoveChildren3DAt,
-    RemoveChildren3DBetween: () => RemoveChildren3DBetween,
-    ReparentChildren3D: () => ReparentChildren3D,
-    ReplaceChild3D: () => ReplaceChild3D,
-    SetChildren3DValue: () => SetChildren3DValue,
-    SetParent3D: () => SetParent3D,
-    SetWorld3D: () => SetWorld3D,
-    SwapChildren3D: () => SwapChildren3D
-  });
-  function DepthFirstSearch3D(parent) {
-    const stack = [parent];
-    const output = [];
-    while (stack.length > 0) {
-      const node = stack.shift();
-      output.push(node);
-      const numChildren = node.numChildren;
-      if (numChildren > 0) {
-        for (let i = numChildren - 1; i >= 0; i--) {
-          stack.unshift(node.children[i]);
-        }
-      }
-    }
-    output.shift();
-    return output;
-  }
-  function GetChild3DIndex(parent, child) {
-    return parent.children.indexOf(child);
-  }
-  function RemoveChild3DAt(parent, index) {
-    const children = parent.children;
-    let child;
-    if (index >= 0 && index < children.length) {
-      const removed = children.splice(index, 1);
-      if (removed[0]) {
-        child = removed[0];
-        child.parent = null;
-      }
-    }
-    return child;
-  }
-  function RemoveChild3D(parent, child) {
-    const currentIndex = GetChild3DIndex(parent, child);
-    if (currentIndex > -1) {
-      RemoveChild3DAt(parent, currentIndex);
-    }
-    return child;
-  }
-  function SetWorld3D(world, ...children) {
-    children.forEach((child) => {
-      if (child.world) {
-        Emit(child.world, RemovedFromWorldEvent, child, child.world);
-        Emit(child, RemovedFromWorldEvent, child, child.world);
-      }
-      child.world = world;
-      Emit(world, AddedToWorldEvent, child, world);
-      Emit(child, AddedToWorldEvent, child, world);
-    });
-    return children;
-  }
-  function SetParent3D(parent, ...children) {
-    children.forEach((child) => {
-      if (child.parent) {
-        RemoveChild3D(child.parent, child);
-      }
-      child.parent = parent;
-    });
-    const parentWorld = parent.world;
-    if (parentWorld) {
-      SetWorld3D(parentWorld, ...DepthFirstSearch3D(parent));
-    }
-    return children;
-  }
-  function AddChild3D(parent, child) {
-    parent.children.push(child);
-    SetParent3D(parent, child);
-    return child;
-  }
-  function AddChild3DAt(parent, index, child) {
-    const children = parent.children;
-    if (index >= 0 && index <= children.length) {
-      SetParent3D(parent, child);
-      children.splice(index, 0, child);
-    }
-    return child;
-  }
-  function AddChildren3D(parent, ...children) {
-    children.forEach((child) => {
-      AddChild3D(parent, child);
-    });
-    return children;
-  }
-  function AddChildren3DAt(parent, index, ...children) {
-    const parentChildren = parent.children;
-    if (index >= 0 && index <= parentChildren.length) {
-      children.reverse().forEach((child) => {
-        children.splice(index, 0, child);
-        SetParent3D(parent, child);
-      });
-    }
-    return children;
-  }
-  function DepthFirstSearchRecursiveNested3D(parent, output = []) {
-    for (let i = 0; i < parent.numChildren; i++) {
-      const node = parent.children[i];
-      const children = [];
-      output.push({node, children});
-      if (node.numChildren > 0) {
-        DepthFirstSearchRecursiveNested3D(node, children);
-      }
-    }
-    return output;
-  }
-  function GetInfo2(entry) {
-    const legend = entry.numChildren > 0 ? "Parent" : "Child";
-    return `${legend} [ type=${entry.type}, name=${entry.name} ]`;
-  }
-  function LogChildren2(entry) {
-    console.group(GetInfo2(entry.node));
-    entry.children.forEach((child) => {
-      if (child.children.length > 0) {
-        LogChildren2(child);
-      } else {
-        console.log(GetInfo2(child.node));
-      }
-    });
-    console.groupEnd();
-  }
-  function ConsoleTreeChildren3D(parent) {
-    const entries = DepthFirstSearchRecursiveNested3D(parent);
-    if (parent.world === parent) {
-      console.group("World");
-    } else {
-      console.group(GetInfo2(parent));
-    }
-    entries.forEach((entry) => {
-      if (entry.children.length) {
-        LogChildren2(entry);
-      } else {
-        console.log(GetInfo2(entry.node));
-      }
-    });
-    console.groupEnd();
-  }
-  function CountMatchingChildren3D(parent, property, value) {
-    const children = parent.children;
-    let total = 0;
-    children.forEach((child) => {
-      const descriptor = Object.getOwnPropertyDescriptor(child, property);
-      if (descriptor && (value === void 0 || value === descriptor.value)) {
-        total++;
-      }
-    });
-    return total;
-  }
-  function DepthFirstSearchRecursive3D(parent, output = []) {
-    for (let i = 0; i < parent.numChildren; i++) {
-      const child = parent.children[i];
-      output.push(child);
-      if (child.numChildren > 0) {
-        DepthFirstSearchRecursive3D(child, output);
-      }
-    }
-    return output;
-  }
-  function RemoveChildren3DBetween(parent, beginIndex = 0, endIndex) {
-    const children = parent.children;
-    if (endIndex === void 0) {
-      endIndex = children.length;
-    }
-    const range = endIndex - beginIndex;
-    if (range > 0 && range <= endIndex) {
-      const removed = children.splice(beginIndex, range);
-      removed.forEach((child) => {
-        child.parent = null;
-      });
-      return removed;
-    } else {
-      return [];
-    }
-  }
-  function DestroyChildren3D(parent, beginIndex = 0, endIndex) {
-    const removed = RemoveChildren3DBetween(parent, beginIndex, endIndex);
-    removed.forEach((child) => {
-      child.destroy();
-    });
-  }
-  function FindChild3DByName(parent, searchString) {
-    const children = DepthFirstSearch3D(parent);
-    const regex = RegExp(searchString);
-    for (let i = 0; i < children.length; i++) {
-      const child = children[i];
-      if (regex.test(child.name)) {
-        return child;
-      }
-    }
-  }
-  function FindChildren3DByName(parent, searchString) {
-    const children = DepthFirstSearch3D(parent);
-    const regex = RegExp(searchString);
-    const results = [];
-    children.forEach((child) => {
-      if (regex.test(child.name)) {
-        results.push(child);
-      }
-    });
-    return results;
-  }
-  function GetAllChildren3D(parent, property, value) {
-    const children = DepthFirstSearch3D(parent);
-    if (!property) {
-      return children;
-    }
-    const results = [];
-    children.forEach((child) => {
-      const descriptor = Object.getOwnPropertyDescriptor(child, property);
-      if (descriptor && (value === void 0 || value === descriptor.value)) {
-        results.push(child);
-      }
-    });
-    return results;
-  }
-  function GetChild3DAt(parent, index) {
-    const children = parent.children;
-    if (index < 0 || index > children.length) {
-      throw new Error(`Index out of bounds: ${index}`);
-    }
-    return children[index];
-  }
-  function GetChildren3D(parent, property, value) {
-    const children = parent.children;
-    if (!property) {
-      return [...children];
-    }
-    const results = [];
-    children.forEach((child) => {
-      const descriptor = Object.getOwnPropertyDescriptor(child, property);
-      if (descriptor && (value === void 0 || value === descriptor.value)) {
-        results.push(child);
-      }
-    });
-    return results;
-  }
-  function GetFirstChild3D(parent, property, value) {
-    const children = parent.children;
-    for (let i = 0; i < children.length; i++) {
-      const child = children[i];
-      const descriptor = Object.getOwnPropertyDescriptor(child, property);
-      if (descriptor && (value === void 0 || value === descriptor.value)) {
-        return child;
-      }
-    }
-  }
-  function GetLastChild3D(parent, property, value) {
-    const children = parent.children;
-    for (let i = children.length - 1; i >= 0; i--) {
-      const child = children[i];
-      const descriptor = Object.getOwnPropertyDescriptor(child, property);
-      if (descriptor && (value === void 0 || value === descriptor.value)) {
-        return child;
-      }
-    }
-  }
-  function GetParents3D(child) {
-    const parents = [];
-    while (child.parent) {
-      parents.push(child.parent);
-      child = child.parent;
-    }
-    return parents;
-  }
-  function GetRandomChild3D(parent, startIndex = 0, length) {
-    const children = parent.children;
-    if (!length) {
-      length = children.length;
-    }
-    const randomIndex = startIndex + Math.floor(Math.random() * length);
-    return children[randomIndex];
-  }
-  function MoveChild3DTo(parent, child, index) {
-    const parentChildren = parent.children;
-    const currentIndex = GetChild3DIndex(parent, child);
-    if (currentIndex === -1 || index < 0 || index >= parentChildren.length) {
-      throw new Error("Index out of bounds");
-    }
-    if (currentIndex !== index) {
-      parentChildren.splice(currentIndex, 1);
-      parentChildren.splice(index, 0, child);
-      child.setDirty(DIRTY_CONST.TRANSFORM);
-    }
-    return child;
-  }
-  function RemoveChildren3D(parent, ...children) {
-    children.forEach((child) => {
-      RemoveChild3D(parent, child);
-    });
-    return children;
-  }
-  function RemoveChildren3DAt(parent, ...index) {
-    const removed = [];
-    index.sort((a, b) => a - b);
-    index.reverse().forEach((i) => {
-      const child = RemoveChild3DAt(parent, i);
-      if (child) {
-        removed.push(child);
-      }
-    });
-    return removed;
-  }
-  function ReparentChildren3D(parent, newParent, beginIndex = 0, endIndex) {
-    const moved = RemoveChildren3DBetween(parent, beginIndex, endIndex);
-    SetParent3D(newParent, ...moved);
-    moved.forEach((child) => {
-    });
-    return moved;
-  }
-  function ReplaceChild3D(target, source) {
-    const targetParent = target.parent;
-    const sourceParent = source.parent;
-    const targetIndex = GetChild3DIndex(targetParent, target);
-    if (targetParent === sourceParent) {
-      MoveChild3DTo(targetParent, source, targetIndex);
-      RemoveChild3D(targetParent, target);
-    } else {
-      RemoveChild3D(targetParent, target);
-      RemoveChild3D(sourceParent, source);
-      AddChild3DAt(targetParent, targetIndex, source);
-    }
-    return target;
-  }
-  function SetChildren3DValue(parent, property, value) {
-    const children = DepthFirstSearch3D(parent);
-    children.forEach((child) => {
-      const descriptor = Object.getOwnPropertyDescriptor(child, property);
-      if (descriptor) {
-        descriptor.set(value);
-      }
-    });
-    return children;
-  }
-  function SwapChildren3D(child1, child2) {
-    if (child1.parent === child2.parent) {
-      const children = child1.parent.children;
-      const index1 = GetChild3DIndex(child1.parent, child1);
-      const index2 = GetChild3DIndex(child2.parent, child2);
-      if (index1 !== index2) {
-        children[index1] = child2;
-        children[index2] = child1;
-      }
-    }
-  }
-  var events_exports = {};
-  __export(events_exports, {
-    ClearEvent: () => ClearEvent,
-    Emit: () => Emit,
-    EventEmitter: () => EventEmitter,
-    EventInstance: () => EventInstance,
-    GetEventNames: () => GetEventNames,
-    GetListenerCount: () => GetListenerCount,
-    GetListeners: () => GetListeners,
-    Off: () => Off,
-    On: () => On,
-    Once: () => Once,
-    RemoveAllListeners: () => RemoveAllListeners
-  });
-  function ClearEvent(emitter, event) {
-    emitter.events.delete(event);
-    return emitter;
-  }
+
+  // node_modules/@phaserjs/phaser/events/EventEmitter.js
   var EventEmitter = class {
     constructor() {
       this.events = new Map();
     }
   };
+
+  // node_modules/@phaserjs/phaser/events/EventInstance.js
   var EventInstance = class {
     constructor(callback, context, once = false) {
       this.callback = callback;
@@ -6545,21 +6633,8 @@ void main (void)
       this.once = once;
     }
   };
-  function GetEventNames(emitter) {
-    return [...emitter.events.keys()];
-  }
-  function GetListenerCount(emitter, event) {
-    const listeners = emitter.events.get(event);
-    return listeners ? listeners.size : 0;
-  }
-  function GetListeners(emitter, event) {
-    const out = [];
-    const listeners = emitter.events.get(event);
-    listeners.forEach((listener) => {
-      out.push(listener.callback);
-    });
-    return out;
-  }
+
+  // node_modules/@phaserjs/phaser/events/Off.js
   function Off(emitter, event, callback, context, once) {
     const events = emitter.events;
     const listeners = events.get(event);
@@ -6581,6 +6656,8 @@ void main (void)
     }
     return emitter;
   }
+
+  // node_modules/@phaserjs/phaser/events/On.js
   function On(emitter, event, callback, context = emitter, once = false) {
     if (typeof callback !== "function") {
       throw new TypeError("Listener not a function");
@@ -6594,16 +6671,13 @@ void main (void)
     }
     return listener;
   }
+
+  // node_modules/@phaserjs/phaser/events/Once.js
   function Once(emitter, event, callback, context = emitter) {
     return On(emitter, event, callback, context, true);
   }
-  function RemoveAllListeners(emitter, event) {
-    if (!event) {
-      emitter.events.clear();
-    } else {
-      emitter.events.delete(event);
-    }
-  }
+
+  // node_modules/@phaserjs/phaser/gameobjects/index.js
   var gameobjects_exports = {};
   __export(gameobjects_exports, {
     AnimatedSprite: () => AnimatedSprite,
@@ -6617,6 +6691,8 @@ void main (void)
     SpriteBatch: () => SpriteBatch,
     Text: () => Text
   });
+
+  // node_modules/@phaserjs/phaser/gameobjects/components/index.js
   var components_exports = {};
   __export(components_exports, {
     Bounds: () => bounds_exports,
@@ -6624,10 +6700,14 @@ void main (void)
     Transform: () => transform_exports,
     Vertex: () => Vertex
   });
+
+  // node_modules/@phaserjs/phaser/gameobjects/components/bounds/index.js
   var bounds_exports = {};
   __export(bounds_exports, {
     BoundsComponent: () => BoundsComponent
   });
+
+  // node_modules/@phaserjs/phaser/gameobjects/components/transform/GetVertices.js
   function GetVertices(transform) {
     const {a, b, c, d, tx, ty} = transform.world;
     const {x, y, right, bottom} = transform.extent;
@@ -6641,6 +6721,8 @@ void main (void)
     const y3 = right * b + y * d + ty;
     return {x0, y0, x1, y1, x2, y2, x3, y3};
   }
+
+  // node_modules/@phaserjs/phaser/gameobjects/components/bounds/BoundsComponent.js
   var BoundsComponent = class {
     constructor(entity) {
       this.fixed = false;
@@ -6704,10 +6786,14 @@ void main (void)
       this.area = null;
     }
   };
+
+  // node_modules/@phaserjs/phaser/gameobjects/components/input/index.js
   var input_exports = {};
   __export(input_exports, {
     InputComponent: () => InputComponent
   });
+
+  // node_modules/@phaserjs/phaser/gameobjects/components/input/InputComponent.js
   var InputComponent = class {
     constructor(entity) {
       this.enabled = false;
@@ -6719,6 +6805,8 @@ void main (void)
       this.hitArea = null;
     }
   };
+
+  // node_modules/@phaserjs/phaser/gameobjects/components/transform/index.js
   var transform_exports = {};
   __export(transform_exports, {
     GetVertices: () => GetVertices,
@@ -6726,414 +6814,18 @@ void main (void)
     UpdateLocalTransform: () => UpdateLocalTransform,
     UpdateWorldTransform: () => UpdateWorldTransform
   });
+
+  // node_modules/@phaserjs/phaser/config/defaultorigin/GetDefaultOriginX.js
   function GetDefaultOriginX() {
     return ConfigStore.get(CONFIG_DEFAULTS.DEFAULT_ORIGIN).x;
   }
+
+  // node_modules/@phaserjs/phaser/config/defaultorigin/GetDefaultOriginY.js
   function GetDefaultOriginY() {
     return ConfigStore.get(CONFIG_DEFAULTS.DEFAULT_ORIGIN).y;
   }
-  var rectangle_exports = {};
-  __export(rectangle_exports, {
-    CeilRectangle: () => CeilRectangle,
-    CeilRectanglePosition: () => CeilRectanglePosition,
-    CenterRectangleOn: () => CenterRectangleOn,
-    CloneRectangle: () => CloneRectangle,
-    CopyRectangleFrom: () => CopyRectangleFrom,
-    DecomposeRectangle: () => DecomposeRectangle,
-    FitRectangleInside: () => FitRectangleInside,
-    FitRectangleOutside: () => FitRectangleOutside,
-    FitRectangleToPoint: () => FitRectangleToPoint,
-    FitRectangleToPoints: () => FitRectangleToPoints,
-    FloorRectangle: () => FloorRectangle,
-    FloorRectanglePosition: () => FloorRectanglePosition,
-    GetRectangleArea: () => GetRectangleArea,
-    GetRectangleAspectRatio: () => GetRectangleAspectRatio,
-    GetRectangleCenter: () => GetRectangleCenter,
-    GetRectangleCenterX: () => GetRectangleCenterX,
-    GetRectangleCenterY: () => GetRectangleCenterY,
-    GetRectangleEdges: () => GetRectangleEdges,
-    GetRectangleIntersection: () => GetRectangleIntersection,
-    GetRectangleMarchingAnts: () => GetRectangleMarchingAnts,
-    GetRectangleOverlap: () => GetRectangleOverlap,
-    GetRectanglePerimeter: () => GetRectanglePerimeter,
-    GetRectanglePerimeterPoint: () => GetRectanglePerimeterPoint,
-    GetRectanglePoint: () => GetRectanglePoint,
-    GetRectanglePoints: () => GetRectanglePoints,
-    GetRectangleRandomPoint: () => GetRectangleRandomPoint,
-    GetRectangleRandomPointOutside: () => GetRectangleRandomPointOutside,
-    GetRectangleSize: () => GetRectangleSize,
-    GetRectangleUnion: () => GetRectangleUnion,
-    InflateRectangle: () => InflateRectangle,
-    MergeRectangle: () => MergeRectangle,
-    Rectangle: () => Rectangle,
-    RectangleContains: () => RectangleContains,
-    RectangleContainsPoint: () => RectangleContainsPoint,
-    RectangleContainsRectangle: () => RectangleContainsRectangle,
-    RectangleEquals: () => RectangleEquals,
-    RectangleFromPoints: () => RectangleFromPoints,
-    RectangleSizeEquals: () => RectangleSizeEquals,
-    ScaleRectangle: () => ScaleRectangle,
-    TranslateRectangle: () => TranslateRectangle,
-    TranslateRectanglePoint: () => TranslateRectanglePoint
-  });
-  function CeilRectangle(rect) {
-    rect.x = Math.ceil(rect.x);
-    rect.y = Math.ceil(rect.y);
-    rect.width = Math.ceil(rect.width);
-    rect.height = Math.ceil(rect.height);
-    return rect;
-  }
-  function CeilRectanglePosition(rect) {
-    rect.x = Math.ceil(rect.x);
-    rect.y = Math.ceil(rect.y);
-    return rect;
-  }
-  function CenterRectangleOn(rect, x, y) {
-    rect.x = x - rect.width / 2;
-    rect.y = y - rect.height / 2;
-    return rect;
-  }
-  function CloneRectangle(source) {
-    return new Rectangle(source.x, source.y, source.width, source.height);
-  }
-  function CopyRectangleFrom(source, dest) {
-    return dest.set(source.x, source.y, source.width, source.height);
-  }
-  function DecomposeRectangle(rect, out = []) {
-    out.push(new Vec2(rect.x, rect.y), new Vec2(rect.right, rect.y), new Vec2(rect.right, rect.bottom), new Vec2(rect.x, rect.bottom));
-    return out;
-  }
-  function GetRectangleAspectRatio(rect) {
-    return rect.height === 0 ? NaN : rect.width / rect.height;
-  }
-  function GetRectangleCenterX(rect) {
-    return rect.x + rect.width / 2;
-  }
-  function GetRectangleCenterY(rect) {
-    return rect.y + rect.height / 2;
-  }
-  function FitRectangleInside(target, source) {
-    const ratio = GetRectangleAspectRatio(target);
-    let width = source.width;
-    let height = source.height;
-    if (ratio < GetRectangleAspectRatio(source)) {
-      width = source.height * ratio;
-    } else {
-      height = source.width / ratio;
-    }
-    return target.set(GetRectangleCenterX(source) - target.width / 2, GetRectangleCenterY(source) - target.height / 2, width, height);
-  }
-  function FitRectangleOutside(target, source) {
-    const ratio = GetRectangleAspectRatio(target);
-    let width = source.width;
-    let height = source.height;
-    if (ratio > GetRectangleAspectRatio(source)) {
-      width = source.height * ratio;
-    } else {
-      height = source.width / ratio;
-    }
-    return target.set(GetRectangleCenterX(source) - target.width / 2, GetRectangleCenterY(source) - target.height / 2, width, height);
-  }
-  function FitRectangleToPoint(target, x, y) {
-    const minX = Math.min(target.x, x);
-    const maxX = Math.max(target.right, x);
-    const minY = Math.min(target.y, y);
-    const maxY = Math.max(target.bottom, y);
-    return target.set(minX, minY, maxX - minX, maxY - minY);
-  }
-  function FitRectangleToPoints(target, points) {
-    let minX = target.x;
-    let maxX = target.right;
-    let minY = target.y;
-    let maxY = target.bottom;
-    for (let i = 0; i < points.length; i++) {
-      minX = Math.min(minX, points[i].x);
-      maxX = Math.max(maxX, points[i].x);
-      minY = Math.min(minY, points[i].y);
-      maxY = Math.max(maxY, points[i].y);
-    }
-    return target.set(minX, minY, maxX - minX, maxY - minY);
-  }
-  function FloorRectangle(rect) {
-    rect.x = Math.floor(rect.x);
-    rect.y = Math.floor(rect.y);
-    rect.width = Math.floor(rect.width);
-    rect.height = Math.floor(rect.height);
-    return rect;
-  }
-  function FloorRectanglePosition(rect) {
-    rect.x = Math.floor(rect.x);
-    rect.y = Math.floor(rect.y);
-    return rect;
-  }
-  function GetRectangleArea(rect) {
-    return rect.width * rect.height;
-  }
-  function GetRectangleCenter(rect, out = new Vec2()) {
-    return out.set(GetRectangleCenterX(rect), GetRectangleCenterY(rect));
-  }
-  var Line = class {
-    constructor(x1 = 0, y1 = 0, x2 = 0, y2 = 0) {
-      this.set(x1, y1, x2, y2);
-    }
-    set(x1 = 0, y1 = 0, x2 = 0, y2 = 0) {
-      this.x1 = x1;
-      this.y1 = y1;
-      this.x2 = x2;
-      this.y2 = y2;
-      return this;
-    }
-    get left() {
-      return Math.min(this.x1, this.x2);
-    }
-    set left(value) {
-      if (this.x1 <= this.x2) {
-        this.x1 = value;
-      } else {
-        this.x2 = value;
-      }
-    }
-    get right() {
-      return Math.max(this.x1, this.x2);
-    }
-    set right(value) {
-      if (this.x1 > this.x2) {
-        this.x1 = value;
-      } else {
-        this.x2 = value;
-      }
-    }
-    get top() {
-      return Math.min(this.y1, this.y2);
-    }
-    set top(value) {
-      if (this.y1 <= this.y2) {
-        this.y1 = value;
-      } else {
-        this.y2 = value;
-      }
-    }
-    get bottom() {
-      return Math.max(this.y1, this.y2);
-    }
-    set bottom(value) {
-      if (this.y1 > this.y2) {
-        this.y1 = value;
-      } else {
-        this.y2 = value;
-      }
-    }
-  };
-  function GetRectangleEdges(rectangle) {
-    const {x, y, right, bottom} = rectangle;
-    const line1 = new Line(x, y, right, y);
-    const line2 = new Line(right, y, right, bottom);
-    const line3 = new Line(right, bottom, x, bottom);
-    const line4 = new Line(x, bottom, x, y);
-    return [line1, line2, line3, line4];
-  }
-  function GetRectangleIntersection(rectA, rectB, out = new Rectangle()) {
-    if (RectangleToRectangle(rectA, rectB)) {
-      out.set(Math.max(rectA.x, rectB.x), Math.max(rectA.y, rectB.y), Math.min(rectA.right, rectB.right) - out.x, Math.min(rectA.bottom, rectB.bottom) - out.y);
-    } else {
-      out.set();
-    }
-    return out;
-  }
-  function GetRectanglePerimeter(rect) {
-    return 2 * (rect.width + rect.height);
-  }
-  function GetRectangleMarchingAnts(rect, step, quantity, out = []) {
-    if (!step && !quantity) {
-      return out;
-    }
-    if (!step) {
-      step = GetRectanglePerimeter(rect) / quantity;
-    } else {
-      quantity = Math.round(GetRectanglePerimeter(rect) / step);
-    }
-    let x = rect.x;
-    let y = rect.y;
-    let face = 0;
-    for (let i = 0; i < quantity; i++) {
-      out.push(new Vec2(x, y));
-      switch (face) {
-        case 0:
-          x += step;
-          if (x >= rect.right) {
-            face = 1;
-            y += x - rect.right;
-            x = rect.right;
-          }
-          break;
-        case 1:
-          y += step;
-          if (y >= rect.bottom) {
-            face = 2;
-            x -= y - rect.bottom;
-            y = rect.bottom;
-          }
-          break;
-        case 2:
-          x -= step;
-          if (x <= rect.x) {
-            face = 3;
-            y -= rect.x - x;
-            x = rect.x;
-          }
-          break;
-        case 3:
-          y -= step;
-          if (y <= rect.y) {
-            face = 0;
-            y = rect.y;
-          }
-          break;
-      }
-    }
-    return out;
-  }
-  function GetRectangleOverlap(rectA, rectB) {
-    return rectA.x < rectB.right && rectA.right > rectB.x && rectA.y < rectB.bottom && rectA.bottom > rectB.y;
-  }
-  function GetRectanglePerimeterPoint(rectangle, angle, out = new Vec2()) {
-    angle = DegToRad(angle);
-    const s = Math.sin(angle);
-    const c = Math.cos(angle);
-    let dx = c > 0 ? rectangle.width / 2 : rectangle.width / -2;
-    let dy = s > 0 ? rectangle.height / 2 : rectangle.height / -2;
-    if (Math.abs(dx * s) < Math.abs(dy * c)) {
-      dy = dx * s / c;
-    } else {
-      dx = dy * c / s;
-    }
-    return out.set(dx + GetRectangleCenterX(rectangle), dy + GetRectangleCenterY(rectangle));
-  }
-  function GetRectanglePoint(rectangle, position, out = new Vec2()) {
-    if (position <= 0 || position >= 1) {
-      return out.set(rectangle.x, rectangle.y);
-    }
-    let p = GetRectanglePerimeter(rectangle) * position;
-    if (position > 0.5) {
-      p -= rectangle.width + rectangle.height;
-      if (p <= rectangle.width) {
-        return out.set(rectangle.right - p, rectangle.bottom);
-      } else {
-        return out.set(rectangle.x, rectangle.bottom - (p - rectangle.width));
-      }
-    } else if (p <= rectangle.width) {
-      return out.set(rectangle.x + p, rectangle.y);
-    } else {
-      return out.set(rectangle.right, rectangle.y + (p - rectangle.width));
-    }
-  }
-  function GetRectanglePoints(rectangle, step, quantity = 0, out = []) {
-    if (!quantity) {
-      quantity = GetRectanglePerimeter(rectangle) / step;
-    }
-    for (let i = 0; i < quantity; i++) {
-      out.push(GetRectanglePoint(rectangle, i / quantity));
-    }
-    return out;
-  }
-  function GetRectangleRandomPoint(rect, out = new Vec2()) {
-    return out.set(rect.x + Math.random() * rect.width, rect.y + Math.random() * rect.height);
-  }
-  function RectangleContainsRectangle(rectA, rectB) {
-    if (rectB.width * rectB.height > rectA.width * rectA.height) {
-      return false;
-    }
-    return rectB.x > rectA.x && rectB.x < rectA.right && (rectB.right > rectA.x && rectB.right < rectA.right) && (rectB.y > rectA.y && rectB.y < rectA.bottom) && (rectB.bottom > rectA.y && rectB.bottom < rectA.bottom);
-  }
-  function GetRectangleRandomPointOutside(outer, inner, out = new Vec2()) {
-    if (RectangleContainsRectangle(outer, inner)) {
-      switch (Between(0, 3)) {
-        case 0:
-          out.x = outer.x + Math.random() * (inner.right - outer.x);
-          out.y = outer.y + Math.random() * (inner.y - outer.y);
-          break;
-        case 1:
-          out.x = inner.x + Math.random() * (outer.right - inner.x);
-          out.y = inner.bottom + Math.random() * (outer.bottom - inner.bottom);
-          break;
-        case 2:
-          out.x = outer.x + Math.random() * (inner.x - outer.x);
-          out.y = inner.y + Math.random() * (outer.bottom - inner.y);
-          break;
-        case 3:
-          out.x = inner.right + Math.random() * (outer.right - inner.right);
-          out.y = outer.y + Math.random() * (inner.bottom - outer.y);
-          break;
-      }
-    }
-    return out;
-  }
-  function GetRectangleSize(rect, out = new Vec2()) {
-    return out.set(rect.width, rect.height);
-  }
-  function GetRectangleUnion(rectA, rectB, out = new Rectangle()) {
-    const x = Math.min(rectA.x, rectB.x);
-    const y = Math.min(rectA.y, rectB.y);
-    const w = Math.max(rectA.right, rectB.right) - x;
-    const h = Math.max(rectA.bottom, rectB.bottom) - y;
-    return out.set(x, y, w, h);
-  }
-  function InflateRectangle(rect, x, y) {
-    const cx = GetRectangleCenterX(rect);
-    const cy = GetRectangleCenterY(rect);
-    rect.width = rect.width + x * 2;
-    rect.height = rect.height + y * 2;
-    return CenterRectangleOn(rect, cx, cy);
-  }
-  function MergeRectangle(target, source) {
-    const minX = Math.min(target.x, source.x);
-    const maxX = Math.max(target.right, source.right);
-    const minY = Math.min(target.y, source.y);
-    const maxY = Math.max(target.bottom, source.bottom);
-    return target.set(minX, minY, maxX - minX, maxY - minY);
-  }
-  function RectangleContainsPoint(rect, point) {
-    return RectangleContains(rect, point.x, point.y);
-  }
-  function RectangleEquals(rect, toCompare) {
-    return rect.x === toCompare.x && rect.y === toCompare.y && rect.width === toCompare.width && rect.height === toCompare.height;
-  }
-  function RectangleFromPoints(points, out = new Rectangle()) {
-    if (points.length === 0) {
-      return out;
-    }
-    let minX = Number.MAX_VALUE;
-    let minY = Number.MAX_VALUE;
-    let maxX = MATH_CONST.MIN_SAFE_INTEGER;
-    let maxY = MATH_CONST.MIN_SAFE_INTEGER;
-    for (let i = 0; i < points.length; i++) {
-      const px = points[i].x;
-      const py = points[i].y;
-      minX = Math.min(minX, px);
-      minY = Math.min(minY, py);
-      maxX = Math.max(maxX, px);
-      maxY = Math.max(maxY, py);
-    }
-    return out.set(minX, minY, maxX - minX, maxY - minY);
-  }
-  function RectangleSizeEquals(rect, toCompare) {
-    return rect.width === toCompare.width && rect.height === toCompare.height;
-  }
-  function ScaleRectangle(rect, x, y = x) {
-    rect.width *= x;
-    rect.height *= y;
-    return rect;
-  }
-  function TranslateRectangle(rect, x, y) {
-    rect.x += x;
-    rect.y += y;
-    return rect;
-  }
-  function TranslateRectanglePoint(rect, point) {
-    rect.x += point.x;
-    rect.y += point.y;
-    return rect;
-  }
+
+  // node_modules/@phaserjs/phaser/gameobjects/components/transform/UpdateLocalTransform.js
   function UpdateLocalTransform(transform) {
     const local = transform.local;
     const x = transform.position.x;
@@ -7145,6 +6837,8 @@ void main (void)
     const skewY = transform.skew.y;
     local.set(Math.cos(rotation + skewY) * scaleX, Math.sin(rotation + skewY) * scaleX, -Math.sin(rotation - skewX) * scaleY, Math.cos(rotation - skewX) * scaleY, x, y);
   }
+
+  // node_modules/@phaserjs/phaser/gameobjects/components/transform/UpdateWorldTransform.js
   function UpdateWorldTransform(gameObject) {
     const parent = gameObject.parent;
     const transform = gameObject.transform;
@@ -7160,6 +6854,8 @@ void main (void)
       wt.set(a * pa + b * pc, a * pb + b * pd, c * pa + d * pc, c * pb + d * pd, tx * pa + ty * pc + ptx, tx * pb + ty * pd + pty);
     }
   }
+
+  // node_modules/@phaserjs/phaser/gameobjects/components/transform/TransformComponent.js
   var TransformComponent = class {
     constructor(entity, x = 0, y = 0) {
       this.passthru = false;
@@ -7252,10 +6948,14 @@ void main (void)
       this.extent = null;
     }
   };
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/colors/PackColor.js
   function PackColor(rgb, alpha) {
     const ua = (alpha * 255 | 0) & 255;
     return (ua << 24 | rgb) >>> 0;
   }
+
+  // node_modules/@phaserjs/phaser/gameobjects/components/Vertex.js
   var Vertex = class {
     constructor(x = 0, y = 0, z = 0) {
       this.x = 0;
@@ -7300,6 +7000,8 @@ void main (void)
       this.color = PackColor(this.tint, this.alpha);
     }
   };
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/draw/BatchTexturedQuad.js
   function BatchTexturedQuad(sprite, renderPass) {
     const {F32, U32, offset} = GetVertexBufferEntry(renderPass, 1);
     const textureIndex = SetTexture(renderPass, sprite.texture);
@@ -7314,6 +7016,8 @@ void main (void)
       vertOffset += 6;
     });
   }
+
+  // node_modules/@phaserjs/phaser/gameobjects/GameObject.js
   var GameObject = class {
     constructor(x = 0, y = 0) {
       this.type = "GameObject";
@@ -7397,6 +7101,8 @@ void main (void)
       this.children = null;
     }
   };
+
+  // node_modules/@phaserjs/phaser/gameobjects/container/Container.js
   var Container = class extends GameObject {
     constructor(x = 0, y = 0) {
       super(x, y);
@@ -7503,6 +7209,8 @@ void main (void)
       }
     }
   };
+
+  // node_modules/@phaserjs/phaser/renderer/canvas/draw/DrawTexturedQuad.js
   function DrawTexturedQuad(sprite, renderer) {
     const frame2 = sprite.frame;
     if (!frame2) {
@@ -7518,12 +7226,16 @@ void main (void)
     ctx.drawImage(frame2.texture.image, frame2.x, frame2.y, frame2.width, frame2.height, x, y, frame2.width, frame2.height);
     ctx.restore();
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/colors/PackColors.js
   function PackColors(sprite) {
     sprite.vertices.forEach((vertex) => {
       vertex.packColor();
     });
     return sprite;
   }
+
+  // node_modules/@phaserjs/phaser/gameobjects/sprite/SetFrame.js
   function SetFrame(texture, key, ...children) {
     const frame2 = texture.getFrame(key);
     const {u0, u1, v0, v1, pivot} = frame2;
@@ -7545,6 +7257,8 @@ void main (void)
     });
     return children;
   }
+
+  // node_modules/@phaserjs/phaser/textures/TextureManagerInstance.js
   var instance3;
   var TextureManagerInstance = {
     get: () => {
@@ -7554,6 +7268,8 @@ void main (void)
       instance3 = manager;
     }
   };
+
+  // node_modules/@phaserjs/phaser/gameobjects/sprite/SetTexture.js
   function SetTexture2(key, frame2, ...children) {
     if (!key) {
       children.forEach((child) => {
@@ -7579,6 +7295,8 @@ void main (void)
     }
     return children;
   }
+
+  // node_modules/@phaserjs/phaser/gameobjects/sprite/UpdateVertices.js
   function UpdateVertices(sprite) {
     const vertices = sprite.vertices;
     const {x0, y0, x1, y1, x2, y2, x3, y3} = GetVertices(sprite.transform);
@@ -7588,6 +7306,8 @@ void main (void)
     vertices[3].setPosition(x3, y3);
     return sprite;
   }
+
+  // node_modules/@phaserjs/phaser/gameobjects/sprite/Sprite.js
   var Sprite = class extends Container {
     constructor(x, y, texture, frame2) {
       super(x, y);
@@ -7658,6 +7378,8 @@ void main (void)
       this.vertices = [];
     }
   };
+
+  // node_modules/@phaserjs/phaser/gameobjects/animatedsprite/AnimatedSprite.js
   var AnimatedSprite = class extends Sprite {
     constructor(x, y, texture, frame2) {
       super(x, y, texture, frame2);
@@ -7772,6 +7494,8 @@ void main (void)
       this.animData = null;
     }
   };
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/draw/BatchSingleQuad.js
   function BatchSingleQuad(renderPass, x, y, width, height, u0, v0, u1, v1, textureIndex = 0, packedColor = 4294967295) {
     const {F32, U32, offset} = GetVertexBufferEntry(renderPass, 1);
     F32[offset + 0] = x;
@@ -7799,6 +7523,8 @@ void main (void)
     F32[offset + 22] = textureIndex;
     U32[offset + 23] = packedColor;
   }
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/draw/DrawTexturedQuad.js
   function DrawTexturedQuad2(renderPass, texture, shader) {
     if (!shader) {
       shader = renderPass.quadShader;
@@ -7813,6 +7539,8 @@ void main (void)
     PopShader(renderPass);
     UnbindTexture(renderPass);
   }
+
+  // node_modules/@phaserjs/phaser/gameobjects/layer/Layer.js
   var Layer = class extends GameObject {
     constructor() {
       super();
@@ -7821,6 +7549,8 @@ void main (void)
       this.willRender = false;
     }
   };
+
+  // node_modules/@phaserjs/phaser/gameobjects/renderlayer/RenderLayer.js
   var RenderLayer = class extends Layer {
     constructor() {
       super();
@@ -7858,6 +7588,8 @@ void main (void)
       this.clearDirty(DIRTY_CONST.TRANSFORM);
     }
   };
+
+  // node_modules/@phaserjs/phaser/gameobjects/effectlayer/EffectLayer.js
   var EffectLayer = class extends RenderLayer {
     constructor(...shaders) {
       super();
@@ -7886,8 +7618,12 @@ void main (void)
       this.clearDirty(DIRTY_CONST.TRANSFORM);
     }
   };
+
+  // node_modules/@phaserjs/phaser/renderer/webgl1/draw/BatchTexturedQuadBuffer.js
   function BatchTexturedQuadBuffer(batch, renderPass) {
   }
+
+  // node_modules/@phaserjs/phaser/gameobjects/components/transform/GetVerticesFromValues.js
   function GetVerticesFromValues(left, right, top, bottom, x, y, rotation = 0, scaleX = 1, scaleY = 1, skewX = 0, skewY = 0) {
     const a = Math.cos(rotation + skewY) * scaleX;
     const b = Math.sin(rotation + skewY) * scaleX;
@@ -7903,6 +7639,8 @@ void main (void)
     const y3 = right * b + top * d + y;
     return {x0, y0, x1, y1, x2, y2, x3, y3};
   }
+
+  // node_modules/@phaserjs/phaser/gameobjects/spritebatch/SpriteBatch.js
   var SpriteBatch = class extends Layer {
     constructor(maxSize, texture) {
       super();
@@ -8058,16 +7796,22 @@ void main (void)
       this.hasTexture = false;
     }
   };
+
+  // node_modules/@phaserjs/phaser/textures/CreateCanvas.js
   function CreateCanvas(width, height) {
     const canvas = document.createElement("canvas");
     canvas.width = width;
     canvas.height = height;
     return canvas.getContext("2d");
   }
+
+  // node_modules/@phaserjs/phaser/textures/types/CanvasTexture.js
   function CanvasTexture(width = 32, height = 32) {
     const ctx = CreateCanvas(width, height);
     return new Texture(ctx.canvas);
   }
+
+  // node_modules/@phaserjs/phaser/gameobjects/text/Text.js
   var Text = class extends Sprite {
     constructor(x, y, text = "", font, fillStyle) {
       super(x, y, CanvasTexture());
@@ -8245,182 +7989,8 @@ void main (void)
       super.destroy(reparentChildren);
     }
   };
-  var gameobjects3d_exports = {};
-  __export(gameobjects3d_exports, {
-    Box: () => Box,
-    Components: () => components_exports2,
-    Cone: () => Cone,
-    GameObject3D: () => GameObject3D,
-    Geometry: () => geometry_exports,
-    Light: () => Light,
-    Material: () => Material,
-    Mesh: () => Mesh,
-    Plane: () => Plane,
-    RenderLayer3D: () => RenderLayer3D,
-    Sphere: () => Sphere
-  });
-  var components_exports2 = {};
-  __export(components_exports2, {
-    Transform3DComponent: () => Transform3DComponent
-  });
-  var Transform3DComponent = class {
-    constructor(entity, x = 0, y = 0, z = 0) {
-      this.passthru = false;
-      this.entity = entity;
-      this.local = new Matrix4();
-      this.world = new Matrix4();
-      this.normal = new Matrix4();
-      this.position = new Vec3Callback(() => this.update(), x, y, z);
-      this.scale = new Vec3Callback(() => this.update(), 1, 1, 1);
-      this.origin = new Vec3Callback(() => this.update());
-      this.rotation = new Quaternion();
-      this.rotation.onChange = () => this.update();
-      this.forward = Vec3Forward();
-      this.up = Vec3Up();
-      this.right = Vec3Right();
-      this.update();
-    }
-    rotateX(angle) {
-      QuatRotateX(this.rotation, angle, this.rotation);
-    }
-    rotateY(angle) {
-      QuatRotateY(this.rotation, angle, this.rotation);
-    }
-    rotateZ(angle) {
-      QuatRotateZ(this.rotation, angle, this.rotation);
-    }
-    update() {
-      const model = this.local;
-      const normal = this.normal;
-      Mat4FromRotationTranslationScale(this.rotation, this.position, this.scale, model);
-      Mat4Invert(model, normal);
-      Mat4Transpose(normal, normal);
-    }
-    updateLocal() {
-      this.entity.setDirty(DIRTY_CONST.TRANSFORM, DIRTY_CONST.BOUNDS);
-    }
-    updateWorld() {
-      const entity = this.entity;
-      entity.setDirty(DIRTY_CONST.TRANSFORM, DIRTY_CONST.BOUNDS);
-      if (entity.numChildren) {
-        this.updateChildren();
-      }
-    }
-    updateChildren() {
-      const children = this.entity.children;
-      for (let i = 0; i < children.length; i++) {
-        const child = children[i];
-      }
-    }
-    destroy() {
-      this.position.destroy();
-      this.scale.destroy();
-      this.origin.destroy();
-      this.rotation.destroy();
-      this.entity = null;
-      this.local = null;
-      this.world = null;
-      this.position = null;
-      this.scale = null;
-      this.origin = null;
-      this.rotation = null;
-    }
-  };
-  var geometry_exports = {};
-  __export(geometry_exports, {
-    CreateVertexSet: () => CreateVertexSet,
-    FaceUVNormalTexture: () => FaceUVNormalTexture,
-    Geometry: () => Geometry,
-    GetBufferFromObj: () => GetBufferFromObj,
-    GetBufferFromVertexSet: () => GetBufferFromVertexSet,
-    GetFacesFromVertexSet: () => GetFacesFromVertexSet,
-    ParseObj: () => ParseObj
-  });
-  function CreateVertexSet() {
-    return {
-      vertices: [],
-      normals: [],
-      uvs: [],
-      indices: [],
-      numberOfVertices: 0
-    };
-  }
-  var webgl1_exports = {};
-  __export(webgl1_exports, {
-    CreateFramebuffer: () => CreateFramebuffer,
-    CreateGLTexture: () => CreateGLTexture,
-    DeleteFramebuffer: () => DeleteFramebuffer,
-    DeleteGLBuffer: () => DeleteGLBuffer,
-    DeleteGLTexture: () => DeleteGLTexture,
-    GL: () => GL,
-    PackColor: () => PackColor,
-    PackColors: () => PackColors,
-    SetGLTextureFilterMode: () => SetGLTextureFilterMode,
-    UpdateGLTexture: () => UpdateGLTexture,
-    WebGLRenderer: () => WebGLRenderer
-  });
-  var FaceUVNormalTexture = class {
-    constructor(v1, v2, v3, n1, n2, n3, uv1, uv2, uv3, scale = 1) {
-      this.color = 16777215;
-      this.alpha = 1;
-      this.size = 30;
-      this.vertex1 = new Vertex(v1.x * scale, v1.y * scale, v1.z * scale);
-      this.vertex2 = new Vertex(v2.x * scale, v2.y * scale, v2.z * scale);
-      this.vertex3 = new Vertex(v3.x * scale, v3.y * scale, v3.z * scale);
-      this.vertex1.setUV(uv1.x, uv1.y);
-      this.vertex2.setUV(uv2.x, uv2.y);
-      this.vertex3.setUV(uv3.x, uv3.y);
-      this.normal1 = n1;
-      this.normal2 = n2;
-      this.normal3 = n3;
-      this._packedColor = PackColor(this.color, this.alpha);
-    }
-    setColor(color, alpha = 1) {
-      this.color = color;
-      this.alpha = alpha;
-      this._packedColor = PackColor(color, alpha);
-    }
-    addToBuffer(F32, U32, textureID, offset) {
-      const v1 = this.vertex1;
-      const v2 = this.vertex2;
-      const v3 = this.vertex3;
-      const n1 = this.normal1;
-      const n2 = this.normal2;
-      const n3 = this.normal3;
-      const color = this._packedColor;
-      F32[offset++] = v1.x;
-      F32[offset++] = v1.y;
-      F32[offset++] = v1.z;
-      F32[offset++] = n1.x;
-      F32[offset++] = n1.y;
-      F32[offset++] = n1.z;
-      F32[offset++] = v1.u;
-      F32[offset++] = v1.v;
-      F32[offset++] = textureID;
-      U32[offset++] = color;
-      F32[offset++] = v2.x;
-      F32[offset++] = v2.y;
-      F32[offset++] = v2.z;
-      F32[offset++] = n2.x;
-      F32[offset++] = n2.y;
-      F32[offset++] = n2.z;
-      F32[offset++] = v2.u;
-      F32[offset++] = v2.v;
-      F32[offset++] = textureID;
-      U32[offset++] = color;
-      F32[offset++] = v3.x;
-      F32[offset++] = v3.y;
-      F32[offset++] = v3.z;
-      F32[offset++] = n3.x;
-      F32[offset++] = n3.y;
-      F32[offset++] = n3.z;
-      F32[offset++] = v3.u;
-      F32[offset++] = v3.v;
-      F32[offset++] = textureID;
-      U32[offset++] = color;
-      return offset;
-    }
-  };
+
+  // node_modules/@phaserjs/phaser/gameobjects3d/geometry/GetBufferFromVertexSet.js
   function GetVec3(data, index) {
     const x = data[index * 3 + 0];
     const y = data[index * 3 + 1];
@@ -8517,6 +8087,8 @@ void main (void)
       return CreateNonIndexedVertexBuffer(data);
     }
   }
+
+  // node_modules/@phaserjs/phaser/gameobjects3d/geometry/Geometry.js
   var Geometry = class {
     constructor(data) {
       if (data) {
@@ -8531,6 +8103,8 @@ void main (void)
       this.buffer.destroy();
     }
   };
+
+  // node_modules/@phaserjs/phaser/gameobjects3d/geometry/ParseObj.js
   var ParseObj = class {
     constructor(fileContents, flipUVs = true, defaultModelName = "untitled") {
       this.currentMaterial = "";
@@ -8726,6 +8300,8 @@ void main (void)
       this.smoothingGroup = groupNumber;
     }
   };
+
+  // node_modules/@phaserjs/phaser/gameobjects3d/geometry/GetBufferFromObj.js
   function GetBufferFromObj(data, flipUVs = true) {
     const parser = new ParseObj(data, flipUVs);
     const result = parser.parse();
@@ -8819,175 +8395,8 @@ void main (void)
     });
     return output;
   }
-  function GetVec32(data, index) {
-    const x = data[index * 3 + 0];
-    const y = data[index * 3 + 1];
-    const z = data[index * 3 + 2];
-    return [x, y, z];
-  }
-  function GetVec22(data, index) {
-    const x = data[index * 2 + 0];
-    const y = data[index * 2 + 1];
-    return [x, y];
-  }
-  function GetFacesFromVertexSet(data) {
-    const {
-      vertices,
-      normals,
-      uvs,
-      indices
-    } = data;
-    const faces = [];
-    for (let i = 0; i < indices.length; i += 3) {
-      const i1 = indices[i + 0];
-      const i2 = indices[i + 1];
-      const i3 = indices[i + 2];
-      const v1 = GetVec32(vertices, i1);
-      const v2 = GetVec32(vertices, i2);
-      const v3 = GetVec32(vertices, i3);
-      const n1 = GetVec32(normals, i1);
-      const n2 = GetVec32(normals, i2);
-      const n3 = GetVec32(normals, i3);
-      const uv1 = GetVec22(uvs, i1);
-      const uv2 = GetVec22(uvs, i2);
-      const uv3 = GetVec22(uvs, i3);
-      const f = new FaceUVNormalTexture({x: v1[0], y: v1[1], z: v1[2]}, {x: v2[0], y: v2[1], z: v2[2]}, {x: v3[0], y: v3[1], z: v3[2]}, {x: n1[0], y: n1[1], z: n1[2]}, {x: n2[0], y: n2[1], z: n2[2]}, {x: n3[0], y: n3[1], z: n3[2]}, {x: uv1[0], y: uv1[1]}, {x: uv2[0], y: uv2[1]}, {x: uv3[0], y: uv3[1]}, 1);
-      faces.push(f);
-    }
-    return faces;
-  }
-  function PlaneGeometry(data, x = 0, y = 0, z = 0, u = 0, v = 1, w = 2, udir = 1, vdir = -1, width = 1, height = 1, depth = 1, gridX = 1, gridY = 1) {
-    if (!data) {
-      data = CreateVertexSet();
-    }
-    const {
-      vertices,
-      normals,
-      uvs,
-      indices,
-      numberOfVertices
-    } = data;
-    const segmentWidth = width / gridX;
-    const segmentHeight = height / gridY;
-    const widthHalf = width / 2;
-    const heightHalf = height / 2;
-    const depthHalf = depth / 2;
-    const gridX1 = gridX + 1;
-    const gridY1 = gridY + 1;
-    let vertexCounter = 0;
-    const vector = [];
-    for (let iy = 0; iy < gridY1; iy++) {
-      const by = iy * segmentHeight - heightHalf;
-      for (let ix = 0; ix < gridX1; ix++) {
-        const bx = ix * segmentWidth - widthHalf;
-        vector[u] = bx * udir;
-        vector[v] = by * vdir;
-        vector[w] = depthHalf;
-        vertices.push(x + vector[0], y + vector[1], z + vector[2]);
-        vector[u] = 0;
-        vector[v] = 0;
-        vector[w] = depth > 0 ? 1 : -1;
-        normals.push(vector[0], vector[1], vector[2]);
-        uvs.push(ix / gridX);
-        uvs.push(1 - iy / gridY);
-        vertexCounter += 1;
-      }
-    }
-    for (let iy = 0; iy < gridY; iy++) {
-      for (let ix = 0; ix < gridX; ix++) {
-        const a = numberOfVertices + ix + gridX1 * iy;
-        const b = numberOfVertices + ix + gridX1 * (iy + 1);
-        const c = numberOfVertices + (ix + 1) + gridX1 * (iy + 1);
-        const d = numberOfVertices + (ix + 1) + gridX1 * iy;
-        indices.push(a, b, d);
-        indices.push(b, c, d);
-      }
-    }
-    data.numberOfVertices += vertexCounter;
-    return data;
-  }
-  function BoxGeometry(x = 0, y = 0, z = 0, width = 1, height = 1, depth = 1, widthSegments = 1, heightSegments = 1, depthSegments = 1) {
-    const data = CreateVertexSet();
-    PlaneGeometry(data, x, y, z, 2, 1, 0, -1, -1, depth, height, width, depthSegments, heightSegments);
-    PlaneGeometry(data, x, y, z, 2, 1, 0, 1, -1, depth, height, -width, depthSegments, heightSegments);
-    PlaneGeometry(data, x, y, z, 0, 2, 1, 1, 1, width, depth, height, widthSegments, depthSegments);
-    PlaneGeometry(data, x, y, z, 0, 2, 1, 1, -1, width, depth, -height, widthSegments, depthSegments);
-    PlaneGeometry(data, x, y, z, 0, 1, 2, 1, -1, width, height, depth, widthSegments, heightSegments);
-    PlaneGeometry(data, x, y, z, 0, 1, 2, -1, -1, width, height, -depth, widthSegments, heightSegments);
-    return data;
-  }
-  var GameObject3D = class {
-    constructor(x = 0, y = 0, z = 0) {
-      this.type = "GameObject3D";
-      this.name = "";
-      this.willUpdate = true;
-      this.willUpdateChildren = true;
-      this.willRender = true;
-      this.willRenderChildren = true;
-      this.willCacheChildren = false;
-      this.dirty = 0;
-      this.dirtyFrame = 0;
-      this.visible = true;
-      this.children = [];
-      this.events = new Map();
-      this.transform = new Transform3DComponent(this, x, y, z);
-      this.dirty = DIRTY_CONST.DEFAULT;
-    }
-    isRenderable() {
-      return this.visible && this.willRender;
-    }
-    isDirty(flag) {
-      return (this.dirty & flag) !== 0;
-    }
-    clearDirty(flag) {
-      if (this.isDirty(flag)) {
-        this.dirty ^= flag;
-      }
-      return this;
-    }
-    setDirty(flag, flag2) {
-      if (!this.isDirty(flag)) {
-        this.dirty ^= flag;
-        this.dirtyFrame = GameInstance.getFrame();
-      }
-      if (!this.isDirty(flag2)) {
-        this.dirty ^= flag2;
-      }
-      return this;
-    }
-    update(delta, time) {
-      if (this.willUpdateChildren) {
-        const children = this.children;
-        for (let i = 0; i < children.length; i++) {
-          const child = children[i];
-          if (child && child.willUpdate) {
-            child.update(delta, time);
-          }
-        }
-      }
-      this.postUpdate(delta, time);
-    }
-    postUpdate(delta, time) {
-    }
-    renderGL(renderPass) {
-    }
-    postRenderGL(renderPass) {
-    }
-    get numChildren() {
-      return this.children.length;
-    }
-    destroy(reparentChildren) {
-      if (reparentChildren) {
-      } else {
-      }
-      Emit(this, DestroyEvent, this);
-      this.transform.destroy();
-      this.events.clear();
-      this.world = null;
-      this.parent = null;
-      this.children = null;
-    }
-  };
+
+  // node_modules/@phaserjs/phaser/gameobjects3d/material/Material.js
   var Material = class {
     constructor(config = {}) {
       this.isDirty = false;
@@ -9025,2225 +8434,19 @@ void main (void)
       this.specular.destroy();
     }
   };
-  function SetFrame2(texture, key, ...children) {
-    const frame2 = texture.getFrame(key);
-    children.forEach((child) => {
-      if (!child || frame2 === child.frame) {
-        return;
-      }
-      child.frame = frame2;
-      child.hasTexture = true;
-    });
-    return children;
-  }
-  function SetTexture3(key, frame2, ...children) {
-    if (!key) {
-      children.forEach((child) => {
-        child.texture = null;
-        child.frame = null;
-        child.hasTexture = false;
-      });
-    } else {
-      let texture;
-      if (key instanceof Texture) {
-        texture = key;
-      } else {
-        texture = TextureManagerInstance.get().get(key);
-      }
-      if (!texture) {
-        console.warn(`Invalid Texture key: ${key}`);
-      } else {
-        children.forEach((child) => {
-          child.texture = texture;
-        });
-        SetFrame2(texture, frame2, ...children);
-      }
-    }
-    return children;
-  }
-  var Mesh = class extends GameObject3D {
-    constructor(x = 0, y = 0, z = 0, geometry, material = new Material()) {
-      super(x, y, z);
-      this.hasTexture = false;
-      this.cullFaces = true;
-      this.geometry = geometry;
-      this.material = material;
-      this.setTexture("__WHITE");
-    }
-    setTexture(key, frame2) {
-      SetTexture3(key, frame2, this);
-      return this;
-    }
-    setFrame(key) {
-      SetFrame2(this.texture, key, this);
-      return this;
-    }
-    setMaterial(material) {
-      this.material = material;
-      return this;
-    }
-    renderGL(renderPass) {
-      const shader = renderPass.currentShader.shader;
-      shader.setUniform("uModelMatrix", this.transform.local.data);
-      shader.setUniform("uNormalMatrix", this.transform.normal.data);
-      if (this.hasTexture) {
-        const textureIndex = SetTexture(renderPass, this.texture);
-        shader.setUniform("uTexture", textureIndex);
-      }
-      this.material.setUniforms(shader);
-      FlushBuffer(renderPass, this.geometry.buffer);
-    }
-    destroy(reparentChildren) {
-      super.destroy(reparentChildren);
-      this.geometry = null;
-      this.material = null;
-      this.texture = null;
-      this.frame = null;
-      this.hasTexture = false;
-    }
-  };
-  var Box = class extends Mesh {
-    constructor(x = 0, y = 0, z = 0, width = 1, height = 1, depth = 1, widthSegments = 1, heightSegments = 1, depthSegments = 1) {
-      const data = BoxGeometry(0, 0, 0, width, height, depth, widthSegments, heightSegments, depthSegments);
-      const geometry = new Geometry(data);
-      super(x, y, z, geometry);
-    }
-  };
-  function GenerateCap(top, data, index, halfHeight, radiusTop, radiusBottom, radialSegments, thetaStart, thetaLength) {
-    const {
-      vertices,
-      normals,
-      uvs,
-      indices
-    } = data;
-    const uv = new Vec2();
-    const vertex = new Vec3();
-    const radius = top === true ? radiusTop : radiusBottom;
-    const sign = top === true ? 1 : -1;
-    const centerIndexStart = index;
-    for (let x = 1; x <= radialSegments; x++) {
-      vertices.push(0, halfHeight * sign, 0);
-      normals.push(0, sign, 0);
-      uvs.push(0.5, 0.5);
-      index++;
-    }
-    const centerIndexEnd = index;
-    for (let x = 0; x <= radialSegments; x++) {
-      const u = x / radialSegments;
-      const theta = u * thetaLength + thetaStart;
-      const cosTheta = Math.cos(theta);
-      const sinTheta = Math.sin(theta);
-      vertex.x = radius * sinTheta;
-      vertex.y = halfHeight * sign;
-      vertex.z = radius * cosTheta;
-      vertices.push(vertex.x, vertex.y, vertex.z);
-      normals.push(0, sign, 0);
-      uv.x = cosTheta * 0.5 + 0.5;
-      uv.y = sinTheta * 0.5 * sign + 0.5;
-      uvs.push(uv.x, uv.y);
-      index++;
-    }
-    for (let x = 0; x < radialSegments; x++) {
-      const c = centerIndexStart + x;
-      const i = centerIndexEnd + x;
-      if (top) {
-        indices.push(i, i + 1, c);
-      } else {
-        indices.push(i + 1, i, c);
-      }
-    }
-    return index;
-  }
-  function CylinderGeometry(radiusTop = 1, radiusBottom = 1, height = 1, radialSegments = 8, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2) {
-    const data = CreateVertexSet();
-    const {
-      vertices,
-      normals,
-      uvs,
-      indices
-    } = data;
-    let index = 0;
-    const indexArray = [];
-    const halfHeight = height / 2;
-    const normal = new Vec3();
-    const vertex = new Vec3();
-    const slope = (radiusBottom - radiusTop) / height;
-    for (let y = 0; y <= heightSegments; y++) {
-      const indexRow = [];
-      const v = y / heightSegments;
-      const radius = v * (radiusBottom - radiusTop) + radiusTop;
-      for (let x = 0; x <= radialSegments; x++) {
-        const u = x / radialSegments;
-        const theta = u * thetaLength + thetaStart;
-        const sinTheta = Math.sin(theta);
-        const cosTheta = Math.cos(theta);
-        vertex.x = radius * sinTheta;
-        vertex.y = -v * height + halfHeight;
-        vertex.z = radius * cosTheta;
-        vertices.push(vertex.x, vertex.y, vertex.z);
-        normal.set(sinTheta, slope, cosTheta);
-        Vec3Normalize(normal, normal);
-        normals.push(normal.x, normal.y, normal.z);
-        uvs.push(u, 1 - v);
-        indexRow.push(index++);
-      }
-      indexArray.push(indexRow);
-    }
-    for (let x = 0; x < radialSegments; x++) {
-      for (let y = 0; y < heightSegments; y++) {
-        const a = indexArray[y][x];
-        const b = indexArray[y + 1][x];
-        const c = indexArray[y + 1][x + 1];
-        const d = indexArray[y][x + 1];
-        indices.push(a, b, d);
-        indices.push(b, c, d);
-      }
-    }
-    if (!openEnded) {
-      if (radiusTop > 0) {
-        index = GenerateCap(true, data, index, halfHeight, radiusTop, radiusBottom, radialSegments, thetaStart, thetaLength);
-      }
-      if (radiusBottom > 0) {
-        GenerateCap(false, data, index, halfHeight, radiusTop, radiusBottom, radialSegments, thetaStart, thetaLength);
-      }
-    }
-    data.numberOfVertices = vertices.length;
-    return data;
-  }
-  function ConeGeometry(radius = 1, height = 1, radialSegments = 8, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2) {
-    return CylinderGeometry(0, radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength);
-  }
-  var Cone = class extends Mesh {
-    constructor(x = 0, y = 0, z = 0, radius = 1, height = 1, radialSegments = 8, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2) {
-      const data = ConeGeometry(radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength);
-      const geometry = new Geometry(data);
-      super(x, y, z, geometry);
-    }
-  };
-  var Light = class {
-    constructor(config = {}) {
-      this.isDirty = false;
-      const {
-        x = 0,
-        y = 0,
-        z = 0.1,
-        ambient = [1, 1, 1],
-        diffuse = [1, 1, 1],
-        specular = [1, 1, 1]
-      } = config;
-      const onChange = () => this.update();
-      this.position = new Vec3Callback(onChange, x, y, z);
-      this.ambient = new RGBCallback(onChange).fromArray(ambient);
-      this.diffuse = new RGBCallback(onChange).fromArray(diffuse);
-      this.specular = new RGBCallback(onChange).fromArray(specular);
-    }
-    setUniforms(shader) {
-      shader.setUniform("uLightPosition", this.position.toArray());
-      shader.setUniform("uLightAmbient", this.ambient.toArray());
-      shader.setUniform("uLightDiffuse", this.diffuse.toArray());
-      shader.setUniform("uLightSpecular", this.specular.toArray());
-    }
-    update() {
-      this.isDirty = true;
-    }
-    destroy() {
-      this.position.destroy();
-      this.ambient.destroy();
-      this.diffuse.destroy();
-      this.specular.destroy();
-    }
-  };
-  var Plane = class extends Mesh {
-    constructor(x = 0, y = 0, z = 0, width = 1, height = 1, widthSegments = 1, heightSegments = 1) {
-      const data = PlaneGeometry(null, 0, 0, 0, 0, 1, 2, 1, -1, width, height, 1, widthSegments, heightSegments);
-      const geometry = new Geometry(data);
-      super(x, y, z, geometry);
-    }
-  };
-  var RenderLayer3D = class extends Layer {
-    constructor() {
-      super();
-      this.type = "RenderLayer";
-      this.willRender = true;
-      this.willRenderChildren = true;
-      this.willCacheChildren = true;
-      this.setDirty(DIRTY_CONST.CHILD_CACHE);
-      const width = GetWidth();
-      const height = GetHeight();
-      const resolution = GetResolution();
-      const texture = new Texture(null, width * resolution, height * resolution);
-      const binding = new GLTextureBinding(texture);
-      texture.binding = binding;
-      binding.framebuffer = CreateFramebuffer(binding.texture);
-      binding.depthbuffer = CreateDepthBuffer(binding.framebuffer, texture.width, texture.height);
-      this.texture = texture;
-      this.framebuffer = binding.framebuffer;
-    }
-    renderGL(renderPass) {
-      if (this.numChildren > 0) {
-        Flush(renderPass);
-        if (!this.willCacheChildren || this.isDirty(DIRTY_CONST.CHILD_CACHE)) {
-          SetFramebuffer(renderPass, this.framebuffer, true);
-          this.clearDirty(DIRTY_CONST.CHILD_CACHE);
-        } else {
-          SetFramebuffer(renderPass, this.framebuffer, false);
-          this.postRenderGL(renderPass);
-        }
-      }
-    }
-    postRenderGL(renderPass) {
-      Flush(renderPass);
-      PopFramebuffer(renderPass);
-      DrawTexturedQuad2(renderPass, this.texture);
-      this.clearDirty(DIRTY_CONST.TRANSFORM);
-    }
-  };
-  function SphereGeometry(radius = 1, widthSegments = 3, heightSegments = 3, phiStart = 0, phiLength = Math.PI * 2, thetaStart = 0, thetaLength = Math.PI) {
-    widthSegments = Math.max(3, Math.floor(widthSegments) || 8);
-    heightSegments = Math.max(2, Math.floor(heightSegments) || 6);
-    const thetaEnd = Math.min(thetaStart + thetaLength, Math.PI);
-    const data = CreateVertexSet();
-    const {
-      vertices,
-      normals,
-      uvs,
-      indices
-    } = data;
-    let index = 0;
-    const grid = [];
-    const vertex = new Vec3();
-    const normal = new Vec3();
-    for (let iy = 0; iy <= heightSegments; iy++) {
-      const verticesRow = [];
-      const v = iy / heightSegments;
-      let uOffset = 0;
-      if (iy === 0 && thetaStart === 0) {
-        uOffset = 0.5 / widthSegments;
-      } else if (iy === heightSegments && thetaEnd == Math.PI) {
-        uOffset = -0.5 / widthSegments;
-      }
-      for (let ix = 0; ix <= widthSegments; ix++) {
-        const u = ix / widthSegments;
-        vertex.x = -radius * Math.cos(phiStart + u * phiLength) * Math.sin(thetaStart + v * thetaLength);
-        vertex.y = radius * Math.cos(thetaStart + v * thetaLength);
-        vertex.z = radius * Math.sin(phiStart + u * phiLength) * Math.sin(thetaStart + v * thetaLength);
-        vertices.push(vertex.x, vertex.y, vertex.z);
-        Vec3Normalize(vertex, normal);
-        normals.push(normal.x, normal.y, normal.z);
-        uvs.push(u + uOffset, 1 - v);
-        verticesRow.push(index++);
-      }
-      grid.push(verticesRow);
-    }
-    for (let iy = 0; iy < heightSegments; iy++) {
-      for (let ix = 0; ix < widthSegments; ix++) {
-        const a = grid[iy][ix + 1];
-        const b = grid[iy][ix];
-        const c = grid[iy + 1][ix];
-        const d = grid[iy + 1][ix + 1];
-        if (iy !== 0 || thetaStart > 0) {
-          indices.push(a, b, d);
-        }
-        if (iy !== heightSegments - 1 || thetaEnd < Math.PI) {
-          indices.push(b, c, d);
-        }
-      }
-    }
-    data.numberOfVertices = vertices.length;
-    return data;
-  }
-  var Sphere = class extends Mesh {
-    constructor(x = 0, y = 0, z = 0, radius = 1, widthSegments = 3, heightSegments = 3, phiStart = 0, phiLength = Math.PI * 2, thetaStart = 0, thetaLength = Math.PI) {
-      const data = SphereGeometry(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength);
-      const geometry = new Geometry(data);
-      super(x, y, z, geometry);
-    }
-  };
-  var geom_exports = {};
-  __export(geom_exports, {
-    Circle: () => circle_exports,
-    Ellipse: () => ellipse_exports,
-    Intersects: () => intersects_exports,
-    Line: () => line_exports,
-    Rectangle: () => rectangle_exports,
-    Triangle: () => triangle_exports
-  });
-  var circle_exports = {};
-  __export(circle_exports, {
-    Circle: () => Circle,
-    CircleContains: () => CircleContains,
-    CircleContainsPoint: () => CircleContainsPoint,
-    CircleContainsRect: () => CircleContainsRect,
-    CircleEquals: () => CircleEquals,
-    CloneCircle: () => CloneCircle,
-    CopyCircleFrom: () => CopyCircleFrom,
-    GetCircleArea: () => GetCircleArea,
-    GetCircleBounds: () => GetCircleBounds,
-    GetCircleCircumference: () => GetCircleCircumference,
-    GetCircleCircumferencePoint: () => GetCircleCircumferencePoint,
-    GetCirclePoint: () => GetCirclePoint,
-    GetCirclePoints: () => GetCirclePoints,
-    GetCircleRandomPoint: () => GetCircleRandomPoint,
-    TranslateCircle: () => TranslateCircle,
-    TranslateCirclePoint: () => TranslateCirclePoint
-  });
-  function CircleContains(circle, x, y) {
-    if (circle.radius > 0 && x >= circle.left && x <= circle.right && y >= circle.top && y <= circle.bottom) {
-      const dx = (circle.x - x) * (circle.x - x);
-      const dy = (circle.y - y) * (circle.y - y);
-      return dx + dy <= circle.radius * circle.radius;
-    } else {
-      return false;
-    }
-  }
-  var Circle = class {
-    constructor(x = 0, y = 0, radius = 0) {
-      this.set(x, y, radius);
-    }
-    set(x = 0, y = 0, radius = 0) {
-      this.x = x;
-      this.y = y;
-      this.radius = radius;
-      return this;
-    }
-    contains(x, y) {
-      return CircleContains(this, x, y);
-    }
-    get radius() {
-      return this._radius;
-    }
-    set radius(value) {
-      this._radius = value;
-      this._diameter = value * 2;
-    }
-    get diameter() {
-      return this._diameter;
-    }
-    set diameter(value) {
-      this._diameter = value;
-      this._radius = value * 0.5;
-    }
-    get left() {
-      return this.x - this._radius;
-    }
-    set left(value) {
-      this.x = value + this._radius;
-    }
-    get right() {
-      return this.x + this._radius;
-    }
-    set right(value) {
-      this.x = value - this._radius;
-    }
-    get top() {
-      return this.y - this._radius;
-    }
-    set top(value) {
-      this.y = value + this._radius;
-    }
-    get bottom() {
-      return this.y + this._radius;
-    }
-    set bottom(value) {
-      this.y = value - this._radius;
-    }
-  };
-  function CircleContainsPoint(circle, point) {
-    return CircleContains(circle, point.x, point.y);
-  }
-  function CircleContainsRect(circle, rect) {
-    return CircleContains(circle, rect.x, rect.y) && CircleContains(circle, rect.right, rect.y) && CircleContains(circle, rect.x, rect.bottom) && CircleContains(circle, rect.right, rect.bottom);
-  }
-  function CircleEquals(circle, toCompare) {
-    return circle.x === toCompare.x && circle.y === toCompare.y && circle.radius === toCompare.radius;
-  }
-  function CloneCircle(source) {
-    return new Circle(source.x, source.y, source.radius);
-  }
-  function CopyCircleFrom(source, dest) {
-    return dest.set(source.x, source.y, source.radius);
-  }
-  function GetCircleArea(circle) {
-    return circle.radius > 0 ? Math.PI * circle.radius * circle.radius : 0;
-  }
-  function GetCircleBounds(circle, out = new Rectangle()) {
-    return out.set(circle.left, circle.top, circle.diameter, circle.diameter);
-  }
-  function GetCircleCircumference(circle) {
-    return 2 * (Math.PI * circle.radius);
-  }
-  function GetCircleCircumferencePoint(circle, angle, out = new Vec2()) {
-    return out.set(circle.x + circle.radius * Math.cos(angle), circle.y + circle.radius * Math.sin(angle));
-  }
-  function GetCirclePoint(circle, position, out = new Vec2()) {
-    const angle = FromPercent(position, 0, MATH_CONST.PI2);
-    return GetCircleCircumferencePoint(circle, angle, out);
-  }
-  function GetCirclePoints(circle, step, quantity = 0, out = []) {
-    if (!quantity) {
-      quantity = GetCircleCircumference(circle) / step;
-    }
-    for (let i = 0; i < quantity; i++) {
-      const angle = FromPercent(i / quantity, 0, MATH_CONST.PI2);
-      out.push(GetCircleCircumferencePoint(circle, angle));
-    }
-    return out;
-  }
-  function GetCircleRandomPoint(circle, out = new Vec2()) {
-    const t = 2 * Math.PI * Math.random();
-    const u = Math.random() + Math.random();
-    const r = u > 1 ? 2 - u : u;
-    const x = r * Math.cos(t);
-    const y = r * Math.sin(t);
-    return out.set(circle.x + x * circle.radius, circle.y + y * circle.radius);
-  }
-  function TranslateCircle(circle, x, y) {
-    circle.x += x;
-    circle.y += y;
-    return circle;
-  }
-  function TranslateCirclePoint(circle, point) {
-    circle.x += point.x;
-    circle.y += point.y;
-    return circle;
-  }
-  var ellipse_exports = {};
-  __export(ellipse_exports, {
-    CloneEllipse: () => CloneEllipse,
-    CopyEllipseFrom: () => CopyEllipseFrom,
-    Ellipse: () => Ellipse,
-    EllipseContains: () => EllipseContains,
-    EllipseContainsPoint: () => EllipseContainsPoint,
-    EllipseContainsRect: () => EllipseContainsRect,
-    EllipseEquals: () => EllipseEquals,
-    GetEllipseArea: () => GetEllipseArea,
-    GetEllipseBounds: () => GetEllipseBounds,
-    GetEllipseCircumference: () => GetEllipseCircumference,
-    GetEllipseCircumferencePoint: () => GetEllipseCircumferencePoint,
-    GetEllipsePoint: () => GetEllipsePoint,
-    GetEllipsePoints: () => GetEllipsePoints,
-    GetEllipseRandomPoint: () => GetEllipseRandomPoint,
-    TranslateEllipse: () => TranslateEllipse,
-    TranslateEllipsePoint: () => TranslateEllipsePoint
-  });
-  function EllipseContains(ellipse, x, y) {
-    if (ellipse.width <= 0 || ellipse.height <= 0) {
-      return false;
-    }
-    let normx = (x - ellipse.x) / ellipse.width;
-    let normy = (y - ellipse.y) / ellipse.height;
-    normx *= normx;
-    normy *= normy;
-    return normx + normy < 0.25;
-  }
-  var Ellipse = class {
-    constructor(x = 0, y = 0, width = 0, height = 0) {
-      this.set(x, y, width, height);
-    }
-    set(x = 0, y = 0, width = 0, height = 0) {
-      this.x = x;
-      this.y = y;
-      this.width = width;
-      this.height = height;
-      return this;
-    }
-    contains(x, y) {
-      return EllipseContains(this, x, y);
-    }
-    getMinorRadius() {
-      return Math.min(this.width, this.height) / 2;
-    }
-    getMajorRadius() {
-      return Math.max(this.width, this.height) / 2;
-    }
-    get left() {
-      return this.x - this.width / 2;
-    }
-    set left(value) {
-      this.x = value + this.width / 2;
-    }
-    get right() {
-      return this.x + this.width / 2;
-    }
-    set right(value) {
-      this.x = value - this.width / 2;
-    }
-    get top() {
-      return this.y - this.height / 2;
-    }
-    set top(value) {
-      this.y = value + this.height / 2;
-    }
-    get bottom() {
-      return this.y + this.height / 2;
-    }
-    set bottom(value) {
-      this.y = value - this.height / 2;
-    }
-  };
-  function CloneEllipse(source) {
-    return new Ellipse(source.x, source.y, source.width, source.height);
-  }
-  function CopyEllipseFrom(source, dest) {
-    return dest.set(source.x, source.y, source.width, source.height);
-  }
-  function EllipseContainsPoint(ellipse, point) {
-    return EllipseContains(ellipse, point.x, point.y);
-  }
-  function EllipseContainsRect(ellipse, rect) {
-    return EllipseContains(ellipse, rect.x, rect.y) && EllipseContains(ellipse, rect.right, rect.y) && EllipseContains(ellipse, rect.x, rect.bottom) && EllipseContains(ellipse, rect.right, rect.bottom);
-  }
-  function EllipseEquals(ellipse, toCompare) {
-    return ellipse.x === toCompare.x && ellipse.y === toCompare.y && ellipse.width === toCompare.width && ellipse.height === toCompare.height;
-  }
-  function GetEllipseArea(ellipse) {
-    if (ellipse.width <= 0 || ellipse.height <= 0) {
-      return 0;
-    }
-    return ellipse.getMajorRadius() * ellipse.getMinorRadius() * Math.PI;
-  }
-  function GetEllipseBounds(ellipse, out = new Rectangle()) {
-    return out.set(ellipse.left, ellipse.top, ellipse.width, ellipse.height);
-  }
-  function GetEllipseCircumference(ellipse) {
-    const rx = ellipse.width / 2;
-    const ry = ellipse.height / 2;
-    const h = Math.pow(rx - ry, 2) / Math.pow(rx + ry, 2);
-    return Math.PI * (rx + ry) * (1 + 3 * h / (10 + Math.sqrt(4 - 3 * h)));
-  }
-  function GetEllipseCircumferencePoint(ellipse, angle, out = new Vec2()) {
-    const halfWidth = ellipse.width / 2;
-    const halfHeight = ellipse.height / 2;
-    return out.set(ellipse.x + halfWidth * Math.cos(angle), ellipse.y + halfHeight * Math.sin(angle));
-  }
-  function GetEllipsePoint(ellipse, position, out = new Vec2()) {
-    const angle = FromPercent(position, 0, MATH_CONST.PI2);
-    return GetEllipseCircumferencePoint(ellipse, angle, out);
-  }
-  function GetEllipsePoints(ellipse, step, quantity = 0, out = []) {
-    if (!quantity) {
-      quantity = GetEllipseCircumference(ellipse) / step;
-    }
-    for (let i = 0; i < quantity; i++) {
-      const angle = FromPercent(i / quantity, 0, MATH_CONST.PI2);
-      out.push(GetEllipseCircumferencePoint(ellipse, angle));
-    }
-    return out;
-  }
-  function GetEllipseRandomPoint(ellipse, out = new Vec2()) {
-    const p = Math.random() * Math.PI * 2;
-    const s = Math.sqrt(Math.random());
-    out.x = ellipse.x + s * Math.cos(p) * ellipse.width / 2;
-    out.y = ellipse.y + s * Math.sin(p) * ellipse.height / 2;
-    return out;
-  }
-  function TranslateEllipse(ellipse, x, y) {
-    ellipse.x += x;
-    ellipse.y += y;
-    return ellipse;
-  }
-  function TranslateEllipsePoint(ellipse, point) {
-    ellipse.x += point.x;
-    ellipse.y += point.y;
-    return ellipse;
-  }
-  var intersects_exports = {};
-  __export(intersects_exports, {
-    CircleToCircle: () => CircleToCircle,
-    CircleToRectangle: () => CircleToRectangle,
-    GetCircleToCircle: () => GetCircleToCircle,
-    GetCircleToRectangle: () => GetCircleToRectangle,
-    GetLineToCircle: () => GetLineToCircle,
-    GetLineToRectangle: () => GetLineToRectangle,
-    GetRectangleIntersection: () => GetRectangleIntersection2,
-    GetRectangleToRectangle: () => GetRectangleToRectangle,
-    GetRectangleToTriangle: () => GetRectangleToTriangle,
-    GetTriangleToCircle: () => GetTriangleToCircle,
-    GetTriangleToLine: () => GetTriangleToLine,
-    GetTriangleToTriangle: () => GetTriangleToTriangle,
-    LineToCircle: () => LineToCircle,
-    LineToLine: () => LineToLine,
-    LineToRectangle: () => LineToRectangle,
-    PointToLine: () => PointToLine,
-    PointToLineSegment: () => PointToLineSegment,
-    RectangleToRectangle: () => RectangleToRectangle,
-    RectangleToTriangle: () => RectangleToTriangle,
-    TriangleToCircle: () => TriangleToCircle,
-    TriangleToLine: () => TriangleToLine,
-    TriangleToTriangle: () => TriangleToTriangle
-  });
-  function CircleToCircle(circleA, circleB) {
-    return GetVec2Distance(circleA, circleB) <= circleA.radius + circleB.radius;
-  }
-  function CircleToRectangle(circle, rect) {
-    const halfWidth = rect.width / 2;
-    const halfHeight = rect.height / 2;
-    const cx = Math.abs(circle.x - rect.x - halfWidth);
-    const cy = Math.abs(circle.y - rect.y - halfHeight);
-    const xDist = halfWidth + circle.radius;
-    const yDist = halfHeight + circle.radius;
-    if (cx > xDist || cy > yDist) {
-      return false;
-    } else if (cx <= halfWidth || cy <= halfHeight) {
-      return true;
-    } else {
-      const xCornerDist = cx - halfWidth;
-      const yCornerDist = cy - halfHeight;
-      const xCornerDistSq = xCornerDist * xCornerDist;
-      const yCornerDistSq = yCornerDist * yCornerDist;
-      const maxCornerDistSq = circle.radius * circle.radius;
-      return xCornerDistSq + yCornerDistSq <= maxCornerDistSq;
-    }
-  }
-  function GetCircleToCircle(circleA, circleB, out = []) {
-    if (CircleToCircle(circleA, circleB)) {
-      const x0 = circleA.x;
-      const y0 = circleA.y;
-      const r0 = circleA.radius;
-      const x1 = circleB.x;
-      const y1 = circleB.y;
-      const r1 = circleB.radius;
-      let coefficientA;
-      let coefficientB;
-      let coefficientC;
-      let lambda;
-      let x;
-      if (y0 === y1) {
-        x = (r1 * r1 - r0 * r0 - x1 * x1 + x0 * x0) / (2 * (x0 - x1));
-        coefficientA = 1;
-        coefficientB = -2 * y1;
-        coefficientC = x1 * x1 + x * x - 2 * x1 * x + y1 * y1 - r1 * r1;
-        lambda = coefficientB * coefficientB - 4 * coefficientA * coefficientC;
-        if (lambda === 0) {
-          out.push(new Vec2(x, -coefficientB / (2 * coefficientA)));
-        } else if (lambda > 0) {
-          out.push(new Vec2(x, (-coefficientB + Math.sqrt(lambda)) / (2 * coefficientA)));
-          out.push(new Vec2(x, (-coefficientB - Math.sqrt(lambda)) / (2 * coefficientA)));
-        }
-      } else {
-        const v1 = (x0 - x1) / (y0 - y1);
-        const n = (r1 * r1 - r0 * r0 - x1 * x1 + x0 * x0 - y1 * y1 + y0 * y0) / (2 * (y0 - y1));
-        coefficientA = v1 * v1 + 1;
-        coefficientB = 2 * y0 * v1 - 2 * n * v1 - 2 * x0;
-        coefficientC = x0 * x0 + y0 * y0 + n * n - r0 * r0 - 2 * y0 * n;
-        lambda = coefficientB * coefficientB - 4 * coefficientA * coefficientC;
-        if (lambda === 0) {
-          x = -coefficientB / (2 * coefficientA);
-          out.push(new Vec2(x, n - x * v1));
-        } else if (lambda > 0) {
-          x = (-coefficientB + Math.sqrt(lambda)) / (2 * coefficientA);
-          out.push(new Vec2(x, n - x * v1));
-          x = (-coefficientB - Math.sqrt(lambda)) / (2 * coefficientA);
-          out.push(new Vec2(x, n - x * v1));
-        }
-      }
-    }
-    return out;
-  }
+
+  // node_modules/@phaserjs/phaser/geom/intersects/LineToCircle.js
   var tmp = new Vec2();
-  function LineToCircle(line, circle, nearest) {
-    if (!nearest) {
-      nearest = tmp;
-    }
-    const {x1, y1, x2, y2} = line;
-    if (CircleContains(circle, x1, y1)) {
-      nearest.set(x1, y1);
-      return true;
-    }
-    if (CircleContains(circle, x2, y2)) {
-      nearest.set(x2, y2);
-      return true;
-    }
-    const dx = x2 - x1;
-    const dy = y2 - y1;
-    const lcx = circle.x - x1;
-    const lcy = circle.y - y1;
-    const dLen2 = dx * dx + dy * dy;
-    let px = dx;
-    let py = dy;
-    if (dLen2 > 0) {
-      const dp = (lcx * dx + lcy * dy) / dLen2;
-      px *= dp;
-      py *= dp;
-    }
-    nearest.set(x1 + px, y1 + py);
-    const pLen2 = px * px + py * py;
-    return pLen2 <= dLen2 && px * dx + py * dy >= 0 && CircleContains(circle, nearest.x, nearest.y);
-  }
-  function GetLineToCircle(line, circle, out = []) {
-    if (LineToCircle(line, circle)) {
-      const {x1, y1, x2, y2} = line;
-      const cr = circle.radius;
-      const lDirX = x2 - x1;
-      const lDirY = y2 - y1;
-      const oDirX = x1 - circle.x;
-      const oDirY = y1 - circle.y;
-      const coefficientA = lDirX * lDirX + lDirY * lDirY;
-      const coefficientB = 2 * (lDirX * oDirX + lDirY * oDirY);
-      const coefficientC = oDirX * oDirX + oDirY * oDirY - cr * cr;
-      const lambda = coefficientB * coefficientB - 4 * coefficientA * coefficientC;
-      let x;
-      let y;
-      if (lambda === 0) {
-        const root = -coefficientB / (2 * coefficientA);
-        x = x1 + root * lDirX;
-        y = y1 + root * lDirY;
-        if (root >= 0 && root <= 1) {
-          out.push(new Vec2(x, y));
-        }
-      } else if (lambda > 0) {
-        const root1 = (-coefficientB - Math.sqrt(lambda)) / (2 * coefficientA);
-        x = x1 + root1 * lDirX;
-        y = y1 + root1 * lDirY;
-        if (root1 >= 0 && root1 <= 1) {
-          out.push(new Vec2(x, y));
-        }
-        const root2 = (-coefficientB + Math.sqrt(lambda)) / (2 * coefficientA);
-        x = x1 + root2 * lDirX;
-        y = y1 + root2 * lDirY;
-        if (root2 >= 0 && root2 <= 1) {
-          out.push(new Vec2(x, y));
-        }
-      }
-    }
-    return out;
-  }
-  function GetCircleToRectangle(circle, rect, out = []) {
-    if (CircleToRectangle(circle, rect)) {
-      const [line1, line2, line3, line4] = GetRectangleEdges(rect);
-      GetLineToCircle(line1, circle, out);
-      GetLineToCircle(line2, circle, out);
-      GetLineToCircle(line3, circle, out);
-      GetLineToCircle(line4, circle, out);
-    }
-    return out;
-  }
-  function LineToLine(line1, line2, out) {
-    const {x1, y1, x2, y2} = line1;
-    const {x1: x3, y1: y3, x2: x4, y2: y4} = line2;
-    const numA = (x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3);
-    const numB = (x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3);
-    const deNom = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
-    if (deNom === 0) {
-      return false;
-    }
-    const uA = numA / deNom;
-    const uB = numB / deNom;
-    if (uA >= 0 && uA <= 1 && uB >= 0 && uB <= 1) {
-      if (out) {
-        out.set(x1 + uA * (x2 - x1), y1 + uA * (y2 - y1));
-      }
-      return true;
-    }
-    return false;
-  }
-  function LineToRectangle(line, rect) {
-    const {x1, y1, x2, y2} = line;
-    const {x, y, right, bottom} = rect;
-    let t = 0;
-    if (x1 >= x && x1 <= right && y1 >= y && y1 <= bottom || x2 >= x && x2 <= right && y2 >= y && y2 <= bottom) {
-      return true;
-    }
-    if (x1 < x && x2 >= x) {
-      t = y1 + (y2 - y1) * (x - x1) / (x2 - x1);
-      if (t > y && t <= bottom) {
-        return true;
-      }
-    } else if (x1 > right && x2 <= right) {
-      t = y1 + (y2 - y1) * (right - x1) / (x2 - x1);
-      if (t >= y && t <= bottom) {
-        return true;
-      }
-    }
-    if (y1 < y && y2 >= y) {
-      t = x1 + (x2 - x1) * (y - y1) / (y2 - y1);
-      if (t >= x && t <= right) {
-        return true;
-      }
-    } else if (y1 > bottom && y2 <= bottom) {
-      t = x1 + (x2 - x1) * (bottom - y1) / (y2 - y1);
-      if (t >= x && t <= right) {
-        return true;
-      }
-    }
-    return false;
-  }
-  function GetLineToRectangle(line, rect, out = []) {
-    if (LineToRectangle(line, rect)) {
-      const [lineA, lineB, lineC, lineD] = GetRectangleEdges(rect);
-      const points = [new Vec2(), new Vec2(), new Vec2(), new Vec2()];
-      const results = [
-        LineToLine(lineA, line, points[0]),
-        LineToLine(lineB, line, points[1]),
-        LineToLine(lineC, line, points[2]),
-        LineToLine(lineD, line, points[3])
-      ];
-      for (let i = 0; i < results.length; i++) {
-        if (results[i]) {
-          out.push(points[i]);
-        }
-      }
-    }
-    return out;
-  }
-  function GetRectangleIntersection2(rectA, rectB, out = new Rectangle()) {
-    if (RectangleToRectangle(rectA, rectB)) {
-      const x = Math.max(rectA.x, rectB.x);
-      const y = Math.max(rectA.y, rectB.y);
-      return out.set(x, y, Math.min(rectA.right, rectB.right) - x, Math.min(rectA.bottom, rectB.bottom) - y);
-    }
-  }
-  function GetRectangleToRectangle(rectA, rectB, out = []) {
-    if (RectangleToRectangle(rectA, rectB)) {
-      const [lineA, lineB, lineC, lineD] = GetRectangleEdges(rectA);
-      GetLineToRectangle(lineA, rectB, out);
-      GetLineToRectangle(lineB, rectB, out);
-      GetLineToRectangle(lineC, rectB, out);
-      GetLineToRectangle(lineD, rectB, out);
-    }
-    return out;
-  }
-  function GetTriangleEdges(triangle) {
-    const {x1, y1, x2, y2, x3, y3} = triangle;
-    const edge1 = new Line(x1, y1, x2, y2);
-    const edge2 = new Line(x2, y2, x3, y3);
-    const edge3 = new Line(x3, y3, x1, y1);
-    return [edge1, edge2, edge3];
-  }
-  function TriangleContains(triangle, x, y) {
-    const {x1, y1, x2, y2, x3, y3} = triangle;
-    const v0x = x3 - x1;
-    const v0y = y3 - y1;
-    const v1x = x2 - x1;
-    const v1y = y2 - y1;
-    const v2x = x - x1;
-    const v2y = y - y1;
-    const dot00 = v0x * v0x + v0y * v0y;
-    const dot01 = v0x * v1x + v0y * v1y;
-    const dot02 = v0x * v2x + v0y * v2y;
-    const dot11 = v1x * v1x + v1y * v1y;
-    const dot12 = v1x * v2x + v1y * v2y;
-    const b = dot00 * dot11 - dot01 * dot01;
-    const inv = b === 0 ? 0 : 1 / b;
-    const u = (dot11 * dot02 - dot01 * dot12) * inv;
-    const v = (dot00 * dot12 - dot01 * dot02) * inv;
-    return u >= 0 && v >= 0 && u + v < 1;
-  }
-  function TriangleContainsPoints(triangle, points, returnFirst = false, out = []) {
-    let skip = false;
-    points.forEach((point) => {
-      if (skip) {
-        return;
-      }
-      const {x, y} = point;
-      if (TriangleContains(triangle, x, y)) {
-        out.push(new Vec2(x, y));
-        if (returnFirst) {
-          skip = true;
-        }
-      }
-    });
-    return out;
-  }
-  function RectangleToTriangle(rect, triangle) {
-    if (triangle.left > rect.right || triangle.right < rect.x || triangle.top > rect.bottom || triangle.bottom < rect.y) {
-      return false;
-    }
-    const [triA, triB, triC] = GetTriangleEdges(triangle);
-    if (RectangleContains(rect, triA.x1, triA.y1) || RectangleContains(rect, triA.x2, triA.y2)) {
-      return true;
-    }
-    if (RectangleContains(rect, triB.x1, triB.y1) || RectangleContains(rect, triB.x2, triB.y2)) {
-      return true;
-    }
-    if (RectangleContains(rect, triC.x1, triC.y1) || RectangleContains(rect, triC.x2, triC.y2)) {
-      return true;
-    }
-    const [rectA, rectB, rectC, rectD] = GetRectangleEdges(rect);
-    if (LineToLine(triA, rectA) || LineToLine(triA, rectB) || LineToLine(triA, rectC) || LineToLine(triA, rectD)) {
-      return true;
-    }
-    if (LineToLine(triB, rectA) || LineToLine(triB, rectB) || LineToLine(triB, rectC) || LineToLine(triB, rectD)) {
-      return true;
-    }
-    if (LineToLine(triC, rectA) || LineToLine(triC, rectB) || LineToLine(triC, rectC) || LineToLine(triC, rectD)) {
-      return true;
-    }
-    const within = TriangleContainsPoints(triangle, DecomposeRectangle(rect), true);
-    return within.length > 0;
-  }
-  function GetRectangleToTriangle(rect, triangle, out = []) {
-    if (RectangleToTriangle(rect, triangle)) {
-      const [lineA, lineB, lineC] = GetTriangleEdges(triangle);
-      GetLineToRectangle(lineA, rect, out);
-      GetLineToRectangle(lineB, rect, out);
-      GetLineToRectangle(lineC, rect, out);
-    }
-    return out;
-  }
-  function TriangleToCircle(triangle, circle) {
-    if (triangle.left > circle.right || triangle.right < circle.left || triangle.top > circle.bottom || triangle.bottom < circle.top) {
-      return false;
-    }
-    if (TriangleContains(triangle, circle.x, circle.y)) {
-      return true;
-    }
-    const [line1, line2, line3] = GetTriangleEdges(triangle);
-    return LineToCircle(line1, circle) || LineToCircle(line2, circle) || LineToCircle(line3, circle);
-  }
-  function GetTriangleToCircle(triangle, circle, out = []) {
-    if (TriangleToCircle(triangle, circle)) {
-      const [lineA, lineB, lineC] = GetTriangleEdges(triangle);
-      GetLineToCircle(lineA, circle, out);
-      GetLineToCircle(lineB, circle, out);
-      GetLineToCircle(lineC, circle, out);
-    }
-    return out;
-  }
-  function TriangleToLine(triangle, line) {
-    const {x1, y1, x2, y2} = line;
-    if (TriangleContains(triangle, x1, y1) || TriangleContains(triangle, x2, y2)) {
-      return true;
-    }
-    const [line1, line2, line3] = GetTriangleEdges(triangle);
-    return LineToLine(line1, line) || LineToLine(line2, line) || LineToLine(line3, line);
-  }
-  function GetTriangleToLine(triangle, line, out = []) {
-    if (TriangleToLine(triangle, line)) {
-      const [lineA, lineB, lineC] = GetTriangleEdges(triangle);
-      const points = [new Vec2(), new Vec2(), new Vec2()];
-      const results = [
-        LineToLine(lineA, line, points[0]),
-        LineToLine(lineB, line, points[1]),
-        LineToLine(lineC, line, points[2])
-      ];
-      for (let i = 0; i < results.length; i++) {
-        if (results[i]) {
-          out.push(points[i]);
-        }
-      }
-    }
-    return out;
-  }
-  function DecomposeTriangle(triangle, out = []) {
-    const {x1, y1, x2, y2, x3, y3} = triangle;
-    out.push(new Vec2(x1, y1), new Vec2(x2, y2), new Vec2(x3, y3));
-    return out;
-  }
-  function TriangleToTriangle(triangleA, triangleB) {
-    if (triangleA.left > triangleB.right || triangleA.right < triangleB.left || triangleA.top > triangleB.bottom || triangleA.bottom < triangleB.top) {
-      return false;
-    }
-    const [lineAA, lineAB, lineAC] = GetTriangleEdges(triangleA);
-    const [lineBA, lineBB, lineBC] = GetTriangleEdges(triangleB);
-    if (LineToLine(lineAA, lineBA) || LineToLine(lineAA, lineBB) || LineToLine(lineAA, lineBC) || LineToLine(lineAB, lineBA) || LineToLine(lineAB, lineBB) || LineToLine(lineAB, lineBC) || LineToLine(lineAC, lineBA) || LineToLine(lineAC, lineBB) || LineToLine(lineAC, lineBC)) {
-      return true;
-    }
-    const withinA = TriangleContainsPoints(triangleB, DecomposeTriangle(triangleA), true);
-    if (withinA.length > 0) {
-      return true;
-    }
-    const withinB = TriangleContainsPoints(triangleA, DecomposeTriangle(triangleB), true);
-    return withinB.length > 0;
-  }
-  function GetTriangleToTriangle(triangleA, triangleB, out = []) {
-    if (TriangleToTriangle(triangleA, triangleB)) {
-      const [lineA, lineB, lineC] = GetTriangleEdges(triangleB);
-      GetTriangleToLine(triangleA, lineA, out);
-      GetTriangleToLine(triangleA, lineB, out);
-      GetTriangleToLine(triangleA, lineC, out);
-    }
-    return out;
-  }
-  function PointToLine(point, line, lineThickness = 1) {
-    const {x1, y1, x2, y2} = line;
-    const {x: px, y: py} = point;
-    const L2 = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
-    if (L2 === 0) {
-      return false;
-    }
-    const r = ((px - x1) * (x2 - x1) + (py - y1) * (y2 - y1)) / L2;
-    if (r < 0) {
-      return Math.sqrt((x1 - px) * (x1 - px) + (y1 - py) * (y1 - py)) <= lineThickness;
-    } else if (r >= 0 && r <= 1) {
-      const s = ((y1 - py) * (x2 - x1) - (x1 - px) * (y2 - y1)) / L2;
-      return Math.abs(s) * Math.sqrt(L2) <= lineThickness;
-    } else {
-      return Math.sqrt((x2 - px) * (x2 - px) + (y2 - py) * (y2 - py)) <= lineThickness;
-    }
-  }
-  function PointToLineSegment(point, line) {
-    if (!PointToLine(point, line)) {
-      return false;
-    }
-    const {x1, y1, x2, y2} = line;
-    const {x, y} = point;
-    const xMin = Math.min(x1, x2);
-    const xMax = Math.max(x1, x2);
-    const yMin = Math.min(y1, y2);
-    const yMax = Math.max(y1, y2);
-    return x >= xMin && x <= xMax && (y >= yMin && y <= yMax);
-  }
-  var line_exports = {};
-  __export(line_exports, {
-    CenterLineOn: () => CenterLineOn,
-    CloneLine: () => CloneLine,
-    CopyLineFrom: () => CopyLineFrom,
-    ExtendLine: () => ExtendLine,
-    GetLineAngle: () => GetLineAngle,
-    GetLineBresenhamPoints: () => GetLineBresenhamPoints,
-    GetLineHeight: () => GetLineHeight,
-    GetLineLength: () => GetLineLength,
-    GetLineMidPoint: () => GetLineMidPoint,
-    GetLineNearestPoint: () => GetLineNearestPoint,
-    GetLineNormal: () => GetLineNormal,
-    GetLineNormalAngle: () => GetLineNormalAngle,
-    GetLineNormalX: () => GetLineNormalX,
-    GetLineNormalY: () => GetLineNormalY,
-    GetLinePerpSlope: () => GetLinePerpSlope,
-    GetLinePoint: () => GetLinePoint,
-    GetLinePoints: () => GetLinePoints,
-    GetLineRandomPoint: () => GetLineRandomPoint,
-    GetLineReflectAngle: () => GetLineReflectAngle,
-    GetLineSlope: () => GetLineSlope,
-    GetLineWidth: () => GetLineWidth,
-    GetShortestLineDistance: () => GetShortestLineDistance,
-    Line: () => Line,
-    LineEquals: () => LineEquals,
-    LineSetToAngle: () => LineSetToAngle,
-    RotateLine: () => RotateLine,
-    RotateLineAround: () => RotateLineAround,
-    RotateLineAroundPoint: () => RotateLineAroundPoint,
-    TranslateLine: () => TranslateLine,
-    TranslateLinePoint: () => TranslateLinePoint
-  });
-  function CenterLineOn(line, x, y) {
-    const tx = x - (line.x1 + line.x2) / 2;
-    const ty = y - (line.y1 + line.y2) / 2;
-    line.x1 += tx;
-    line.y1 += ty;
-    line.x2 += tx;
-    line.y2 += ty;
-    return line;
-  }
-  function CloneLine(source) {
-    return new Line(source.x1, source.y1, source.x2, source.y2);
-  }
-  function CopyLineFrom(source, dest) {
-    return dest.set(source.x1, source.y1, source.x2, source.y2);
-  }
-  function GetLineLength(line) {
-    const {x1, y1, x2, y2} = line;
-    return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
-  }
-  function ExtendLine(line, left, right = left) {
-    const length = GetLineLength(line);
-    const slopX = line.x2 - line.x1;
-    const slopY = line.y2 - line.y1;
-    if (left) {
-      line.x1 = line.x1 - slopX / length * left;
-      line.y1 = line.y1 - slopY / length * left;
-    }
-    if (right) {
-      line.x2 = line.x2 + slopX / length * right;
-      line.y2 = line.y2 + slopY / length * right;
-    }
-    return line;
-  }
-  function GetLineAngle(line) {
-    return Math.atan2(line.y2 - line.y1, line.x2 - line.x1);
-  }
-  function GetLineBresenhamPoints(line, stepRate = 1, results = []) {
-    let x1 = Math.round(line.x1);
-    let y1 = Math.round(line.y1);
-    const x2 = Math.round(line.x2);
-    const y2 = Math.round(line.y2);
-    const dx = Math.abs(x2 - x1);
-    const dy = Math.abs(y2 - y1);
-    const sx = x1 < x2 ? 1 : -1;
-    const sy = y1 < y2 ? 1 : -1;
-    let err = dx - dy;
-    results.push(new Vec2(x1, y1));
-    let i = 1;
-    while (!(x1 === x2 && y1 === y2)) {
-      const e2 = err << 1;
-      if (e2 > -dy) {
-        err -= dy;
-        x1 += sx;
-      }
-      if (e2 < dx) {
-        err += dx;
-        y1 += sy;
-      }
-      if (i % stepRate === 0) {
-        results.push(new Vec2(x1, y1));
-      }
-      i++;
-    }
-    return results;
-  }
-  function GetLineHeight(line) {
-    return Math.abs(line.y1 - line.y2);
-  }
-  function GetLineMidPoint(line, out = new Vec2()) {
-    out.x = (line.x1 + line.x2) / 2;
-    out.y = (line.y1 + line.y2) / 2;
-    return out;
-  }
-  function GetLineNearestPoint(line, point, out = new Vec2()) {
-    const {x1, y1, x2, y2} = line;
-    const L2 = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
-    if (L2 === 0) {
-      return out;
-    }
-    const r = ((point.x - x1) * (x2 - x1) + (point.y - y1) * (y2 - y1)) / L2;
-    out.x = x1 + r * (x2 - x1);
-    out.y = y1 + r * (y2 - y1);
-    return out;
-  }
-  function GetLineNormal(line, out = new Vec2()) {
-    const a = GetLineAngle(line) - MATH_CONST.HALF_PI;
-    out.x = Math.cos(a);
-    out.y = Math.sin(a);
-    return out;
-  }
-  function GetLineNormalAngle(line) {
-    const angle = GetLineAngle(line) - MATH_CONST.HALF_PI;
-    return Wrap(angle, -Math.PI, Math.PI);
-  }
-  function GetLineNormalX(line) {
-    return Math.cos(GetLineAngle(line) - MATH_CONST.HALF_PI);
-  }
-  function GetLineNormalY(line) {
-    return Math.sin(GetLineAngle(line) - MATH_CONST.HALF_PI);
-  }
-  function GetLinePerpSlope(line) {
-    const {x1, y1, x2, y2} = line;
-    return -((x2 - x1) / (y2 - y1));
-  }
-  function GetLinePoint(line, position, out = new Vec2()) {
-    out.x = line.x1 + (line.x2 - line.x1) * position;
-    out.y = line.y1 + (line.y2 - line.y1) * position;
-    return out;
-  }
-  function GetLinePoints(line, quantity, stepRate = 0, out = []) {
-    if (!quantity) {
-      quantity = GetLineLength(line) / stepRate;
-    }
-    const {x1, y1, x2, y2} = line;
-    for (let i = 0; i < quantity; i++) {
-      const position = i / quantity;
-      const x = x1 + (x2 - x1) * position;
-      const y = y1 + (y2 - y1) * position;
-      out.push(new Vec2(x, y));
-    }
-    return out;
-  }
-  function GetLineRandomPoint(line, out = new Vec2()) {
-    const t = Math.random();
-    out.x = line.x1 + t * (line.x2 - line.x1);
-    out.y = line.y1 + t * (line.y2 - line.y1);
-    return out;
-  }
-  function GetLineReflectAngle(lineA, lineB) {
-    return 2 * GetLineNormalAngle(lineB) - Math.PI - GetLineAngle(lineA);
-  }
-  function GetLineSlope(line) {
-    const {x1, y1, x2, y2} = line;
-    return (y2 - y1) / (x2 - x1);
-  }
-  function GetLineWidth(line) {
-    return Math.abs(line.x1 - line.x2);
-  }
-  function GetShortestLineDistance(line, point) {
-    const {x1, y1, x2, y2} = line;
-    const L2 = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
-    if (L2 === 0) {
-      return 0;
-    }
-    const s = ((y1 - point.y) * (x2 - x1) - (x1 - point.x) * (y2 - y1)) / L2;
-    return Math.abs(s) * Math.sqrt(L2);
-  }
-  function LineEquals(line, toCompare) {
-    return line.x1 === toCompare.x1 && line.y1 === toCompare.y1 && line.x2 === toCompare.x2 && line.y2 === toCompare.y2;
-  }
-  function LineSetToAngle(line, x, y, angle, length) {
-    line.x1 = x;
-    line.y1 = y;
-    line.x2 = x + Math.cos(angle) * length;
-    line.y2 = y + Math.sin(angle) * length;
-    return line;
-  }
-  function RotateLineAround(line, x, y, angle) {
-    const c = Math.cos(angle);
-    const s = Math.sin(angle);
-    let tx = line.x1 - x;
-    let ty = line.y1 - y;
-    line.x1 = tx * c - ty * s + x;
-    line.y1 = tx * s + ty * c + y;
-    tx = line.x2 - x;
-    ty = line.y2 - y;
-    line.x2 = tx * c - ty * s + x;
-    line.y2 = tx * s + ty * c + y;
-    return line;
-  }
-  function RotateLine(line, angle) {
-    const x = (line.x1 + line.x2) / 2;
-    const y = (line.y1 + line.y2) / 2;
-    return RotateLineAround(line, x, y, angle);
-  }
-  function RotateLineAroundPoint(line, point, angle) {
-    return RotateLineAround(line, point.x, point.y, angle);
-  }
-  function TranslateLine(line, x, y) {
-    line.x1 += x;
-    line.y1 += y;
-    line.x2 += x;
-    line.y2 += y;
-    return line;
-  }
-  function TranslateLinePoint(line, v) {
-    return TranslateLine(line, v.x, v.y);
-  }
-  var triangle_exports = {};
-  __export(triangle_exports, {
-    BuildEquilateralTriangle: () => BuildEquilateralTriangle,
-    BuildRightTriangle: () => BuildRightTriangle,
-    CenterTriangleOn: () => CenterTriangleOn,
-    CloneTriangle: () => CloneTriangle,
-    CopyTriangleFrom: () => CopyTriangleFrom,
-    DecomposeTriangle: () => DecomposeTriangle,
-    GetTriangleArea: () => GetTriangleArea,
-    GetTriangleCentroid: () => GetTriangleCentroid,
-    GetTriangleCircumCenter: () => GetTriangleCircumCenter,
-    GetTriangleCircumCircle: () => GetTriangleCircumCircle,
-    GetTriangleEdges: () => GetTriangleEdges,
-    GetTriangleInCenter: () => GetTriangleInCenter,
-    GetTrianglePerimeter: () => GetTrianglePerimeter,
-    GetTrianglePoint: () => GetTrianglePoint,
-    GetTrianglePoints: () => GetTrianglePoints,
-    GetTriangleRandomPoint: () => GetTriangleRandomPoint,
-    RotateTriangle: () => RotateTriangle,
-    RotateTriangleAround: () => RotateTriangleAround,
-    RotateTriangleAroundPoint: () => RotateTriangleAroundPoint,
-    TranslateTriangle: () => TranslateTriangle,
-    Triangle: () => Triangle,
-    TriangleContains: () => TriangleContains,
-    TriangleContainsPoint: () => TriangleContainsPoint,
-    TriangleContainsPoints: () => TriangleContainsPoints,
-    TriangleEquals: () => TriangleEquals
-  });
-  var Triangle = class {
-    constructor(x1 = 0, y1 = 0, x2 = 0, y2 = 0, x3 = 0, y3 = 0) {
-      this.set(x1, y1, x2, y2, x3, y3);
-    }
-    set(x1 = 0, y1 = 0, x2 = 0, y2 = 0, x3 = 0, y3 = 0) {
-      this.x1 = x1;
-      this.y1 = y1;
-      this.x2 = x2;
-      this.y2 = y2;
-      this.x3 = x3;
-      this.y3 = y3;
-      return this;
-    }
-    contains(x, y) {
-      return TriangleContains(this, x, y);
-    }
-    get left() {
-      return Math.min(this.x1, this.x2, this.x3);
-    }
-    set left(value) {
-      let diff = 0;
-      if (this.x1 <= this.x2 && this.x1 <= this.x3) {
-        diff = this.x1 - value;
-      } else if (this.x2 <= this.x1 && this.x2 <= this.x3) {
-        diff = this.x2 - value;
-      } else {
-        diff = this.x3 - value;
-      }
-      this.x1 -= diff;
-      this.x2 -= diff;
-      this.x3 -= diff;
-    }
-    get right() {
-      return Math.max(this.x1, this.x2, this.x3);
-    }
-    set right(value) {
-      let diff = 0;
-      if (this.x1 >= this.x2 && this.x1 >= this.x3) {
-        diff = this.x1 - value;
-      } else if (this.x2 >= this.x1 && this.x2 >= this.x3) {
-        diff = this.x2 - value;
-      } else {
-        diff = this.x3 - value;
-      }
-      this.x1 -= diff;
-      this.x2 -= diff;
-      this.x3 -= diff;
-    }
-    get top() {
-      return Math.min(this.y1, this.y2, this.y3);
-    }
-    set top(value) {
-      let diff = 0;
-      if (this.y1 <= this.y2 && this.y1 <= this.y3) {
-        diff = this.y1 - value;
-      } else if (this.y2 <= this.y1 && this.y2 <= this.y3) {
-        diff = this.y2 - value;
-      } else {
-        diff = this.y3 - value;
-      }
-      this.y1 -= diff;
-      this.y2 -= diff;
-      this.y3 -= diff;
-    }
-    get bottom() {
-      return Math.max(this.y1, this.y2, this.y3);
-    }
-    set bottom(value) {
-      let diff = 0;
-      if (this.y1 >= this.y2 && this.y1 >= this.y3) {
-        diff = this.y1 - value;
-      } else if (this.y2 >= this.y1 && this.y2 >= this.y3) {
-        diff = this.y2 - value;
-      } else {
-        diff = this.y3 - value;
-      }
-      this.y1 -= diff;
-      this.y2 -= diff;
-      this.y3 -= diff;
-    }
-  };
-  function BuildEquilateralTriangle(x, y, length) {
-    const height = length * (Math.sqrt(3) / 2);
-    const x1 = x;
-    const y1 = y;
-    const x2 = x + length / 2;
-    const y2 = y + height;
-    const x3 = x - length / 2;
-    const y3 = y + height;
-    return new Triangle(x1, y1, x2, y2, x3, y3);
-  }
-  function BuildRightTriangle(x, y, width, height = width) {
-    const x1 = x;
-    const y1 = y;
-    const x2 = x;
-    const y2 = y - height;
-    const x3 = x + width;
-    const y3 = y;
-    return new Triangle(x1, y1, x2, y2, x3, y3);
-  }
-  function GetTriangleCentroid(triangle, out = new Vec2()) {
-    return out.set((triangle.x1 + triangle.x2 + triangle.x3) / 3, (triangle.y1 + triangle.y2 + triangle.y3) / 3);
-  }
-  function TranslateTriangle(triangle, x, y) {
-    triangle.x1 += x;
-    triangle.y1 += y;
-    triangle.x2 += x;
-    triangle.y2 += y;
-    triangle.x3 += x;
-    triangle.y3 += y;
-    return triangle;
-  }
-  function CenterTriangleOn(triangle, x, y, centerFunc = GetTriangleCentroid) {
-    const center = centerFunc(triangle);
-    const diffX = x - center.x;
-    const diffY = y - center.y;
-    return TranslateTriangle(triangle, diffX, diffY);
-  }
-  function CloneTriangle(source) {
-    const {x1, y1, x2, y2, x3, y3} = source;
-    return new Triangle(x1, y1, x2, y2, x3, y3);
-  }
-  function CopyTriangleFrom(source, dest) {
-    const {x1, y1, x2, y2, x3, y3} = source;
-    return dest.set(x1, y1, x2, y2, x3, y3);
-  }
-  function GetTriangleArea(triangle) {
-    const {x1, y1, x2, y2, x3, y3} = triangle;
-    return Math.abs(((x3 - x1) * (y2 - y1) - (x2 - x1) * (y3 - y1)) / 2);
-  }
-  function Det(m00, m01, m10, m11) {
-    return m00 * m11 - m01 * m10;
-  }
-  function GetTriangleCircumCenter(triangle, out = new Vec2()) {
-    const cx = triangle.x3;
-    const cy = triangle.y3;
-    const ax = triangle.x1 - cx;
-    const ay = triangle.y1 - cy;
-    const bx = triangle.x2 - cx;
-    const by = triangle.y2 - cy;
-    const denom = 2 * Det(ax, ay, bx, by);
-    const numx = Det(ay, ax * ax + ay * ay, by, bx * bx + by * by);
-    const numy = Det(ax, ax * ax + ay * ay, bx, bx * bx + by * by);
-    return out.set(cx - numx / denom, cy + numy / denom);
-  }
-  function GetTriangleCircumCircle(triangle, out = new Circle()) {
-    const {x1, y1, x2, y2, x3, y3} = triangle;
-    const A = x2 - x1;
-    const B = y2 - y1;
-    const C = x3 - x1;
-    const D = y3 - y1;
-    const E = A * (x1 + x2) + B * (y1 + y2);
-    const F = C * (x1 + x3) + D * (y1 + y3);
-    const G = 2 * (A * (y3 - y2) - B * (x3 - x2));
-    if (Math.abs(G) < 1e-6) {
-      const minX = Math.min(x1, x2, x3);
-      const minY = Math.min(y1, y2, y3);
-      const dx = (Math.max(x1, x2, x3) - minX) * 0.5;
-      const dy = (Math.max(y1, y2, y3) - minY) * 0.5;
-      return out.set(minX + dx, minY + dy, Math.sqrt(dx * dx + dy * dy));
-    } else {
-      const cx = (D * E - B * F) / G;
-      const cy = (A * F - C * E) / G;
-      const dx = cx - x1;
-      const dy = cy - y1;
-      return out.set(cx, cy, Math.sqrt(dx * dx + dy * dy));
-    }
-  }
-  function GetLength(x1, y1, x2, y2) {
-    const x = x1 - x2;
-    const y = y1 - y2;
-    return Math.sqrt(x * x + y * y);
-  }
-  function GetTriangleInCenter(triangle, out = new Vec2()) {
-    const {x1, y1, x2, y2, x3, y3} = triangle;
-    const d1 = GetLength(x3, y3, x2, y2);
-    const d2 = GetLength(x1, y1, x3, y3);
-    const d3 = GetLength(x2, y2, x1, y1);
-    const p = d1 + d2 + d3;
-    return out.set((x1 * d1 + x2 * d2 + x3 * d3) / p, (y1 * d1 + y2 * d2 + y3 * d3) / p);
-  }
-  function GetTrianglePerimeter(triangle) {
-    const [line1, line2, line3] = GetTriangleEdges(triangle);
-    return GetLineLength(line1) + GetLineLength(line2) + GetLineLength(line3);
-  }
-  function GetTrianglePoint(triangle, position, out = new Vec2()) {
-    const [line1, line2, line3] = GetTriangleEdges(triangle);
-    if (position <= 0 || position >= 1) {
-      return out.set(line1.x1, line1.y1);
-    }
-    const length1 = GetLineLength(line1);
-    const length2 = GetLineLength(line2);
-    const length3 = GetLineLength(line3);
-    const perimeter = length1 + length2 + length3;
-    let p = perimeter * position;
-    let localPosition = 0;
-    if (p < length1) {
-      localPosition = p / length1;
-      const {x1, y1, x2, y2} = line1;
-      return out.set(x1 + (x2 - x1) * localPosition, y1 + (y2 - y1) * localPosition);
-    } else if (p > length1 + length2) {
-      p -= length1 + length2;
-      localPosition = p / length3;
-      const {x1, y1, x2, y2} = line3;
-      return out.set(x1 + (x2 - x1) * localPosition, y1 + (y2 - y1) * localPosition);
-    } else {
-      p -= length1;
-      localPosition = p / length2;
-      const {x1, y1, x2, y2} = line2;
-      return out.set(x1 + (x2 - x1) * localPosition, y1 + (y2 - y1) * localPosition);
-    }
-  }
-  function GetTrianglePoints(triangle, quantity, stepRate, out = []) {
-    const [line1, line2, line3] = GetTriangleEdges(triangle);
-    const length1 = GetLineLength(line1);
-    const length2 = GetLineLength(line2);
-    const length3 = GetLineLength(line3);
-    const perimeter = length1 + length2 + length3;
-    if (!quantity) {
-      quantity = perimeter / stepRate;
-    }
-    for (let i = 0; i < quantity; i++) {
-      let p = perimeter * (i / quantity);
-      let localPosition = 0;
-      let point;
-      if (p < length1) {
-        localPosition = p / length1;
-        const {x1, y1, x2, y2} = line1;
-        point = new Vec2(x1 + (x2 - x1) * localPosition, y1 + (y2 - y1) * localPosition);
-      } else if (p > length1 + length2) {
-        p -= length1 + length2;
-        localPosition = p / length3;
-        const {x1, y1, x2, y2} = line3;
-        point = new Vec2(x1 + (x2 - x1) * localPosition, y1 + (y2 - y1) * localPosition);
-      } else {
-        p -= length1;
-        localPosition = p / length2;
-        const {x1, y1, x2, y2} = line2;
-        point = new Vec2(x1 + (x2 - x1) * localPosition, y1 + (y2 - y1) * localPosition);
-      }
-      out.push(point);
-    }
-    return out;
-  }
-  function GetTriangleRandomPoint(triangle, out = new Vec2()) {
-    const {x1, y1, x2, y2, x3, y3} = triangle;
-    const ux = x2 - x1;
-    const uy = y2 - y1;
-    const vx = x3 - x1;
-    const vy = y3 - y1;
-    let r = Math.random();
-    let s = Math.random();
-    if (r + s >= 1) {
-      r = 1 - r;
-      s = 1 - s;
-    }
-    return out.set(x1 + (ux * r + vx * s), y1 + (uy * r + vy * s));
-  }
-  function RotateTriangleAround(triangle, x, y, angle) {
-    const {x1, y1, x2, y2, x3, y3} = triangle;
-    const c = Math.cos(angle);
-    const s = Math.sin(angle);
-    return triangle.set((x1 - x) * c - (y1 - y) * s + x, (x1 - x) * s + (y1 - y) * c + y, (x2 - x) * c - (y2 - y) * s + x, (x2 - x) * s + (y2 - y) * c + y, (x3 - x) * c - (y3 - y) * s + x, (x3 - x) * s + (y3 - y) * c + y);
-  }
-  function RotateTriangle(triangle, angle) {
-    const point = GetTriangleInCenter(triangle);
-    return RotateTriangleAround(triangle, point.x, point.y, angle);
-  }
-  function RotateTriangleAroundPoint(triangle, point, angle) {
-    return RotateTriangleAround(triangle, point.x, point.y, angle);
-  }
-  function TriangleContainsPoint(triangle, point) {
-    return TriangleContains(triangle, point.x, point.y);
-  }
-  function TriangleEquals(src, dest) {
-    return src.x1 === dest.x1 && src.y1 === dest.y1 && src.x2 === dest.x2 && src.y2 === dest.y2 && src.x3 === dest.x3 && src.y3 === dest.y3;
-  }
-  var geom3d_exports = {};
-  __export(geom3d_exports, {
-    BoxGeometry: () => BoxGeometry,
-    ConeGeometry: () => ConeGeometry,
-    CylinderGeometry: () => CylinderGeometry,
-    PlaneGeometry: () => PlaneGeometry,
-    SphereGeometry: () => SphereGeometry,
-    TorusGeometry: () => TorusGeometry
-  });
-  function TorusGeometry(radius = 1, tube = 0.4, radialSegments = 8, tubularSegments = 6, arc = Math.PI * 2) {
-    const data = CreateVertexSet();
-    const {
-      vertices,
-      normals,
-      uvs,
-      indices
-    } = data;
-    const center = new Vec3();
-    const vertex = new Vec3();
-    const normal = new Vec3();
-    for (let j = 0; j <= radialSegments; j++) {
-      for (let i = 0; i <= tubularSegments; i++) {
-        const u = i / tubularSegments * arc;
-        const v = j / radialSegments * Math.PI * 2;
-        vertex.x = (radius + tube * Math.cos(v)) * Math.cos(u);
-        vertex.y = (radius + tube * Math.cos(v)) * Math.sin(u);
-        vertex.z = tube * Math.sin(v);
-        vertices.push(vertex.x, vertex.y, vertex.z);
-        center.x = radius * Math.cos(u);
-        center.y = radius * Math.sin(u);
-        Vec3Subtract(vertex, center, normal);
-        Vec3Normalize(normal, normal);
-        normals.push(normal.x, normal.y, normal.z);
-        uvs.push(i / tubularSegments);
-        uvs.push(j / radialSegments);
-      }
-    }
-    for (let j = 1; j <= radialSegments; j++) {
-      for (let i = 1; i <= tubularSegments; i++) {
-        const a = (tubularSegments + 1) * j + i - 1;
-        const b = (tubularSegments + 1) * (j - 1) + i - 1;
-        const c = (tubularSegments + 1) * (j - 1) + i;
-        const d = (tubularSegments + 1) * j + i;
-        indices.push(a, b, d);
-        indices.push(b, c, d);
-      }
-    }
-    data.numberOfVertices = vertices.length;
-    return data;
-  }
-  var input_exports2 = {};
-  __export(input_exports2, {
-    Keyboard: () => keyboard_exports,
-    Mouse: () => mouse_exports,
-    SetInteractive: () => SetInteractive
-  });
-  var keyboard_exports = {};
-  __export(keyboard_exports, {
-    GetKeyDownDuration: () => GetKeyDownDuration,
-    Key: () => Key,
-    Keyboard: () => Keyboard,
-    Keys: () => keys_exports,
-    SetKeyRepeatRate: () => SetKeyRepeatRate
-  });
-  var keys_exports = {};
-  __export(keys_exports, {
-    AKey: () => AKey,
-    ArrowKeys: () => ArrowKeys,
-    BKey: () => BKey,
-    CKey: () => CKey,
-    DKey: () => DKey,
-    DownKey: () => DownKey,
-    EKey: () => EKey,
-    FKey: () => FKey,
-    GKey: () => GKey,
-    HKey: () => HKey,
-    IKey: () => IKey,
-    JKey: () => JKey,
-    KKey: () => KKey,
-    LKey: () => LKey,
-    LeftKey: () => LeftKey,
-    MKey: () => MKey,
-    NKey: () => NKey,
-    OKey: () => OKey,
-    PKey: () => PKey,
-    QKey: () => QKey,
-    RKey: () => RKey,
-    RightKey: () => RightKey,
-    SKey: () => SKey,
-    SpaceKey: () => SpaceKey,
-    TKey: () => TKey,
-    UKey: () => UKey,
-    UpKey: () => UpKey,
-    VKey: () => VKey,
-    WASDKeys: () => WASDKeys,
-    WKey: () => WKey,
-    XKey: () => XKey,
-    YKey: () => YKey,
-    ZKey: () => ZKey
-  });
-  var Key = class {
-    constructor(value) {
-      this.capture = true;
-      this.isDown = false;
-      this.enabled = true;
-      this.repeatRate = 0;
-      this.canRepeat = true;
-      this.timeDown = 0;
-      this.timeUpdated = 0;
-      this.timeUp = 0;
-      this.value = value;
-      this.events = new Map();
-    }
-    getValue() {
-      return this.value;
-    }
-    down(event) {
-      if (!this.enabled) {
-        return;
-      }
-      if (this.capture) {
-        event.preventDefault();
-      }
-      this.shiftKey = event.shiftKey;
-      this.ctrlKey = event.ctrlKey;
-      this.altKey = event.altKey;
-      if (this.isDown && this.canRepeat) {
-        this.timeUpdated = event.timeStamp;
-        const delay = this.timeUpdated - this.timeDown;
-        if (delay >= this.repeatRate) {
-          Emit(this, "keydown", this);
-          if (this.downCallback) {
-            this.downCallback(this);
-          }
-        }
-      } else {
-        this.isDown = true;
-        this.timeDown = event.timeStamp;
-        this.timeUpdated = event.timeStamp;
-        Emit(this, "keydown", this);
-        if (this.downCallback) {
-          this.downCallback(this);
-        }
-      }
-    }
-    up(event) {
-      if (!this.enabled) {
-        return;
-      }
-      if (this.capture) {
-        event.preventDefault();
-      }
-      this.shiftKey = event.shiftKey;
-      this.ctrlKey = event.ctrlKey;
-      this.altKey = event.altKey;
-      if (this.isDown) {
-        this.isDown = false;
-        this.timeUp = event.timeStamp;
-        this.timeUpdated = event.timeStamp;
-        Emit(this, "keyup", this);
-        if (this.upCallback) {
-          this.upCallback(this);
-        }
-      }
-    }
-    reset() {
-      this.isDown = false;
-      this.timeUpdated = this.timeDown;
-      this.timeUp = this.timeDown;
-    }
-    destroy() {
-      this.downCallback = null;
-      this.upCallback = null;
-      this.events.clear();
-    }
-  };
-  var AKey = class extends Key {
-    constructor() {
-      super("a");
-    }
-  };
-  var ArrowKeys = class {
-    constructor(keyboardManager, config) {
-      const {
-        left = true,
-        right = true,
-        up = true,
-        down = true,
-        space = true
-      } = config;
-      const keys = keyboardManager.keys;
-      if (left) {
-        this.left = new Key("ArrowLeft");
-        keys.set(this.left.value, this.left);
-      }
-      if (right) {
-        this.right = new Key("ArrowRight");
-        keys.set(this.right.value, this.right);
-      }
-      if (up) {
-        this.up = new Key("ArrowUp");
-        keys.set(this.up.value, this.up);
-      }
-      if (down) {
-        this.down = new Key("ArrowDown");
-        keys.set(this.down.value, this.down);
-      }
-      if (space) {
-        this.space = new Key(" ");
-        keys.set(this.space.value, this.space);
-      }
-    }
-  };
-  var BKey = class extends Key {
-    constructor() {
-      super("b");
-    }
-  };
-  var CKey = class extends Key {
-    constructor() {
-      super("c");
-    }
-  };
-  var DKey = class extends Key {
-    constructor() {
-      super("d");
-    }
-  };
-  var DownKey = class extends Key {
-    constructor() {
-      super("ArrowDown");
-    }
-  };
-  var EKey = class extends Key {
-    constructor() {
-      super("e");
-    }
-  };
-  var FKey = class extends Key {
-    constructor() {
-      super("f");
-    }
-  };
-  var GKey = class extends Key {
-    constructor() {
-      super("g");
-    }
-  };
-  var HKey = class extends Key {
-    constructor() {
-      super("h");
-    }
-  };
-  var IKey = class extends Key {
-    constructor() {
-      super("i");
-    }
-  };
-  var JKey = class extends Key {
-    constructor() {
-      super("j");
-    }
-  };
-  var KKey = class extends Key {
-    constructor() {
-      super("k");
-    }
-  };
-  var LKey = class extends Key {
-    constructor() {
-      super("l");
-    }
-  };
-  var LeftKey = class extends Key {
-    constructor() {
-      super("ArrowLeft");
-    }
-  };
-  var MKey = class extends Key {
-    constructor() {
-      super("m");
-    }
-  };
-  var NKey = class extends Key {
-    constructor() {
-      super("n");
-    }
-  };
-  var OKey = class extends Key {
-    constructor() {
-      super("o");
-    }
-  };
-  var PKey = class extends Key {
-    constructor() {
-      super("p");
-    }
-  };
-  var QKey = class extends Key {
-    constructor() {
-      super("q");
-    }
-  };
-  var RKey = class extends Key {
-    constructor() {
-      super("r");
-    }
-  };
-  var RightKey = class extends Key {
-    constructor() {
-      super("ArrowRight");
-    }
-  };
-  var SKey = class extends Key {
-    constructor() {
-      super("s");
-    }
-  };
-  var SpaceKey = class extends Key {
-    constructor() {
-      super(" ");
-    }
-  };
-  var TKey = class extends Key {
-    constructor() {
-      super("t");
-    }
-  };
-  var UKey = class extends Key {
-    constructor() {
-      super("u");
-    }
-  };
-  var UpKey = class extends Key {
-    constructor() {
-      super("ArrowUp");
-    }
-  };
-  var VKey = class extends Key {
-    constructor() {
-      super("v");
-    }
-  };
-  var WASDKeys = class {
-    constructor(keyboardManager, config) {
-      const {
-        W = true,
-        A = true,
-        S = true,
-        D = true,
-        space = true
-      } = config;
-      const keys = keyboardManager.keys;
-      if (W) {
-        this.W = new Key("w");
-        keys.set(this.W.value, this.W);
-      }
-      if (A) {
-        this.A = new Key("a");
-        keys.set(this.A.value, this.A);
-      }
-      if (S) {
-        this.S = new Key("s");
-        keys.set(this.S.value, this.S);
-      }
-      if (D) {
-        this.D = new Key("d");
-        keys.set(this.D.value, this.D);
-      }
-      if (space) {
-        this.space = new Key(" ");
-        keys.set(this.space.value, this.space);
-      }
-    }
-  };
-  var WKey = class extends Key {
-    constructor() {
-      super("w");
-    }
-  };
-  var XKey = class extends Key {
-    constructor() {
-      super("x");
-    }
-  };
-  var YKey = class extends Key {
-    constructor() {
-      super("y");
-    }
-  };
-  var ZKey = class extends Key {
-    constructor() {
-      super("z");
-    }
-  };
-  function GetKeyDownDuration(key) {
-    if (key.isDown) {
-      return key.timeUpdated - key.timeDown;
-    } else {
-      return key.timeUp - key.timeDown;
-    }
-  }
-  var Keyboard = class extends EventEmitter {
-    constructor() {
-      super();
-      this.keyConversion = {
-        Up: "ArrowUp",
-        Down: "ArrowDown",
-        Left: "ArrowLeft",
-        Right: "ArrowRight",
-        Spacebar: " ",
-        Win: "Meta",
-        Scroll: "ScrollLock",
-        Del: "Delete",
-        Apps: "ContextMenu",
-        Esc: "Escape",
-        Add: "+",
-        Subtract: "-",
-        Multiply: "*",
-        Decimal: ".",
-        Divide: "/"
-      };
-      this.keydownHandler = (event) => this.onKeyDown(event);
-      this.keyupHandler = (event) => this.onKeyUp(event);
-      this.blurHandler = () => this.onBlur();
-      window.addEventListener("keydown", this.keydownHandler);
-      window.addEventListener("keyup", this.keyupHandler);
-      window.addEventListener("blur", this.blurHandler);
-      this.keys = new Map();
-    }
-    addKeys(...keys) {
-      keys.forEach((key) => {
-        this.keys.set(key.getValue(), key);
-      });
-    }
-    clearKeys() {
-      this.keys.clear();
-    }
-    onBlur() {
-      this.keys.forEach((key) => {
-        key.reset();
-      });
-    }
-    getKeyValue(key) {
-      if (this.keyConversion.hasOwnProperty(key)) {
-        return this.keyConversion[key];
-      } else {
-        return key;
-      }
-    }
-    onKeyDown(event) {
-      const value = this.getKeyValue(event.key);
-      if (this.keys.has(value)) {
-        const key = this.keys.get(value);
-        key.down(event);
-      }
-      Emit(this, "keydown-" + value, event);
-      Emit(this, "keydown", event);
-    }
-    onKeyUp(event) {
-      const value = this.getKeyValue(event.key);
-      if (this.keys.has(value)) {
-        const key = this.keys.get(value);
-        key.up(event);
-      }
-      Emit(this, "keyup-" + value, event);
-      Emit(this, "keyup", event);
-    }
-    destroy() {
-      window.removeEventListener("keydown", this.keydownHandler);
-      window.removeEventListener("keyup", this.keyupHandler);
-      window.removeEventListener("blur", this.blurHandler);
-      Emit(this, "destroy");
-    }
-  };
-  function SetKeyRepeatRate(rate, ...keys) {
-    keys.forEach((key) => {
-      key.repeatRate = rate;
-    });
-    return keys;
-  }
-  var mouse_exports = {};
-  __export(mouse_exports, {
-    Mouse: () => Mouse
-  });
-  var Mouse = class extends EventEmitter {
-    constructor(target) {
-      super();
-      this.primaryDown = false;
-      this.auxDown = false;
-      this.secondaryDown = false;
-      this.blockContextMenu = true;
-      this.resolution = 1;
-      this.mousedownHandler = (event) => this.onMouseDown(event);
-      this.mouseupHandler = (event) => this.onMouseUp(event);
-      this.mousemoveHandler = (event) => this.onMouseMove(event);
-      this.mousewheelHandler = (event) => this.onMouseWheel(event);
-      this.contextmenuHandler = (event) => this.onContextMenuEvent(event);
-      this.blurHandler = () => this.onBlur();
-      this.localPoint = new Vec2();
-      this.hitPoint = new Vec2();
-      this.transPoint = new Vec2();
-      if (!target) {
-        target = GameInstance.get().renderer.canvas;
-      }
-      target.addEventListener("mousedown", this.mousedownHandler);
-      target.addEventListener("mouseup", this.mouseupHandler);
-      target.addEventListener("wheel", this.mousewheelHandler, {passive: false});
-      target.addEventListener("contextmenu", this.contextmenuHandler);
-      window.addEventListener("mouseup", this.mouseupHandler);
-      window.addEventListener("mousemove", this.mousemoveHandler);
-      window.addEventListener("blur", this.blurHandler);
-      this.target = target;
-    }
-    onBlur() {
-    }
-    onMouseDown(event) {
-      this.positionToPoint(event);
-      this.primaryDown = event.button === 0;
-      this.auxDown = event.button === 1;
-      this.secondaryDown = event.button === 2;
-      Emit(this, "pointerdown", this.localPoint.x, this.localPoint.y, event.button, event);
-    }
-    onMouseUp(event) {
-      this.positionToPoint(event);
-      this.primaryDown = !(event.button === 0);
-      this.auxDown = !(event.button === 1);
-      this.secondaryDown = !(event.button === 2);
-      Emit(this, "pointerup", this.localPoint.x, this.localPoint.y, event.button, event);
-    }
-    onMouseMove(event) {
-      this.positionToPoint(event);
-      Emit(this, "pointermove", this.localPoint.x, this.localPoint.y, event);
-    }
-    onMouseWheel(event) {
-      Emit(this, "wheel", event.deltaX, event.deltaY, event.deltaZ, event);
-    }
-    onContextMenuEvent(event) {
-      if (this.blockContextMenu) {
-        event.preventDefault();
-      }
-      Emit(this, "contextmenu", event);
-    }
-    positionToPoint(event) {
-      return this.localPoint.set(event.offsetX, event.offsetY);
-    }
-    getInteractiveChildren(parent, results) {
-      const children = parent.children;
-      for (let i = 0; i < children.length; i++) {
-        const child = children[i];
-        if (!child.visible || !child.input.enabled) {
-          continue;
-        }
-        results.push(child);
-        if (child.input.enabledChildren && child.numChildren) {
-          this.getInteractiveChildren(child, results);
-        }
-      }
-    }
-    checkHitArea(entity, px, py) {
-      if (entity.input.hitArea) {
-        if (entity.input.hitArea.contains(px, py)) {
-          return true;
-        }
-      } else {
-        return entity.transform.extent.contains(px, py);
-      }
-      return false;
-    }
-    hitTest(...entities) {
-      const localX = this.localPoint.x;
-      const localY = this.localPoint.y;
-      const point = this.transPoint;
-      for (let i = 0; i < entities.length; i++) {
-        const entity = entities[i];
-        if (!entity.world) {
-          continue;
-        }
-        const mat = Mat2dAppend(entity.world.camera.worldTransform, entity.transform.world);
-        Mat2dGlobalToLocal(mat, localX, localY, point);
-        if (this.checkHitArea(entity, point.x, point.y)) {
-          this.hitPoint.set(point.x, point.y);
-          return true;
-        }
-      }
-      return false;
-    }
-    hitTestChildren(parent, topOnly = true) {
-      const output = [];
-      if (!parent.visible) {
-        return output;
-      }
-      const candidates = [];
-      const parentInput = parent.input;
-      if (parentInput && parentInput.enabled) {
-        candidates.push(parent);
-      }
-      if (parentInput.enabledChildren && parent.numChildren) {
-        this.getInteractiveChildren(parent, candidates);
-      }
-      for (let i = candidates.length - 1; i >= 0; i--) {
-        const entity = candidates[i];
-        if (this.hitTest(entity)) {
-          output.push(entity);
-          if (topOnly) {
-            break;
-          }
-        }
-      }
-      return output;
-    }
-    shutdown() {
-      const target = this.target;
-      target.removeEventListener("mousedown", this.mousedownHandler);
-      target.removeEventListener("mouseup", this.mouseupHandler);
-      target.removeEventListener("wheel", this.mousewheelHandler);
-      target.removeEventListener("contextmenu", this.contextmenuHandler);
-      window.removeEventListener("mouseup", this.mouseupHandler);
-      window.removeEventListener("mousemove", this.mousemoveHandler);
-      window.removeEventListener("blur", this.blurHandler);
-    }
-  };
-  function SetInteractive(...children) {
-    children.forEach((child) => {
-      child.input.enabled = true;
-    });
-    return children;
-  }
+
+  // node_modules/@phaserjs/phaser/loader/index.js
   var loader_exports = {};
   __export(loader_exports, {
     File: () => File,
     Files: () => files_exports,
     Loader: () => Loader
   });
+
+  // node_modules/@phaserjs/phaser/loader/files/index.js
   var files_exports = {};
   __export(files_exports, {
     AtlasFile: () => AtlasFile,
@@ -11257,6 +8460,8 @@ void main (void)
     SpriteSheetFile: () => SpriteSheetFile,
     XMLFile: () => XMLFile
   });
+
+  // node_modules/@phaserjs/phaser/textures/parsers/AtlasParser.js
   function AtlasParser(texture, data) {
     let frames;
     if (Array.isArray(data.textures)) {
@@ -11286,6 +8491,8 @@ void main (void)
       }
     }
   }
+
+  // node_modules/@phaserjs/phaser/loader/File.js
   var File = class {
     constructor(key, url, config) {
       this.responseType = "text";
@@ -11297,6 +8504,8 @@ void main (void)
       this.config = config;
     }
   };
+
+  // node_modules/@phaserjs/phaser/loader/GetURL.js
   function GetURL(key, url, extension, loader) {
     if (!url) {
       url = key + extension;
@@ -11309,6 +8518,8 @@ void main (void)
       return url;
     }
   }
+
+  // node_modules/@phaserjs/phaser/loader/ImageTagLoader.js
   function ImageTagLoader(file) {
     file.data = new Image();
     if (file.crossOrigin) {
@@ -11338,6 +8549,8 @@ void main (void)
       }
     });
   }
+
+  // node_modules/@phaserjs/phaser/loader/files/ImageFile.js
   function ImageFile(key, url, glConfig) {
     const file = new File(key, url);
     file.load = () => {
@@ -11361,6 +8574,8 @@ void main (void)
     };
     return file;
   }
+
+  // node_modules/@phaserjs/phaser/cache/Cache.js
   var caches = new Map();
   var Cache = {
     get: (type) => {
@@ -11375,6 +8590,8 @@ void main (void)
       }
     }
   };
+
+  // node_modules/@phaserjs/phaser/loader/XHRLoader.js
   function XHRLoader(file) {
     const xhr = new XMLHttpRequest();
     xhr.open("GET", file.url, true);
@@ -11392,6 +8609,8 @@ void main (void)
       xhr.send();
     });
   }
+
+  // node_modules/@phaserjs/phaser/loader/files/JSONFile.js
   function JSONFile(key, url) {
     const file = new File(key, url);
     file.load = () => {
@@ -11415,6 +8634,8 @@ void main (void)
     };
     return file;
   }
+
+  // node_modules/@phaserjs/phaser/loader/files/AtlasFile.js
   function AtlasFile(key, textureURL, atlasURL, glConfig) {
     const json = JSONFile(key, atlasURL);
     const image = ImageFile(key, textureURL, glConfig);
@@ -11438,6 +8659,8 @@ void main (void)
     };
     return file;
   }
+
+  // node_modules/@phaserjs/phaser/textures/parsers/BitmapTextParser.js
   function GetValue(node, attribute) {
     return parseInt(node.getAttribute(attribute), 10);
   }
@@ -11482,6 +8705,8 @@ void main (void)
     }
     return data;
   }
+
+  // node_modules/@phaserjs/phaser/loader/files/XMLFile.js
   function XMLFile(key, url) {
     const file = new File(key, url);
     file.load = () => {
@@ -11510,6 +8735,8 @@ void main (void)
     };
     return file;
   }
+
+  // node_modules/@phaserjs/phaser/loader/files/BitmapTextFile.js
   function BitmapTextFile(key, textureURL, fontDataURL, glConfig) {
     const xml = XMLFile(key, fontDataURL);
     const image = ImageFile(key, textureURL, glConfig);
@@ -11535,6 +8762,8 @@ void main (void)
     };
     return file;
   }
+
+  // node_modules/@phaserjs/phaser/loader/files/CSVFile.js
   function CSVFile(key, url) {
     const file = new File(key, url);
     file.load = () => {
@@ -11557,6 +8786,8 @@ void main (void)
     };
     return file;
   }
+
+  // node_modules/@phaserjs/phaser/loader/files/JSONGeometryFile.js
   function JSONGeometryFile(key, url, mappingConfig) {
     const file = new File(key, url);
     const {
@@ -11593,6 +8824,8 @@ void main (void)
     };
     return file;
   }
+
+  // node_modules/@phaserjs/phaser/loader/files/OBJFile.js
   function OBJFile(key, url) {
     const file = new File(key, url);
     file.load = () => {
@@ -11615,6 +8848,8 @@ void main (void)
     };
     return file;
   }
+
+  // node_modules/@phaserjs/phaser/loader/files/OBJGeometryFile.js
   function OBJGeometryFile(key, url, flipUVs = true) {
     const file = new File(key, url);
     file.load = () => {
@@ -11646,6 +8881,8 @@ void main (void)
     };
     return file;
   }
+
+  // node_modules/@phaserjs/phaser/textures/parsers/SpriteSheetParser.js
   function SpriteSheetParser(texture, x, y, width, height, frameConfig) {
     const {
       frameWidth = null,
@@ -11701,6 +8938,8 @@ void main (void)
       }
     }
   }
+
+  // node_modules/@phaserjs/phaser/loader/files/SpriteSheetFile.js
   function SpriteSheetFile(key, url, frameConfig, glConfig) {
     const file = new File(key, url);
     file.load = () => {
@@ -11729,6 +8968,8 @@ void main (void)
     };
     return file;
   }
+
+  // node_modules/@phaserjs/phaser/loader/Loader.js
   var Loader = class extends EventEmitter {
     constructor() {
       super();
@@ -11845,448 +9086,200 @@ void main (void)
       return this;
     }
   };
-  var materials3d_exports = {};
-  __export(materials3d_exports, {
-    BlackPlastic: () => BlackPlastic,
-    BlackRubber: () => BlackRubber,
-    Brass: () => Brass,
-    Bronze: () => Bronze,
-    Chrome: () => Chrome,
-    Copper: () => Copper,
-    CyanPlastic: () => CyanPlastic,
-    CyanRubber: () => CyanRubber,
-    Emerald: () => Emerald,
-    Gold: () => Gold,
-    GreenPlastic: () => GreenPlastic,
-    GreenRubber: () => GreenRubber,
-    Jade: () => Jade,
-    Obsidian: () => Obsidian,
-    Pearl: () => Pearl,
-    RedPlastic: () => RedPlastic,
-    RedRubber: () => RedRubber,
-    Ruby: () => Ruby,
-    Silver: () => Silver,
-    Turquoise: () => Turquoise,
-    WhitePlastic: () => WhitePlastic,
-    WhiteRubber: () => WhiteRubber,
-    YellowPlastic: () => YellowPlastic,
-    YellowRubber: () => YellowRubber
-  });
+
+  // node_modules/@phaserjs/phaser/materials3d/BlackPlastic.js
   var BlackPlastic = new Material({
     ambient: [0, 0, 0],
     diffuse: [0.01, 0.01, 0.01],
     specular: [0.5, 0.5, 0.5],
     shine: 0.25
   });
+
+  // node_modules/@phaserjs/phaser/materials3d/BlackRubber.js
   var BlackRubber = new Material({
     ambient: [0.02, 0.02, 0.02],
     diffuse: [0.01, 0.01, 0.01],
     specular: [0.4, 0.4, 0.4],
     shine: 0.078125
   });
+
+  // node_modules/@phaserjs/phaser/materials3d/Brass.js
   var Brass = new Material({
     ambient: [0.329412, 0.223529, 0.027451],
     diffuse: [0.780392, 0.568627, 0.113725],
     specular: [0.992157, 0.941176, 0.807843],
     shine: 0.21794872
   });
+
+  // node_modules/@phaserjs/phaser/materials3d/Bronze.js
   var Bronze = new Material({
     ambient: [0.2125, 0.1275, 0.054],
     diffuse: [0.714, 0.4284, 0.18144],
     specular: [0.393548, 0.271906, 0.166721],
     shine: 0.2
   });
+
+  // node_modules/@phaserjs/phaser/materials3d/Chrome.js
   var Chrome = new Material({
     ambient: [0.25, 0.25, 0.25],
     diffuse: [0.4, 0.4, 0.4],
     specular: [0.774597, 0.774597, 0.774597],
     shine: 0.6
   });
+
+  // node_modules/@phaserjs/phaser/materials3d/Copper.js
   var Copper = new Material({
     ambient: [0.19125, 0.0735, 0.0225],
     diffuse: [0.7038, 0.27048, 0.0828],
     specular: [0.256777, 0.137622, 0.086014],
     shine: 0.1
   });
+
+  // node_modules/@phaserjs/phaser/materials3d/CyanPlastic.js
   var CyanPlastic = new Material({
     ambient: [0, 0.1, 0.06],
     diffuse: [0, 0.50980392, 0.50980392],
     specular: [0.50196078, 0.50196078, 0.50196078],
     shine: 0.25
   });
+
+  // node_modules/@phaserjs/phaser/materials3d/CyanRubber.js
   var CyanRubber = new Material({
     ambient: [0, 0.05, 0.05],
     diffuse: [0.4, 0.5, 0.5],
     specular: [0.04, 0.7, 0.7],
     shine: 0.078125
   });
+
+  // node_modules/@phaserjs/phaser/materials3d/Emerald.js
   var Emerald = new Material({
     ambient: [0.0215, 0.1745, 0.0215],
     diffuse: [0.07568, 0.61424, 0.07568],
     specular: [0.633, 0.727811, 0.633],
     shine: 0.6
   });
+
+  // node_modules/@phaserjs/phaser/materials3d/Gold.js
   var Gold = new Material({
     ambient: [0.24725, 0.1995, 0.0745],
     diffuse: [0.75164, 0.60648, 0.22648],
     specular: [0.628281, 0.555802, 0.366065],
     shine: 0.4
   });
+
+  // node_modules/@phaserjs/phaser/materials3d/GreenPlastic.js
   var GreenPlastic = new Material({
     ambient: [0, 0, 0],
     diffuse: [0.1, 0.35, 0.1],
     specular: [0.45, 0.55, 0.45],
     shine: 0.25
   });
+
+  // node_modules/@phaserjs/phaser/materials3d/GreenRubber.js
   var GreenRubber = new Material({
     ambient: [0, 0.05, 0],
     diffuse: [0.4, 0.5, 0.4],
     specular: [0.04, 0.7, 0.04],
     shine: 0.078125
   });
+
+  // node_modules/@phaserjs/phaser/materials3d/Jade.js
   var Jade = new Material({
     ambient: [0.135, 0.2225, 0.1575],
     diffuse: [0.54, 0.89, 0.63],
     specular: [0.316228, 0.316228, 0.316228],
     shine: 0.1
   });
+
+  // node_modules/@phaserjs/phaser/materials3d/Obsidian.js
   var Obsidian = new Material({
     ambient: [0.05375, 0.05, 0.06625],
     diffuse: [0.18275, 0.17, 0.22525],
     specular: [0.332741, 0.328634, 0.346435],
     shine: 0.3
   });
+
+  // node_modules/@phaserjs/phaser/materials3d/Pearl.js
   var Pearl = new Material({
     ambient: [0.25, 0.20725, 0.20725],
     diffuse: [1, 0.829, 0.829],
     specular: [0.296648, 0.296648, 0.296648],
     shine: 0.088
   });
+
+  // node_modules/@phaserjs/phaser/materials3d/RedPlastic.js
   var RedPlastic = new Material({
     ambient: [0, 0, 0],
     diffuse: [0.5, 0, 0],
     specular: [0.7, 0.6, 0.6],
     shine: 0.25
   });
+
+  // node_modules/@phaserjs/phaser/materials3d/RedRubber.js
   var RedRubber = new Material({
     ambient: [0.05, 0, 0],
     diffuse: [0.5, 0.4, 0.4],
     specular: [0.7, 0.04, 0.04],
     shine: 0.078125
   });
+
+  // node_modules/@phaserjs/phaser/materials3d/Ruby.js
   var Ruby = new Material({
     ambient: [0.1745, 0.01175, 0.01175],
     diffuse: [0.61424, 0.04136, 0.04136],
     specular: [0.727811, 0.626959, 0.626959],
     shine: 0.6
   });
+
+  // node_modules/@phaserjs/phaser/materials3d/Silver.js
   var Silver = new Material({
     ambient: [0.19225, 0.19225, 0.19225],
     diffuse: [0.50754, 0.50754, 0.50754],
     specular: [0.508273, 0.508273, 0.508273],
     shine: 0.4
   });
+
+  // node_modules/@phaserjs/phaser/materials3d/Turquoise.js
   var Turquoise = new Material({
     ambient: [0.1, 0.18725, 0.1745],
     diffuse: [0.396, 0.74151, 0.69102],
     specular: [0.297254, 0.30829, 0.306678],
     shine: 0.1
   });
+
+  // node_modules/@phaserjs/phaser/materials3d/WhitePlastic.js
   var WhitePlastic = new Material({
     ambient: [0, 0, 0],
     diffuse: [0.55, 0.55, 0.55],
     specular: [0.7, 0.7, 0.7],
     shine: 0.25
   });
+
+  // node_modules/@phaserjs/phaser/materials3d/WhiteRubber.js
   var WhiteRubber = new Material({
     ambient: [0.05, 0.05, 0.05],
     diffuse: [0.5, 0.5, 0.5],
     specular: [0.7, 0.7, 0.7],
     shine: 0.078125
   });
+
+  // node_modules/@phaserjs/phaser/materials3d/YellowPlastic.js
   var YellowPlastic = new Material({
     ambient: [0, 0, 0],
     diffuse: [0.5, 0.5, 0],
     specular: [0.6, 0.6, 0.5],
     shine: 0.25
   });
+
+  // node_modules/@phaserjs/phaser/materials3d/YellowRubber.js
   var YellowRubber = new Material({
     ambient: [0.05, 0.05, 0],
     diffuse: [0.5, 0.5, 0.4],
     specular: [0.7, 0.7, 0.04],
     shine: 0.078125
   });
-  var textures_exports = {};
-  __export(textures_exports, {
-    CreateCanvas: () => CreateCanvas,
-    Frame: () => Frame,
-    GetFrames: () => GetFrames,
-    GetFramesInRange: () => GetFramesInRange,
-    Palettes: () => palettes_exports,
-    Parsers: () => parsers_exports,
-    SetFilter: () => SetFilter,
-    Texture: () => Texture,
-    TextureManager: () => TextureManager,
-    Types: () => types_exports
-  });
-  var palettes_exports = {};
-  __export(palettes_exports, {
-    Arne16: () => Arne16,
-    C64: () => C64,
-    CGA: () => CGA,
-    JMP: () => JMP,
-    MSX: () => MSX,
-    PICO8: () => PICO8
-  });
-  var Arne16 = [
-    "#000",
-    "#9D9D9D",
-    "#FFF",
-    "#BE2633",
-    "#E06F8B",
-    "#493C2B",
-    "#A46422",
-    "#EB8931",
-    "#F7E26B",
-    "#2F484E",
-    "#44891A",
-    "#A3CE27",
-    "#1B2632",
-    "#005784",
-    "#31A2F2",
-    "#B2DCEF"
-  ];
-  var C64 = [
-    "#000",
-    "#fff",
-    "#8b4131",
-    "#7bbdc5",
-    "#8b41ac",
-    "#6aac41",
-    "#3931a4",
-    "#d5de73",
-    "#945a20",
-    "#5a4100",
-    "#bd736a",
-    "#525252",
-    "#838383",
-    "#acee8b",
-    "#7b73de",
-    "#acacac"
-  ];
-  var CGA = [
-    "#000",
-    "#2234d1",
-    "#0c7e45",
-    "#44aacc",
-    "#8a3622",
-    "#5c2e78",
-    "#aa5c3d",
-    "#b5b5b5",
-    "#5e606e",
-    "#4c81fb",
-    "#6cd947",
-    "#7be2f9",
-    "#eb8a60",
-    "#e23d69",
-    "#ffd93f",
-    "#fff"
-  ];
-  var JMP = [
-    "#000",
-    "#191028",
-    "#46af45",
-    "#a1d685",
-    "#453e78",
-    "#7664fe",
-    "#833129",
-    "#9ec2e8",
-    "#dc534b",
-    "#e18d79",
-    "#d6b97b",
-    "#e9d8a1",
-    "#216c4b",
-    "#d365c8",
-    "#afaab9",
-    "#f5f4eb"
-  ];
-  var MSX = [
-    "#000",
-    "#191028",
-    "#46af45",
-    "#a1d685",
-    "#453e78",
-    "#7664fe",
-    "#833129",
-    "#9ec2e8",
-    "#dc534b",
-    "#e18d79",
-    "#d6b97b",
-    "#e9d8a1",
-    "#216c4b",
-    "#d365c8",
-    "#afaab9",
-    "#fff"
-  ];
-  var PICO8 = [
-    "#000",
-    "#1D2B53",
-    "#7E2553",
-    "#008751",
-    "#AB5236",
-    "#5F574F",
-    "#C2C3C7",
-    "#FFF1E8",
-    "#FF004D",
-    "#FFA300",
-    "#FFEC27",
-    "#00E436",
-    "#29ADFF",
-    "#83769C",
-    "#FF77A8",
-    "#FFCCAA"
-  ];
-  var parsers_exports = {};
-  __export(parsers_exports, {
-    AtlasParser: () => AtlasParser,
-    BitmapTextParser: () => BitmapTextParser,
-    SpriteSheetParser: () => SpriteSheetParser
-  });
-  var types_exports = {};
-  __export(types_exports, {
-    CanvasTexture: () => CanvasTexture,
-    GridTexture: () => GridTexture,
-    PixelTexture: () => PixelTexture,
-    RenderTexture: () => RenderTexture,
-    SolidColorTexture: () => SolidColorTexture
-  });
-  function GridTexture(color1, color2, width = 32, height = 32, cols = 2, rows = 2) {
-    const ctx = CreateCanvas(width, height);
-    const colWidth = width / cols;
-    const rowHeight = height / rows;
-    ctx.fillStyle = color1;
-    ctx.fillRect(0, 0, width, height);
-    ctx.fillStyle = color2;
-    for (let y = 0; y < rows; y++) {
-      for (let x = y % 2; x < cols; x += 2) {
-        ctx.fillRect(x * colWidth, y * rowHeight, colWidth, rowHeight);
-      }
-    }
-    return new Texture(ctx.canvas);
-  }
-  function PixelTexture(config) {
-    const {
-      data = [],
-      palette = Arne16,
-      pixelWidth = 1,
-      pixelHeight = pixelWidth,
-      preRender = null,
-      postRender = null
-    } = config;
-    let {
-      canvas = null,
-      resizeCanvas = true,
-      clearCanvas = true
-    } = config;
-    const width = Math.floor(Math.abs(data[0].length * pixelWidth));
-    const height = Math.floor(Math.abs(data.length * pixelHeight));
-    if (!canvas) {
-      canvas = CreateCanvas(width, height).canvas;
-      resizeCanvas = false;
-      clearCanvas = false;
-    }
-    if (resizeCanvas) {
-      canvas.width = width;
-      canvas.height = height;
-    }
-    const ctx = canvas.getContext("2d");
-    if (clearCanvas) {
-      ctx.clearRect(0, 0, width, height);
-    }
-    if (preRender) {
-      preRender(canvas, ctx);
-    }
-    for (let y = 0; y < data.length; y++) {
-      const row = data[y];
-      for (let x = 0; x < row.length; x++) {
-        const d = row[x];
-        if (d !== "." && d !== " ") {
-          ctx.fillStyle = palette[parseInt("0x" + d.toUpperCase())];
-          ctx.fillRect(x * pixelWidth, y * pixelHeight, pixelWidth, pixelHeight);
-        }
-      }
-    }
-    if (postRender) {
-      postRender(canvas, ctx);
-    }
-    return new Texture(canvas);
-  }
-  var RenderTexture = class extends Texture {
-    constructor(renderer, width = 256, height = width) {
-      super(null, width, height);
-      this.renderer = renderer;
-    }
-    cls() {
-      return this;
-    }
-    batchStart() {
-      return this;
-    }
-    batchDraw(sprites) {
-      for (let i = 0, len = sprites.length; i < len; i++) {
-      }
-      return this;
-    }
-    batchEnd() {
-      const renderer = this.renderer;
-      renderer.reset();
-      return this;
-    }
-    draw(...sprites) {
-      this.batchStart();
-      this.batchDraw(sprites);
-      this.batchEnd();
-      return this;
-    }
-  };
-  function SolidColorTexture(color = "rgba(0,0,0,0)", width = 32, height = 32) {
-    const ctx = CreateCanvas(width, height);
-    ctx.fillStyle = color;
-    ctx.fillRect(0, 0, width, height);
-    return new Texture(ctx.canvas);
-  }
-  function GetFrames(texture, frames) {
-    const output = [];
-    frames.forEach((key) => {
-      output.push(texture.getFrame(key));
-    });
-    return output;
-  }
-  function GetFramesInRange(texture, config) {
-    const {
-      prefix = "",
-      start = 0,
-      zeroPad = 0,
-      suffix = ""
-    } = config;
-    let end = config.end;
-    const output = [];
-    const diff = start < end ? 1 : -1;
-    end += diff;
-    for (let i = start; i !== end; i += diff) {
-      const frameKey = prefix + i.toString().padStart(zeroPad, "0") + suffix;
-      output.push(texture.getFrame(frameKey));
-    }
-    return output;
-  }
-  function SetFilter(linear, ...textures) {
-    textures.forEach((texture) => {
-      if (texture.binding) {
-        texture.binding.setFilter(linear);
-      }
-    });
-    return textures;
-  }
+
+  // node_modules/@phaserjs/phaser/textures/TextureManager.js
   var TextureManager = class {
     constructor() {
       this.textures = new Map();
@@ -12333,97 +9326,15 @@ void main (void)
       return texture;
     }
   };
-  var time_exports = {};
-  __export(time_exports, {
-    AddDelayedCall: () => AddDelayedCall,
-    AddTimer: () => AddTimer,
-    Clock: () => Clock,
-    NOOP: () => NOOP2
-  });
-  function NOOP2() {
-  }
-  function AddTimer(clock, config) {
-    const {
-      duration = 0,
-      repeat = 0,
-      delay = -1,
-      onStart = NOOP2,
-      onUpdate = NOOP2,
-      onRepeat = NOOP2,
-      onComplete = NOOP2
-    } = config;
-    const timer = {
-      elapsed: duration,
-      duration,
-      repeat,
-      delay,
-      update: null,
-      onStart,
-      onUpdate,
-      onRepeat,
-      onComplete
-    };
-    timer.update = (delta) => {
-      if (timer.delay > 0) {
-        timer.delay -= delta;
-        if (timer.delay < 0) {
-          timer.delay = 0;
-        } else {
-          return false;
-        }
-      }
-      if (timer.delay === 0) {
-        timer.onStart();
-        timer.delay = -1;
-      }
-      if (timer.delay === -1) {
-        timer.elapsed -= delta;
-        timer.onUpdate(delta, timer.elapsed / timer.duration);
-        if (timer.elapsed <= 0) {
-          if (timer.repeat > 0) {
-            timer.repeat--;
-            timer.elapsed = timer.duration;
-            timer.onRepeat(timer.repeat);
-          } else {
-            timer.elapsed = 0;
-            timer.onComplete();
-          }
-        }
-      }
-      return timer.elapsed === 0;
-    };
-    clock.events.add(timer);
-  }
-  function AddDelayedCall(clock, delay, callback) {
-    AddTimer(clock, {
-      duration: 0,
-      delay,
-      onComplete: callback
-    });
-  }
-  var Clock = class {
-    constructor(world) {
-      this.world = world;
-      this.timeScale = 1;
-      this.events = new Set();
-    }
-    update(delta, time) {
-      this.now = time;
-      delta *= this.timeScale;
-      this.events.forEach((timer) => {
-        if (timer.update(delta)) {
-          this.events.delete(timer);
-        }
-      });
-    }
-  };
+
+  // node_modules/@phaserjs/phaser/world/index.js
   var world_exports = {};
   __export(world_exports, {
     BaseWorld: () => BaseWorld,
     BuildRenderList: () => BuildRenderList,
     CalculateTotalRenderable: () => CalculateTotalRenderable,
     CreateWorldRenderData: () => CreateWorldRenderData,
-    Events: () => events_exports2,
+    Events: () => events_exports,
     HasDirtyChildren: () => HasDirtyChildren,
     MergeRenderData: () => MergeRenderData,
     ResetWorldRenderData: () => ResetWorldRenderData,
@@ -12432,13 +9343,21 @@ void main (void)
     World: () => World,
     WorldDepthFirstSearch: () => WorldDepthFirstSearch
   });
-  var events_exports2 = {};
-  __export(events_exports2, {
+
+  // node_modules/@phaserjs/phaser/world/events/index.js
+  var events_exports = {};
+  __export(events_exports, {
     WorldRenderEvent: () => WorldRenderEvent,
     WorldShutdownEvent: () => WorldShutdownEvent
   });
+
+  // node_modules/@phaserjs/phaser/world/events/WorldRenderEvent.js
   var WorldRenderEvent = "worldrender";
+
+  // node_modules/@phaserjs/phaser/world/events/WorldShutdownEvent.js
   var WorldShutdownEvent = "worldshutdown";
+
+  // node_modules/@phaserjs/phaser/world/CalculateTotalRenderable.js
   function CalculateTotalRenderable(entry, renderData) {
     renderData.numRendered++;
     renderData.numRenderable++;
@@ -12451,6 +9370,8 @@ void main (void)
       }
     });
   }
+
+  // node_modules/@phaserjs/phaser/world/HasDirtyChildren.js
   function HasDirtyChildren(parent) {
     if (parent.node.isDirty(DIRTY_CONST.CHILD_CACHE)) {
       return true;
@@ -12471,6 +9392,8 @@ void main (void)
     stack.length = 0;
     return false;
   }
+
+  // node_modules/@phaserjs/phaser/world/UpdateCachedLayers.js
   function UpdateCachedLayers(cachedLayers, dirtyCamera) {
     cachedLayers.forEach((layer) => {
       if (dirtyCamera || HasDirtyChildren(layer)) {
@@ -12480,6 +9403,8 @@ void main (void)
       }
     });
   }
+
+  // node_modules/@phaserjs/phaser/world/WorldDepthFirstSearch.js
   function WorldDepthFirstSearch(cachedLayers, parent, output = []) {
     for (let i = 0; i < parent.numChildren; i++) {
       const node = parent.children[i];
@@ -12497,6 +9422,8 @@ void main (void)
     }
     return output;
   }
+
+  // node_modules/@phaserjs/phaser/world/BuildRenderList.js
   function BuildRenderList(world) {
     const cachedLayers = [];
     const stack = [];
@@ -12522,6 +9449,8 @@ void main (void)
       world.forceRefresh = false;
     }
   }
+
+  // node_modules/@phaserjs/phaser/world/MergeRenderData.js
   function MergeRenderData(sceneRenderData, worldRenderData) {
     sceneRenderData.numDirtyFrames += worldRenderData.dirtyFrame;
     sceneRenderData.numTotalFrames += worldRenderData.numRendered;
@@ -12530,12 +9459,16 @@ void main (void)
     }
     sceneRenderData.worldData.push(worldRenderData);
   }
+
+  // node_modules/@phaserjs/phaser/world/ResetWorldRenderData.js
   function ResetWorldRenderData(renderData, gameFrame) {
     renderData.gameFrame = gameFrame;
     renderData.dirtyFrame = 0;
     renderData.numRendered = 0;
     renderData.numRenderable = 0;
   }
+
+  // node_modules/@phaserjs/phaser/world/BaseWorld.js
   var BaseWorld = class extends GameObject {
     constructor(scene) {
       super();
@@ -12625,6 +9558,8 @@ void main (void)
       this.events = null;
     }
   };
+
+  // node_modules/@phaserjs/phaser/world/CreateWorldRenderData.js
   function CreateWorldRenderData(world, camera) {
     return {
       world,
@@ -12635,6 +9570,8 @@ void main (void)
       numRenderable: 0
     };
   }
+
+  // node_modules/@phaserjs/phaser/world/StaticWorld.js
   var StaticWorld = class extends BaseWorld {
     constructor(scene) {
       super(scene);
@@ -12643,6 +9580,8 @@ void main (void)
       this.renderData = CreateWorldRenderData(this, this.camera);
     }
   };
+
+  // node_modules/@phaserjs/phaser/world/World.js
   var World = class extends BaseWorld {
     constructor(scene) {
       super(scene);
@@ -12652,492 +9591,8 @@ void main (void)
       this.renderData = CreateWorldRenderData(this, this.camera);
     }
   };
-  var world3d_exports = {};
-  __export(world3d_exports, {
-    BaseWorld3D: () => BaseWorld3D,
-    BuildRenderList: () => BuildRenderList2,
-    CalculateTotalRenderable: () => CalculateTotalRenderable2,
-    CreateWorld3DRenderData: () => CreateWorld3DRenderData,
-    Events: () => events_exports3,
-    HasDirtyChildren: () => HasDirtyChildren2,
-    MergeRenderData: () => MergeRenderData2,
-    ResetWorld3DRenderData: () => ResetWorld3DRenderData,
-    UpdateCachedLayers: () => UpdateCachedLayers2,
-    World3D: () => World3D,
-    WorldDepthFirstSearch: () => WorldDepthFirstSearch2
-  });
-  var events_exports3 = {};
-  __export(events_exports3, {
-    World3DRenderEvent: () => World3DRenderEvent,
-    World3DShutdownEvent: () => World3DShutdownEvent
-  });
-  var World3DRenderEvent = "worldrender";
-  var World3DShutdownEvent = "worldshutdown";
-  function CalculateTotalRenderable2(entry, renderData) {
-    renderData.numRendered++;
-    renderData.numRenderable++;
-    if (entry.node.dirtyFrame >= renderData.gameFrame) {
-      renderData.dirtyFrame++;
-    }
-    entry.children.forEach((child) => {
-      if (child.children.length > 0) {
-        CalculateTotalRenderable2(child, renderData);
-      }
-    });
-  }
-  function HasDirtyChildren2(parent) {
-    if (parent.node.isDirty(DIRTY_CONST.CHILD_CACHE)) {
-      return true;
-    }
-    const stack = [parent];
-    while (stack.length > 0) {
-      const entry = stack.pop();
-      if (entry.node.isDirty(DIRTY_CONST.TRANSFORM)) {
-        return true;
-      }
-      const numChildren = entry.children.length;
-      if (numChildren > 0) {
-        for (let i = 0; i < numChildren; i++) {
-          stack.push(entry.children[i]);
-        }
-      }
-    }
-    stack.length = 0;
-    return false;
-  }
-  function UpdateCachedLayers2(cachedLayers, dirtyCamera) {
-    cachedLayers.forEach((layer) => {
-      if (dirtyCamera || HasDirtyChildren2(layer)) {
-        layer.node.setDirty(DIRTY_CONST.CHILD_CACHE);
-      } else {
-        layer.children.length = 0;
-      }
-    });
-  }
-  function WorldDepthFirstSearch2(cachedLayers, parent, output = []) {
-    for (let i = 0; i < parent.numChildren; i++) {
-      const node = parent.children[i];
-      if (node.isRenderable()) {
-        const children = [];
-        const entry = {node, children};
-        output.push(entry);
-        if (node.willRenderChildren && node.numChildren > 0) {
-          if (node.willCacheChildren) {
-            cachedLayers.push(entry);
-          }
-          WorldDepthFirstSearch2(cachedLayers, node, children);
-        }
-      }
-    }
-    return output;
-  }
-  function BuildRenderList2(world) {
-    const cachedLayers = [];
-    const stack = [];
-    const entries = WorldDepthFirstSearch2(cachedLayers, world, stack);
-    const renderData = world.renderData;
-    if (cachedLayers.length > 0) {
-      UpdateCachedLayers2(cachedLayers, world.camera.dirtyRender);
-    }
-    entries.forEach((entry) => {
-      if (entry.children.length > 0) {
-        CalculateTotalRenderable2(entry, renderData);
-      } else {
-        renderData.numRendered++;
-        renderData.numRenderable++;
-        if (entry.node.dirtyFrame >= renderData.gameFrame) {
-          renderData.dirtyFrame++;
-        }
-      }
-    });
-    world.renderList = entries;
-    if (world.forceRefresh) {
-      renderData.dirtyFrame++;
-      world.forceRefresh = false;
-    }
-  }
-  function MergeRenderData2(sceneRenderData, worldRenderData) {
-    sceneRenderData.numDirtyFrames += worldRenderData.dirtyFrame;
-    sceneRenderData.numTotalFrames += worldRenderData.numRendered;
-    if (worldRenderData.camera.dirtyRender) {
-      sceneRenderData.numDirtyCameras++;
-    }
-    sceneRenderData.worldData.push(worldRenderData);
-  }
-  function ResetWorld3DRenderData(renderData, gameFrame) {
-    renderData.gameFrame = gameFrame;
-    renderData.dirtyFrame = 0;
-    renderData.numRendered = 0;
-    renderData.numRenderable = 0;
-  }
-  var BaseWorld3D = class extends GameObject3D {
-    constructor(scene) {
-      super();
-      this.forceRefresh = false;
-      this.is3D = true;
-      this.type = "BaseWorld";
-      this.scene = scene;
-      this.world = this;
-      this.events = new Map();
-      this.renderList = [];
-      this._updateListener = On(scene, "update", (delta, time) => this.update(delta, time));
-      this._renderListener = On(scene, "render", (renderData) => this.render(renderData));
-      this._shutdownListener = On(scene, "shutdown", () => this.shutdown());
-      Once(scene, "destroy", () => this.destroy());
-    }
-    update(delta, time) {
-      if (!this.willUpdate) {
-        return;
-      }
-      Emit(this, UpdateEvent, delta, time, this);
-      super.update(delta, time);
-    }
-    postUpdate(delta, time) {
-      Emit(this, PostUpdateEvent, delta, time, this);
-    }
-    render(sceneRenderData) {
-      const renderData = this.renderData;
-      ResetWorld3DRenderData(renderData, sceneRenderData.gameFrame);
-      if (!this.willRender || !this.visible) {
-        return;
-      }
-      BuildRenderList2(this);
-      Emit(this, World3DRenderEvent, renderData, this);
-      MergeRenderData2(sceneRenderData, renderData);
-    }
-    renderNode(entry, renderPass) {
-      entry.node.renderGL(renderPass);
-      entry.children.forEach((child) => {
-        if (child.children.length > 0) {
-          this.renderNode(child, renderPass);
-        } else {
-          child.node.renderGL(renderPass);
-        }
-      });
-      entry.node.postRenderGL(renderPass);
-    }
-    shutdown() {
-      const scene = this.scene;
-      Off(scene, "update", this._updateListener);
-      Off(scene, "render", this._renderListener);
-      Off(scene, "shutdown", this._shutdownListener);
-      RemoveChildren3D(this);
-      Emit(this, World3DShutdownEvent, this);
-      ResetWorld3DRenderData(this.renderData, 0);
-    }
-    destroy(reparentChildren) {
-      super.destroy(reparentChildren);
-      Emit(this, DestroyEvent, this);
-      ResetWorld3DRenderData(this.renderData, 0);
-      this.events.clear();
-      this.camera = null;
-      this.renderData = null;
-      this.events = null;
-    }
-  };
-  function CreateWorld3DRenderData(world, camera) {
-    return {
-      world,
-      camera,
-      gameFrame: 0,
-      dirtyFrame: 0,
-      numRendered: 0,
-      numRenderable: 0
-    };
-  }
-  var AMBIENT_LIGHT_FRAG = `#define SHADER_NAME AMBIENT_LIGHT_FRAG
 
-precision highp float;
-
-uniform vec3 uLightPosition;
-uniform vec3 uLightAmbient;
-uniform vec3 uLightDiffuse;
-uniform vec3 uLightSpecular;
-
-uniform vec3 uMaterialAmbient;
-uniform vec3 uMaterialDiffuse;
-uniform vec3 uMaterialSpecular;
-uniform float uMaterialShine;
-
-uniform vec3 uCameraPosition;
-
-uniform sampler2D uTexture;
-
-varying vec2 vTextureCoord;
-varying vec3 vNormal;
-varying vec3 vPosition;
-
-void main (void)
-{
-    vec4 color = texture2D(uTexture, vTextureCoord);
-
-    vec3 ambient = uLightAmbient * uMaterialAmbient;
-
-    vec3 norm = normalize(vNormal);
-    vec3 lightDir = normalize(uLightPosition - vPosition);
-    float diff = max(dot(norm, lightDir), 0.0);
-    vec3 diffuse = uLightDiffuse * (diff * uMaterialDiffuse);
-
-    vec3 viewDir = normalize(uCameraPosition - vPosition);
-    vec3 reflectDir = reflect(-lightDir, norm);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), uMaterialShine);
-    vec3 specular = uLightSpecular * (spec * uMaterialSpecular);
-
-    vec3 result = (ambient + diffuse + specular) * color.rgb;
-
-    gl_FragColor = vec4(result, color.a);
-}`;
-  var AMBIENT_LIGHT_VERT = `
-#define SHADER_NAME AMBIENT_LIGHT_VERT
-
-precision highp float;
-
-attribute vec3 aVertexPosition;
-attribute vec3 aVertexNormal;
-attribute vec2 aTextureCoord;
-
-uniform mat4 uViewProjectionMatrix;
-uniform mat4 uModelMatrix;
-uniform mat4 uNormalMatrix;
-
-varying vec2 vTextureCoord;
-varying vec3 vNormal;
-varying vec3 vPosition;
-
-void main(void)
-{
-    vTextureCoord = aTextureCoord;
-
-    vPosition = vec3(uModelMatrix * vec4(aVertexPosition, 1.0));
-
-    vNormal = vec3(uNormalMatrix * vec4(aVertexNormal, 1.0));
-
-    gl_Position = uViewProjectionMatrix * uModelMatrix * vec4(aVertexPosition, 1.0);
-}
-`;
-  var AmbientLightShader = class extends Shader {
-    constructor() {
-      super();
-      const tempMat4 = new Float32Array(16).fill(0);
-      const tempVec3 = [0, 0, 0];
-      const config = {
-        fragmentShader: AMBIENT_LIGHT_FRAG,
-        vertexShader: AMBIENT_LIGHT_VERT,
-        attributes: {
-          aVertexPosition: {size: 3, type: FLOAT, normalized: false, offset: 0},
-          aVertexNormal: {size: 3, type: FLOAT, normalized: false, offset: 12},
-          aTextureCoord: {size: 2, type: FLOAT, normalized: false, offset: 24}
-        },
-        uniforms: {
-          uViewProjectionMatrix: tempMat4,
-          uNormalMatrix: tempMat4,
-          uModelMatrix: tempMat4,
-          uCameraPosition: tempVec3,
-          uTexture: 0,
-          uLightPosition: tempVec3,
-          uLightAmbient: tempVec3,
-          uLightDiffuse: tempVec3,
-          uLightSpecular: tempVec3,
-          uMaterialAmbient: tempVec3,
-          uMaterialDiffuse: tempVec3,
-          uMaterialSpecular: tempVec3,
-          uMaterialShine: 0
-        }
-      };
-      this.fromConfig(config);
-    }
-  };
-  var NewCamera3D = class {
-    constructor(fov = 45, near = 0.1, far = 1e3) {
-      this.isOrbit = false;
-      this.minDistance = 0;
-      this.maxDistance = Infinity;
-      this.minPolarAngle = 0;
-      this.maxPolarAngle = Math.PI;
-      this.minAzimuthAngle = -Infinity;
-      this.maxAzimuthAngle = Infinity;
-      this.dirtyRender = true;
-      this.panRate = 5;
-      this.zoomRate = 200;
-      this.rotateRate = -3;
-      this._yaw = 0;
-      this._pitch = 0;
-      this._roll = 0;
-      this.type = "Camera3D";
-      this._fov = fov;
-      this._near = near;
-      this._far = far;
-      this.matrix = new Matrix4();
-      this.viewMatrix = new Matrix4();
-      this.projectionMatrix = new Matrix4();
-      this.viewProjectionMatrix = new Matrix4();
-      this.position = new Vec3Callback(() => this.update());
-      this.rotation = new Quaternion();
-      const game = GameInstance.get();
-      const renderer = game.renderer;
-      this.viewport = new Rectangle(0, 0, renderer.width, renderer.height);
-      this.renderer = renderer;
-      this.forward = Vec3Forward();
-      this.up = Vec3Up();
-      this.right = Vec3Right();
-      this.start = new Vec3();
-      this.setAspectRatio();
-    }
-    update() {
-      const matrix2 = this.matrix;
-      const view = this.viewMatrix;
-      Mat4FromRotationXYTranslation(this.rotation, this.position, !this.isOrbit, matrix2);
-      Vec3TransformMat4Zero(FORWARD, matrix2, this.forward);
-      Vec3TransformMat4Zero(UP, matrix2, this.up);
-      Vec3TransformMat4Zero(RIGHT, matrix2, this.right);
-      Mat4Invert(matrix2, view);
-      Mat4Multiply(this.projectionMatrix, view, this.viewProjectionMatrix);
-      return this;
-    }
-    panX(amount) {
-      const pos = this.position;
-      if (!this.isOrbit) {
-        Vec3ScaleAndAdd(pos, this.right, amount, pos);
-      }
-      return this;
-    }
-    panY(amount) {
-      const pos = this.position;
-      const up = this.up;
-      if (this.isOrbit) {
-        pos.y += up.y * amount;
-      } else {
-        Vec3ScaleAndAdd(pos, up, amount, pos);
-      }
-      return this;
-    }
-    panZ(amount) {
-      const pos = this.position;
-      if (this.isOrbit) {
-        pos.z += amount;
-      } else {
-        Vec3ScaleAndAdd(pos, this.forward, amount, pos);
-      }
-      return this;
-    }
-    begin(x, y) {
-      this.start.set(x, y);
-    }
-    pan(x, y) {
-      const dx = x - this.start.x;
-      const dy = y - this.start.y;
-      const viewport = this.viewport;
-      this.panX(-dx * (this.panRate / viewport.width));
-      this.panY(dy * (this.panRate / viewport.height));
-      this.start.set(x, y);
-    }
-    rotate(x, y) {
-      const dx = x - this.start.x;
-      const dy = y - this.start.y;
-      const viewport = this.viewport;
-      this.rotation.x += dy * (this.rotateRate / viewport.height);
-      this.rotation.y += dx * (this.rotateRate / viewport.width);
-      this.start.set(x, y);
-      this.update();
-    }
-    zoom(delta) {
-      this.panZ(Clamp(delta, -1, 1) * (this.zoomRate / this.viewport.height));
-    }
-    setAspectRatio(value) {
-      if (!value) {
-        const renderer = this.renderer;
-        value = renderer.width / renderer.height;
-      }
-      this.aspect = value;
-      return this.updateProjectionMatrix();
-    }
-    updateProjectionMatrix() {
-      Mat4Perspective(DegToRad(this._fov), this.aspect, this._near, this._far, this.projectionMatrix);
-      return this;
-    }
-    get fov() {
-      return this._fov;
-    }
-    set fov(value) {
-      this._fov = Clamp(value, 0, 180);
-      this.updateProjectionMatrix();
-    }
-    get near() {
-      return this._near;
-    }
-    set near(value) {
-      if (value > 0) {
-        this._near = value;
-        this.updateProjectionMatrix();
-      }
-    }
-    get far() {
-      return this._far;
-    }
-    set far(value) {
-      if (value > 0) {
-        this._far = value;
-        this.updateProjectionMatrix();
-      }
-    }
-    get yaw() {
-      return this._yaw;
-    }
-    set yaw(value) {
-      this._yaw = value;
-      QuatRotationYawPitchRoll(value, this._pitch, this._roll, this.rotation);
-    }
-    get pitch() {
-      return this._pitch;
-    }
-    set pitch(value) {
-      this._pitch = value;
-      QuatRotationYawPitchRoll(this._yaw, value, this._roll, this.rotation);
-    }
-    get roll() {
-      return this._roll;
-    }
-    set roll(value) {
-      this._roll = value;
-      QuatRotationYawPitchRoll(this._yaw, this._pitch, value, this.rotation);
-    }
-  };
-  var World3D = class extends BaseWorld3D {
-    constructor(scene, x = 0, y = 0, z = 0, lightConfig) {
-      super(scene);
-      this.enableCameraCull = true;
-      this.type = "World3D";
-      this.camera = new NewCamera3D();
-      this.camera.position.set(x, y, z);
-      this.light = new Light(lightConfig);
-      this.shader = new AmbientLightShader();
-      this.renderData = CreateWorld3DRenderData(this, this.camera);
-    }
-    renderGL(renderPass) {
-      Flush(renderPass);
-      const shader = this.shader;
-      const camera = this.camera;
-      const gl2 = renderPass.renderer.gl;
-      SetShader(renderPass, shader, 0);
-      shader.setUniform("uViewProjectionMatrix", camera.viewProjectionMatrix.data);
-      shader.setUniform("uCameraPosition", camera.position.toArray());
-      this.light.setUniforms(shader);
-      gl2.enable(gl2.DEPTH_TEST);
-      this.renderList.forEach((entry) => {
-        if (entry.children.length > 0) {
-          this.renderNode(entry, renderPass);
-        } else {
-          entry.node.renderGL(renderPass);
-        }
-      });
-    }
-    postRenderGL(renderPass) {
-      const gl2 = renderPass.renderer.gl;
-      gl2.disable(gl2.DEPTH_TEST);
-      gl2.disable(gl2.CULL_FACE);
-      PopShader(renderPass);
-    }
-  };
+  // node_modules/@phaserjs/phaser/config/banner/GetBanner.js
   function GetBanner() {
     const {title, version, url, color, background} = ConfigStore.get(CONFIG_DEFAULTS.BANNER);
     if (title !== "") {
@@ -13145,12 +9600,18 @@ void main(void)
       console.log(`%c${str}%c ${url}`, `padding: 4px 16px; color: ${color}; background: ${background}`, "");
     }
   }
+
+  // node_modules/@phaserjs/phaser/config/parent/GetParent.js
   function GetParent() {
     return ConfigStore.get(CONFIG_DEFAULTS.PARENT);
   }
+
+  // node_modules/@phaserjs/phaser/config/renderer/GetRenderer.js
   function GetRenderer() {
     return ConfigStore.get(CONFIG_DEFAULTS.RENDERER);
   }
+
+  // node_modules/@phaserjs/phaser/scenes/CreateSceneRenderData.js
   function CreateSceneRenderData() {
     return {
       gameFrame: 0,
@@ -13160,9 +9621,13 @@ void main(void)
       worldData: []
     };
   }
+
+  // node_modules/@phaserjs/phaser/config/scenes/GetScenes.js
   function GetScenes() {
     return ConfigStore.get(CONFIG_DEFAULTS.SCENES);
   }
+
+  // node_modules/@phaserjs/phaser/scenes/ResetSceneRenderData.js
   function ResetSceneRenderData(renderData, gameFrame = 0) {
     renderData.gameFrame = gameFrame;
     renderData.numTotalFrames = 0;
@@ -13170,6 +9635,8 @@ void main(void)
     renderData.numDirtyCameras = 0;
     renderData.worldData.length = 0;
   }
+
+  // node_modules/@phaserjs/phaser/scenes/SceneManagerInstance.js
   var instance4;
   var SceneManagerInstance = {
     get: () => {
@@ -13179,6 +9646,8 @@ void main(void)
       instance4 = manager;
     }
   };
+
+  // node_modules/@phaserjs/phaser/scenes/SceneManager.js
   var SceneManager = class {
     constructor() {
       this.scenes = new Map();
@@ -13210,6 +9679,8 @@ void main(void)
       return results;
     }
   };
+
+  // node_modules/@phaserjs/phaser/config/SetConfigDefaults.js
   function SetConfigDefaults() {
     SetBackgroundColor(0);
     SetBatchSize(4096);
@@ -13218,6 +9689,8 @@ void main(void)
     SetDefaultOrigin(0.5, 0.5);
     SetSize(800, 600, 1);
   }
+
+  // node_modules/@phaserjs/phaser/Game.js
   var Game = class extends EventEmitter {
     constructor(...settings) {
       super();
@@ -13277,6 +9750,8 @@ void main(void)
     destroy() {
     }
   };
+
+  // node_modules/@phaserjs/phaser/scenes/GetConfigValue.js
   function GetConfigValue(config, property, defaultValue) {
     if (Object.prototype.hasOwnProperty.call(config, property)) {
       return config[property];
@@ -13284,6 +9759,8 @@ void main(void)
       return defaultValue;
     }
   }
+
+  // node_modules/@phaserjs/phaser/scenes/Install.js
   function Install(scene, config = {}) {
     const sceneManager = SceneManagerInstance.get();
     const size = sceneManager.scenes.size;
@@ -13302,6 +9779,8 @@ void main(void)
       sceneManager.sceneIndex++;
     }
   }
+
+  // node_modules/@phaserjs/phaser/scenes/Scene.js
   var Scene = class {
     constructor(config) {
       this.game = GameInstance.get();
@@ -13310,10 +9789,210 @@ void main(void)
     }
   };
 
-  // src/index.ts
+  // node_modules/@phaserjs/phaser/motion/tween/TweenProperty.js
+  var TweenProperty = class {
+    constructor(name, end) {
+      this.name = name;
+      if (typeof end === "string") {
+        this.modifier = end.substr(0, 1);
+        this.end = parseFloat(end.substring(1));
+      } else {
+        this.end = end;
+      }
+    }
+    getEnd(start) {
+      const modifier = this.modifier;
+      const end = this.end;
+      if (modifier === "+") {
+        return start + end;
+      } else if (modifier === "-") {
+        return start - end;
+      } else {
+        return end;
+      }
+    }
+    to(target) {
+      const current = target[this.name];
+      const end = this.getEnd(current);
+      this.start = current;
+      this.end = end;
+    }
+    from(target) {
+      const current = target[this.name];
+      const end = this.getEnd(current);
+      this.start = end;
+      this.end = current;
+      target[this.name] = end;
+    }
+    update(target, v) {
+      target[this.name] = this.start + (this.end - this.start) * v;
+    }
+  };
+
+  // node_modules/@phaserjs/phaser/motion/tween/nano/NanoTween.js
+  var NanoTween = class {
+    constructor(target, emitter, autoStart = true) {
+      this.state = {running: false, repeat: false, hold: false, delay: false, yoyo: false, yoyoing: false, autoStart: true, reversed: false};
+      this.init = {duration: 0, repeat: 0, repeatDelay: 0, hold: 0, delay: 0};
+      this.counters = {repeat: 0, delay: 0, progress: 0, elapsed: 0};
+      this.ease = Linear;
+      this.properties = [];
+      if (!emitter) {
+        emitter = GameInstance.get();
+      }
+      this.target = target;
+      this.state.autoStart = autoStart;
+      this.emitter = emitter;
+    }
+    to(duration, properties = null) {
+      return this.add(duration, properties, false);
+    }
+    from(duration, properties = null) {
+      return this.add(duration, properties, true);
+    }
+    add(duration, props, reversed) {
+      const state = this.state;
+      const init = this.init;
+      if (state.running) {
+        return this;
+      }
+      const properties = this.properties;
+      for (const [name, value] of Object.entries(props)) {
+        properties.push(new TweenProperty(name, value));
+      }
+      init.duration = duration;
+      state.reversed = reversed;
+      if (state.autoStart) {
+        this.start();
+      }
+      return this;
+    }
+    start() {
+      const state = this.state;
+      if (state.running) {
+        return this;
+      }
+      const target = this.target;
+      const properties = this.properties;
+      properties.forEach((property) => {
+        if (state.reversed) {
+          property.from(target);
+        } else {
+          property.to(target);
+        }
+      });
+      state.running = true;
+      this.listener = On(this.emitter, UpdateEvent, (delta) => this.update(delta));
+      return this;
+    }
+    restart() {
+      const state = this.state;
+      const init = this.init;
+      const counters = this.counters;
+      if (!state) {
+        throw "Cannot restart destroyed tween";
+      }
+      counters.delay = init.delay;
+      counters.elapsed = 0;
+      counters.progress = 0;
+      counters.repeat = init.repeat;
+      state.yoyoing = false;
+      state.running = true;
+      return this;
+    }
+    update(delta) {
+      const state = this.state;
+      const init = this.init;
+      const counters = this.counters;
+      if (!state.running) {
+        return false;
+      }
+      if (counters.delay > 0) {
+        counters.delay -= delta;
+        if (counters.delay <= 0) {
+          counters.elapsed = Math.abs(counters.delay) - delta;
+          counters.delay = 0;
+        } else {
+          return false;
+        }
+      }
+      counters.elapsed += delta;
+      const progress = Math.min(counters.elapsed / init.duration, 1);
+      counters.progress = progress;
+      const v = state.yoyoing ? this.ease(1 - progress) : this.ease(progress);
+      const target = this.target;
+      const properties = this.properties;
+      properties.forEach((property) => {
+        property.update(target, v);
+      });
+      if (progress < 1) {
+        return false;
+      }
+      const diff = counters.elapsed - init.duration;
+      if (state.yoyo && !state.yoyoing) {
+        counters.elapsed = diff;
+        counters.delay = init.hold - diff;
+        state.yoyoing = true;
+        return false;
+      }
+      if (counters.repeat > 0) {
+        counters.repeat--;
+        counters.elapsed = diff;
+        counters.delay = init.repeatDelay - diff;
+        state.yoyoing = false;
+        return false;
+      }
+      this.destroy();
+      return true;
+    }
+    delay(duration) {
+      const delay = duration;
+      this.init.delay = delay;
+      this.counters.delay = delay;
+      return this;
+    }
+    hold(duration) {
+      this.init.hold = duration;
+      return this;
+    }
+    yoyo(value = true) {
+      this.state.yoyo = value;
+      return this;
+    }
+    repeat(repeatCount = 1, delay = 0) {
+      const init = this.init;
+      this.state.repeat = repeatCount > 0;
+      this.counters.repeat = repeatCount;
+      init.repeat = repeatCount;
+      init.repeatDelay = delay;
+      return this;
+    }
+    easing(f) {
+      this.ease = f;
+      return this;
+    }
+    destroy() {
+      Off(this.emitter, UpdateEvent, this.listener);
+      this.properties.length = 0;
+      this.target = null;
+      this.ease = null;
+      this.emitter = null;
+      this.state = null;
+      this.init = null;
+      this.counters = null;
+    }
+  };
+
+  // node_modules/@phaserjs/phaser/motion/tween/nano/AddTween.js
+  function AddTween(target, emitter = null, autoStart = true) {
+    return new NanoTween(target, emitter, autoStart);
+  }
+
+  // src/index-bundle.ts
   var Demo = class extends Scene {
     constructor() {
       super();
+      console.log("index-bundle");
       const world = new world_exports.StaticWorld(this);
       const loader = new loader_exports.Loader();
       if (window.location.href.includes("192.168.0.100/phaser-genesis/")) {
@@ -13321,14 +10000,15 @@ void main(void)
       } else {
         loader.setPath("/examples/public/assets/");
       }
-      loader.add(loader_exports.ImageFile("logo", "logo.png"));
+      loader.add(loader_exports.Files.ImageFile("logo", "logo.png"));
       loader.start().then(() => {
-        const logo = new gameobjects_exports.Sprite(400, 300, "logo").setRotation(0.3);
+        const logo = new gameobjects_exports.Sprite(400, 100, "logo").setRotation(0.3);
+        AddTween(logo).to(3e3, {y: 400, rotation: 0}).easing(math_exports.Easing.Bounce.Out);
         display_exports.AddChildren(world, logo);
       });
     }
   };
-  new Game(config_exports.WebGL(), config_exports.Parent("gameParent"), config_exports.BackgroundColor(2960685), config_exports.Scenes(Demo));
+  new Game(WebGL(), Parent("gameParent"), BackgroundColor(2960685), Scenes(Demo));
 })();
 /**
  * @author       Florian Vazelle

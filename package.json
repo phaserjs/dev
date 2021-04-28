@@ -24,5 +24,8 @@
     "gzip-size": "^6.0.0",
     "tslib": "^2.2.0",
     "typescript": "^4.2.4"
+  },
+  "dependencies": {
+    "@phaserjs/phaser": "^0.1.11"
   }
 }
