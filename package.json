@@ -26,6 +26,6 @@
     "typescript": "^4.2.4"
   },
   "dependencies": {
-    "@phaserjs/phaser": "^0.1.11"
+    "@phaserjs/phaser": "^0.1.13"
   }
 }
