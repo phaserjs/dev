@@ -1,37 +1,37 @@
-import { AKey, DownKey, LeftKey, MKey, RightKey, UpKey } from '../src/input/keyboard/keys';
-import { BackgroundColor, Parent, Scenes, Size, WebGL } from '../src/config';
+import { AKey, DownKey, LeftKey, MKey, RightKey, UpKey } from '../../phaser-genesis/src/input/keyboard/keys';
+import { BackgroundColor, Parent, Scenes, Size, WebGL } from '../../phaser-genesis/src/config';
 
-import { AddChild3D } from '../src/display3d/AddChild3D';
-import { AddChildren3D } from '../src/display3d/AddChildren3D';
-import { Box } from '../src/gameobjects3d/box/Box';
-import { BoxGeometry } from '../src/geom3d/BoxGeometry';
-import { Cache } from '../src/cache/Cache';
-import { Camera3D } from '../src/camera3d/Camera3D';
-// import { Clone } from '../src/math/vec3/Vec3Clone';
-import { Cone } from '../src/gameobjects3d/cone/Cone';
-import { ConeGeometry } from '../src/geom3d/ConeGeometry';
-import { CylinderGeometry } from '../src/geom3d/CylinderGeometry';
-import { Game } from '../src/Game';
-import { Geometry } from '../src/gameobjects3d/geometry/Geometry';
-import { IWorld3D } from '../src/world3d/IWorld3D';
-import { ImageFile } from '../src/loader/files/ImageFile';
-import { JSONFile } from '../src/loader/files/JSONFile';
-import { Keyboard } from '../src/input/keyboard';
-import { Loader } from '../src/loader/Loader';
-import { Mesh } from '../src/gameobjects3d/mesh/Mesh';
-import { Mouse } from '../src/input/mouse/Mouse';
-import { On } from '../src/events';
-import { Plane } from '../src/gameobjects3d/plane/Plane';
-import { PlaneGeometry } from '../src/geom3d/PlaneGeometry';
-import { Scene } from '../src/scenes/Scene';
-import { Sphere } from '../src/gameobjects3d/sphere/Sphere';
-import { SphereGeometry } from '../src/geom3d/SphereGeometry';
-import { TorusGeometry } from '../src/geom3d/TorusGeometry';
-import { Vec3 } from '../src/math/vec3';
-import { VertexBuffer } from '../src/renderer/webgl1/buffers/VertexBuffer';
-import { World3D } from '../src/world3d/World3D';
+import { AddChild3D } from '../../phaser-genesis/src/display3d/AddChild3D';
+import { AddChildren3D } from '../../phaser-genesis/src/display3d/AddChildren3D';
+import { Box } from '../../phaser-genesis/src/gameobjects3d/box/Box';
+import { BoxGeometry } from '../../phaser-genesis/src/geom3d/BoxGeometry';
+import { Cache } from '../../phaser-genesis/src/cache/Cache';
+import { Camera3D } from '../../phaser-genesis/src/camera3d/Camera3D';
+// import { Clone } from '../../phaser-genesis/src/math/vec3/Vec3Clone';
+import { Cone } from '../../phaser-genesis/src/gameobjects3d/cone/Cone';
+import { ConeGeometry } from '../../phaser-genesis/src/geom3d/ConeGeometry';
+import { CylinderGeometry } from '../../phaser-genesis/src/geom3d/CylinderGeometry';
+import { Game } from '../../phaser-genesis/src/Game';
+import { Geometry } from '../../phaser-genesis/src/gameobjects3d/geometry/Geometry';
+import { IWorld3D } from '../../phaser-genesis/src/world3d/IWorld3D';
+import { ImageFile } from '../../phaser-genesis/src/loader/files/ImageFile';
+import { JSONFile } from '../../phaser-genesis/src/loader/files/JSONFile';
+import { Keyboard } from '../../phaser-genesis/src/input/keyboard';
+import { Loader } from '../../phaser-genesis/src/loader/Loader';
+import { Mesh } from '../../phaser-genesis/src/gameobjects3d/mesh/Mesh';
+import { Mouse } from '../../phaser-genesis/src/input/mouse/Mouse';
+import { On } from '../../phaser-genesis/src/events';
+import { Plane } from '../../phaser-genesis/src/gameobjects3d/plane/Plane';
+import { PlaneGeometry } from '../../phaser-genesis/src/geom3d/PlaneGeometry';
+import { Scene } from '../../phaser-genesis/src/scenes/Scene';
+import { Sphere } from '../../phaser-genesis/src/gameobjects3d/sphere/Sphere';
+import { SphereGeometry } from '../../phaser-genesis/src/geom3d/SphereGeometry';
+import { TorusGeometry } from '../../phaser-genesis/src/geom3d/TorusGeometry';
+import { Vec3 } from '../../phaser-genesis/src/math/vec3';
+import { VertexBuffer } from '../../phaser-genesis/src/renderer/webgl1/buffers/VertexBuffer';
+import { World3D } from '../../phaser-genesis/src/world3d/World3D';
 
-// import { OrbitCamera } from '../src/camera3d/OrbitCamera';
+// import { OrbitCamera } from '../../phaser-genesis/src/camera3d/OrbitCamera';
 
 
 
@@ -184,13 +184,10 @@ class Demo extends Scene
     }
 }
 
-export default function (): void
-{
-    new Game(
-        WebGL(),
-        Size(800, 600),
-        Parent('gameParent'),
-        BackgroundColor(0x1d1d1d),
-        Scenes(Demo)
-    );
-}
+new Game(
+    WebGL(),
+    Size(800, 600),
+    Parent('gameParent'),
+    BackgroundColor(0x1d1d1d),
+    Scenes(Demo)
+);
