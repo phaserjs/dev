@@ -1,8 +1,14 @@
 import boxen from 'boxen';
+import chalk from 'chalk';
 import esbuild from 'esbuild';
 import fileSize from 'filesize';
 import fs from 'fs-extra';
+import gradient from 'gradient-string';
 import gzip from 'gzip-size';
+import { hideBin } from 'yargs/helpers';
+import yargs from 'yargs';
+
+const argv = yargs(hideBin(process.argv)).argv
 
 let info = '';
 const times = [];
@@ -55,14 +61,30 @@ const endLog = (message) =>
 
     total /= 1000;
 
-    info = info.concat(`${message} in ${total} secs\n`);
+    info = info.concat(gradient.rainbow(`${message} in ${total} secs`));
 }
 
 startTimer();
 
+const src = argv.src;
+
+if (!src)
+{
+    info = chalk`{whiteBright Missing command-line argument:} {yellowBright --src file}`;
+    console.log(boxen(info, { padding: 1, margin: 1, borderColor: 'redBright', borderStyle: 'bold' }));
+    process.exit(1);
+}
+
+if (!fs.existsSync(`./src/${src}.ts`))
+{
+    info = chalk`{whiteBright File {yellowBright src/${src}.ts} is missing}`;
+    console.log(boxen(info, { padding: 1, margin: 1, borderColor: 'redBright', borderStyle: 'bold' }));
+    process.exit(1);
+}
+
 const buildResults = esbuild.buildSync({
-    entryPoints: [ './src/index-bundle.ts' ],
-    outfile: './public/index.js',
+    entryPoints: [ `./src/${src}.ts` ],
+    outfile: `./public/${src}.js`,
     target: 'es6',
     sourcemap: true,
     minify: false,
@@ -77,14 +99,14 @@ if (buildResults.errors.length > 0)
 }
 else
 {
-    logTime(`✔ Bundle built`);
+    logTime(chalk`✔ {whiteBright ${src}.js}`);
 }
 
 const minResults = esbuild.buildSync({
-    entryPoints: [ './src/index.ts' ],
-    outfile: './public/index.min.js',
+    entryPoints: [ `./src/${src}.ts` ],
+    outfile: `./public/${src}.min.js`,
     target: 'es6',
-    sourcemap: true,
+    sourcemap: false,
     minify: true,
     bundle: true
 });
@@ -97,21 +119,21 @@ if (minResults.errors.length > 0)
 }
 else
 {
-    logTime(`✔ Min Bundle built`);
+    logTime(chalk`✔ {whiteBright ${src}.min.js}`);
 }
 
-endLog('✔ Build complete');
-
-const code = fs.readFileSync('./public/index.js');
-const codeMin = fs.readFileSync('./public/index.min.js');
+const code = fs.readFileSync(`./public/${src}.js`);
+const codeMin = fs.readFileSync(`./public/${src}.min.js`);
 
 const unminSize = fileSize(Buffer.byteLength(code));
 const minSize = fileSize(Buffer.byteLength(codeMin));
 const gzSize = fileSize(gzip.sync(codeMin));
 
-info = info.concat(`
-Bundle: ${unminSize}
-Minified: ${minSize}
-Gzipped: ${gzSize}`);
+info = info.concat(chalk`
+{yellowBright.bold Bundle:} ${unminSize}
+{yellowBright.bold Minified:} ${minSize}
+{yellowBright.bold Gzipped:} ${gzSize}\n\n`);
+
+endLog('Build complete');
 
 console.log(boxen(info, { padding: 1, margin: 1, borderColor: 'cyanBright', borderStyle: 'bold' }));

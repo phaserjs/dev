@@ -18,12 +18,15 @@
   "homepage": "https://github.com/phaserjs/dev#readme",
   "devDependencies": {
     "boxen": "^5.0.1",
+    "chalk": "^4.1.1",
     "esbuild": "^0.11.16",
     "filesize": "^6.3.0",
     "fs-extra": "^9.1.0",
+    "gradient-string": "^1.2.0",
     "gzip-size": "^6.0.0",
     "tslib": "^2.2.0",
-    "typescript": "^4.2.4"
+    "typescript": "^4.2.4",
+    "yargs": "^16.2.0"
   },
   "dependencies": {
     "@phaserjs/phaser": "^0.1.13"
