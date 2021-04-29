@@ -1,0 +1,692 @@
+{
+	"textures": [
+		{
+			"image": "bubbles.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 1020,
+				"h": 992
+			},
+			"scale": 1,
+			"frames": [
+				{
+					"filename": "Header-Ui",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 695,
+						"h": 72
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 695,
+						"h": 72
+					},
+					"frame": {
+						"x": 2,
+						"y": 2,
+						"w": 695,
+						"h": 72
+					}
+				},
+				{
+					"filename": "Game GUI-01",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 351,
+						"h": 123
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 351,
+						"h": 123
+					},
+					"frame": {
+						"x": 2,
+						"y": 77,
+						"w": 351,
+						"h": 123
+					}
+				},
+				{
+					"filename": "Game GUI-02",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 368,
+						"h": 89
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 368,
+						"h": 89
+					},
+					"frame": {
+						"x": 2,
+						"y": 203,
+						"w": 368,
+						"h": 89
+					}
+				},
+				{
+					"filename": "Game GUI-03",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 368,
+						"h": 89
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 368,
+						"h": 89
+					},
+					"frame": {
+						"x": 2,
+						"y": 295,
+						"w": 368,
+						"h": 89
+					}
+				},
+				{
+					"filename": "Game GUI-04",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 368,
+						"h": 89
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 368,
+						"h": 89
+					},
+					"frame": {
+						"x": 2,
+						"y": 387,
+						"w": 368,
+						"h": 89
+					}
+				},
+				{
+					"filename": "Game GUI-05",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 368,
+						"h": 88
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 368,
+						"h": 88
+					},
+					"frame": {
+						"x": 2,
+						"y": 479,
+						"w": 368,
+						"h": 88
+					}
+				},
+				{
+					"filename": "bubble explosion_0000004",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 25,
+						"y": 56,
+						"w": 245,
+						"h": 181
+					},
+					"frame": {
+						"x": 2,
+						"y": 570,
+						"w": 245,
+						"h": 181
+					}
+				},
+				{
+					"filename": "fish characters_0000003",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 55,
+						"w": 150,
+						"h": 210
+					},
+					"frame": {
+						"x": 2,
+						"y": 754,
+						"w": 150,
+						"h": 210
+					}
+				},
+				{
+					"filename": "cannon_0000001",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 113,
+						"h": 234
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 113,
+						"h": 234
+					},
+					"frame": {
+						"x": 155,
+						"y": 754,
+						"w": 113,
+						"h": 234
+					}
+				},
+				{
+					"filename": "bubbles-01",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 201,
+						"h": 201
+					},
+					"spriteSourceSize": {
+						"x": 12,
+						"y": 14,
+						"w": 177,
+						"h": 177
+					},
+					"frame": {
+						"x": 250,
+						"y": 570,
+						"w": 177,
+						"h": 177
+					}
+				},
+				{
+					"filename": "fish characters_0000000",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 57,
+						"w": 153,
+						"h": 203
+					},
+					"frame": {
+						"x": 271,
+						"y": 750,
+						"w": 153,
+						"h": 203
+					}
+				},
+				{
+					"filename": "bubbles-02",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 201,
+						"h": 201
+					},
+					"spriteSourceSize": {
+						"x": 9,
+						"y": 14,
+						"w": 177,
+						"h": 177
+					},
+					"frame": {
+						"x": 700,
+						"y": 2,
+						"w": 177,
+						"h": 177
+					}
+				},
+				{
+					"filename": "cannon_0000002",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 113,
+						"h": 234
+					},
+					"spriteSourceSize": {
+						"x": 5,
+						"y": 40,
+						"w": 108,
+						"h": 194
+					},
+					"frame": {
+						"x": 880,
+						"y": 2,
+						"w": 108,
+						"h": 194
+					}
+				},
+				{
+					"filename": "fish characters_0000002",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 83,
+						"y": 55,
+						"w": 148,
+						"h": 208
+					},
+					"frame": {
+						"x": 373,
+						"y": 77,
+						"w": 148,
+						"h": 208
+					}
+				},
+				{
+					"filename": "fish characters_0000004",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 83,
+						"y": 55,
+						"w": 148,
+						"h": 208
+					},
+					"frame": {
+						"x": 524,
+						"y": 77,
+						"w": 148,
+						"h": 208
+					}
+				},
+				{
+					"filename": "bubbles-03",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 201,
+						"h": 201
+					},
+					"spriteSourceSize": {
+						"x": 12,
+						"y": 14,
+						"w": 177,
+						"h": 177
+					},
+					"frame": {
+						"x": 373,
+						"y": 288,
+						"w": 177,
+						"h": 177
+					}
+				},
+				{
+					"filename": "bubbles-04",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 201,
+						"h": 201
+					},
+					"spriteSourceSize": {
+						"x": 13,
+						"y": 14,
+						"w": 177,
+						"h": 177
+					},
+					"frame": {
+						"x": 553,
+						"y": 288,
+						"w": 177,
+						"h": 177
+					}
+				},
+				{
+					"filename": "bubbles-05",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 201,
+						"h": 201
+					},
+					"spriteSourceSize": {
+						"x": 16,
+						"y": 14,
+						"w": 177,
+						"h": 177
+					},
+					"frame": {
+						"x": 430,
+						"y": 468,
+						"w": 177,
+						"h": 177
+					}
+				},
+				{
+					"filename": "bubbles-06",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 201,
+						"h": 201
+					},
+					"spriteSourceSize": {
+						"x": 10,
+						"y": 14,
+						"w": 176,
+						"h": 177
+					},
+					"frame": {
+						"x": 610,
+						"y": 468,
+						"w": 176,
+						"h": 177
+					}
+				},
+				{
+					"filename": "bubbles-07",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 201,
+						"h": 201
+					},
+					"spriteSourceSize": {
+						"x": 17,
+						"y": 12,
+						"w": 176,
+						"h": 176
+					},
+					"frame": {
+						"x": 430,
+						"y": 648,
+						"w": 176,
+						"h": 176
+					}
+				},
+				{
+					"filename": "bubble explosion_0000003",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 67,
+						"y": 69,
+						"w": 167,
+						"h": 163
+					},
+					"frame": {
+						"x": 427,
+						"y": 827,
+						"w": 167,
+						"h": 163
+					}
+				},
+				{
+					"filename": "bubbles-08",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 201,
+						"h": 201
+					},
+					"spriteSourceSize": {
+						"x": 10,
+						"y": 14,
+						"w": 176,
+						"h": 177
+					},
+					"frame": {
+						"x": 609,
+						"y": 648,
+						"w": 176,
+						"h": 177
+					}
+				},
+				{
+					"filename": "bubble explosion_0000002",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 82,
+						"y": 84,
+						"w": 137,
+						"h": 133
+					},
+					"frame": {
+						"x": 597,
+						"y": 828,
+						"w": 137,
+						"h": 133
+					}
+				},
+				{
+					"filename": "cannon_0000003",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 113,
+						"h": 234
+					},
+					"spriteSourceSize": {
+						"x": 5,
+						"y": 10,
+						"w": 108,
+						"h": 224
+					},
+					"frame": {
+						"x": 733,
+						"y": 182,
+						"w": 108,
+						"h": 224
+					}
+				},
+				{
+					"filename": "fish characters_0000001",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 57,
+						"w": 150,
+						"h": 204
+					},
+					"frame": {
+						"x": 844,
+						"y": 199,
+						"w": 150,
+						"h": 204
+					}
+				},
+				{
+					"filename": "fish characters_0000005",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 57,
+						"w": 150,
+						"h": 204
+					},
+					"frame": {
+						"x": 789,
+						"y": 409,
+						"w": 150,
+						"h": 204
+					}
+				},
+				{
+					"filename": "bubble explosion_0000005",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 88,
+						"y": 83,
+						"w": 125,
+						"h": 135
+					},
+					"frame": {
+						"x": 737,
+						"y": 828,
+						"w": 125,
+						"h": 135
+					}
+				},
+				{
+					"filename": "bubble explosion_0000000",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 85,
+						"y": 85,
+						"w": 131,
+						"h": 131
+					},
+					"frame": {
+						"x": 789,
+						"y": 616,
+						"w": 131,
+						"h": 131
+					}
+				},
+				{
+					"filename": "bubble explosion_0000001",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 300,
+						"h": 300
+					},
+					"spriteSourceSize": {
+						"x": 103,
+						"y": 103,
+						"w": 95,
+						"h": 95
+					},
+					"frame": {
+						"x": 923,
+						"y": 616,
+						"w": 95,
+						"h": 95
+					}
+				},
+				{
+					"filename": "Game GUI-06",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 90,
+						"h": 69
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 90,
+						"h": 69
+					},
+					"frame": {
+						"x": 788,
+						"y": 750,
+						"w": 90,
+						"h": 69
+					}
+				},
+				{
+					"filename": "cannon_0000000",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 113,
+						"h": 234
+					},
+					"spriteSourceSize": {
+						"x": 5,
+						"y": 73,
+						"w": 108,
+						"h": 161
+					},
+					"frame": {
+						"x": 865,
+						"y": 822,
+						"w": 108,
+						"h": 161
+					}
+				},
+				{
+					"filename": "Game GUI-07",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 78,
+						"h": 77
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 78,
+						"h": 77
+					},
+					"frame": {
+						"x": 923,
+						"y": 714,
+						"w": 78,
+						"h": 77
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "3.0",
+		"smartupdate": "$TexturePacker:SmartUpdate:b05b33eac00ab83d9d700283789652f0:e067832ab218ab7cd3c49c70fcd9d957:bca2200893a80f12811007d61ceaffd1$"
+	}
+}

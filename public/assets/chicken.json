@@ -1,0 +1,1847 @@
+{
+	"textures": [
+		{
+			"image": "chicken.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 1012,
+				"h": 1687
+			},
+			"scale": 0.3,
+			"frames": [
+				{
+					"filename": "__orange_chicken_die_003",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 29,
+						"y": 75,
+						"w": 183,
+						"h": 109
+					},
+					"frame": {
+						"x": 2,
+						"y": 2,
+						"w": 183,
+						"h": 109
+					}
+				},
+				{
+					"filename": "__orange_chicken_die_004",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 28,
+						"y": 80,
+						"w": 182,
+						"h": 111
+					},
+					"frame": {
+						"x": 188,
+						"y": 2,
+						"w": 182,
+						"h": 111
+					}
+				},
+				{
+					"filename": "__orange_chicken_peck_005",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 1,
+						"y": 63,
+						"w": 163,
+						"h": 126
+					},
+					"frame": {
+						"x": 373,
+						"y": 2,
+						"w": 163,
+						"h": 126
+					}
+				},
+				{
+					"filename": "__orange_chicken_peck_004",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 3,
+						"y": 59,
+						"w": 163,
+						"h": 130
+					},
+					"frame": {
+						"x": 539,
+						"y": 2,
+						"w": 163,
+						"h": 130
+					}
+				},
+				{
+					"filename": "__orange_chicken_peck_006",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 3,
+						"y": 59,
+						"w": 163,
+						"h": 130
+					},
+					"frame": {
+						"x": 705,
+						"y": 2,
+						"w": 163,
+						"h": 130
+					}
+				},
+				{
+					"filename": "__orange_chicken_egg_projectile_002",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 66,
+						"y": 49,
+						"w": 100,
+						"h": 140
+					},
+					"frame": {
+						"x": 871,
+						"y": 2,
+						"w": 100,
+						"h": 140
+					}
+				},
+				{
+					"filename": "__orange_chicken_die_002",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 53,
+						"y": 55,
+						"w": 157,
+						"h": 131
+					},
+					"frame": {
+						"x": 2,
+						"y": 114,
+						"w": 157,
+						"h": 131
+					}
+				},
+				{
+					"filename": "__orange_chicken_peck_003",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 15,
+						"y": 58,
+						"w": 154,
+						"h": 131
+					},
+					"frame": {
+						"x": 162,
+						"y": 116,
+						"w": 154,
+						"h": 131
+					}
+				},
+				{
+					"filename": "__orange_chicken_peck_007",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 15,
+						"y": 58,
+						"w": 154,
+						"h": 131
+					},
+					"frame": {
+						"x": 319,
+						"y": 131,
+						"w": 154,
+						"h": 131
+					}
+				},
+				{
+					"filename": "__orange_chicken_egg_projectile_003",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 66,
+						"y": 49,
+						"w": 100,
+						"h": 140
+					},
+					"frame": {
+						"x": 476,
+						"y": 135,
+						"w": 100,
+						"h": 140
+					}
+				},
+				{
+					"filename": "__orange_chicken_egg_projectile_004",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 65,
+						"y": 49,
+						"w": 101,
+						"h": 140
+					},
+					"frame": {
+						"x": 579,
+						"y": 135,
+						"w": 101,
+						"h": 140
+					}
+				},
+				{
+					"filename": "__orange_chicken_egg_projectile_008",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 65,
+						"y": 48,
+						"w": 101,
+						"h": 141
+					},
+					"frame": {
+						"x": 683,
+						"y": 135,
+						"w": 101,
+						"h": 141
+					}
+				},
+				{
+					"filename": "__orange_chicken_fying_000",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 33,
+						"y": 26,
+						"w": 182,
+						"h": 147
+					},
+					"frame": {
+						"x": 787,
+						"y": 145,
+						"w": 182,
+						"h": 147
+					}
+				},
+				{
+					"filename": "__orange_chicken_egg_projectile_007",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 57,
+						"y": 42,
+						"w": 106,
+						"h": 149
+					},
+					"frame": {
+						"x": 2,
+						"y": 248,
+						"w": 106,
+						"h": 149
+					}
+				},
+				{
+					"filename": "__orange_chicken_fying_005",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 33,
+						"y": 25,
+						"w": 182,
+						"h": 147
+					},
+					"frame": {
+						"x": 111,
+						"y": 250,
+						"w": 182,
+						"h": 147
+					}
+				},
+				{
+					"filename": "__orange_chicken_peck_002",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 36,
+						"y": 40,
+						"w": 136,
+						"h": 149
+					},
+					"frame": {
+						"x": 296,
+						"y": 265,
+						"w": 136,
+						"h": 149
+					}
+				},
+				{
+					"filename": "__orange_chicken_peck_008",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 37,
+						"y": 40,
+						"w": 135,
+						"h": 149
+					},
+					"frame": {
+						"x": 435,
+						"y": 278,
+						"w": 135,
+						"h": 149
+					}
+				},
+				{
+					"filename": "__orange_chicken_fying_003",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 12,
+						"w": 123,
+						"h": 151
+					},
+					"frame": {
+						"x": 573,
+						"y": 279,
+						"w": 123,
+						"h": 151
+					}
+				},
+				{
+					"filename": "__orange_chicken_jump_005",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 62,
+						"y": 0,
+						"w": 148,
+						"h": 152
+					},
+					"frame": {
+						"x": 699,
+						"y": 295,
+						"w": 148,
+						"h": 152
+					}
+				},
+				{
+					"filename": "__orange_chicken_fying_008",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 79,
+						"y": 10,
+						"w": 126,
+						"h": 154
+					},
+					"frame": {
+						"x": 850,
+						"y": 295,
+						"w": 126,
+						"h": 154
+					}
+				},
+				{
+					"filename": "__orange_chicken_egg_projectile_006",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 47,
+						"y": 36,
+						"w": 116,
+						"h": 155
+					},
+					"frame": {
+						"x": 2,
+						"y": 400,
+						"w": 116,
+						"h": 155
+					}
+				},
+				{
+					"filename": "__orange_chicken_fying_001",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 46,
+						"y": 14,
+						"w": 166,
+						"h": 156
+					},
+					"frame": {
+						"x": 121,
+						"y": 400,
+						"w": 166,
+						"h": 156
+					}
+				},
+				{
+					"filename": "__orange_chicken_fying_007",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 68,
+						"y": 9,
+						"w": 139,
+						"h": 157
+					},
+					"frame": {
+						"x": 290,
+						"y": 417,
+						"w": 139,
+						"h": 157
+					}
+				},
+				{
+					"filename": "__orange_chicken_jump_002",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 96,
+						"y": 32,
+						"w": 105,
+						"h": 158
+					},
+					"frame": {
+						"x": 432,
+						"y": 430,
+						"w": 105,
+						"h": 158
+					}
+				},
+				{
+					"filename": "__orange_chicken_jump_003",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 96,
+						"y": 32,
+						"w": 105,
+						"h": 158
+					},
+					"frame": {
+						"x": 432,
+						"y": 430,
+						"w": 105,
+						"h": 158
+					}
+				},
+				{
+					"filename": "__orange_chicken_fying_002",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 64,
+						"y": 10,
+						"w": 144,
+						"h": 157
+					},
+					"frame": {
+						"x": 540,
+						"y": 433,
+						"w": 144,
+						"h": 157
+					}
+				},
+				{
+					"filename": "__orange_chicken_fying_009",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 53,
+						"y": 12,
+						"w": 157,
+						"h": 157
+					},
+					"frame": {
+						"x": 687,
+						"y": 450,
+						"w": 157,
+						"h": 157
+					}
+				},
+				{
+					"filename": "__orange_chicken_fying_006",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 48,
+						"y": 14,
+						"w": 163,
+						"h": 156
+					},
+					"frame": {
+						"x": 847,
+						"y": 452,
+						"w": 163,
+						"h": 156
+					}
+				},
+				{
+					"filename": "__orange_chicken_fying_004",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 56,
+						"y": 11,
+						"w": 154,
+						"h": 158
+					},
+					"frame": {
+						"x": 2,
+						"y": 559,
+						"w": 154,
+						"h": 158
+					}
+				},
+				{
+					"filename": "__orange_chicken_egg_projectile_005",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 38,
+						"y": 29,
+						"w": 124,
+						"h": 160
+					},
+					"frame": {
+						"x": 159,
+						"y": 559,
+						"w": 124,
+						"h": 160
+					}
+				},
+				{
+					"filename": "__orange_chicken_egg_projectile_001",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 69,
+						"y": 28,
+						"w": 103,
+						"h": 161
+					},
+					"frame": {
+						"x": 286,
+						"y": 577,
+						"w": 103,
+						"h": 161
+					}
+				},
+				{
+					"filename": "__orange_chicken_egg_projectile_009",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 69,
+						"y": 28,
+						"w": 103,
+						"h": 161
+					},
+					"frame": {
+						"x": 392,
+						"y": 591,
+						"w": 103,
+						"h": 161
+					}
+				},
+				{
+					"filename": "__orange_chicken_lay_egg_003",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 75,
+						"y": 25,
+						"w": 119,
+						"h": 165
+					},
+					"frame": {
+						"x": 498,
+						"y": 593,
+						"w": 119,
+						"h": 165
+					}
+				},
+				{
+					"filename": "__orange_chicken_lay_egg_004",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 75,
+						"y": 25,
+						"w": 121,
+						"h": 165
+					},
+					"frame": {
+						"x": 620,
+						"y": 610,
+						"w": 121,
+						"h": 165
+					}
+				},
+				{
+					"filename": "__orange_chicken_lay_egg_005",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 75,
+						"y": 25,
+						"w": 124,
+						"h": 165
+					},
+					"frame": {
+						"x": 744,
+						"y": 611,
+						"w": 124,
+						"h": 165
+					}
+				},
+				{
+					"filename": "__orange_chicken_lay_egg_006",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 75,
+						"y": 22,
+						"w": 125,
+						"h": 167
+					},
+					"frame": {
+						"x": 871,
+						"y": 611,
+						"w": 125,
+						"h": 167
+					}
+				},
+				{
+					"filename": "__orange_chicken_peck_001",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 61,
+						"y": 21,
+						"w": 123,
+						"h": 168
+					},
+					"frame": {
+						"x": 2,
+						"y": 720,
+						"w": 123,
+						"h": 168
+					}
+				},
+				{
+					"filename": "__orange_chicken_peck_009",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 61,
+						"y": 21,
+						"w": 123,
+						"h": 168
+					},
+					"frame": {
+						"x": 128,
+						"y": 722,
+						"w": 123,
+						"h": 168
+					}
+				},
+				{
+					"filename": "__orange_chicken_lay_egg_002",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 76,
+						"y": 20,
+						"w": 114,
+						"h": 169
+					},
+					"frame": {
+						"x": 254,
+						"y": 741,
+						"w": 114,
+						"h": 169
+					}
+				},
+				{
+					"filename": "__orange_chicken_jump_001",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 91,
+						"y": 20,
+						"w": 108,
+						"h": 170
+					},
+					"frame": {
+						"x": 371,
+						"y": 755,
+						"w": 108,
+						"h": 170
+					}
+				},
+				{
+					"filename": "__orange_chicken_jump_007",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 92,
+						"y": 20,
+						"w": 109,
+						"h": 170
+					},
+					"frame": {
+						"x": 482,
+						"y": 761,
+						"w": 109,
+						"h": 170
+					}
+				},
+				{
+					"filename": "__orange_chicken_lay_egg_007",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 77,
+						"y": 19,
+						"w": 119,
+						"h": 170
+					},
+					"frame": {
+						"x": 594,
+						"y": 778,
+						"w": 119,
+						"h": 170
+					}
+				},
+				{
+					"filename": "__orange_chicken_lay_egg_008",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 78,
+						"y": 16,
+						"w": 138,
+						"h": 173
+					},
+					"frame": {
+						"x": 716,
+						"y": 779,
+						"w": 138,
+						"h": 173
+					}
+				},
+				{
+					"filename": "__orange_chicken_jump_008",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 91,
+						"y": 16,
+						"w": 109,
+						"h": 174
+					},
+					"frame": {
+						"x": 857,
+						"y": 781,
+						"w": 109,
+						"h": 174
+					}
+				},
+				{
+					"filename": "__orange_chicken_lay_egg_001",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 78,
+						"y": 15,
+						"w": 115,
+						"h": 174
+					},
+					"frame": {
+						"x": 2,
+						"y": 891,
+						"w": 115,
+						"h": 174
+					}
+				},
+				{
+					"filename": "__orange_chicken_walk_001",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 82,
+						"y": 12,
+						"w": 114,
+						"h": 174
+					},
+					"frame": {
+						"x": 120,
+						"y": 893,
+						"w": 114,
+						"h": 174
+					}
+				},
+				{
+					"filename": "__orange_chicken_walk_006",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 82,
+						"y": 14,
+						"w": 112,
+						"h": 174
+					},
+					"frame": {
+						"x": 237,
+						"y": 913,
+						"w": 112,
+						"h": 174
+					}
+				},
+				{
+					"filename": "__orange_chicken_walk_007",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 86,
+						"y": 14,
+						"w": 108,
+						"h": 174
+					},
+					"frame": {
+						"x": 352,
+						"y": 928,
+						"w": 108,
+						"h": 174
+					}
+				},
+				{
+					"filename": "__orange_chicken_jump_009",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 87,
+						"y": 13,
+						"w": 111,
+						"h": 176
+					},
+					"frame": {
+						"x": 463,
+						"y": 934,
+						"w": 111,
+						"h": 176
+					}
+				},
+				{
+					"filename": "__orange_chicken_walk_002",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 84,
+						"y": 12,
+						"w": 111,
+						"h": 176
+					},
+					"frame": {
+						"x": 577,
+						"y": 951,
+						"w": 111,
+						"h": 176
+					}
+				},
+				{
+					"filename": "__orange_chicken_lay_egg_009",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 79,
+						"y": 13,
+						"w": 137,
+						"h": 176
+					},
+					"frame": {
+						"x": 691,
+						"y": 955,
+						"w": 137,
+						"h": 176
+					}
+				},
+				{
+					"filename": "__orange_chicken_walk_005",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 86,
+						"y": 12,
+						"w": 108,
+						"h": 177
+					},
+					"frame": {
+						"x": 831,
+						"y": 958,
+						"w": 108,
+						"h": 177
+					}
+				},
+				{
+					"filename": "__orange_chicken_walk_008",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 86,
+						"y": 13,
+						"w": 108,
+						"h": 177
+					},
+					"frame": {
+						"x": 2,
+						"y": 1068,
+						"w": 108,
+						"h": 177
+					}
+				},
+				{
+					"filename": "__orange_chicken_walk_009",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 85,
+						"y": 12,
+						"w": 110,
+						"h": 177
+					},
+					"frame": {
+						"x": 113,
+						"y": 1070,
+						"w": 110,
+						"h": 177
+					}
+				},
+				{
+					"filename": "__orange_chicken_walk_003",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 85,
+						"y": 12,
+						"w": 110,
+						"h": 178
+					},
+					"frame": {
+						"x": 226,
+						"y": 1090,
+						"w": 110,
+						"h": 178
+					}
+				},
+				{
+					"filename": "__orange_chicken_die_000",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 81,
+						"y": 10,
+						"w": 115,
+						"h": 179
+					},
+					"frame": {
+						"x": 339,
+						"y": 1105,
+						"w": 115,
+						"h": 179
+					}
+				},
+				{
+					"filename": "__orange_chicken_egg_projectile_000",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 81,
+						"y": 10,
+						"w": 115,
+						"h": 179
+					},
+					"frame": {
+						"x": 339,
+						"y": 1105,
+						"w": 115,
+						"h": 179
+					}
+				},
+				{
+					"filename": "__orange_chicken_idle_000",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 81,
+						"y": 10,
+						"w": 115,
+						"h": 179
+					},
+					"frame": {
+						"x": 339,
+						"y": 1105,
+						"w": 115,
+						"h": 179
+					}
+				},
+				{
+					"filename": "__orange_chicken_jump_000",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 81,
+						"y": 10,
+						"w": 115,
+						"h": 179
+					},
+					"frame": {
+						"x": 339,
+						"y": 1105,
+						"w": 115,
+						"h": 179
+					}
+				},
+				{
+					"filename": "__orange_chicken_lay_egg_000",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 81,
+						"y": 10,
+						"w": 115,
+						"h": 179
+					},
+					"frame": {
+						"x": 339,
+						"y": 1105,
+						"w": 115,
+						"h": 179
+					}
+				},
+				{
+					"filename": "__orange_chicken_peck_000",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 81,
+						"y": 10,
+						"w": 115,
+						"h": 179
+					},
+					"frame": {
+						"x": 339,
+						"y": 1105,
+						"w": 115,
+						"h": 179
+					}
+				},
+				{
+					"filename": "__orange_chicken_idle_001",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 81,
+						"y": 10,
+						"w": 115,
+						"h": 179
+					},
+					"frame": {
+						"x": 457,
+						"y": 1113,
+						"w": 115,
+						"h": 179
+					}
+				},
+				{
+					"filename": "__orange_chicken_idle_019",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 81,
+						"y": 10,
+						"w": 115,
+						"h": 179
+					},
+					"frame": {
+						"x": 457,
+						"y": 1113,
+						"w": 115,
+						"h": 179
+					}
+				},
+				{
+					"filename": "__orange_chicken_idle_003",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 82,
+						"y": 10,
+						"w": 113,
+						"h": 179
+					},
+					"frame": {
+						"x": 575,
+						"y": 1130,
+						"w": 113,
+						"h": 179
+					}
+				},
+				{
+					"filename": "__orange_chicken_idle_017",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 82,
+						"y": 10,
+						"w": 113,
+						"h": 179
+					},
+					"frame": {
+						"x": 575,
+						"y": 1130,
+						"w": 113,
+						"h": 179
+					}
+				},
+				{
+					"filename": "__orange_chicken_idle_002",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 81,
+						"y": 10,
+						"w": 115,
+						"h": 179
+					},
+					"frame": {
+						"x": 691,
+						"y": 1134,
+						"w": 115,
+						"h": 179
+					}
+				},
+				{
+					"filename": "__orange_chicken_idle_018",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 81,
+						"y": 10,
+						"w": 115,
+						"h": 179
+					},
+					"frame": {
+						"x": 691,
+						"y": 1134,
+						"w": 115,
+						"h": 179
+					}
+				},
+				{
+					"filename": "__orange_chicken_idle_004",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 82,
+						"y": 10,
+						"w": 113,
+						"h": 179
+					},
+					"frame": {
+						"x": 809,
+						"y": 1138,
+						"w": 113,
+						"h": 179
+					}
+				},
+				{
+					"filename": "__orange_chicken_idle_016",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 82,
+						"y": 10,
+						"w": 113,
+						"h": 179
+					},
+					"frame": {
+						"x": 809,
+						"y": 1138,
+						"w": 113,
+						"h": 179
+					}
+				},
+				{
+					"filename": "__orange_chicken_walk_004",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 86,
+						"y": 11,
+						"w": 108,
+						"h": 179
+					},
+					"frame": {
+						"x": 2,
+						"y": 1248,
+						"w": 108,
+						"h": 179
+					}
+				},
+				{
+					"filename": "__orange_chicken_idle_009",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 84,
+						"y": 9,
+						"w": 110,
+						"h": 180
+					},
+					"frame": {
+						"x": 113,
+						"y": 1250,
+						"w": 110,
+						"h": 180
+					}
+				},
+				{
+					"filename": "__orange_chicken_idle_011",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 84,
+						"y": 9,
+						"w": 110,
+						"h": 180
+					},
+					"frame": {
+						"x": 113,
+						"y": 1250,
+						"w": 110,
+						"h": 180
+					}
+				},
+				{
+					"filename": "__orange_chicken_idle_010",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 84,
+						"y": 9,
+						"w": 110,
+						"h": 180
+					},
+					"frame": {
+						"x": 226,
+						"y": 1271,
+						"w": 110,
+						"h": 180
+					}
+				},
+				{
+					"filename": "__orange_chicken_idle_005",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 82,
+						"y": 10,
+						"w": 113,
+						"h": 179
+					},
+					"frame": {
+						"x": 339,
+						"y": 1287,
+						"w": 113,
+						"h": 179
+					}
+				},
+				{
+					"filename": "__orange_chicken_idle_015",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 82,
+						"y": 10,
+						"w": 113,
+						"h": 179
+					},
+					"frame": {
+						"x": 455,
+						"y": 1295,
+						"w": 113,
+						"h": 179
+					}
+				},
+				{
+					"filename": "__orange_chicken_walk_010",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 84,
+						"y": 10,
+						"w": 111,
+						"h": 179
+					},
+					"frame": {
+						"x": 571,
+						"y": 1312,
+						"w": 111,
+						"h": 179
+					}
+				},
+				{
+					"filename": "__orange_chicken_idle_006",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 83,
+						"y": 9,
+						"w": 112,
+						"h": 180
+					},
+					"frame": {
+						"x": 685,
+						"y": 1316,
+						"w": 112,
+						"h": 180
+					}
+				},
+				{
+					"filename": "__orange_chicken_die_001",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 63,
+						"y": 28,
+						"w": 123,
+						"h": 180
+					},
+					"frame": {
+						"x": 800,
+						"y": 1320,
+						"w": 123,
+						"h": 180
+					}
+				},
+				{
+					"filename": "__orange_chicken_idle_007",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 83,
+						"y": 9,
+						"w": 112,
+						"h": 180
+					},
+					"frame": {
+						"x": 2,
+						"y": 1433,
+						"w": 112,
+						"h": 180
+					}
+				},
+				{
+					"filename": "__orange_chicken_idle_008",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 83,
+						"y": 9,
+						"w": 112,
+						"h": 180
+					},
+					"frame": {
+						"x": 117,
+						"y": 1454,
+						"w": 112,
+						"h": 180
+					}
+				},
+				{
+					"filename": "__orange_chicken_idle_012",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 83,
+						"y": 9,
+						"w": 112,
+						"h": 180
+					},
+					"frame": {
+						"x": 117,
+						"y": 1454,
+						"w": 112,
+						"h": 180
+					}
+				},
+				{
+					"filename": "__orange_chicken_idle_013",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 83,
+						"y": 9,
+						"w": 112,
+						"h": 180
+					},
+					"frame": {
+						"x": 232,
+						"y": 1469,
+						"w": 112,
+						"h": 180
+					}
+				},
+				{
+					"filename": "__orange_chicken_idle_014",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 83,
+						"y": 9,
+						"w": 112,
+						"h": 180
+					},
+					"frame": {
+						"x": 347,
+						"y": 1477,
+						"w": 112,
+						"h": 180
+					}
+				},
+				{
+					"filename": "__orange_chicken_jump_006",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 78,
+						"y": 6,
+						"w": 128,
+						"h": 180
+					},
+					"frame": {
+						"x": 462,
+						"y": 1494,
+						"w": 128,
+						"h": 180
+					}
+				},
+				{
+					"filename": "__orange_chicken_walk_000",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 76,
+						"y": 10,
+						"w": 120,
+						"h": 180
+					},
+					"frame": {
+						"x": 593,
+						"y": 1499,
+						"w": 120,
+						"h": 180
+					}
+				},
+				{
+					"filename": "__orange_chicken_walk_011",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 82,
+						"y": 10,
+						"w": 114,
+						"h": 180
+					},
+					"frame": {
+						"x": 716,
+						"y": 1503,
+						"w": 114,
+						"h": 180
+					}
+				},
+				{
+					"filename": "__orange_chicken_jump_004",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 218,
+						"h": 215
+					},
+					"spriteSourceSize": {
+						"x": 65,
+						"y": 7,
+						"w": 145,
+						"h": 182
+					},
+					"frame": {
+						"x": 833,
+						"y": 1503,
+						"w": 145,
+						"h": 182
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "3.0",
+		"smartupdate": "$TexturePacker:SmartUpdate:551fc25dacb46b48870f32982fc5057c:9034581a3f69a0593abe149de1be990f:327165fe4c3b7e9cab19b045cdf98e8c$"
+	}
+}

@@ -1,0 +1,13 @@
+# Blender MTL File: 'None'
+# Material Count: 1
+
+newmtl atlas_retroForest_extras_A.001
+Ns 82.706287
+Ka 1.000000 1.000000 1.000000
+Kd 0.588235 0.588235 0.588235
+Ks 0.580000 0.580000 0.580000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd E:\\3D GameDev Market\\Retro Forest Props\\textures\\atlas_retroForest_extras_A.png
