@@ -10,6 +10,25 @@ import yargs from 'yargs';
 
 const argv = yargs(hideBin(process.argv)).argv
 
+let src = '';
+
+if (argv.dev)
+{
+    src = argv._[0];
+}
+else if (argv.src)
+{
+    src = argv.src;
+}
+
+const srcTS = (!src.endsWith('.ts')) ? src.concat('.ts') : src;
+const srcJS = (src.endsWith('.ts')) ? src.replace('.ts', '.js') : src.concat('.js');
+const srcMinJS = (src.endsWith('.ts')) ? src.replace('.ts', '.min.js') : src.concat('.min.js');
+
+const pathTS = `./src/${srcTS}`;
+const pathJS = `./public/${srcJS}`;
+const pathMinJS = `./public/${srcMinJS}`;
+
 let info = '';
 const times = [];
 
@@ -66,25 +85,23 @@ const endLog = (message) =>
 
 startTimer();
 
-const src = argv.src;
-
-if (!src)
+if (!src || src === '')
 {
     info = chalk`{whiteBright Missing command-line argument:} {yellowBright --src file}`;
     console.log(boxen(info, { padding: 1, margin: 1, borderColor: 'redBright', borderStyle: 'bold' }));
     process.exit(1);
 }
 
-if (!fs.existsSync(`./src/${src}.ts`))
+if (!fs.existsSync(pathTS))
 {
-    info = chalk`{whiteBright File {yellowBright src/${src}.ts} is missing}`;
+    info = chalk`{whiteBright File {yellowBright ${pathTS}} is missing}`;
     console.log(boxen(info, { padding: 1, margin: 1, borderColor: 'redBright', borderStyle: 'bold' }));
     process.exit(1);
 }
 
 const buildResults = esbuild.buildSync({
-    entryPoints: [ `./src/${src}.ts` ],
-    outfile: `./public/${src}.js`,
+    entryPoints: [ pathTS ],
+    outfile: pathJS,
     target: 'es6',
     sourcemap: true,
     minify: false,
@@ -103,8 +120,8 @@ else
 }
 
 const minResults = esbuild.buildSync({
-    entryPoints: [ `./src/${src}.ts` ],
-    outfile: `./public/${src}.min.js`,
+    entryPoints: [ pathTS ],
+    outfile: pathMinJS,
     target: 'es6',
     sourcemap: false,
     minify: true,
@@ -119,11 +136,11 @@ if (minResults.errors.length > 0)
 }
 else
 {
-    logTime(chalk`✔ {whiteBright ${src}.min.js}`);
+    logTime(chalk`✔ {whiteBright ${pathMinJS}}`);
 }
 
-const code = fs.readFileSync(`./public/${src}.js`);
-const codeMin = fs.readFileSync(`./public/${src}.min.js`);
+const code = fs.readFileSync(pathJS);
+const codeMin = fs.readFileSync(pathMinJS);
 
 const unminSize = fileSize(Buffer.byteLength(code));
 const minSize = fileSize(Buffer.byteLength(codeMin));
