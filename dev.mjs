@@ -11,6 +11,8 @@ import yargs from 'yargs';
 const argv = yargs(hideBin(process.argv)).argv
 
 let src = '';
+let info = '';
+const times = [];
 
 if (argv.dev)
 {
@@ -21,6 +23,13 @@ else if (argv.src)
     src = argv.src;
 }
 
+if (!src || src === '')
+{
+    info = chalk`{whiteBright Missing command-line argument:} {yellowBright --src file}`;
+    console.log(boxen(info, { padding: 1, margin: 1, borderColor: 'redBright', borderStyle: 'bold' }));
+    process.exit(1);
+}
+
 const srcTS = (!src.endsWith('.ts')) ? src.concat('.ts') : src;
 const srcJS = (src.endsWith('.ts')) ? src.replace('.ts', '.js') : src.concat('.js');
 const srcMinJS = (src.endsWith('.ts')) ? src.replace('.ts', '.min.js') : src.concat('.min.js');
@@ -28,9 +37,6 @@ const srcMinJS = (src.endsWith('.ts')) ? src.replace('.ts', '.min.js') : src.con
 const pathTS = `./src/${srcTS}`;
 const pathJS = `./public/${srcJS}`;
 const pathMinJS = `./public/${srcMinJS}`;
-
-let info = '';
-const times = [];
 
 const startTimer = () =>
 {
@@ -84,13 +90,6 @@ const endLog = (message) =>
 }
 
 startTimer();
-
-if (!src || src === '')
-{
-    info = chalk`{whiteBright Missing command-line argument:} {yellowBright --src file}`;
-    console.log(boxen(info, { padding: 1, margin: 1, borderColor: 'redBright', borderStyle: 'bold' }));
-    process.exit(1);
-}
 
 if (!fs.existsSync(pathTS))
 {
