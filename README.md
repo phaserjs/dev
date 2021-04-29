@@ -1,14 +1,22 @@
 # Phaser 4 Dev
 
-The code in this repo has been written specifically to test new features of Phaser 4 during development. Any code which we feel is useful to the wider community will eventually be moved to the official Phaser Examples repository. Considering this place as a testing-ground only.
+Rebooting the Phaser universe from scratch.
 
-To build code:
+![Phaser4](public/assets/logo.png)
+
+The code in this repo has been written specifically to test new features of Phaser 4 during development. Any code which we feel is useful to the wider community will eventually be moved to the official Phaser Examples repository. Consider this place as ground-zero, for tests only.
+
+All examples are written in TypeScript and built via ESBuild.
+
+To build an example:
 
 `npm run dev --src filename`
 
 If the filename, or folder, has a space in it, quote it:
 
 `npm run dev --src "folder/longer filename"`
+
+The bundle will be built into the `public` folder, under the same folder given in the path.
 
 ## Example using the npm package
 
@@ -60,11 +68,11 @@ new Game(
 );
 ```
 
-## Example using the src code directly
+## Example using the source code directly
 
 You can directly import the Phaser TypeScript source into your bundle. Note that you must have the Phaser repo checked out locally and the paths must point to it. The following works fine on our test system, but you will need to adjust the paths for your own.
 
-This method isn't meant for production yes, it's just meant to allow you to quickly test new Phaser features without having to re-publish a new build to npm, or mess around with npm symlinking.
+This method isn't meant for production. It's just meant to allow you to quickly test new Phaser features direct from the repo without a version having been published to npm, or without having to mess around with npm symlinking.
 
 ```js
 import * as Easing from '../../../phaser-genesis/src/math/easing';
@@ -116,7 +124,7 @@ new Game(
 
 If you prefer, you can import Phaser entirely and modify your code like so:
 
-We do not recommend this approach as it produces massive bundle sizes.
+We do not recommend this approach as it produces massive bundle sizes, no tree-shaking takes place.
 
 ```js
 import * as Phaser from '@phaserjs/phaser';
