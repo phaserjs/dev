@@ -23,16 +23,7 @@ class Demo extends Scene
 
         const loader = new Loader();
 
-        if (window.location.href.includes('192.168.0.100/phaser-genesis/'))
-        {
-            loader.setPath('/phaser4-examples/public/assets/');
-        }
-        else
-        {
-            loader.setPath('/examples/public/assets/');
-        }
-
-        loader.add(ImageFile('logo', 'logo.png'));
+        loader.add(ImageFile('logo', 'assets/logo.png'));
 
         loader.start().then(() => {
 

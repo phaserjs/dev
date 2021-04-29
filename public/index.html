@@ -13,6 +13,23 @@
     </head>
     <body>
         <div id="gameParent"></div>
-        <script src="index.js"></script>
+        <script>
+            function decodeURI (value)
+            {
+                return decodeURIComponent(value.replace(/\+/g, ' '));
+            }
+
+            const params = new URLSearchParams(document.location.search);
+
+            const filename = params.get('f');
+
+            const example = document.createElement('script');
+
+            // example.type = 'module';
+            example.src = decodeURI(filename).split('\\').join('/');
+
+            document.body.appendChild(example);
+
+        </script>
     </body>
 </html>

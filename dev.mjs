@@ -116,7 +116,7 @@ if (buildResults.errors.length > 0)
 }
 else
 {
-    logTime(chalk`✔ {whiteBright ${src}.js}`);
+    logTime(chalk`✔ {whiteBright ${srcJS}}`);
 }
 
 const minResults = esbuild.buildSync({
@@ -136,7 +136,7 @@ if (minResults.errors.length > 0)
 }
 else
 {
-    logTime(chalk`✔ {whiteBright ${pathMinJS}}`);
+    logTime(chalk`✔ {whiteBright ${srcMinJS}}`);
 }
 
 const code = fs.readFileSync(pathJS);
