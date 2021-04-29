@@ -5,8 +5,5 @@
         "allowSyntheticDefaultImports": true,
         "suppressImplicitAnyIndexErrors": true,
         "diagnostics": false
-    },
-    "files": [
-        "index.ts"
-    ]
+    }
 }
