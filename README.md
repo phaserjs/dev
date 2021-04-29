@@ -2,7 +2,7 @@
 
 Rebooting the Phaser universe from scratch.
 
-![Phaser4](public/assets/logo.png)
+![Phaser4](readme-logo.png)
 
 The code in this repo has been written specifically to test new features of Phaser 4 during development. Any code which we feel is useful to the wider community will eventually be moved to the official Phaser Examples repository. Consider this place as ground-zero, for tests only.
 
@@ -15,6 +15,8 @@ To build an example:
 If the filename, or folder, has a space in it, quote it:
 
 `npm run dev --src "folder/longer filename"`
+
+![Phaser4](readme-build.png)
 
 The bundle will be built into the `public` folder, under the same folder given in the path.
 
