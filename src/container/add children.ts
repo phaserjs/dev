@@ -84,8 +84,8 @@ class Demo extends Scene
             child1.rotation += 0.01;
             child5.rotation -= 0.03;
 
-            parent.scaleX = Math.cos(i);
-            parent.scaleY = Math.cos(i);
+            parent.scaleX = Math.cos(i) * 2;
+            parent.scaleY = Math.cos(i) * 2;
 
             i += 0.01;
         });

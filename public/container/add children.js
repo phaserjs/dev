@@ -3537,7 +3537,7 @@ void main (void)
       loader.add(ImageFile("64", "box-item-boxed.png"));
       loader.add(ImageFile("32", "shinyball.png"));
       loader.add(ImageFile("16", "skull.png"));
-      loader.start().then(this.create);
+      loader.start().then(() => this.create());
     }
     create() {
       const parent = new Sprite(400, 300, "256");
@@ -3576,8 +3576,8 @@ void main (void)
         parent.rotation += 5e-3;
         child1.rotation += 0.01;
         child5.rotation -= 0.03;
-        parent.scaleX = Math.cos(i);
-        parent.scaleY = Math.cos(i);
+        parent.scaleX = Math.cos(i) * 2;
+        parent.scaleY = Math.cos(i) * 2;
         i += 0.01;
       });
     }
