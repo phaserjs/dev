@@ -1,5 +1,6 @@
 import boxen from 'boxen';
 import chalk from 'chalk';
+import dirTree from 'directory-tree';
 import esbuild from 'esbuild';
 import fileSize from 'filesize';
 import fs from 'fs-extra';
@@ -149,6 +150,10 @@ info = info.concat(chalk`
 {yellowBright.bold Bundle:} ${unminSize}
 {yellowBright.bold Minified:} ${minSize}
 {yellowBright.bold Gzipped:} ${gzSize}\n\n`);
+
+//  Update Examples JSON file
+
+
 
 endLog('Build complete');
 
