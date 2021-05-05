@@ -1,4 +1,4 @@
-import { Panel, TreeView, TreeViewItem } from './pcui.js';
+import { Button, Container, Label, Panel, TreeView, TreeViewItem } from './pcui.js';
 
 import { decodeURI } from './decodeURI.js';
 import { loadJSON } from './loadJSON.js'
@@ -15,7 +15,7 @@ const selectHandler = (item) => {
     c.width = 800;
     c.height = 632;
     c.collapsible = false;
-    c.scrollable = true;
+    c.scrollable = false;
     c.classAdd('pcui-collapsible');
 
 
@@ -32,11 +32,12 @@ const selectHandler = (item) => {
 
     iframe.width = 800;
     iframe.height = 600;
+    iframe.scrolling = 'no';
     iframe.sandbox = 'allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation';
 
-    c.dom.appendChild(iframe);
+    c.content.dom.appendChild(iframe);
 
-    // console.log(c.header); // a Container
+    console.log(c.content); // a Container
 
     // for (let i = 0; i < c.header.dom.childNodes.length; i++)
     // {
@@ -45,7 +46,7 @@ const selectHandler = (item) => {
 
     document.body.appendChild(c.dom);
 
-    $(c.dom).draggable().resizable();;
+    $(c.dom).draggable();
 
     iframe.src = 'view.html?f=' + decodeURI(item.data.path);
 }
@@ -88,25 +89,56 @@ const addFolder = (data, treeView) => {
 
 loadJSON('examples.json', (data) => {
 
+    const window = new Container({ flex: true });
+
+    window.class.add('pcui-panel');
+    window.width = 250;
+    window.style.height = '100vh';
+
+    const header = new Container({ flex: true, flexDirection: 'row', class: [ 'pcui-panel-header', 'font-bold' ] });
+
+    const title = new Label({ text: ' ', class: [ 'pcui-panel-title', 'font-bold' ] });
+
+    // https://css.gg/app
+
+    title.classAdd('gg-push-chevron-down-r');
+    title.classRemove('pcui-element');
+
+    title.on('click', () => {
+
+        console.log('clicked');
+
+    });
+
+    header.append(title);
+
+    const title2 = new Label({ text: 'Phaser 4 Examples', class: [ 'pcui-panel-title', 'font-bold' ] });
+    header.append(title2);
+
+    window.append(header);
+
+    const rootTreeView = new TreeView();
+
+    addFolder(data, rootTreeView);
+
+    window.append(rootTreeView);
+
+    document.body.appendChild(window.dom);
+
+    /*
     const examplesPanel = new Panel();
 
     examplesPanel.headerText = 'Examples';
-    examplesPanel.width = 250;
     examplesPanel.collapsible = true;
     examplesPanel.collapseHorizontally = true;
-    examplesPanel.scrollable = true;
+    examplesPanel.scrollable = false;
 
     examplesPanel.style.position = 'absolute';
     examplesPanel.style.top = '0px';
     examplesPanel.style.left = '0px';
     examplesPanel.style.zIndex = '100';
 
-    const rootTreeView = new TreeView();
-
-    addFolder(data, rootTreeView);
-
-    examplesPanel.append(rootTreeView);
-
     document.body.appendChild(examplesPanel.dom);
+    */
 
 });
