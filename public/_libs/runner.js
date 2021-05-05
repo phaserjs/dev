@@ -14,8 +14,10 @@ const selectHandler = (item) => {
     c.headerText = item.data.path;
     c.width = 800;
     c.height = 632;
-    c.collapsible = true;
+    c.collapsible = false;
     c.scrollable = true;
+    c.classAdd('pcui-collapsible');
+
 
     c.style.position = 'absolute';
     c.style.top = `${windowY}px`;
@@ -33,6 +35,13 @@ const selectHandler = (item) => {
     iframe.sandbox = 'allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation';
 
     c.dom.appendChild(iframe);
+
+    // console.log(c.header); // a Container
+
+    // for (let i = 0; i < c.header.dom.childNodes.length; i++)
+    // {
+    //     console.log(c.header.dom.childNodes[i]);
+    // }
 
     document.body.appendChild(c.dom);
 

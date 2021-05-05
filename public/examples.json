@@ -31,8 +31,23 @@
       ],
       "size": 107936,
       "type": "directory"
+    },
+    {
+      "path": "public/sprite",
+      "name": "sprite",
+      "children": [
+        {
+          "path": "public/sprite/create sprite.js",
+          "name": "create sprite.js",
+          "size": 104538,
+          "extension": ".js",
+          "type": "file"
+        }
+      ],
+      "size": 104538,
+      "type": "directory"
     }
   ],
-  "size": 252094,
+  "size": 356632,
   "type": "directory"
 }

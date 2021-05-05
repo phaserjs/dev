@@ -1,14 +1,14 @@
-import { AddChild, AddChildren } from '../src/display/';
-import { BackgroundColor, CanvasRenderer, Parent, Scenes, Size, WebGLRenderer } from '../src/config';
+import { AddChild, AddChildren } from '@phaserjs/phaser/display/';
+import { BackgroundColor, Canvas, Parent, Scenes, Size, WebGL } from '@phaserjs/phaser/config';
 
-import { CanvasTexture } from '../src/textures/types';
-import { Game } from '../src/Game';
-import { ImageFile } from '../src/loader/files/ImageFile';
-import { Loader } from '../src/loader/Loader';
-import { On } from '../src/events';
-import { Scene } from '../src/scenes/Scene';
-import { Sprite } from '../src/gameobjects/';
-import { StaticWorld } from '../src/world/StaticWorld';
+import { CanvasTexture } from '@phaserjs/phaser/textures/types';
+import { Game } from '@phaserjs/phaser/Game';
+import { ImageFile } from '@phaserjs/phaser/loader/files/ImageFile';
+import { Loader } from '@phaserjs/phaser/loader/Loader';
+import { On } from '@phaserjs/phaser/events';
+import { Scene } from '@phaserjs/phaser/scenes/Scene';
+import { Sprite } from '@phaserjs/phaser/gameobjects/';
+import { StaticWorld } from '@phaserjs/phaser/world/StaticWorld';
 
 class Demo extends Scene
 {
@@ -22,14 +22,14 @@ class Demo extends Scene
 
         const loader = new Loader();
 
-        loader.setPath('/phaser4-examples/public/assets/');
+        loader.setPath('assets/');
 
         loader.add(ImageFile('256', 'f-texture.png'));
         loader.add(ImageFile('64', 'box-item-boxed.png'));
         loader.add(ImageFile('32', 'shinyball.png'));
         loader.add(ImageFile('16', 'skull.png'));
 
-        loader.start(() => this.create());
+        loader.start().then(() => this.create());
     }
 
     create ()
@@ -47,8 +47,7 @@ class Demo extends Scene
         ctx.strokeStyle = '#0f0';
         ctx.fillStyle = '#0f0';
 
-        AddChild(this.world, sprite);
-        AddChild(this.world, debug);
+        AddChildren(this.world, sprite, debug);
 
         let i = 0;
 
@@ -69,14 +68,11 @@ class Demo extends Scene
     }
 }
 
-export default function (): void
-{
-    new Game(
-        CanvasRenderer(),
-        // WebGLRenderer(),
-        Size(800, 600),
-        Parent('gameParent'),
-        BackgroundColor(0x2d2d2d),
-        Scenes(Demo)
-    );
-}
+new Game(
+    // Canvas(),
+    WebGL(),
+    Size(800, 600),
+    Parent('gameParent'),
+    BackgroundColor(0x2d2d2d),
+    Scenes(Demo)
+);
