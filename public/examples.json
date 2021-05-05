@@ -12,16 +12,9 @@
           "size": 144158,
           "extension": ".js",
           "type": "file"
-        },
-        {
-          "path": "public/3d/primitives.min.js",
-          "name": "primitives.min.js",
-          "size": 63122,
-          "extension": ".js",
-          "type": "file"
         }
       ],
-      "size": 207280,
+      "size": 144158,
       "type": "directory"
     },
     {
@@ -34,105 +27,12 @@
           "size": 107936,
           "extension": ".js",
           "type": "file"
-        },
-        {
-          "path": "public/container/add children.min.js",
-          "name": "add children.min.js",
-          "size": 47242,
-          "extension": ".js",
-          "type": "file"
         }
       ],
-      "size": 155178,
-      "type": "directory"
-    },
-    {
-      "path": "public/layer",
-      "name": "layer",
-      "children": [
-        {
-          "path": "public/layer/effect layer.js",
-          "name": "effect layer.js",
-          "size": 123614,
-          "extension": ".js",
-          "type": "file"
-        },
-        {
-          "path": "public/layer/effect layer.min.js",
-          "name": "effect layer.min.js",
-          "size": 59233,
-          "extension": ".js",
-          "type": "file"
-        }
-      ],
-      "size": 182847,
-      "type": "directory"
-    },
-    {
-      "path": "public/sprite",
-      "name": "sprite",
-      "children": [
-        {
-          "path": "public/sprite/bounds test 1.js",
-          "name": "bounds test 1.js",
-          "size": 105938,
-          "extension": ".js",
-          "type": "file"
-        },
-        {
-          "path": "public/sprite/bounds test 1.min.js",
-          "name": "bounds test 1.min.js",
-          "size": 46446,
-          "extension": ".js",
-          "type": "file"
-        },
-        {
-          "path": "public/sprite/sprite from bundle.js",
-          "name": "sprite from bundle.js",
-          "size": 621378,
-          "extension": ".js",
-          "type": "file"
-        },
-        {
-          "path": "public/sprite/sprite from bundle.min.js",
-          "name": "sprite from bundle.min.js",
-          "size": 264597,
-          "extension": ".js",
-          "type": "file"
-        },
-        {
-          "path": "public/sprite/sprite from package.js",
-          "name": "sprite from package.js",
-          "size": 119574,
-          "extension": ".js",
-          "type": "file"
-        },
-        {
-          "path": "public/sprite/sprite from package.min.js",
-          "name": "sprite from package.min.js",
-          "size": 51803,
-          "extension": ".js",
-          "type": "file"
-        },
-        {
-          "path": "public/sprite/sprite from src.js",
-          "name": "sprite from src.js",
-          "size": 117854,
-          "extension": ".js",
-          "type": "file"
-        },
-        {
-          "path": "public/sprite/sprite from src.min.js",
-          "name": "sprite from src.min.js",
-          "size": 51799,
-          "extension": ".js",
-          "type": "file"
-        }
-      ],
-      "size": 1379389,
+      "size": 107936,
       "type": "directory"
     }
   ],
-  "size": 1924694,
+  "size": 252094,
   "type": "directory"
 }

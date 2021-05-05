@@ -1,30 +1,44 @@
-import { GridView, GridViewItem, Panel, TreeView, TreeViewItem } from './pcui.js';
+import { Panel, TreeView, TreeViewItem } from './pcui.js';
 
-const loadJSON = (file, callback) =>
-{
-    const xhr = new XMLHttpRequest();
+import { decodeURI } from './decodeURI.js';
+import { loadJSON } from './loadJSON.js'
 
-    xhr.overrideMimeType('application/json');
-    xhr.open('GET', file, true);
+let openWindows = 0;
+let windowX = 250;
+let windowY = 0;
 
-    xhr.onload = function ()
-    {
-        if (xhr.readyState === 4 && xhr.status >= 400 && xhr.status <= 599)
-        {
-            throw Error('Failed to load ' + file);
-        }
-        else
-        {
-            callback(JSON.parse(xhr.responseText));
-        }
-    };
+const selectHandler = (item) => {
 
-    xhr.send();
-}
+    const c = new Panel();
 
-const decodeURI = (value) =>
-{
-    return decodeURIComponent(value.replace(/\+/g, ' '));
+    c.headerText = item.data.path;
+    c.width = 800;
+    c.height = 632;
+    c.collapsible = true;
+    c.scrollable = true;
+
+    c.style.position = 'absolute';
+    c.style.top = `${windowY}px`;
+    c.style.left = `${windowX}px`;
+    c.style.zIndex = '1000';
+
+    openWindows++;
+    windowX += 32;
+    windowY += 32;
+
+    const iframe = document.createElement('iframe');
+
+    iframe.width = 800;
+    iframe.height = 600;
+    iframe.sandbox = 'allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation';
+
+    c.dom.appendChild(iframe);
+
+    document.body.appendChild(c.dom);
+
+    $(c.dom).draggable().resizable();;
+
+    iframe.src = 'view.html?f=' + decodeURI(item.data.path);
 }
 
 const addFolder = (data, treeView) => {
@@ -44,15 +58,7 @@ const addFolder = (data, treeView) => {
 
                 item.data = { path: child.path.replace('public/', '') };
 
-                item.on('select', () =>
-                {
-                    console.log('selected', item.data.path);
-
-                    c.headerText = item.data.path;
-                    c.collapsed = false;
-
-                    example.src = decodeURI(item.data.path);
-                });
+                item.on('select', item => selectHandler(item));
 
                 folder.append(item);
             }
@@ -71,62 +77,27 @@ const addFolder = (data, treeView) => {
     }
 }
 
-const example = document.createElement('script');
-
-// example.type = 'module';
-
-document.body.appendChild(example);
-
-const params = new URLSearchParams(document.location.search);
-
-const filename = params.get('f');
-
-const c = new Panel();
-
 loadJSON('examples.json', (data) => {
 
-    c.headerText = 'Select an example';
-    c.width = 800;
-    c.height = 632;
-    c.collapsed = true;
-    c.collapsible = true;
-    c.scrollable = true;
-    c.resizable = 'right';
-    c.style.position = 'absolute';
-    c.style.top = '0px';
-    c.style.left = '250px';
-    c.dom.draggable = true;
+    const examplesPanel = new Panel();
 
-    const div = document.createElement('div');
+    examplesPanel.headerText = 'Examples';
+    examplesPanel.width = 250;
+    examplesPanel.collapsible = true;
+    examplesPanel.collapseHorizontally = true;
+    examplesPanel.scrollable = true;
 
-    div.id = 'gameParent';
+    examplesPanel.style.position = 'absolute';
+    examplesPanel.style.top = '0px';
+    examplesPanel.style.left = '0px';
+    examplesPanel.style.zIndex = '100';
 
-    c.dom.appendChild(div);
+    const rootTreeView = new TreeView();
 
-    document.body.appendChild(c.dom);
+    addFolder(data, rootTreeView);
 
-    const p = new Panel();
+    examplesPanel.append(rootTreeView);
 
-    p.headerText = 'Examples';
-    p.width = 250;
-    p.collapsible = true;
-    p.collapseHorizontally = true;
-    p.scrollable = true;
-    p.style.position = 'absolute';
-    p.style.top = '0px';
-    p.style.left = '0px';
-
-    const t = new TreeView();
-
-    addFolder(data, t);
-
-    p.append(t);
-
-    document.body.appendChild(p.dom);
-    
-    if (filename)
-    {
-        example.src = decodeURI(filename).split('\\').join('/');
-    }
+    document.body.appendChild(examplesPanel.dom);
 
 });

@@ -1,6 +1,6 @@
 import boxen from 'boxen';
+import { buildExamples } from './buildExamples.mjs';
 import chalk from 'chalk';
-import dirTree from 'directory-tree';
 import esbuild from 'esbuild';
 import fileSize from 'filesize';
 import fs from 'fs-extra';
@@ -24,6 +24,8 @@ else if (argv.src)
     src = argv.src;
 }
 
+const createMin = (argv.min) ? true : false;
+
 if (!src || src === '')
 {
     info = chalk`{whiteBright Missing command-line argument:} {yellowBright --src file}`;
@@ -38,6 +40,7 @@ const srcMinJS = (src.endsWith('.ts')) ? src.replace('.ts', '.min.js') : src.con
 const pathTS = `./src/${srcTS}`;
 const pathJS = `./public/${srcJS}`;
 const pathMinJS = `./public/${srcMinJS}`;
+const pathTempMinJS = './temp.min.js';
 
 const startTimer = () =>
 {
@@ -121,7 +124,7 @@ else
 
 const minResults = esbuild.buildSync({
     entryPoints: [ pathTS ],
-    outfile: pathMinJS,
+    outfile: (createMin) ? pathMinJS : pathTempMinJS,
     target: 'es6',
     sourcemap: false,
     minify: true,
@@ -139,8 +142,10 @@ else
     logTime(chalk`✔ {whiteBright ${srcMinJS}}`);
 }
 
+logTime(chalk`✔ {whiteBright ${buildExamples()}}`);
+
 const code = fs.readFileSync(pathJS);
-const codeMin = fs.readFileSync(pathMinJS);
+const codeMin = fs.readFileSync((createMin) ? pathMinJS : pathTempMinJS);
 
 const unminSize = fileSize(Buffer.byteLength(code));
 const minSize = fileSize(Buffer.byteLength(codeMin));
@@ -151,9 +156,10 @@ info = info.concat(chalk`
 {yellowBright.bold Minified:} ${minSize}
 {yellowBright.bold Gzipped:} ${gzSize}\n\n`);
 
-//  Update Examples JSON file
-
-
+if (!createMin)
+{
+    fs.removeSync(pathTempMinJS);
+}
 
 endLog('Build complete');
 
