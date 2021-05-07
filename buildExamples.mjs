@@ -10,8 +10,8 @@ const filterConfig = {
     exclude: [
         /public\\assets/,
         /public\/assets/,
-        /public\\_libs/,
-        /public\/_libs/
+        /public\\libs/,
+        /public\/libs/
     ]
 };
 
