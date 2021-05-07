@@ -5,10 +5,9 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <title>Phaser 4 Examples</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
-        <link rel="stylesheet" href="_libs/jquery-ui.min.css">
         <link rel="stylesheet" href="_libs/icons.css">
-        <script src="_libs/jquery-3.6.0.min.js"></script>
-        <script src="_libs/jquery-ui.min.js"></script>
+        <link rel="stylesheet" href="_libs/dock/css/dock-manager.css">
+        <link rel="stylesheet" href="_libs/dock/css/dock-manager-style.css">
         <style>
             body {
                 margin: 0;
@@ -18,6 +17,14 @@
                 background-image: -moz-linear-gradient(0deg, #FF3CAC 0%, #784BA0 50%, #2B86C5 100%);
                 background-image: -o-linear-gradient(0deg, #FF3CAC 0%, #784BA0 50%, #2B86C5 100%);
                 background-image: linear-gradient(0deg, #FF3CAC 0%, #784BA0 50%, #2B86C5 100%);
+            }
+
+            #container {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
             }
 
             iframe {
@@ -33,6 +40,12 @@
         </style>
     </head>
     <body>
+
+        <div id="container">
+            <div id="dockManager" style="position: relative"></div>
+        </div>
+
         <script src="_libs/runner.js" type="module"></script>
+
     </body>
 </html>

@@ -1,32 +1,11 @@
-import { Button, Container, Label, Panel, TreeView, TreeViewItem } from './pcui.js';
+import { TreeView, TreeViewItem } from './pcui.js';
 
+import { DockManager } from './dock/js/DockManager.js';
+import { PanelContainer } from './dock/js/PanelContainer.js';
 import { decodeURI } from './decodeURI.js';
 import { loadJSON } from './loadJSON.js'
 
-let openWindows = 0;
-let windowX = 250;
-let windowY = 0;
-
 const selectHandler = (item) => {
-
-    const c = new Panel();
-
-    c.headerText = item.data.path;
-    c.width = 800;
-    c.height = 632;
-    c.collapsible = false;
-    c.scrollable = false;
-    c.classAdd('pcui-collapsible');
-
-
-    c.style.position = 'absolute';
-    c.style.top = `${windowY}px`;
-    c.style.left = `${windowX}px`;
-    c.style.zIndex = '1000';
-
-    openWindows++;
-    windowX += 32;
-    windowY += 32;
 
     const iframe = document.createElement('iframe');
 
@@ -34,21 +13,12 @@ const selectHandler = (item) => {
     iframe.height = 600;
     iframe.scrolling = 'no';
     iframe.sandbox = 'allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation';
-
-    c.content.dom.appendChild(iframe);
-
-    console.log(c.content); // a Container
-
-    // for (let i = 0; i < c.header.dom.childNodes.length; i++)
-    // {
-    //     console.log(c.header.dom.childNodes[i]);
-    // }
-
-    document.body.appendChild(c.dom);
-
-    $(c.dom).draggable();
-
     iframe.src = 'view.html?f=' + decodeURI(item.data.path);
+
+    let demoPanel = new PanelContainer(iframe, dockManager, item.data.path, 'document', false);
+    
+    dockManager.dockFill(documentNode, demoPanel);
+
 }
 
 const addFolder = (data, treeView) => {
@@ -87,58 +57,38 @@ const addFolder = (data, treeView) => {
     }
 }
 
-loadJSON('examples.json', (data) => {
+let dockManager;
+let documentNode;
 
-    const window = new Container({ flex: true });
+window.onload = () => {
 
-    window.class.add('pcui-panel');
-    window.width = 250;
-    window.style.height = '100vh';
+    loadJSON('examples.json', (data) => {
 
-    const header = new Container({ flex: true, flexDirection: 'row', class: [ 'pcui-panel-header', 'font-bold' ] });
+        let divDockContainer = document.getElementById('container');
+        let divDockManager = document.getElementById('dockManager');
+    
+        dockManager = new DockManager(divDockManager);
+    
+        dockManager.initialize();
+    
+        documentNode = dockManager.context.model.documentManagerNode;
+    
+        window.onresize = () => dockManager.resize(divDockContainer.clientWidth, divDockContainer.clientHeight);
+        window.onresize(null);
+    
+        // https://css.gg/app
+        // title.classAdd('gg-push-chevron-down-r');
 
-    const title = new Label({ text: ' ', class: [ 'pcui-panel-title', 'font-bold' ] });
-
-    // https://css.gg/app
-
-    title.classAdd('gg-push-chevron-down-r');
-    title.classRemove('pcui-element');
-
-    title.on('click', () => {
-
-        console.log('clicked');
-
+        const rootTreeView = new TreeView();
+    
+        addFolder(data, rootTreeView);
+    
+        document.body.appendChild(rootTreeView.dom);
+    
+        let examplesPanel = new PanelContainer(rootTreeView.dom, dockManager, 'Phaser 4 Examples', 'panel', true);
+    
+        dockManager.dockLeft(documentNode, examplesPanel, 0.25);
+    
     });
 
-    header.append(title);
-
-    const title2 = new Label({ text: 'Phaser 4 Examples', class: [ 'pcui-panel-title', 'font-bold' ] });
-    header.append(title2);
-
-    window.append(header);
-
-    const rootTreeView = new TreeView();
-
-    addFolder(data, rootTreeView);
-
-    window.append(rootTreeView);
-
-    document.body.appendChild(window.dom);
-
-    /*
-    const examplesPanel = new Panel();
-
-    examplesPanel.headerText = 'Examples';
-    examplesPanel.collapsible = true;
-    examplesPanel.collapseHorizontally = true;
-    examplesPanel.scrollable = false;
-
-    examplesPanel.style.position = 'absolute';
-    examplesPanel.style.top = '0px';
-    examplesPanel.style.left = '0px';
-    examplesPanel.style.zIndex = '100';
-
-    document.body.appendChild(examplesPanel.dom);
-    */
-
-});
+};
