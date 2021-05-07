@@ -30,6 +30,7 @@
     "yargs": "^17.0.1"
   },
   "dependencies": {
-    "@phaserjs/phaser": "^0.1.14"
+    "@phaserjs/phaser": "^0.1.14",
+    "terminal-kit": "^2.1.0"
   }
 }
