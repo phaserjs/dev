@@ -2,9 +2,7 @@ import boxen from 'boxen';
 import { buildExamples } from './buildExamples.mjs';
 import esbuild from 'esbuild';
 import fs from 'fs-extra';
-import gradient from 'gradient-string';
 import { hideBin } from 'yargs/helpers';
-import readline from 'readline';
 import terminalKit from 'terminal-kit';
 import yargs from 'yargs';
 
@@ -78,6 +76,8 @@ if (buildResults.errors.length > 0)
 }
 else
 {
+    buildExamples();
+
     term.clear();
 
     const document = term.createDocument({
