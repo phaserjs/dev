@@ -2424,6 +2424,37 @@ void main (void)
     }
   };
 
+  // ../phaser-genesis/src/renderer/webgl1/colors/PackColors.ts
+  function PackColors(vertices) {
+    vertices.forEach((vertex) => {
+      vertex.packColor();
+    });
+  }
+
+  // ../phaser-genesis/src/gameobjects/components/transform/UpdateVertices.ts
+  function UpdateVertices(gameObject) {
+    const vertices = gameObject.vertices;
+    const {x0, y0, x1, y1, x2, y2, x3, y3} = GetVertices(gameObject.transform);
+    vertices[0].setPosition(x0, y0);
+    vertices[1].setPosition(x1, y1);
+    vertices[2].setPosition(x2, y2);
+    vertices[3].setPosition(x3, y3);
+    return gameObject;
+  }
+
+  // ../phaser-genesis/src/gameobjects/components/transform/PreRenderVertices.ts
+  function PreRenderVertices(gameObject) {
+    if (gameObject.isDirty(DIRTY_CONST.COLORS)) {
+      PackColors(gameObject.vertices);
+      gameObject.clearDirty(DIRTY_CONST.COLORS);
+    }
+    if (gameObject.isDirty(DIRTY_CONST.TRANSFORM)) {
+      UpdateVertices(gameObject);
+      gameObject.clearDirty(DIRTY_CONST.TRANSFORM);
+    }
+    return gameObject;
+  }
+
   // ../phaser-genesis/src/config/defaultorigin/GetDefaultOriginX.ts
   function GetDefaultOriginX() {
     return ConfigStore.get(CONFIG_DEFAULTS.DEFAULT_ORIGIN).x;
@@ -2593,17 +2624,6 @@ void main (void)
       this.extent = null;
     }
   };
-
-  // ../phaser-genesis/src/gameobjects/components/transform/UpdateVertices.ts
-  function UpdateVertices(gameObject) {
-    const vertices = gameObject.vertices;
-    const {x0, y0, x1, y1, x2, y2, x3, y3} = GetVertices(gameObject.transform);
-    vertices[0].setPosition(x0, y0);
-    vertices[1].setPosition(x1, y1);
-    vertices[2].setPosition(x2, y2);
-    vertices[3].setPosition(x3, y3);
-    return gameObject;
-  }
 
   // ../phaser-genesis/src/renderer/webgl1/colors/PackColor.ts
   function PackColor(rgb, alpha) {
@@ -2906,26 +2926,6 @@ void main (void)
     ctx.globalAlpha = alpha;
     ctx.drawImage(frame2.texture.image, frame2.x, frame2.y, frame2.width, frame2.height, x, y, frame2.width, frame2.height);
     ctx.restore();
-  }
-
-  // ../phaser-genesis/src/renderer/webgl1/colors/PackColors.ts
-  function PackColors(vertices) {
-    vertices.forEach((vertex) => {
-      vertex.packColor();
-    });
-  }
-
-  // ../phaser-genesis/src/gameobjects/components/transform/PreRenderVertices.ts
-  function PreRenderVertices(gameObject) {
-    if (gameObject.isDirty(DIRTY_CONST.COLORS)) {
-      PackColors(gameObject.vertices);
-      gameObject.clearDirty(DIRTY_CONST.COLORS);
-    }
-    if (gameObject.isDirty(DIRTY_CONST.TRANSFORM)) {
-      UpdateVertices(gameObject);
-      gameObject.clearDirty(DIRTY_CONST.TRANSFORM);
-    }
-    return gameObject;
   }
 
   // ../phaser-genesis/src/gameobjects/rectangle/Rectangle.ts

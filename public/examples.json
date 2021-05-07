@@ -9,12 +9,12 @@
         {
           "path": "public/3d/primitives.js",
           "name": "primitives.js",
-          "size": 144158,
+          "size": 148891,
           "extension": ".js",
           "type": "file"
         }
       ],
-      "size": 144158,
+      "size": 148891,
       "type": "directory"
     },
     {
@@ -24,12 +24,12 @@
         {
           "path": "public/container/add children.js",
           "name": "add children.js",
-          "size": 107936,
+          "size": 111534,
           "extension": ".js",
           "type": "file"
         }
       ],
-      "size": 107936,
+      "size": 111534,
       "type": "directory"
     },
     {
@@ -43,7 +43,7 @@
             {
               "path": "public/gameobjects/rectangle/1024 rectangles.js",
               "name": "1024 rectangles.js",
-              "size": 109130,
+              "size": 113080,
               "extension": ".js",
               "type": "file"
             },
@@ -57,16 +57,16 @@
             {
               "path": "public/gameobjects/rectangle/random rectangles.js",
               "name": "random rectangles.js",
-              "size": 109133,
+              "size": 112883,
               "extension": ".js",
               "type": "file"
             }
           ],
-          "size": 316064,
+          "size": 323764,
           "type": "directory"
         }
       ],
-      "size": 316064,
+      "size": 323764,
       "type": "directory"
     },
     {
@@ -85,6 +85,6 @@
       "type": "directory"
     }
   ],
-  "size": 687206,
+  "size": 703237,
   "type": "directory"
 }

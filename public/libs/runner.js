@@ -1,23 +1,16 @@
 import { TreeView, TreeViewItem } from './pcui.js';
 
-import { DockManager } from './dock/js/DockManager.js';
-import { PanelContainer } from './dock/js/PanelContainer.js';
+import WinBox from './winbox/js/winbox.js';
 import { decodeURI } from './decodeURI.js';
 import { loadJSON } from './loadJSON.js'
 
 const selectHandler = (item) => {
 
-    const iframe = document.createElement('iframe');
-
-    iframe.width = 800;
-    iframe.height = 600;
-    iframe.scrolling = 'no';
-    iframe.sandbox = 'allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation';
-    iframe.src = 'view.html?f=' + decodeURI(item.data.path);
-
-    let demoPanel = new PanelContainer(iframe, dockManager, item.data.path, 'document', false);
-    
-    dockManager.dockFill(documentNode, demoPanel);
+    new WinBox({ 
+        title: item.data.path,
+        root: document.body,
+        url: 'view.html?f=' + decodeURI(item.data.path)
+    });
 
 }
 
@@ -57,37 +50,27 @@ const addFolder = (data, treeView) => {
     }
 }
 
-let dockManager;
-let documentNode;
-
 window.onload = () => {
 
     loadJSON('examples.json', (data) => {
 
-        let divDockContainer = document.getElementById('container');
-        let divDockManager = document.getElementById('dockManager');
-    
-        dockManager = new DockManager(divDockManager);
-    
-        dockManager.initialize();
-    
-        documentNode = dockManager.context.model.documentManagerNode;
-    
-        window.onresize = () => dockManager.resize(divDockContainer.clientWidth, divDockContainer.clientHeight);
-        window.onresize(null);
-    
-        // https://css.gg/app
-        // title.classAdd('gg-push-chevron-down-r');
-
         const rootTreeView = new TreeView();
     
         addFolder(data, rootTreeView);
-    
-        document.body.appendChild(rootTreeView.dom);
-    
-        let examplesPanel = new PanelContainer(rootTreeView.dom, dockManager, 'Phaser 4 Examples', 'panel', true);
-    
-        dockManager.dockLeft(documentNode, examplesPanel, 0.25);
+
+        new WinBox({ 
+            title: 'Phaser 4 Examples',
+            class: [ 'no-full' ],
+            root: document.body,
+            x: 16,
+            y: 16,
+            width: 260,
+            height: '50%',
+            mount: rootTreeView.dom
+        });
+
+        // https://css.gg/app
+        // title.classAdd('gg-push-chevron-down-r');
     
     });
 

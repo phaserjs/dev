@@ -59,92 +59,74 @@ if (!fs.existsSync(pathTS))
     process.exit(1);
 }
 
-const buildResults = esbuild.buildSync({
+term.clear();
+
+const document = term.createDocument({
+    palette: new terminalKit.Palette()
+});
+
+const table = new terminalKit.TextTable({
+    parent: document,
+    cellContents: [
+        [ 'File:' , `^Y${srcTS}` ],
+        [ 'Built:' , `^C${new Date().toTimeString().substr(0, 8)}` ],
+        [ 'Info:' , '^WWatching     Press ^RCtrl + C ^Wto quit' ]
+    ],
+    hasBorder: true,
+    contentHasMarkup: true,
+    borderChars: 'lightRounded' ,
+    borderAttr: { color: 'blue' } ,
+    width: 60,
+    fit: true
+});
+
+const spinner = await new terminalKit.AnimatedText({
+    parent: document,
+    animation: 'impulse',
+    x: 18,
+    y: 5
+});
+
+term.hideCursor();
+
+esbuild.build({
     entryPoints: [ pathTS ],
     outfile: pathJS,
     target: 'es6',
     sourcemap: true,
     minify: false,
-    bundle: true
-});
-
-if (buildResults.errors.length > 0)
-{
-    console.log('❌ esbuild error');
-    console.log(buildResults.errors);
-    process.exit(1);
-}
-else
-{
-    buildExamples();
-
-    term.clear();
-
-    const document = term.createDocument({
-        palette: new terminalKit.Palette()
-    });
-    
-    const table = new terminalKit.TextTable({
-        parent: document,
-        cellContents: [
-            [ 'File:' , `^Y${srcTS}` ],
-            [ 'Built:' , `^C${new Date().toTimeString().substr(0, 8)}` ],
-            [ 'Info:' , '^WWatching     Press ^RCtrl + C ^Wto quit' ]
-        ],
-        hasBorder: true,
-        contentHasMarkup: true,
-        borderChars: 'lightRounded' ,
-        borderAttr: { color: 'blue' } ,
-        width: 60,
-        fit: true
-    });
-
-    const spinner = await new terminalKit.AnimatedText({
-        parent: document,
-        animation: 'impulse',
-        x: 18,
-        y: 5
-    });
-
-    term.hideCursor();
-
-    esbuild.build({
-        entryPoints: [ pathTS ],
-        outfile: pathJS,
-        target: 'es6',
-        sourcemap: true,
-        minify: false,
-        bundle: true,
-        watch: {
-            onRebuild(error, result)
+    bundle: true,
+    watch: {
+        onRebuild(error, result)
+        {
+            if (error)
             {
-                if (error)
-                {
-                    table.setCellContent(1, 1, '^RRebuild failed');
-                    console.log();
-                    process.exit(1);
-                }
-                else
-                {
-                    table.setCellContent(1, 1, `${new Date().toTimeString().substr(0, 8)}`);
-                }
+                table.setCellContent(1, 1, '^RRebuild failed');
+                console.log();
+                process.exit(1);
+            }
+            else
+            {
+                table.setCellContent(1, 1, `${new Date().toTimeString().substr(0, 8)}`);
             }
         }
-    }).then(result =>{
-    
-        term.grabInput();
+    }
+}).then(result => {
 
-        term.on('key', key =>
+    buildExamples();
+
+    term.grabInput();
+
+    term.on('key', key =>
+    {
+        if (key === 'CTRL_C')
         {
-            if (key === 'CTRL_C')
-            {
-                term.grabInput(false);
-                term.reset();
-                term('Build complete\n');
-                result.stop();
-                process.exit();
-            }
-        });
-    
+            term.grabInput(false);
+            term.reset();
+            term('Build complete\n');
+            result.stop();
+            process.exit();
+        }
     });
-}
+
+});
