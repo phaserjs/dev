@@ -9,7 +9,7 @@
         {
           "path": "examples/live/3d/edit cube.js",
           "name": "edit cube.js",
-          "size": 427733,
+          "size": 427734,
           "extension": ".js",
           "type": "file"
         },
@@ -28,7 +28,7 @@
           "type": "file"
         }
       ],
-      "size": 709316,
+      "size": 709317,
       "type": "directory"
     },
     {
@@ -84,6 +84,13 @@
           "name": "sprite",
           "children": [
             {
+              "path": "examples/live/gameobjects/sprite/add sprite on click.js",
+              "name": "add sprite on click.js",
+              "size": 110617,
+              "extension": ".js",
+              "type": "file"
+            },
+            {
               "path": "examples/live/gameobjects/sprite/bounce sprite.js",
               "name": "bounce sprite.js",
               "size": 119460,
@@ -103,13 +110,20 @@
               "size": 402806,
               "extension": ".js",
               "type": "file"
+            },
+            {
+              "path": "examples/live/gameobjects/sprite/rotating sprite.js",
+              "name": "rotating sprite.js",
+              "size": 104827,
+              "extension": ".js",
+              "type": "file"
             }
           ],
-          "size": 627016,
+          "size": 842460,
           "type": "directory"
         }
       ],
-      "size": 945127,
+      "size": 1160571,
       "type": "directory"
     },
     {
@@ -128,6 +142,6 @@
       "type": "directory"
     }
   ],
-  "size": 1887186,
+  "size": 2102631,
   "type": "directory"
 }

@@ -169,7 +169,7 @@ window.onload = () => {
             x: 16,
             y: 16,
             width: 260,
-            // height: '90%',
+            height: '90%',
             mount: rootTree.getContainer()
         });
 
