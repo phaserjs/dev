@@ -1,17 +1,17 @@
 import dirTree from 'directory-tree';
 import fs from 'fs-extra';
 
-const rootDir = './public/';
-const examplesJSON = './public/examples.json';
+const rootDir = './examples/live/';
+const examplesJSON = './examples/live/examples.json';
 
 const filterConfig = {
     extensions: /\.js$/,
     normalizePath: true,
     exclude: [
-        /public\\assets/,
-        /public\/assets/,
-        /public\\libs/,
-        /public\/libs/
+        /examples\\live\\assets/,
+        /examples\/live\/assets/,
+        /examples\\live\\libs/,
+        /examples\/live\/libs/
     ]
 };
 

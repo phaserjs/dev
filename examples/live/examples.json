@@ -1,0 +1,23 @@
+{
+  "path": "./examples/live/",
+  "name": "live",
+  "children": [
+    {
+      "path": "examples/live/container",
+      "name": "container",
+      "children": [
+        {
+          "path": "examples/live/container/add children.js",
+          "name": "add children.js",
+          "size": 108094,
+          "extension": ".js",
+          "type": "file"
+        }
+      ],
+      "size": 108094,
+      "type": "directory"
+    }
+  ],
+  "size": 108094,
+  "type": "directory"
+}

@@ -20,7 +20,7 @@ if (!src || src === '')
 
     await term.fileInput({
 
-        baseDir: './src/',
+        baseDir: './examples/src/',
         autoCompleteMenu: true,
         autoCompleteHint: true
 
@@ -37,20 +37,20 @@ if (!src || src === '')
     });
 }
 
-if (src.startsWith('src/') || src.startsWith('src\\'))
+if (src.startsWith('examples/src/') || src.startsWith('examples\\src\\'))
 {
-    src = src.substr(4);
+    src = src.substr(13);
 }
-else if (src.startsWith('/src/') || src.startsWith('\\src\\'))
+else if (src.startsWith('/examples/src/') || src.startsWith('\\examples\\src\\'))
 {
-    src = src.substr(5);
+    src = src.substr(14);
 }
 
 const srcTS = (!src.endsWith('.ts')) ? src.concat('.ts') : src;
 const srcJS = (src.endsWith('.ts')) ? src.replace('.ts', '.js') : src.concat('.js');
 
-const pathTS = `./src/${srcTS}`;
-const pathJS = `./public/${srcJS}`;
+const pathTS = `./examples/src/${srcTS}`;
+const pathJS = `./examples/live/${srcJS}`;
 
 if (!fs.existsSync(pathTS))
 {

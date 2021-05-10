@@ -33,13 +33,21 @@ if (!src || src === '')
     process.exit(1);
 }
 
+const srcFolder = process.cwd() + '/examples/src';
+const liveFolder = process.cwd() + '/examples/live';
+
+if (src.startsWith('examples/src/') || src.startsWith('examples\\src\\'))
+{
+    src = src.substr(13);
+}
+
 const srcTS = (!src.endsWith('.ts')) ? src.concat('.ts') : src;
 const srcJS = (src.endsWith('.ts')) ? src.replace('.ts', '.js') : src.concat('.js');
 const srcMinJS = (src.endsWith('.ts')) ? src.replace('.ts', '.min.js') : src.concat('.min.js');
 
-const pathTS = `./src/${srcTS}`;
-const pathJS = `./public/${srcJS}`;
-const pathMinJS = `./public/${srcMinJS}`;
+const pathTS = `${srcFolder}/${srcTS}`;
+const pathJS = `${liveFolder}/${srcJS}`;
+const pathMinJS = `${liveFolder}/${srcMinJS}`;
 const pathTempMinJS = './temp.min.js';
 
 const startTimer = () =>
