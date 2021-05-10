@@ -4,14 +4,24 @@ import WinBox from './winbox/js/winbox.js';
 import { decodeURI } from './decodeURI.js';
 import { loadJSON } from './loadJSON.js'
 
+let demoCount = 1;
+
 const selectHandler = (item) => {
 
-    new WinBox({ 
+    const iframe = `<iframe id="demo${demoCount}" src="view.html?f=${decodeURI(item.data.path)}"></iframe>`;
+
+    const example = new WinBox({ 
         title: item.data.path,
         root: document.body,
-        url: 'view.html?f=' + decodeURI(item.data.path)
+        html: iframe,
+        width: 800,
+        height: 600,
+        x: 100,
+        y: 32
     });
 
+    demoCount++;
+  
 }
 
 const addFolder = (data, treeView) => {
@@ -65,7 +75,7 @@ window.onload = () => {
             x: 16,
             y: 16,
             width: 260,
-            height: '50%',
+            height: '90%',
             mount: rootTreeView.dom
         });
 

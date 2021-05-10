@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "@phaserjs/phaser": "^0.1.14",
-    "terminal-kit": "^2.1.0"
+    "terminal-kit": "^2.1.0",
+    "tweakpane": "^2.4.3"
   }
 }
