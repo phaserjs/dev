@@ -7,14 +7,28 @@
       "name": "3d",
       "children": [
         {
+          "path": "examples/live/3d/edit cube.js",
+          "name": "edit cube.js",
+          "size": 427733,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
           "path": "examples/live/3d/primitives.js",
           "name": "primitives.js",
           "size": 145072,
           "extension": ".js",
           "type": "file"
+        },
+        {
+          "path": "examples/live/3d/rotating cube.js",
+          "name": "rotating cube.js",
+          "size": 136511,
+          "extension": ".js",
+          "type": "file"
         }
       ],
-      "size": 145072,
+      "size": 709316,
       "type": "directory"
     },
     {
@@ -114,6 +128,6 @@
       "type": "directory"
     }
   ],
-  "size": 1322942,
+  "size": 1887186,
   "type": "directory"
 }

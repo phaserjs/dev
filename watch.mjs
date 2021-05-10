@@ -83,7 +83,7 @@ const table = new terminalKit.TextTable({
 const spinner = await new terminalKit.AnimatedText({
     parent: document,
     animation: 'impulse',
-    x: 18,
+    x: 19,
     y: 5
 });
 
