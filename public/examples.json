@@ -9,12 +9,12 @@
         {
           "path": "public/3d/primitives.js",
           "name": "primitives.js",
-          "size": 144158,
+          "size": 148891,
           "extension": ".js",
           "type": "file"
         }
       ],
-      "size": 144158,
+      "size": 148891,
       "type": "directory"
     },
     {
@@ -24,12 +24,12 @@
         {
           "path": "public/container/add children.js",
           "name": "add children.js",
-          "size": 107936,
+          "size": 111534,
           "extension": ".js",
           "type": "file"
         }
       ],
-      "size": 107936,
+      "size": 111534,
       "type": "directory"
     },
     {
@@ -43,7 +43,7 @@
             {
               "path": "public/gameobjects/rectangle/1024 rectangles.js",
               "name": "1024 rectangles.js",
-              "size": 109320,
+              "size": 113080,
               "extension": ".js",
               "type": "file"
             },
@@ -57,12 +57,12 @@
             {
               "path": "public/gameobjects/rectangle/random rectangles.js",
               "name": "random rectangles.js",
-              "size": 109133,
+              "size": 112883,
               "extension": ".js",
               "type": "file"
             }
           ],
-          "size": 316254,
+          "size": 323764,
           "type": "directory"
         },
         {
@@ -72,33 +72,33 @@
             {
               "path": "public/gameobjects/sprite/bounce sprite.js",
               "name": "bounce sprite.js",
-              "size": 118841,
+              "size": 122928,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "public/gameobjects/sprite/create sprite.js",
               "name": "create sprite.js",
-              "size": 104131,
+              "size": 107649,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "public/gameobjects/sprite/debug sprite.js",
               "name": "debug sprite.js",
-              "size": 402180,
+              "size": 412681,
               "extension": ".js",
               "type": "file"
             }
           ],
-          "size": 625152,
+          "size": 643258,
           "type": "directory"
         }
       ],
-      "size": 941406,
+      "size": 967022,
       "type": "directory"
     }
   ],
-  "size": 1193500,
+  "size": 1227447,
   "type": "directory"
 }

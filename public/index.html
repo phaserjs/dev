@@ -6,60 +6,15 @@
         <title>Phaser 4 Examples</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
         <link rel="preload" href="libs/winbox/winbox.bundle.js" as="script">
-        <link rel="stylesheet" href="libs/icons.css">
-        <style>
-            body {
-                margin: 0;
-                width: 100vw;
-                height: 100vh;
-                background-color: #0093E9;
-                background-image: linear-gradient(180deg, #0093E9 0%, #80D0C7 100%);
-            }
-
-            iframe {
-                border: 0;
-                padding: 0;
-                margin: 0;
-            }
-
-            .winbox {
-                background: radial-gradient( circle farthest-corner at 10% 20%,  rgba(255,37,174,1) 0%, rgba(241,147,55,1) 53.4%, rgba(250,237,56,1) 99.5% );
-                /* background: linear-gradient(to top, #00c6fb 0%, #0046b6 100%); */
-                /* background: linear-gradient(0deg, #f77062 0%, #fe5196 100%); */
-                /* background: linear-gradient(to bottom, #4481eb 0%, #04befe 100%); */
-                /* background: linear-gradient(to top, #00dbde 0%, #fc00ff 100%); */
-            }
-
-            .wb-icon * {
-                opacity: 0.7;
-            }
-
-            .wb-icon *:hover {
-                opacity: 1;
-            }
-
-            .wb-body {
-                margin: 2px;
-                background: #000000;
-            }
-
-            .wb-title {
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                /* font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif; */
-                /* font-size: 0.75em; */
-                /* font-weight: bold; */
-            	color:#fff;
-                text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.4); 
-            }
-
-            .font-regular, .font-bold, .font-thin, .font-light {
-                font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif;
-                font-size: 12px;
-            }
-        </style>
+        <link rel="stylesheet" href="libs/css/index.css">
+        <link rel="stylesheet" href="libs/tree/treejs.css">
+        <link rel="stylesheet" href="libs/css/icons.css">
     </head>
     <body>
 
+        <div id="treeView"></div>
+
+        <script src="libs/tree/tree.js" defer></script>
         <script src="libs/winbox/winbox.bundle.js" defer></script>
         <script src="libs/runner.js" type="module"></script>
 

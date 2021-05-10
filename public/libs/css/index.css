@@ -1,0 +1,101 @@
+body {
+    margin: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #0093E9;
+    background-image: linear-gradient(180deg, #0093E9 0%, #80D0C7 100%);
+    font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    font-size: 0.8em;
+    color: #fff;
+}
+
+iframe {
+    border: 0;
+    padding: 0;
+    margin: 0;
+}
+
+#winbox-1 .wb-body {
+    background-color: #2d2d2d;
+}
+
+#treeView {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 0.9em;
+    line-height: 2.0em;
+}
+
+#treeView .tj_icon, #treeView .tj_mod_icon {
+    --ggs: 0.7;
+    color: #fff;
+}
+
+#treeView .tj_description {
+    /* font-weight: bold; */
+    /* font-size: 1.1em; */
+    /* color: #f9507f; */
+}
+
+#treeView .tj_leaf {
+    font-weight: normal;
+    font-size: 1em;
+    color: rgb(210, 210, 210);
+}
+
+.winbox {
+    background: radial-gradient( circle farthest-corner at 10% 20%,  rgba(255,37,174,1) 0%, rgba(241,147,55,1) 53.4%, rgba(250,237,56,1) 99.5% );
+    /* background: linear-gradient(to top, #00c6fb 0%, #0046b6 100%); */
+    /* background: linear-gradient(0deg, #f77062 0%, #fe5196 100%); */
+    /* background: linear-gradient(to bottom, #4481eb 0%, #04befe 100%); */
+    /* background: linear-gradient(to top, #00dbde 0%, #fc00ff 100%); */
+}
+
+.wb-icon * {
+    opacity: 0.7;
+}
+
+.wb-icon *:hover {
+    opacity: 1;
+}
+
+.wb-body {
+    margin: 2px;
+    background: #000000;
+}
+
+.wb-title {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif; */
+    /* font-size: 0.75em; */
+    /* font-weight: bold; */
+    color:#fff;
+    text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.4); 
+}
+
+.wb-git {
+    background-image: url(git.svg);
+    background-size: 24px auto;
+}
+
+.wb-edit {
+    background-image: url(pen.svg);
+    background-size: 20px auto;
+}
+
+.wb-link {
+    background-image: url(hashtag.svg);
+    background-size: 24px auto;
+    margin-right: 48px;
+}
+
+.wb-pause {
+    background-image: url(pause.svg);
+    background-size: 30px auto;
+    margin-right: 48px;
+}
+
+.wb-play {
+    background-image: url(play.svg);
+    background-size: 30px auto;
+    display: none;
+}
