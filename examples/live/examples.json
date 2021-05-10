@@ -3,6 +3,21 @@
   "name": "live",
   "children": [
     {
+      "path": "examples/live/3d",
+      "name": "3d",
+      "children": [
+        {
+          "path": "examples/live/3d/primitives.js",
+          "name": "primitives.js",
+          "size": 145072,
+          "extension": ".js",
+          "type": "file"
+        }
+      ],
+      "size": 145072,
+      "type": "directory"
+    },
+    {
       "path": "examples/live/container",
       "name": "container",
       "children": [
@@ -16,8 +31,89 @@
       ],
       "size": 108094,
       "type": "directory"
+    },
+    {
+      "path": "examples/live/gameobjects",
+      "name": "gameobjects",
+      "children": [
+        {
+          "path": "examples/live/gameobjects/rectangle",
+          "name": "rectangle",
+          "children": [
+            {
+              "path": "examples/live/gameobjects/rectangle/1024 rectangles.js",
+              "name": "1024 rectangles.js",
+              "size": 109939,
+              "extension": ".js",
+              "type": "file"
+            },
+            {
+              "path": "examples/live/gameobjects/rectangle/create rectangle.js",
+              "name": "create rectangle.js",
+              "size": 98420,
+              "extension": ".js",
+              "type": "file"
+            },
+            {
+              "path": "examples/live/gameobjects/rectangle/random rectangles.js",
+              "name": "random rectangles.js",
+              "size": 109752,
+              "extension": ".js",
+              "type": "file"
+            }
+          ],
+          "size": 318111,
+          "type": "directory"
+        },
+        {
+          "path": "examples/live/gameobjects/sprite",
+          "name": "sprite",
+          "children": [
+            {
+              "path": "examples/live/gameobjects/sprite/bounce sprite.js",
+              "name": "bounce sprite.js",
+              "size": 119460,
+              "extension": ".js",
+              "type": "file"
+            },
+            {
+              "path": "examples/live/gameobjects/sprite/create sprite.js",
+              "name": "create sprite.js",
+              "size": 104750,
+              "extension": ".js",
+              "type": "file"
+            },
+            {
+              "path": "examples/live/gameobjects/sprite/debug sprite.js",
+              "name": "debug sprite.js",
+              "size": 402806,
+              "extension": ".js",
+              "type": "file"
+            }
+          ],
+          "size": 627016,
+          "type": "directory"
+        }
+      ],
+      "size": 945127,
+      "type": "directory"
+    },
+    {
+      "path": "examples/live/layer",
+      "name": "layer",
+      "children": [
+        {
+          "path": "examples/live/layer/effect layer.js",
+          "name": "effect layer.js",
+          "size": 124649,
+          "extension": ".js",
+          "type": "file"
+        }
+      ],
+      "size": 124649,
+      "type": "directory"
     }
   ],
-  "size": 108094,
+  "size": 1322942,
   "type": "directory"
 }
