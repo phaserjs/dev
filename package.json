@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "node dev.mjs --dev=1 --src=$npm_config_src",
+    "watch": "node watch.mjs",
     "rebuild": "node buildAll.mjs",
     "examples": "node examples.mjs"
   },
