@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "node dev.mjs --dev=1 --src=$npm_config_src"
+    "dev": "node dev.mjs --dev=1 --src=$npm_config_src",
+    "rebuild": "node buildAll.mjs",
+    "examples": "node examples.mjs"
   },
   "repository": {
     "type": "git",
