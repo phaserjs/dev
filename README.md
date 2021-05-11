@@ -18,7 +18,9 @@ If the filename, or folder, has a space in it, quote it:
 
 ![Phaser4](readme-build.png)
 
-The bundle will be built into the `public` folder, under the same folder given in the path.
+The bundle will be built into the `examples/live` folder, under the same folder given in the path.
+
+The examples are accessible via GitHub Pages: https://phaserjs.github.io/dev/examples/live/
 
 ## Example using the npm package
 
@@ -72,7 +74,7 @@ new Game(
 
 ## Example using the source code directly
 
-You can directly import the Phaser TypeScript source into your bundle. Note that you must have the Phaser repo checked out locally and the paths must point to it. The following works fine on our test system, but you will need to adjust the paths for your own.
+You can directly import the Phaser TypeScript source into your bundle. Note that you must have the [Phaser repo](https://github.com/phaserjs/phaser) checked out locally and the paths must point to it. The following works fine on our test system, but you will need to adjust the paths for your own.
 
 This method isn't meant for production. It's just meant to allow you to quickly test new Phaser features direct from the repo without a version having been published to npm, or without having to mess around with npm symlinking.
 
