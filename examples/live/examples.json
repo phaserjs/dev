@@ -16,7 +16,7 @@
         {
           "path": "examples/live/3d/primitives.js",
           "name": "primitives.js",
-          "size": 145072,
+          "size": 149836,
           "extension": ".js",
           "type": "file"
         },
@@ -28,7 +28,7 @@
           "type": "file"
         }
       ],
-      "size": 709317,
+      "size": 714081,
       "type": "directory"
     },
     {
@@ -38,12 +38,12 @@
         {
           "path": "examples/live/container/add children.js",
           "name": "add children.js",
-          "size": 108094,
+          "size": 111738,
           "extension": ".js",
           "type": "file"
         }
       ],
-      "size": 108094,
+      "size": 111738,
       "type": "directory"
     },
     {
@@ -57,26 +57,26 @@
             {
               "path": "examples/live/gameobjects/rectangle/1024 rectangles.js",
               "name": "1024 rectangles.js",
-              "size": 109939,
+              "size": 113721,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/rectangle/create rectangle.js",
               "name": "create rectangle.js",
-              "size": 98420,
+              "size": 101721,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/rectangle/random rectangles.js",
               "name": "random rectangles.js",
-              "size": 109752,
+              "size": 113524,
               "extension": ".js",
               "type": "file"
             }
           ],
-          "size": 318111,
+          "size": 328966,
           "type": "directory"
         },
         {
@@ -86,40 +86,40 @@
             {
               "path": "examples/live/gameobjects/sprite/add sprite on click.js",
               "name": "add sprite on click.js",
-              "size": 110626,
+              "size": 114323,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/sprite/bounce sprite.js",
               "name": "bounce sprite.js",
-              "size": 119460,
+              "size": 123569,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/sprite/create sprite.js",
               "name": "create sprite.js",
-              "size": 104750,
+              "size": 108290,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/sprite/debug sprite.js",
               "name": "debug sprite.js",
-              "size": 402806,
+              "size": 413329,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/sprite/rotating sprite.js",
               "name": "rotating sprite.js",
-              "size": 104827,
+              "size": 108370,
               "extension": ".js",
               "type": "file"
             }
           ],
-          "size": 842469,
+          "size": 867881,
           "type": "directory"
         },
         {
@@ -129,41 +129,26 @@
             {
               "path": "examples/live/gameobjects/text/create text.js",
               "name": "create text.js",
-              "size": 105877,
+              "size": 109397,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/text/fill style.js",
               "name": "fill style.js",
-              "size": 106614,
+              "size": 112917,
               "extension": ".js",
               "type": "file"
             }
           ],
-          "size": 212491,
+          "size": 222314,
           "type": "directory"
         }
       ],
-      "size": 1373071,
-      "type": "directory"
-    },
-    {
-      "path": "examples/live/layer",
-      "name": "layer",
-      "children": [
-        {
-          "path": "examples/live/layer/effect layer.js",
-          "name": "effect layer.js",
-          "size": 124649,
-          "extension": ".js",
-          "type": "file"
-        }
-      ],
-      "size": 124649,
+      "size": 1419161,
       "type": "directory"
     }
   ],
-  "size": 2315131,
+  "size": 2244980,
   "type": "directory"
 }
