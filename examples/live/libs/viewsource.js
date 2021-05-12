@@ -13,8 +13,8 @@ window.onload = () => {
 
         loadFile(path, (data) => {
 
-            data = data.replace('<', '&lt;');
-            data = data.replace('&', '&amp;');
+            // data = data.replace('<', '&lt;');
+            // data = data.replace('&', '&amp;');
 
             document.getElementById('code').innerHTML = Prism.highlight(data, Prism.languages.typescript, 'typescript');
 
