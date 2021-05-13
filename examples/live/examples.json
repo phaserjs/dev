@@ -68,12 +68,12 @@
         {
           "path": "examples/live/display/overlap bounds.js",
           "name": "overlap bounds.js",
-          "size": 118950,
+          "size": 119022,
           "extension": ".js",
           "type": "file"
         }
       ],
-      "size": 118950,
+      "size": 119022,
       "type": "directory"
     },
     {
@@ -169,13 +169,20 @@
               "size": 112917,
               "extension": ".js",
               "type": "file"
+            },
+            {
+              "path": "examples/live/gameobjects/text/text stroke.js",
+              "name": "text stroke.js",
+              "size": 106263,
+              "extension": ".js",
+              "type": "file"
             }
           ],
-          "size": 218794,
+          "size": 325057,
           "type": "directory"
         }
       ],
-      "size": 1379374,
+      "size": 1485637,
       "type": "directory"
     },
     {
@@ -202,12 +209,33 @@
           "size": 100277,
           "extension": ".js",
           "type": "file"
+        },
+        {
+          "path": "examples/live/textures/pixel texture 1.js",
+          "name": "pixel texture 1.js",
+          "size": 101382,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/textures/texture atlas.js",
+          "name": "texture atlas.js",
+          "size": 119332,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/textures/trimmed texture atlas.js",
+          "name": "trimmed texture atlas.js",
+          "size": 119350,
+          "extension": ".js",
+          "type": "file"
         }
       ],
-      "size": 300748,
+      "size": 640812,
       "type": "directory"
     }
   ],
-  "size": 2689956,
+  "size": 3136355,
   "type": "directory"
 }
