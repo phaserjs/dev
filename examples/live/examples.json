@@ -41,9 +41,16 @@
           "size": 115329,
           "extension": ".js",
           "type": "file"
+        },
+        {
+          "path": "examples/live/animation/create animation from atlas.js",
+          "name": "create animation from atlas.js",
+          "size": 77287,
+          "extension": ".js",
+          "type": "file"
         }
       ],
-      "size": 115329,
+      "size": 192616,
       "type": "directory"
     },
     {
@@ -281,6 +288,6 @@
       "type": "directory"
     }
   ],
-  "size": 3481312,
+  "size": 3558599,
   "type": "directory"
 }
