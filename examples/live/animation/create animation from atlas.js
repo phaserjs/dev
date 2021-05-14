@@ -1960,6 +1960,53 @@ void main (void)
     };
   }
 
+  // ../phaser-genesis/src/animation/CalculateDuration.ts
+  function CalculateDuration(animation, frameRate, duration) {
+    const totalFrames = animation.frames.size;
+    if (!Number.isFinite(duration) && !Number.isFinite(frameRate)) {
+      animation.frameRate = 24;
+      animation.duration = 24 / totalFrames * 1e3;
+    } else if (duration && !Number.isFinite(frameRate)) {
+      animation.duration = duration;
+      animation.frameRate = totalFrames / (duration / 1e3);
+    } else {
+      animation.frameRate = frameRate;
+      animation.duration = totalFrames / frameRate * 1e3;
+    }
+    animation.msPerFrame = 1e3 / animation.frameRate;
+    return animation;
+  }
+
+  // ../phaser-genesis/src/animation/LinkFrames.ts
+  function LinkFrames(animation) {
+    const totalFrames = animation.frames.size;
+    if (totalFrames === 0) {
+      return animation;
+    }
+    let i = 0;
+    const framePercent = 1 / totalFrames;
+    let firstFrame;
+    let prevFrame;
+    for (const frame2 of animation.frames.values()) {
+      if (!prevFrame) {
+        frame2.isFirst = true;
+        firstFrame = frame2;
+      } else {
+        prevFrame.nextFrame = frame2;
+        frame2.prevFrame = prevFrame;
+      }
+      prevFrame = frame2;
+      i++;
+      frame2.progress = framePercent * i;
+      if (i === totalFrames) {
+        frame2.isLast = true;
+        frame2.nextFrame = firstFrame;
+        firstFrame.prevFrame = frame2;
+      }
+    }
+    return animation;
+  }
+
   // ../phaser-genesis/src/animation/Animation.ts
   var Animation = class {
     constructor(config) {
@@ -1987,33 +2034,11 @@ void main (void)
       this.hideOnComplete = hideOnComplete;
       this.paused = paused;
       this.frames = new Set(frames);
-      this.calculateDuration(frameRate, duration);
-    }
-    calculateDuration(frameRate, duration) {
-      const totalFrames = this.frames.size;
-      if (!Number.isFinite(duration) && !Number.isFinite(frameRate)) {
-        this.frameRate = 24;
-        this.duration = 24 / totalFrames * 1e3;
-      } else if (duration && !Number.isFinite(frameRate)) {
-        this.duration = duration;
-        this.frameRate = totalFrames / (duration / 1e3);
-      } else {
-        this.frameRate = frameRate;
-        this.duration = totalFrames / frameRate * 1e3;
-      }
-      this.msPerFrame = 1e3 / this.frameRate;
-      return this;
+      CalculateDuration(this, frameRate, duration);
+      LinkFrames(this);
     }
     getTotalFrames() {
       return this.frames.size;
-    }
-    addFrame(frame2) {
-      this.frames.add(frame2);
-      return this.calculateDuration(this.frameRate);
-    }
-    removeFrame(frame2) {
-      this.frames.delete(frame2);
-      return this.calculateDuration(this.frameRate);
     }
     destroy() {
       this.frames.clear();
