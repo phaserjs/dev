@@ -1,9 +1,9 @@
-import { AddAnimationFromAtlas, AnimatedSprite, Play } from '../../../../phaser-genesis/src/gameobjects/animatedsprite';
 import { AtlasFile, ImageFile } from '../../../../phaser-genesis/src/loader/files';
 import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../phaser-genesis/src/config';
+import { CreateAnimationFromAtlas, Play } from '../../../../phaser-genesis/src/animation';
 
 import { AddChildren } from '../../../../phaser-genesis/src/display/';
-import { CreateAnimationFromAtlas } from '../../../../phaser-genesis/src/animation';
+import { AnimatedSprite } from '../../../../phaser-genesis/src/gameobjects/animatedsprite';
 import { Game } from '../../../../phaser-genesis/src/Game';
 import { Loader } from '../../../../phaser-genesis/src/loader/Loader';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
@@ -23,21 +23,22 @@ class Demo extends Scene
 
         loader.start().then(() => {
 
-            // const world = new StaticWorld(this);
+            const world = new StaticWorld(this);
 
-            const anim = CreateAnimationFromAtlas({
+            const peckAnimation = CreateAnimationFromAtlas({
                 key: 'peck',
                 texture: 'chicken',
                 prefix: '__orange_chicken_peck_',
                 end: 9,
-                zeroPad: 3
+                zeroPad: 3,
+                frameRate: 12
             });
 
-            console.log(anim);
+            // console.log(peckAnimation);
 
-            // const bg = new Sprite(400, 300, 'background');
+            const bg = new Sprite(400, 300, 'background');
 
-            // const chicken1 = new AnimatedSprite(100, 450, 'chicken', '__orange_chicken_idle_000');
+            const chicken1 = new AnimatedSprite(100, 450, 'chicken', '__orange_chicken_idle_000');
             // const chicken2 = new AnimatedSprite(320, 320, 'chicken', '__orange_chicken_idle_000');
             // const chicken3 = new AnimatedSprite(600, 400, 'chicken', '__orange_chicken_idle_000');
 
@@ -51,6 +52,12 @@ class Demo extends Scene
 
             // AddChildren(world, bg, chicken1, chicken2, chicken3);
 
+            Play(peckAnimation, { repeat: -1, repeatDelay: 1000 }, chicken1);
+
+            console.log(chicken1);
+
+            AddChildren(world, bg, chicken1);
+
         });
     }
 }
@@ -59,6 +66,6 @@ new Game(
     WebGL(),
     Parent('gameParent'),
     GlobalVar('Phaser4'),
-    BackgroundColor(0x59010c),
+    BackgroundColor(0x000000),
     Scenes(Demo)
 );
