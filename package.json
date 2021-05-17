@@ -7,7 +7,8 @@
     "dev": "node dev.mjs --dev=1 --src=$npm_config_src",
     "watch": "node watch.mjs",
     "rebuild": "node buildAll.mjs",
-    "examples": "node examples.mjs"
+    "examples": "node examples.mjs",
+    "serve": "http-server ./examples/live --cors -o -c-1"
   },
   "repository": {
     "type": "git",
@@ -34,6 +35,7 @@
   },
   "dependencies": {
     "@phaserjs/phaser": "^0.1.16",
+    "http-server": "^0.12.3",
     "terminal-kit": "^2.1.2",
     "tweakpane": "^3.0.0"
   }

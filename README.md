@@ -20,7 +20,13 @@ If the filename, or folder, has a space in it, quote it:
 
 The bundle will be built into the `examples/live` folder, under the same folder given in the path.
 
-The examples are accessible via GitHub Pages: https://phaserjs.github.io/dev/examples/live/
+To view the examples locally, use:
+
+`npm run serve`
+
+Which will launch an http-server instance and open your default browser on the examples page.
+
+You can also view all examples via GitHub Pages: https://phaserjs.github.io/dev/examples/live/
 
 ## Example using the npm package
 
