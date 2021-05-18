@@ -45,12 +45,12 @@
         {
           "path": "examples/live/animation/create animation from atlas.js",
           "name": "create animation from atlas.js",
-          "size": 77913,
+          "size": 77963,
           "extension": ".js",
           "type": "file"
         }
       ],
-      "size": 193242,
+      "size": 193292,
       "type": "directory"
     },
     {
@@ -166,12 +166,12 @@
             {
               "path": "examples/live/gameobjects/sprite/rotating sprite.js",
               "name": "rotating sprite.js",
-              "size": 108370,
+              "size": 103854,
               "extension": ".js",
               "type": "file"
             }
           ],
-          "size": 867881,
+          "size": 863365,
           "type": "directory"
         },
         {
@@ -204,7 +204,7 @@
           "type": "directory"
         }
       ],
-      "size": 1532723,
+      "size": 1528207,
       "type": "directory"
     },
     {
@@ -288,6 +288,6 @@
       "type": "directory"
     }
   ],
-  "size": 3666715,
+  "size": 3662249,
   "type": "directory"
 }
