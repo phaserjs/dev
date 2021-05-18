@@ -103,6 +103,21 @@
       "name": "gameobjects",
       "children": [
         {
+          "path": "examples/live/gameobjects/effectlayer",
+          "name": "effectlayer",
+          "children": [
+            {
+              "path": "examples/live/gameobjects/effectlayer/create effect layer.js",
+              "name": "create effect layer.js",
+              "size": 124007,
+              "extension": ".js",
+              "type": "file"
+            }
+          ],
+          "size": 124007,
+          "type": "directory"
+        },
+        {
           "path": "examples/live/gameobjects/rectangle",
           "name": "rectangle",
           "children": [
@@ -129,6 +144,21 @@
             }
           ],
           "size": 328966,
+          "type": "directory"
+        },
+        {
+          "path": "examples/live/gameobjects/renderlayer",
+          "name": "renderlayer",
+          "children": [
+            {
+              "path": "examples/live/gameobjects/renderlayer/create render layer.js",
+              "name": "create render layer.js",
+              "size": 110110,
+              "extension": ".js",
+              "type": "file"
+            }
+          ],
+          "size": 110110,
           "type": "directory"
         },
         {
@@ -204,7 +234,7 @@
           "type": "directory"
         }
       ],
-      "size": 1528207,
+      "size": 1762324,
       "type": "directory"
     },
     {
@@ -288,6 +318,6 @@
       "type": "directory"
     }
   ],
-  "size": 3662249,
+  "size": 3896366,
   "type": "directory"
 }

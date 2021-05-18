@@ -1,12 +1,12 @@
-import { BackgroundColor, Parent, Scenes, SetWebGL, Size } from '../src/config';
-import { RenderLayer, Sprite } from '../src/gameobjects/';
+import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../../phaser-genesis/src/config';
+import { RenderLayer, Sprite } from '../../../../../phaser-genesis/src/gameobjects/';
 
-import { AddChildren } from '../src/display/AddChildren';
-import { Game } from '../src/Game';
-import { ImageFile } from '../src/loader/files/ImageFile';
-import { Loader } from '../src/loader/Loader';
-import { Scene } from '../src/scenes/Scene';
-import { StaticWorld } from '../src/world/StaticWorld';
+import { AddChildren } from '../../../../../phaser-genesis/src/display/AddChildren';
+import { Game } from '../../../../../phaser-genesis/src/Game';
+import { ImageFile } from '../../../../../phaser-genesis/src/loader/files/ImageFile';
+import { Loader } from '../../../../../phaser-genesis/src/loader/Loader';
+import { Scene } from '../../../../../phaser-genesis/src/scenes/Scene';
+import { StaticWorld } from '../../../../../phaser-genesis/src/world/StaticWorld';
 
 class Demo extends Scene
 {
@@ -16,8 +16,7 @@ class Demo extends Scene
 
         const loader = new Loader();
 
-        loader.setPath('/phaser4-examples/public/assets/');
-        // loader.setPath('/examples/public/assets/');
+        loader.setPath('assets/');
 
         loader.add(ImageFile('background', 'farm-background.png'));
         loader.add(ImageFile('ayu', 'ayu.png'));
@@ -44,19 +43,19 @@ class Demo extends Scene
         const bubble = new Sprite(400, 450, 'bubble');
         const star = new Sprite(650, 500, 'star');
 
+        //  Add these 5 children to the RenderLayer
+        //  These will render to their own fbo, not on their own
         AddChildren(layer, ayu, logo, farm, rocket, bubble);
 
+        //  The display list consists of 'bg', 'layer' and finally 'star'
         AddChildren(world, bg, layer, star);
     }
 }
 
-export default function (): void
-{
-    new Game(
-        SetWebGL(),
-        Size(800, 600),
-        Parent('gameParent'),
-        BackgroundColor(0x2d2d2d),
-        Scenes(Demo)
-    );
-}
+new Game(
+    WebGL(),
+    Parent('gameParent'),
+    GlobalVar('Phaser4'),
+    BackgroundColor(0x2d2d2d),
+    Scenes(Demo)
+);

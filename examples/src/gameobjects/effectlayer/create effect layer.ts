@@ -1,13 +1,13 @@
-import { BackgroundColor, Parent, Scenes, Size, WebGL } from '@phaserjs/phaser/config';
-import { EffectLayer, Sprite } from '@phaserjs/phaser/gameobjects';
+import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../../phaser-genesis/src/config';
+import { EffectLayer, Sprite } from '../../../../../phaser-genesis/src/gameobjects';
 
-import { AddChildren } from '@phaserjs/phaser/display';
-import { Game } from '@phaserjs/phaser/Game';
-import { ImageFile } from '@phaserjs/phaser/loader/files/ImageFile';
-import { Loader } from '@phaserjs/phaser/loader/Loader';
-import { Scene } from '@phaserjs/phaser/scenes/Scene';
-import { Shader } from '@phaserjs/phaser/renderer/webgl1/shaders/Shader';
-import { StaticWorld } from '@phaserjs/phaser/world/StaticWorld';
+import { AddChildren } from '../../../../../phaser-genesis/src/display';
+import { Game } from '../../../../../phaser-genesis/src/Game';
+import { ImageFile } from '../../../../../phaser-genesis/src/loader/files/ImageFile';
+import { Loader } from '../../../../../phaser-genesis/src/loader/Loader';
+import { Scene } from '../../../../../phaser-genesis/src/scenes/Scene';
+import { Shader } from '../../../../../phaser-genesis/src/renderer/webgl1/shaders/Shader';
+import { StaticWorld } from '../../../../../phaser-genesis/src/world/StaticWorld';
 
 const cloudsFragmentShader = `
 #define SHADER_NAME CLOUDS_FRAG
@@ -430,18 +430,18 @@ class Demo extends Scene
 
     create ()
     {
-        const red = new Shader({ fragmentShader: redFragmentShader });
-        const blurX = new Shader({ fragmentShader: blurXFragmentShader });
-        const blurY = new Shader({ fragmentShader: blurYFragmentShader });
-        const lazer = new Shader({ fragmentShader: lazerBeamFragmentShader });
-        const plasma = new Shader({ fragmentShader: plasmaFragmentShader });
-        const pixel = new Shader({ fragmentShader: pixelateFragmentShader });
-        const sine = new Shader({ fragmentShader: sineWaveFragmentShader });
-        const sine2 = new Shader({ fragmentShader: sineWaveFragmentShader2 });
-        const underwater = new Shader({ fragmentShader: underwaterFragmentShader });
-        const vdu = new Shader({ fragmentShader: vduNoiseFragmentShader });
-        const bars = new Shader({ fragmentShader: verticalBarsFragmentShader });
-        const clouds = new Shader({ fragmentShader: cloudsFragmentShader });
+        const red = new Shader({ fragmentShader: redFragmentShader, renderToFramebuffer: true });
+        const blurX = new Shader({ fragmentShader: blurXFragmentShader, renderToFramebuffer: true });
+        const blurY = new Shader({ fragmentShader: blurYFragmentShader, renderToFramebuffer: true });
+        const lazer = new Shader({ fragmentShader: lazerBeamFragmentShader, renderToFramebuffer: true });
+        const plasma = new Shader({ fragmentShader: plasmaFragmentShader, renderToFramebuffer: true });
+        const pixel = new Shader({ fragmentShader: pixelateFragmentShader, renderToFramebuffer: true });
+        const sine = new Shader({ fragmentShader: sineWaveFragmentShader, renderToFramebuffer: true });
+        const sine2 = new Shader({ fragmentShader: sineWaveFragmentShader2, renderToFramebuffer: true });
+        const underwater = new Shader({ fragmentShader: underwaterFragmentShader, renderToFramebuffer: true });
+        const vdu = new Shader({ fragmentShader: vduNoiseFragmentShader, renderToFramebuffer: true });
+        const bars = new Shader({ fragmentShader: verticalBarsFragmentShader, renderToFramebuffer: true });
+        const clouds = new Shader({ fragmentShader: cloudsFragmentShader, renderToFramebuffer: true });
         // const empty = new Shader();
 
         const world = new StaticWorld(this);
@@ -449,11 +449,11 @@ class Demo extends Scene
         const layer = new EffectLayer();
         // const layer2 = new EffectLayer();
 
-        layer.shaders.push(red);
+        // layer.shaders.push(red);
         // layer.shaders.push(blurX, red);
         // layer.shaders.push(lazer);
         // layer.shaders.push(plasma);
-        // layer.shaders.push(pixel);
+        layer.shaders.push(pixel);
         // layer.shaders.push(sine);
         // layer.shaders.push(sine2);
         // layer.shaders.push(underwater);
@@ -489,8 +489,8 @@ class Demo extends Scene
 
 new Game(
     WebGL(),
-    Size(800, 600),
     Parent('gameParent'),
+    GlobalVar('Phaser4'),
     BackgroundColor(0x2d2d2d),
     Scenes(Demo)
 );
