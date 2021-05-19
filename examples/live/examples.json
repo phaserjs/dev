@@ -78,9 +78,30 @@
           "size": 108094,
           "extension": ".js",
           "type": "file"
+        },
+        {
+          "path": "examples/live/container/armature.js",
+          "name": "armature.js",
+          "size": 133214,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/container/crashstack.js",
+          "name": "crashstack.js",
+          "size": 119091,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/container/deep children.js",
+          "name": "deep children.js",
+          "size": 130971,
+          "extension": ".js",
+          "type": "file"
         }
       ],
-      "size": 108094,
+      "size": 491370,
       "type": "directory"
     },
     {
@@ -196,7 +217,7 @@
             {
               "path": "examples/live/gameobjects/sprite/modify sprite verts.js",
               "name": "modify sprite verts.js",
-              "size": 104080,
+              "size": 376105,
               "extension": ".js",
               "type": "file"
             },
@@ -208,7 +229,7 @@
               "type": "file"
             }
           ],
-          "size": 945576,
+          "size": 1217601,
           "type": "directory"
         },
         {
@@ -241,7 +262,7 @@
           "type": "directory"
         }
       ],
-      "size": 1822252,
+      "size": 2094277,
       "type": "directory"
     },
     {
@@ -272,6 +293,21 @@
         }
       ],
       "size": 229443,
+      "type": "directory"
+    },
+    {
+      "path": "examples/live/layer",
+      "name": "layer",
+      "children": [
+        {
+          "path": "examples/live/layer/effect layer.js",
+          "name": "effect layer.js",
+          "size": 125006,
+          "extension": ".js",
+          "type": "file"
+        }
+      ],
+      "size": 125006,
       "type": "directory"
     },
     {
@@ -325,6 +361,6 @@
       "type": "directory"
     }
   ],
-  "size": 3895385,
+  "size": 4675692,
   "type": "directory"
 }
