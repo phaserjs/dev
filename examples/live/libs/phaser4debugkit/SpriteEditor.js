@@ -1,4 +1,4 @@
-import Tweakpane from 'tweakpane';
+import { Pane } from 'tweakpane';
 
 export class SpriteEditor
 {
@@ -12,17 +12,17 @@ export class SpriteEditor
 
     createWindow ()
     {
-        const pane = new Tweakpane();
+        const pane = new Pane();
 
         const transformFolder = pane.addFolder({ title: 'Transform' });
 
         const step01 = { step: 0.1 };
 
-        transformFolder.addInput(this.transform, 'position');
-        transformFolder.addInput(this.transform, 'rotation', step01);
-        transformFolder.addInput(this.transform, 'scale', { x: step01, y: step01 });
-        transformFolder.addInput(this.transform, 'skew', { x: step01, y: step01 });
-        transformFolder.addInput(this.transform, 'origin', { min: 0, max: 1, step: 0.1 });
+        transformFolder.addInput(this.target, 'position');
+        transformFolder.addInput(this.target, 'rotation', step01);
+        transformFolder.addInput(this.target, 'scale', { x: step01, y: step01 });
+        transformFolder.addInput(this.target, 'skew', { x: step01, y: step01 });
+        transformFolder.addInput(this.target, 'origin', { min: 0, max: 1, step: 0.1 });
 
         const displayFolder = pane.addFolder({ title: 'Display' });
 
