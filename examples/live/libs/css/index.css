@@ -25,15 +25,24 @@ iframe {
     line-height: 2.0em;
 }
 
-#treeView .tj_icon, #treeView .tj_mod_icon {
+#treeView .tj_icon {
+    --ggs: 0.7;
+    color: #ff00ff;
+}
+
+#treeView .tj_leaf .tj_icon {
+    --ggs: 0.7;
+    color: #fff;
+}
+
+#treeView .tj_mod_icon {
     --ggs: 0.7;
     color: #fff;
 }
 
 #treeView .tj_description {
-    /* font-weight: bold; */
-    /* font-size: 1.1em; */
-    /* color: #f9507f; */
+    font-weight: bold;
+    color: rgba(250,237,56,1);
 }
 
 #treeView .tj_leaf {
@@ -43,7 +52,7 @@ iframe {
 }
 
 .winbox {
-    background: radial-gradient( circle farthest-corner at 10% 20%,  rgba(255,37,174,1) 0%, rgba(241,147,55,1) 53.4%, rgba(250,237,56,1) 99.5% );
+    background: radial-gradient(circle farthest-corner at 10% 20%,  rgba(255,37,174,1) 0%, rgba(241,147,55,1) 53.4%, rgba(250,237,56,1) 99.5%);
     /* background: linear-gradient(to top, #00c6fb 0%, #0046b6 100%); */
     /* background: linear-gradient(0deg, #f77062 0%, #fe5196 100%); */
     /* background: linear-gradient(to bottom, #4481eb 0%, #04befe 100%); */
@@ -65,9 +74,6 @@ iframe {
 
 .wb-title {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    /* font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif; */
-    /* font-size: 0.75em; */
-    /* font-weight: bold; */
     color:#fff;
     text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.4); 
 }
