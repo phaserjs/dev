@@ -35,7 +35,7 @@
 
   // ../phaser-genesis/src/config/banner/SetBanner.ts
   function SetBanner(title = "", version = "", url = "", color = "#fff", background = "linear-gradient(#3e0081 40%, #00bcc3)") {
-    ConfigStore.set(CONFIG_DEFAULTS.BANNER, {title, version, url, color, background});
+    ConfigStore.set(CONFIG_DEFAULTS.BANNER, { title, version, url, color, background });
   }
 
   // ../phaser-genesis/src/config/batchsize/SetBatchSize.ts
@@ -63,14 +63,14 @@
     if (resolution === 0) {
       resolution = window.devicePixelRatio;
     }
-    ConfigStore.set(CONFIG_DEFAULTS.SIZE, {width, height, resolution});
+    ConfigStore.set(CONFIG_DEFAULTS.SIZE, { width, height, resolution });
   }
 
   // ../phaser-genesis/src/renderer/BindingQueue.ts
   var queue = [];
   var BindingQueue = {
     add: (texture, glConfig) => {
-      queue.push({texture, glConfig});
+      queue.push({ texture, glConfig });
     },
     get: () => {
       return queue;
@@ -92,7 +92,7 @@
 
   // ../phaser-genesis/src/config/defaultorigin/SetDefaultOrigin.ts
   function SetDefaultOrigin(x = 0.5, y = x) {
-    ConfigStore.set(CONFIG_DEFAULTS.DEFAULT_ORIGIN, {x, y});
+    ConfigStore.set(CONFIG_DEFAULTS.DEFAULT_ORIGIN, { x, y });
   }
 
   // ../phaser-genesis/src/config/globalvar/SetGlobalVar.ts
@@ -243,7 +243,7 @@
     if (!entry) {
       entry = renderPass.currentFramebuffer;
     }
-    const {framebuffer, viewport} = entry;
+    const { framebuffer, viewport } = entry;
     gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
     if (clear) {
       gl.clearColor(0, 0, 0, 0);
@@ -279,7 +279,7 @@
 
   // ../phaser-genesis/src/renderer/webgl1/renderpass/AddFramebuffer.ts
   function AddFramebuffer(renderPass, framebuffer, viewport) {
-    const entry = {framebuffer, viewport};
+    const entry = { framebuffer, viewport };
     renderPass.framebufferStack.push(entry);
     return entry;
   }
@@ -362,7 +362,7 @@
 
   // ../phaser-genesis/src/renderer/webgl1/textures/CreateGLTexture.ts
   function CreateGLTexture(binding) {
-    const {parent, flipY, unpackPremultiplyAlpha, minFilter, magFilter, wrapS, wrapT, generateMipmap, isPOT} = binding;
+    const { parent, flipY, unpackPremultiplyAlpha, minFilter, magFilter, wrapS, wrapT, generateMipmap, isPOT } = binding;
     const source = parent.image;
     let width = parent.width;
     let height = parent.height;
@@ -514,7 +514,7 @@
   function ProcessBindingQueue() {
     const queue2 = BindingQueue.get();
     queue2.forEach((entry) => {
-      const {texture, glConfig} = entry;
+      const { texture, glConfig } = entry;
       if (!texture.binding) {
         texture.binding = new GLTextureBinding(texture, glConfig);
       }
@@ -830,7 +830,7 @@
         stride = defaultSettings.stride,
         offset = defaultSettings.offset
       } = setting;
-      attributes.set(name, {index, size, type, normalized, stride, offset});
+      attributes.set(name, { index, size, type, normalized, stride, offset });
     }
     return attributes;
   }
@@ -996,10 +996,10 @@
 
   // ../phaser-genesis/src/renderer/webgl1/shaders/DefaultQuadAttributes.ts
   var DefaultQuadAttributes = {
-    aVertexPosition: {size: 2, type: FLOAT, normalized: false, offset: 0},
-    aTextureCoord: {size: 2, type: FLOAT, normalized: false, offset: 8},
-    aTextureId: {size: 1, type: FLOAT, normalized: false, offset: 16},
-    aTintColor: {size: 4, type: UNSIGNED_BYTE, normalized: true, offset: 20}
+    aVertexPosition: { size: 2, type: FLOAT, normalized: false, offset: 0 },
+    aTextureCoord: { size: 2, type: FLOAT, normalized: false, offset: 8 },
+    aTextureId: { size: 1, type: FLOAT, normalized: false, offset: 16 },
+    aTintColor: { size: 4, type: UNSIGNED_BYTE, normalized: true, offset: 20 }
   };
 
   // ../phaser-genesis/src/renderer/webgl1/shaders/DefaultQuadUniforms.ts
@@ -1091,7 +1091,7 @@ void main (void)
       this.updateUVs();
     }
     setPivot(x, y) {
-      this.pivot = {x, y};
+      this.pivot = { x, y };
     }
     setSize(width, height) {
       this.width = width;
@@ -1131,7 +1131,7 @@ void main (void)
         top = -originY * sourceSizeHeight;
         bottom = top + sourceSizeHeight;
       }
-      return {left, right, top, bottom};
+      return { left, right, top, bottom };
     }
     copyToExtent(child) {
       const originX = child.originX;
@@ -1157,7 +1157,7 @@ void main (void)
       return this;
     }
     copyToVertices(vertices, offset = 0) {
-      const {u0, u1, v0, v1} = this;
+      const { u0, u1, v0, v1 } = this;
       vertices[offset + 0].setUV(u0, v0);
       vertices[offset + 1].setUV(u0, v1);
       vertices[offset + 2].setUV(u1, v1);
@@ -1165,7 +1165,7 @@ void main (void)
       return this;
     }
     updateUVs() {
-      const {x, y, width, height} = this;
+      const { x, y, width, height } = this;
       const baseTextureWidth = this.texture.width;
       const baseTextureHeight = this.texture.height;
       this.u0 = x / baseTextureWidth;
@@ -1296,6 +1296,9 @@ void main (void)
     updateUniforms(renderPass) {
     }
     bind(renderPass) {
+      const uniforms = this.uniforms;
+      uniforms.set("uProjectionMatrix", renderPass.projectionMatrix.data);
+      uniforms.set("uCameraMatrix", renderPass.cameraMatrix.data);
       this.updateUniforms(renderPass);
       return this.setUniforms(renderPass);
     }
@@ -1409,7 +1412,7 @@ void main (void)
 
   // ../phaser-genesis/src/renderer/webgl1/renderpass/SetDefaultBlendMode.ts
   function SetDefaultBlendMode(renderPass, enable, sfactor, dfactor) {
-    const entry = {enable, sfactor, dfactor};
+    const entry = { enable, sfactor, dfactor };
     renderPass.blendModeStack[0] = entry;
     renderPass.currentBlendMode = entry;
     renderPass.defaultBlendMode = entry;
@@ -1417,7 +1420,7 @@ void main (void)
 
   // ../phaser-genesis/src/renderer/webgl1/renderpass/SetDefaultFramebuffer.ts
   function SetDefaultFramebuffer(renderPass, framebuffer = null, viewport) {
-    const entry = {framebuffer, viewport};
+    const entry = { framebuffer, viewport };
     renderPass.framebufferStack[0] = entry;
     renderPass.currentFramebuffer = entry;
     renderPass.defaultFramebuffer = entry;
@@ -1425,7 +1428,7 @@ void main (void)
 
   // ../phaser-genesis/src/renderer/webgl1/renderpass/SetDefaultShader.ts
   function SetDefaultShader(renderPass, shader, textureID) {
-    const entry = {shader, textureID};
+    const entry = { shader, textureID };
     renderPass.shaderStack[0] = entry;
     renderPass.currentShader = entry;
     renderPass.defaultShader = entry;
@@ -1494,7 +1497,7 @@ void main (void)
       return this.set();
     }
     toArray() {
-      const {a, b, c, d, tx, ty} = this;
+      const { a, b, c, d, tx, ty } = this;
       return [a, b, c, d, tx, ty];
     }
     fromArray(src) {
@@ -1578,12 +1581,12 @@ void main (void)
       const gl2 = this.renderer.gl;
       const indexLayout = [0, 1, 2, 2, 3, 0];
       this.quadShader = new QuadShader();
-      this.quadBuffer = new IndexedVertexBuffer({isDynamic: false, indexLayout});
+      this.quadBuffer = new IndexedVertexBuffer({ isDynamic: false, indexLayout });
       this.quadCamera = new StaticCamera();
       CreateTempTextures(this);
       SetDefaultFramebuffer(this);
       SetDefaultBlendMode(this, true, gl2.ONE, gl2.ONE_MINUS_SRC_ALPHA);
-      SetDefaultVertexBuffer(this, new IndexedVertexBuffer({batchSize: GetBatchSize(), indexLayout}));
+      SetDefaultVertexBuffer(this, new IndexedVertexBuffer({ batchSize: GetBatchSize(), indexLayout }));
       SetDefaultShader(this, new MultiTextureQuadShader());
     }
     resize(width, height) {
@@ -1595,7 +1598,7 @@ void main (void)
 
   // ../phaser-genesis/src/renderer/webgl1/renderpass/AddShader.ts
   function AddShader(renderPass, shader, textureID) {
-    const stackEntry = {shader, textureID};
+    const stackEntry = { shader, textureID };
     renderPass.shaderStack.push(stackEntry);
     return stackEntry;
   }
@@ -1766,7 +1769,7 @@ void main (void)
     constructor() {
       this.clearColor = [0, 0, 0, 1];
       this.clearBeforeRender = true;
-      this.optimizeRedraw = false;
+      this.optimizeRedraw = true;
       this.autoResize = true;
       this.contextLost = false;
       this.width = GetWidth();
@@ -1824,6 +1827,7 @@ void main (void)
       }
       const gl2 = this.gl;
       const renderPass = this.renderPass;
+      gl2.getContextAttributes();
       ProcessBindingQueue();
       if (this.optimizeRedraw && renderData.numDirtyFrames === 0 && renderData.numDirtyCameras === 0) {
         return;
@@ -1836,7 +1840,7 @@ void main (void)
       const worlds = renderData.worldData;
       Start(renderPass);
       for (let i = 0; i < worlds.length; i++) {
-        const {world} = worlds[i];
+        const { world } = worlds[i];
         world.renderGL(renderPass);
         world.postRenderGL(renderPass);
       }
@@ -1881,8 +1885,8 @@ void main (void)
 
   // ../phaser-genesis/src/components/transform/GetVertices.ts
   function GetVertices(worldTransform, transformExtent) {
-    const {a, b, c, d, tx, ty} = worldTransform;
-    const {x, y, right, bottom} = transformExtent;
+    const { a, b, c, d, tx, ty } = worldTransform;
+    const { x, y, right, bottom } = transformExtent;
     const x0 = x * a + y * c + tx;
     const y0 = x * b + y * d + ty;
     const x1 = x * a + bottom * c + tx;
@@ -1891,7 +1895,7 @@ void main (void)
     const y2 = right * b + bottom * d + ty;
     const x3 = right * a + y * c + tx;
     const y3 = right * b + y * d + ty;
-    return {x0, y0, x1, y1, x2, y2, x3, y3};
+    return { x0, y0, x1, y1, x2, y2, x3, y3 };
   }
 
   // ../phaser-genesis/src/components/bounds/BoundsComponent.ts
@@ -1913,7 +1917,7 @@ void main (void)
       return this.area;
     }
     updateLocal() {
-      const {x0, y0, x1, y1, x2, y2, x3, y3} = GetVertices(this.entity.worldTransform, this.entity.transformExtent);
+      const { x0, y0, x1, y1, x2, y2, x3, y3 } = GetVertices(this.entity.worldTransform, this.entity.transformExtent);
       const x = Math.min(x0, x1, x2, x3);
       const y = Math.min(y0, y1, y2, y3);
       const right = Math.max(x0, x1, x2, x3);
@@ -1983,7 +1987,7 @@ void main (void)
       return this;
     }
     toArray(dst = [], index = 0) {
-      const {x, y} = this;
+      const { x, y } = this;
       dst[index] = x;
       dst[index + 1] = y;
       return dst;
@@ -1992,7 +1996,7 @@ void main (void)
       return this.set(src[index], src[index + 1]);
     }
     toString() {
-      const {x, y} = this;
+      const { x, y } = this;
       return `{ x=${x}, y=${y} }`;
     }
   };
@@ -2006,7 +2010,7 @@ void main (void)
 
   // ../phaser-genesis/src/components/transform/UpdateVertices.ts
   function UpdateVertices(vertices, worldTransform, transformExtent) {
-    const {x0, y0, x1, y1, x2, y2, x3, y3} = GetVertices(worldTransform, transformExtent);
+    const { x0, y0, x1, y1, x2, y2, x3, y3 } = GetVertices(worldTransform, transformExtent);
     vertices[0].setPosition(x0, y0);
     vertices[1].setPosition(x1, y1);
     vertices[2].setPosition(x2, y2);
@@ -2035,7 +2039,7 @@ void main (void)
 
   // ../phaser-genesis/src/math/mat2d/Mat2dCopyFrom.ts
   function Mat2dCopyFrom(src, target) {
-    const {a, b, c, d, tx, ty} = src;
+    const { a, b, c, d, tx, ty } = src;
     return target.set(a, b, c, d, tx, ty);
   }
 
@@ -2046,8 +2050,8 @@ void main (void)
     } else if (passthru) {
       Mat2dCopyFrom(parentWorldTransform, worldTransform);
     } else {
-      const {a, b, c, d, tx, ty} = localTransform;
-      const {a: pa, b: pb, c: pc, d: pd, tx: ptx, ty: pty} = parentWorldTransform;
+      const { a, b, c, d, tx, ty } = localTransform;
+      const { a: pa, b: pb, c: pc, d: pd, tx: ptx, ty: pty } = parentWorldTransform;
       worldTransform.set(a * pa + b * pc, a * pb + b * pd, c * pa + d * pc, c * pb + d * pd, tx * pa + ty * pc + ptx, tx * pb + ty * pd + pty);
     }
   }
@@ -2106,7 +2110,7 @@ void main (void)
 
   // ../phaser-genesis/src/renderer/webgl1/draw/BatchTexturedQuad.ts
   function BatchTexturedQuad(texture, vertices, renderPass) {
-    const {F32, U32, offset} = GetVertexBufferEntry(renderPass, 1);
+    const { F32, U32, offset } = GetVertexBufferEntry(renderPass, 1);
     const textureIndex = SetTexture(renderPass, texture);
     let vertOffset = offset;
     vertices.forEach((vertex) => {
@@ -2580,8 +2584,8 @@ void main (void)
       return;
     }
     const ctx = renderer.ctx;
-    const {a, b, c, d, tx, ty} = worldTransform;
-    const {x, y} = transformExtent;
+    const { a, b, c, d, tx, ty } = worldTransform;
+    const { x, y } = transformExtent;
     ctx.save();
     ctx.setTransform(a, b, c, d, tx, ty);
     ctx.globalAlpha = alpha;
@@ -2705,7 +2709,7 @@ void main (void)
 
   // ../phaser-genesis/src/renderer/webgl1/draw/BatchSingleQuad.ts
   function BatchSingleQuad(renderPass, x, y, width, height, u0, v0, u1, v1, textureIndex = 0, packedColor = 4294967295) {
-    const {F32, U32, offset} = GetVertexBufferEntry(renderPass, 1);
+    const { F32, U32, offset } = GetVertexBufferEntry(renderPass, 1);
     F32[offset + 0] = x;
     F32[offset + 1] = y;
     F32[offset + 2] = u0;
@@ -2737,7 +2741,7 @@ void main (void)
     if (!shader) {
       shader = renderPass.quadShader;
     }
-    const {u0, v0, u1, v1} = texture.firstFrame;
+    const { u0, v0, u1, v1 } = texture.firstFrame;
     BindTexture(texture, 0);
     SetVertexBuffer(renderPass, renderPass.quadBuffer);
     SetShader(renderPass, shader, 0);
@@ -2912,7 +2916,7 @@ void main (void)
 
   // ../phaser-genesis/src/config/banner/GetBanner.ts
   function GetBanner() {
-    const {title, version, url, color, background} = ConfigStore.get(CONFIG_DEFAULTS.BANNER);
+    const { title, version, url, color, background } = ConfigStore.get(CONFIG_DEFAULTS.BANNER);
     if (title !== "") {
       const str = version !== "" ? title + " " + version : title;
       console.log(`%c${str}%c ${url}`, `padding: 4px 16px; color: ${color}; background: ${background}`, "");
@@ -3429,7 +3433,7 @@ void main (void)
       const node = parent.children[i];
       if (node.isRenderable()) {
         const children = [];
-        const entry = {node, children};
+        const entry = { node, children };
         output.push(entry);
         if (node.willRenderChildren && node.numChildren > 0) {
           if (node.willCacheChildren) {
