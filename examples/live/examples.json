@@ -194,6 +194,13 @@
               "type": "file"
             },
             {
+              "path": "examples/live/gameobjects/sprite/modify sprite verts.js",
+              "name": "modify sprite verts.js",
+              "size": 104080,
+              "extension": ".js",
+              "type": "file"
+            },
+            {
               "path": "examples/live/gameobjects/sprite/rotating sprite.js",
               "name": "rotating sprite.js",
               "size": 103854,
@@ -201,7 +208,7 @@
               "type": "file"
             }
           ],
-          "size": 841496,
+          "size": 945576,
           "type": "directory"
         },
         {
@@ -234,7 +241,7 @@
           "type": "directory"
         }
       ],
-      "size": 1718172,
+      "size": 1822252,
       "type": "directory"
     },
     {
@@ -318,6 +325,6 @@
       "type": "directory"
     }
   ],
-  "size": 3791305,
+  "size": 3895385,
   "type": "directory"
 }
