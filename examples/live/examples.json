@@ -87,13 +87,6 @@
           "type": "file"
         },
         {
-          "path": "examples/live/container/tentacle.js",
-          "name": "tentacle.js",
-          "size": 114175,
-          "extension": ".js",
-          "type": "file"
-        },
-        {
           "path": "examples/live/container/water in container.js",
           "name": "water in container.js",
           "size": 103567,
@@ -101,7 +94,7 @@
           "type": "file"
         }
       ],
-      "size": 459471,
+      "size": 345296,
       "type": "directory"
     },
     {
@@ -227,9 +220,16 @@
               "size": 103854,
               "extension": ".js",
               "type": "file"
+            },
+            {
+              "path": "examples/live/gameobjects/sprite/sprite ecs.js",
+              "name": "sprite ecs.js",
+              "size": 130403,
+              "extension": ".js",
+              "type": "file"
             }
           ],
-          "size": 1217601,
+          "size": 1348004,
           "type": "directory"
         },
         {
@@ -262,7 +262,7 @@
           "type": "directory"
         }
       ],
-      "size": 2094277,
+      "size": 2224680,
       "type": "directory"
     },
     {
@@ -346,6 +346,6 @@
       "type": "directory"
     }
   ],
-  "size": 4518787,
+  "size": 4535015,
   "type": "directory"
 }
