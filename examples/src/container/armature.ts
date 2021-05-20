@@ -1,17 +1,14 @@
-import { AddChild, AddChildren, ConsoleTreeChildren, GetBounds, RemoveChild, SetBounds } from '../../../../phaser-genesis/src/display/';
-
-import { Game } from '../../../../phaser-genesis/src/Game';
 import { BackgroundColor, GlobalVar, Parent, Scenes, Size, WebGL } from '../../../../phaser-genesis/src/config';
+import { AddChild, AddChildren } from '../../../../phaser-genesis/src/display/';
 import { On } from '../../../../phaser-genesis/src/events';
+import { Game } from '../../../../phaser-genesis/src/Game';
 import { Container, GameObject, Rectangle, Text } from '../../../../phaser-genesis/src/gameobjects/';
-import { Mouse } from '../../../../phaser-genesis/src/input/mouse';
+import { GetRectangleCenterX, GetRectangleCenterY } from '../../../../phaser-genesis/src/geom/rectangle';
+import { Keyboard, Keys } from '../../../../phaser-genesis/src/input/keyboard';
+import { RadToDeg, Wrap } from '../../../../phaser-genesis/src/math';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
 import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
-import { SetInteractive } from '../../../../phaser-genesis/src/input';
-import { IGameObject } from '../../../../phaser-genesis/src/gameobjects/IGameObject';
-import { Between, RadToDeg, Wrap } from '../../../../phaser-genesis/src/math';
-import { Key, Keyboard, Keys } from '../../../../phaser-genesis/src/input/keyboard';
-import { GetRectangleCenterX, GetRectangleCenterY } from '../../../../phaser-genesis/src/geom/rectangle';
+
 
 class Arm extends Container
 {
@@ -41,15 +38,15 @@ class Arm extends Container
         },
     };
     static restitution = {
-        shoulder: {rotation:{value:0, restitution:Math.PI/8, impulse:Math.PI/4}},
-        elbow: {rotation:{value:0, restitution:Math.PI/8, impulse:Math.PI/4}},
-        wrist: {rotation:{value:0, restitution:Math.PI/8, impulse:-Math.PI/4}},
+        shoulder: {rotation:{value:0, restitution:Math.PI/8, impulse:Math.PI/4, epsilon:.01}},
+        elbow: {rotation:{value:0, restitution:Math.PI/8, impulse:Math.PI/4, epsilon:.01}},
+        wrist: {rotation:{value:0, restitution:Math.PI/8, impulse:-Math.PI/4, epsilon:.01}},
         palm: {
-            scaleX:{value:1, restitution:.25, impulse:.5},
-            scaleY:{value:1, restitution:.25, impulse:.5},
+            scaleX:{value:1, restitution:.25, impulse:.5, epsilon:.01},
+            scaleY:{value:1, restitution:.25, impulse:.5, epsilon:.01},
         },
-        thumb: {x:{value:16, restitution:4, impulse:-8}},
-        finger: {x:{value:-16, restitution:4, impulse:8}},
+        thumb: {x:{value:16, restitution:4, impulse:-8, epsilon:.07}},
+        finger: {x:{value:-16, restitution:4, impulse:8, epsilon:.07}},
     };
     parts: {[key:string]: Rectangle};
     restitution: number;
@@ -185,9 +182,9 @@ class Demo extends Scene
 
             [↑/↓/←/→] Palm scale: ${this.dump(arm.parts.palm)}
 
-            [T] Thumb x-: ${this.dump(arm.parts.thumb)}
+            [R] Thumb x-: ${this.dump(arm.parts.thumb)}
 
-            [Y] Finger x+: ${this.dump(arm.parts.finger)}
+            [T] Finger x+: ${this.dump(arm.parts.finger)}
             `;
         });
     }
