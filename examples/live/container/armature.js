@@ -3,7 +3,7 @@
   var __getOwnPropSymbols = Object.getOwnPropertySymbols;
   var __hasOwnProp = Object.prototype.hasOwnProperty;
   var __propIsEnum = Object.prototype.propertyIsEnumerable;
-  var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, {enumerable: true, configurable: true, writable: true, value}) : obj[key] = value;
+  var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
   var __spreadValues = (a, b) => {
     for (var prop in b || (b = {}))
       if (__hasOwnProp.call(b, prop))
@@ -17,7 +17,7 @@
   };
   var __export = (target, all) => {
     for (var name in all)
-      __defProp(target, name, {get: all[name], enumerable: true});
+      __defProp(target, name, { get: all[name], enumerable: true });
   };
 
   // ../phaser-1/src/display/DepthFirstSearch.ts
@@ -407,12 +407,12 @@
 
   // ../phaser-1/src/config/banner/SetBanner.ts
   function SetBanner(title = "", version = "", url = "", color = "#fff", background = "linear-gradient(#3e0081 40%, #00bcc3)") {
-    ConfigStore.set(CONFIG_DEFAULTS.BANNER, {title, version, url, color, background});
+    ConfigStore.set(CONFIG_DEFAULTS.BANNER, { title, version, url, color, background });
   }
 
   // ../phaser-1/src/config/banner/GetBanner.ts
   function GetBanner() {
-    const {title, version, url, color, background} = ConfigStore.get(CONFIG_DEFAULTS.BANNER);
+    const { title, version, url, color, background } = ConfigStore.get(CONFIG_DEFAULTS.BANNER);
     if (title !== "") {
       const str = version !== "" ? title + " " + version : title;
       console.log(`%c${str}%c ${url}`, `padding: 4px 16px; color: ${color}; background: ${background}`, "");
@@ -558,7 +558,7 @@
 
   // ../phaser-1/src/config/defaultorigin/SetDefaultOrigin.ts
   function SetDefaultOrigin(x = 0.5, y = x) {
-    ConfigStore.set(CONFIG_DEFAULTS.DEFAULT_ORIGIN, {x, y});
+    ConfigStore.set(CONFIG_DEFAULTS.DEFAULT_ORIGIN, { x, y });
   }
 
   // ../phaser-1/src/config/maxtextures/SetMaxTextures.ts
@@ -571,7 +571,7 @@
     if (resolution === 0) {
       resolution = window.devicePixelRatio;
     }
-    ConfigStore.set(CONFIG_DEFAULTS.SIZE, {width, height, resolution});
+    ConfigStore.set(CONFIG_DEFAULTS.SIZE, { width, height, resolution });
   }
 
   // ../phaser-1/src/config/webglcontext/GetWebGLContext.ts
@@ -611,7 +611,7 @@
   var queue = [];
   var BindingQueue = {
     add: (texture, glConfig) => {
-      queue.push({texture, glConfig});
+      queue.push({ texture, glConfig });
     },
     get: () => {
       return queue;
@@ -636,7 +636,7 @@
       this.updateUVs();
     }
     setPivot(x, y) {
-      this.pivot = {x, y};
+      this.pivot = { x, y };
     }
     setSize(width, height) {
       this.width = width;
@@ -676,7 +676,7 @@
         top = -originY * sourceSizeHeight;
         bottom = top + sourceSizeHeight;
       }
-      return {left, right, top, bottom};
+      return { left, right, top, bottom };
     }
     copyToExtent(child) {
       const originX = child.originX;
@@ -702,7 +702,7 @@
       return this;
     }
     copyToVertices(vertices, offset = 0) {
-      const {u0, u1, v0, v1} = this;
+      const { u0, u1, v0, v1 } = this;
       vertices[offset + 0].setUV(u0, v0);
       vertices[offset + 1].setUV(u0, v1);
       vertices[offset + 2].setUV(u1, v1);
@@ -710,7 +710,7 @@
       return this;
     }
     updateUVs() {
-      const {x, y, width, height} = this;
+      const { x, y, width, height } = this;
       const baseTextureWidth = this.texture.width;
       const baseTextureHeight = this.texture.height;
       this.u0 = x / baseTextureWidth;
@@ -983,7 +983,7 @@
     if (!entry) {
       entry = renderPass.currentFramebuffer;
     }
-    const {framebuffer, viewport} = entry;
+    const { framebuffer, viewport } = entry;
     gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
     if (clear) {
       gl.clearColor(0, 0, 0, 0);
@@ -1019,7 +1019,7 @@
 
   // ../phaser-1/src/renderer/webgl1/renderpass/AddFramebuffer.ts
   function AddFramebuffer(renderPass, framebuffer, viewport) {
-    const entry = {framebuffer, viewport};
+    const entry = { framebuffer, viewport };
     renderPass.framebufferStack.push(entry);
     return entry;
   }
@@ -1097,7 +1097,7 @@
 
   // ../phaser-1/src/renderer/webgl1/textures/CreateGLTexture.ts
   function CreateGLTexture(binding) {
-    const {parent, flipY, unpackPremultiplyAlpha, minFilter, magFilter, wrapS, wrapT, generateMipmap, isPOT} = binding;
+    const { parent, flipY, unpackPremultiplyAlpha, minFilter, magFilter, wrapS, wrapT, generateMipmap, isPOT } = binding;
     const source = parent.image;
     let width = parent.width;
     let height = parent.height;
@@ -1249,7 +1249,7 @@
   function ProcessBindingQueue() {
     const queue2 = BindingQueue.get();
     queue2.forEach((entry) => {
-      const {texture, glConfig} = entry;
+      const { texture, glConfig } = entry;
       if (!texture.binding) {
         texture.binding = new GLTextureBinding(texture, glConfig);
       }
@@ -1565,7 +1565,7 @@
         stride = defaultSettings.stride,
         offset = defaultSettings.offset
       } = setting;
-      attributes.set(name, {index, size, type, normalized, stride, offset});
+      attributes.set(name, { index, size, type, normalized, stride, offset });
     }
     return attributes;
   }
@@ -1731,10 +1731,10 @@
 
   // ../phaser-1/src/renderer/webgl1/shaders/DefaultQuadAttributes.ts
   var DefaultQuadAttributes = {
-    aVertexPosition: {size: 2, type: FLOAT, normalized: false, offset: 0},
-    aTextureCoord: {size: 2, type: FLOAT, normalized: false, offset: 8},
-    aTextureId: {size: 1, type: FLOAT, normalized: false, offset: 16},
-    aTintColor: {size: 4, type: UNSIGNED_BYTE, normalized: true, offset: 20}
+    aVertexPosition: { size: 2, type: FLOAT, normalized: false, offset: 0 },
+    aTextureCoord: { size: 2, type: FLOAT, normalized: false, offset: 8 },
+    aTextureId: { size: 1, type: FLOAT, normalized: false, offset: 16 },
+    aTintColor: { size: 4, type: UNSIGNED_BYTE, normalized: true, offset: 20 }
   };
 
   // ../phaser-1/src/renderer/webgl1/shaders/DefaultQuadUniforms.ts
@@ -1987,7 +1987,7 @@ void main (void)
 
   // ../phaser-1/src/renderer/webgl1/renderpass/SetDefaultBlendMode.ts
   function SetDefaultBlendMode(renderPass, enable, sfactor, dfactor) {
-    const entry = {enable, sfactor, dfactor};
+    const entry = { enable, sfactor, dfactor };
     renderPass.blendModeStack[0] = entry;
     renderPass.currentBlendMode = entry;
     renderPass.defaultBlendMode = entry;
@@ -1995,7 +1995,7 @@ void main (void)
 
   // ../phaser-1/src/renderer/webgl1/renderpass/SetDefaultFramebuffer.ts
   function SetDefaultFramebuffer(renderPass, framebuffer = null, viewport) {
-    const entry = {framebuffer, viewport};
+    const entry = { framebuffer, viewport };
     renderPass.framebufferStack[0] = entry;
     renderPass.currentFramebuffer = entry;
     renderPass.defaultFramebuffer = entry;
@@ -2003,7 +2003,7 @@ void main (void)
 
   // ../phaser-1/src/renderer/webgl1/renderpass/SetDefaultShader.ts
   function SetDefaultShader(renderPass, shader, textureID) {
-    const entry = {shader, textureID};
+    const entry = { shader, textureID };
     renderPass.shaderStack[0] = entry;
     renderPass.currentShader = entry;
     renderPass.defaultShader = entry;
@@ -2036,7 +2036,7 @@ void main (void)
       return this;
     }
     toArray(dst = [], index = 0) {
-      const {x, y, z} = this;
+      const { x, y, z } = this;
       dst[index] = x;
       dst[index + 1] = y;
       dst[index + 2] = z;
@@ -2046,7 +2046,7 @@ void main (void)
       return this.set(src[index], src[index + 1], src[index + 2]);
     }
     toString() {
-      const {x, y, z} = this;
+      const { x, y, z } = this;
       return `{ x=${x}, y=${y}, z=${z} }`;
     }
   };
@@ -2074,7 +2074,7 @@ void main (void)
       return this.set();
     }
     toArray() {
-      const {a, b, c, d, tx, ty} = this;
+      const { a, b, c, d, tx, ty } = this;
       return [a, b, c, d, tx, ty];
     }
     fromArray(src) {
@@ -2102,6 +2102,7 @@ void main (void)
   // ../phaser-1/src/camera/StaticCamera.ts
   var StaticCamera = class {
     constructor() {
+      this.type = "StaticCamera";
       this.dirtyRender = true;
       const game = GameInstance.get();
       this.renderer = game.renderer;
@@ -2163,12 +2164,12 @@ void main (void)
       const gl2 = this.renderer.gl;
       const indexLayout = [0, 1, 2, 2, 3, 0];
       this.quadShader = new QuadShader();
-      this.quadBuffer = new IndexedVertexBuffer({isDynamic: false, indexLayout});
+      this.quadBuffer = new IndexedVertexBuffer({ isDynamic: false, indexLayout });
       this.quadCamera = new StaticCamera();
       CreateTempTextures(this);
       SetDefaultFramebuffer(this);
       SetDefaultBlendMode(this, true, gl2.ONE, gl2.ONE_MINUS_SRC_ALPHA);
-      SetDefaultVertexBuffer(this, new IndexedVertexBuffer({batchSize: GetBatchSize(), indexLayout}));
+      SetDefaultVertexBuffer(this, new IndexedVertexBuffer({ batchSize: GetBatchSize(), indexLayout }));
       SetDefaultShader(this, new MultiTextureQuadShader());
     }
     resize(width, height) {
@@ -2358,7 +2359,7 @@ void main (void)
       const worlds = renderData.worldData;
       Start(renderPass);
       for (let i = 0; i < worlds.length; i++) {
-        const {world} = worlds[i];
+        const { world } = worlds[i];
         world.renderGL(renderPass);
         world.postRenderGL(renderPass);
       }
@@ -2378,8 +2379,8 @@ void main (void)
 
   // ../phaser-1/src/components/transform/GetVertices.ts
   function GetVertices(worldTransform, transformExtent) {
-    const {a, b, c, d, tx, ty} = worldTransform;
-    const {x, y, right, bottom} = transformExtent;
+    const { a, b, c, d, tx, ty } = worldTransform;
+    const { x, y, right, bottom } = transformExtent;
     const x0 = x * a + y * c + tx;
     const y0 = x * b + y * d + ty;
     const x1 = x * a + bottom * c + tx;
@@ -2388,7 +2389,7 @@ void main (void)
     const y2 = right * b + bottom * d + ty;
     const x3 = right * a + y * c + tx;
     const y3 = right * b + y * d + ty;
-    return {x0, y0, x1, y1, x2, y2, x3, y3};
+    return { x0, y0, x1, y1, x2, y2, x3, y3 };
   }
 
   // ../phaser-1/src/components/bounds/BoundsComponent.ts
@@ -2410,7 +2411,7 @@ void main (void)
       return this.area;
     }
     updateLocal() {
-      const {x0, y0, x1, y1, x2, y2, x3, y3} = GetVertices(this.entity.worldTransform, this.entity.transformExtent);
+      const { x0, y0, x1, y1, x2, y2, x3, y3 } = GetVertices(this.entity.worldTransform, this.entity.transformExtent);
       const x = Math.min(x0, x1, x2, x3);
       const y = Math.min(y0, y1, y2, y3);
       const right = Math.max(x0, x1, x2, x3);
@@ -2480,7 +2481,7 @@ void main (void)
       return this;
     }
     toArray(dst = [], index = 0) {
-      const {x, y} = this;
+      const { x, y } = this;
       dst[index] = x;
       dst[index + 1] = y;
       return dst;
@@ -2489,7 +2490,7 @@ void main (void)
       return this.set(src[index], src[index + 1]);
     }
     toString() {
-      const {x, y} = this;
+      const { x, y } = this;
       return `{ x=${x}, y=${y} }`;
     }
   };
@@ -2503,7 +2504,7 @@ void main (void)
 
   // ../phaser-1/src/components/transform/UpdateVertices.ts
   function UpdateVertices(vertices, worldTransform, transformExtent) {
-    const {x0, y0, x1, y1, x2, y2, x3, y3} = GetVertices(worldTransform, transformExtent);
+    const { x0, y0, x1, y1, x2, y2, x3, y3 } = GetVertices(worldTransform, transformExtent);
     vertices[0].setPosition(x0, y0);
     vertices[1].setPosition(x1, y1);
     vertices[2].setPosition(x2, y2);
@@ -2532,7 +2533,7 @@ void main (void)
 
   // ../phaser-1/src/math/mat2d/Mat2dCopyFrom.ts
   function Mat2dCopyFrom(src, target) {
-    const {a, b, c, d, tx, ty} = src;
+    const { a, b, c, d, tx, ty } = src;
     return target.set(a, b, c, d, tx, ty);
   }
 
@@ -2543,8 +2544,8 @@ void main (void)
     } else if (passthru) {
       Mat2dCopyFrom(parentWorldTransform, worldTransform);
     } else {
-      const {a, b, c, d, tx, ty} = localTransform;
-      const {a: pa, b: pb, c: pc, d: pd, tx: ptx, ty: pty} = parentWorldTransform;
+      const { a, b, c, d, tx, ty } = localTransform;
+      const { a: pa, b: pb, c: pc, d: pd, tx: ptx, ty: pty } = parentWorldTransform;
       worldTransform.set(a * pa + b * pc, a * pb + b * pd, c * pa + d * pc, c * pb + d * pd, tx * pa + ty * pc + ptx, tx * pb + ty * pd + pty);
     }
   }
@@ -2603,7 +2604,7 @@ void main (void)
 
   // ../phaser-1/src/renderer/webgl1/draw/BatchTexturedQuad.ts
   function BatchTexturedQuad(texture, vertices, renderPass) {
-    const {F32, U32, offset} = GetVertexBufferEntry(renderPass, 1);
+    const { F32, U32, offset } = GetVertexBufferEntry(renderPass, 1);
     const textureIndex = SetTexture(renderPass, texture);
     let vertOffset = offset;
     vertices.forEach((vertex) => {
@@ -2649,6 +2650,7 @@ void main (void)
   // ../phaser-1/src/gameobjects/GameObject.ts
   var GameObject = class {
     constructor(x = 0, y = 0) {
+      this.type = "GameObject";
       this.name = "";
       this.willUpdate = true;
       this.willUpdateChildren = true;
@@ -2907,7 +2909,7 @@ void main (void)
 
   // ../phaser-1/src/gameobjects/container/Container.ts
   var Container = class extends GameObject {
-    constructor(x = 0, y = 0, width, height) {
+    constructor(x = 0, y = 0) {
       super(x, y);
       this._alpha = 1;
       this.type = "Container";
@@ -2932,8 +2934,8 @@ void main (void)
       return;
     }
     const ctx = renderer.ctx;
-    const {a, b, c, d, tx, ty} = worldTransform;
-    const {x, y} = transformExtent;
+    const { a, b, c, d, tx, ty } = worldTransform;
+    const { x, y } = transformExtent;
     ctx.save();
     ctx.setTransform(a, b, c, d, tx, ty);
     ctx.globalAlpha = alpha;
@@ -3001,6 +3003,7 @@ void main (void)
       super(x, y);
       this.hasTexture = false;
       this._tint = 16777215;
+      this.type = "Sprite";
       this.vertices = [new Vertex(), new Vertex(), new Vertex(), new Vertex()];
       this.setTexture(texture, frame2);
     }
@@ -3048,6 +3051,7 @@ void main (void)
     constructor(x, y, width = 64, height = 64, color = 16777215) {
       super(x, y);
       this._color = 16777215;
+      this.type = "Rectangle";
       this.vertices = [new Vertex(), new Vertex(), new Vertex(), new Vertex()];
       this.color = color;
       this.setWhiteTexture();
@@ -3104,7 +3108,7 @@ void main (void)
     constructor(x, y, text = "", font, fillStyle) {
       super(x, y, CanvasTexture());
       this.splitRegExp = /(?:\r\n|\r|\n)/;
-      this.padding = {left: 0, right: 0, top: 0, bottom: 0};
+      this.padding = { left: 0, right: 0, top: 0, bottom: 0 };
       this.verticalAlign = "ascent";
       this.lineSpacing = 0;
       this.font = "16px monospace";
@@ -3117,6 +3121,7 @@ void main (void)
       this.lineWidth = 0;
       this.lineDash = [];
       this.antialias = false;
+      this.type = "Text";
       const game = GameInstance.get();
       this.resolution = game.renderer.resolution;
       this.canvas = this.texture.image;
@@ -3191,7 +3196,7 @@ void main (void)
           }
         }
         maxWidth = Math.max(maxWidth, lineWidth);
-        lineMetrics.push({lineWidth, lineHeight, ascent, descent, left, right, y});
+        lineMetrics.push({ lineWidth, lineHeight, ascent, descent, left, right, y });
       }
       maxWidth += padding.left + padding.right;
       maxHeight += padding.top + padding.bottom;
@@ -3374,7 +3379,7 @@ void main (void)
       const node = parent.children[i];
       if (node.isRenderable()) {
         const children = [];
-        const entry = {node, children};
+        const entry = { node, children };
         output.push(entry);
         if (node.willRenderChildren && node.numChildren > 0) {
           if (node.willCacheChildren) {
@@ -3443,6 +3448,7 @@ void main (void)
       super();
       this.forceRefresh = false;
       this.is3D = false;
+      this.type = "BaseWorld";
       this.scene = scene;
       this.world = this;
       this.events = new Map();
@@ -3543,6 +3549,7 @@ void main (void)
   var StaticWorld = class extends BaseWorld {
     constructor(scene) {
       super(scene);
+      this.type = "StaticWorld";
       this.camera = new StaticCamera();
       this.renderData = CreateWorldRenderData(this, this.camera);
     }
@@ -4521,15 +4528,15 @@ void main (void)
     }
   };
   Arm.restitution = {
-    shoulder: {rotation: {value: 0, restitution: Math.PI / 8, impulse: Math.PI / 4}},
-    elbow: {rotation: {value: 0, restitution: Math.PI / 8, impulse: Math.PI / 4}},
-    wrist: {rotation: {value: 0, restitution: Math.PI / 8, impulse: -Math.PI / 4}},
+    shoulder: { rotation: { value: 0, restitution: Math.PI / 8, impulse: Math.PI / 4, epsilon: 0.01 } },
+    elbow: { rotation: { value: 0, restitution: Math.PI / 8, impulse: Math.PI / 4, epsilon: 0.01 } },
+    wrist: { rotation: { value: 0, restitution: Math.PI / 8, impulse: -Math.PI / 4, epsilon: 0.01 } },
     palm: {
-      scaleX: {value: 1, restitution: 0.25, impulse: 0.5},
-      scaleY: {value: 1, restitution: 0.25, impulse: 0.5}
+      scaleX: { value: 1, restitution: 0.25, impulse: 0.5, epsilon: 0.01 },
+      scaleY: { value: 1, restitution: 0.25, impulse: 0.5, epsilon: 0.01 }
     },
-    thumb: {x: {value: 16, restitution: 4, impulse: -8}},
-    finger: {x: {value: -16, restitution: 4, impulse: 8}}
+    thumb: { x: { value: 16, restitution: 4, impulse: -8, epsilon: 0.07 } },
+    finger: { x: { value: -16, restitution: 4, impulse: 8, epsilon: 0.07 } }
   };
   var Demo = class extends Scene {
     constructor() {
@@ -4580,14 +4587,14 @@ void main (void)
 
             [\u2191/\u2193/\u2190/\u2192] Palm scale: ${this.dump(arm.parts.palm)}
 
-            [T] Thumb x-: ${this.dump(arm.parts.thumb)}
+            [R] Thumb x-: ${this.dump(arm.parts.thumb)}
 
-            [Y] Finger x+: ${this.dump(arm.parts.finger)}
+            [T] Finger x+: ${this.dump(arm.parts.finger)}
             `;
       });
     }
     dump(obj) {
-      const cfg = {maximumFractionDigits: 2};
+      const cfg = { maximumFractionDigits: 2 };
       return `pos:(${obj.x.toLocaleString(void 0, cfg)}, ${obj.y.toLocaleString(void 0, cfg)}) rot: ${(obj.rotation / Math.PI).toLocaleString(void 0, cfg)}\u03C0 (${RadToDeg(obj.rotation).toLocaleString(void 0, cfg)}\xB0) scale:(${obj.scaleX.toLocaleString(void 0, cfg)}, ${obj.scaleY.toLocaleString(void 0, cfg)}) skew:(${obj.skewX.toLocaleString(void 0, cfg)}, ${obj.skewY.toLocaleString(void 0, cfg)})`;
     }
   };

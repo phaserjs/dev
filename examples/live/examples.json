@@ -82,26 +82,26 @@
         {
           "path": "examples/live/container/armature.js",
           "name": "armature.js",
-          "size": 133214,
+          "size": 133635,
           "extension": ".js",
           "type": "file"
         },
         {
-          "path": "examples/live/container/crashstack.js",
-          "name": "crashstack.js",
-          "size": 119091,
+          "path": "examples/live/container/tentacle.js",
+          "name": "tentacle.js",
+          "size": 114175,
           "extension": ".js",
           "type": "file"
         },
         {
-          "path": "examples/live/container/deep children.js",
-          "name": "deep children.js",
-          "size": 130971,
+          "path": "examples/live/container/water in container.js",
+          "name": "water in container.js",
+          "size": 103567,
           "extension": ".js",
           "type": "file"
         }
       ],
-      "size": 491370,
+      "size": 459471,
       "type": "directory"
     },
     {
@@ -296,21 +296,6 @@
       "type": "directory"
     },
     {
-      "path": "examples/live/layer",
-      "name": "layer",
-      "children": [
-        {
-          "path": "examples/live/layer/effect layer.js",
-          "name": "effect layer.js",
-          "size": 125006,
-          "extension": ".js",
-          "type": "file"
-        }
-      ],
-      "size": 125006,
-      "type": "directory"
-    },
-    {
       "path": "examples/live/textures",
       "name": "textures",
       "children": [
@@ -361,6 +346,6 @@
       "type": "directory"
     }
   ],
-  "size": 4675692,
+  "size": 4518787,
   "type": "directory"
 }
