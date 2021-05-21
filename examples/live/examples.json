@@ -124,6 +124,20 @@
       "name": "display",
       "children": [
         {
+          "path": "examples/live/display/fill lots of rects.js",
+          "name": "fill lots of rects.js",
+          "size": 130677,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/display/fill rect.js",
+          "name": "fill rect.js",
+          "size": 118492,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
           "path": "examples/live/display/overlap bounds.js",
           "name": "overlap bounds.js",
           "size": 122951,
@@ -131,7 +145,7 @@
           "type": "file"
         }
       ],
-      "size": 122951,
+      "size": 372120,
       "type": "directory"
     },
     {
@@ -419,6 +433,6 @@
       "type": "directory"
     }
   ],
-  "size": 5627263,
+  "size": 5876432,
   "type": "directory"
 }
