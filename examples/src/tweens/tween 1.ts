@@ -1,16 +1,16 @@
-import { AddChild, AddChildren } from '../../src/display';
-import { BackgroundColor, CanvasRenderer, Parent, Scenes, Size, WebGLRenderer } from '../../src/config';
+import { AddChild, AddChildren } from '../../../../phaser-genesis/src/display';
+import { BackgroundColor, GlobalVar, Parent, Scenes, Size, WebGL } from '../../../../phaser-genesis/src/config';
 
-import { Game } from '../../src/Game';
-import { IBaseWorld } from '../../src/world/IBaseWorld';
-import { IEventInstance } from '../../src/events/IEventInstance';
-import { ImageFile } from '../../src/loader/files/ImageFile';
-import { Loader } from '../../src/loader/Loader';
-import { On } from '../../src/events';
-import { Quadratic } from '../../src/math/easing';
-import { Scene } from '../../src/scenes/Scene';
-import { Sprite } from '../../src/gameobjects';
-import { StaticWorld } from '../../src/world/StaticWorld';
+import { Game } from '../../../../phaser-genesis/src/Game';
+import { IBaseWorld } from '../../../../phaser-genesis/src/world/IBaseWorld';
+import { IEventInstance } from '../../../../phaser-genesis/src/events/IEventInstance';
+import { ImageFile } from '../../../../phaser-genesis/src/loader/files/ImageFile';
+import { Loader } from '../../../../phaser-genesis/src/loader/Loader';
+import { On } from '../../../../phaser-genesis/src/events';
+import { Quadratic } from '../../../../phaser-genesis/src/math/easing';
+import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
+import { Sprite } from '../../../../phaser-genesis/src/gameobjects';
+import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
 
 class TweenProperty
 {
@@ -533,8 +533,7 @@ class Demo extends Scene
 
         const loader = new Loader();
 
-        loader.setPath('/phaser4-examples/public/assets/');
-        // loader.setPath('/examples/public/assets/');
+        loader.setPath('/assets/');
 
         loader.add(ImageFile('logo', 'logo.png'));
 
@@ -551,13 +550,11 @@ class Demo extends Scene
     }
 }
 
-export default function (): void
-{
-    new Game(
-        WebGLRenderer(),
-        Size(800, 600),
-        Parent('gameParent'),
-        BackgroundColor(0x2d2d2d),
-        Scenes(Demo)
-    );
-}
+new Game(
+    WebGL(),
+    Size(800, 600),
+    Parent('gameParent'),
+    GlobalVar('Phaser4'),
+    BackgroundColor(0x2d2d2d),
+    Scenes(Demo)
+);

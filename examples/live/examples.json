@@ -38,19 +38,19 @@
         {
           "path": "examples/live/animation/atlas animation.js",
           "name": "atlas animation.js",
-          "size": 115329,
+          "size": 119218,
           "extension": ".js",
           "type": "file"
         },
         {
           "path": "examples/live/animation/create animation from atlas.js",
           "name": "create animation from atlas.js",
-          "size": 77963,
+          "size": 80560,
           "extension": ".js",
           "type": "file"
         }
       ],
-      "size": 193292,
+      "size": 199778,
       "type": "directory"
     },
     {
@@ -63,9 +63,16 @@
           "size": 140355,
           "extension": ".js",
           "type": "file"
+        },
+        {
+          "path": "examples/live/camera/camera test 2.js",
+          "name": "camera test 2.js",
+          "size": 138322,
+          "extension": ".js",
+          "type": "file"
         }
       ],
-      "size": 140355,
+      "size": 278677,
       "type": "directory"
     },
     {
@@ -119,14 +126,14 @@
         {
           "path": "examples/live/display/fill lots of rects.js",
           "name": "fill lots of rects.js",
-          "size": 114871,
+          "size": 130677,
           "extension": ".js",
           "type": "file"
         },
         {
           "path": "examples/live/display/fill rect.js",
           "name": "fill rect.js",
-          "size": 114853,
+          "size": 118492,
           "extension": ".js",
           "type": "file"
         },
@@ -138,7 +145,7 @@
           "type": "file"
         }
       ],
-      "size": 352675,
+      "size": 372120,
       "type": "directory"
     },
     {
@@ -152,12 +159,12 @@
             {
               "path": "examples/live/gameobjects/effectlayer/create effect layer.js",
               "name": "create effect layer.js",
-              "size": 123101,
+              "size": 127191,
               "extension": ".js",
               "type": "file"
             }
           ],
-          "size": 123101,
+          "size": 127191,
           "type": "directory"
         },
         {
@@ -253,7 +260,14 @@
             {
               "path": "examples/live/gameobjects/sprite/rotating sprite.js",
               "name": "rotating sprite.js",
-              "size": 103854,
+              "size": 107334,
+              "extension": ".js",
+              "type": "file"
+            },
+            {
+              "path": "examples/live/gameobjects/sprite/sprite alpha.js",
+              "name": "sprite alpha.js",
+              "size": 117164,
               "extension": ".js",
               "type": "file"
             },
@@ -265,7 +279,7 @@
               "type": "file"
             }
           ],
-          "size": 1534576,
+          "size": 1655220,
           "type": "directory"
         },
         {
@@ -298,7 +312,7 @@
           "type": "directory"
         }
       ],
-      "size": 2436588,
+      "size": 2561322,
       "type": "directory"
     },
     {
@@ -395,8 +409,30 @@
       ],
       "size": 662788,
       "type": "directory"
+    },
+    {
+      "path": "examples/live/tweens",
+      "name": "tweens",
+      "children": [
+        {
+          "path": "examples/live/tweens/tween 1.js",
+          "name": "tween 1.js",
+          "size": 134112,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/tweens/tween 2.js",
+          "name": "tween 2.js",
+          "size": 132290,
+          "extension": ".js",
+          "type": "file"
+        }
+      ],
+      "size": 266402,
+      "type": "directory"
     }
   ],
-  "size": 5321043,
+  "size": 5876432,
   "type": "directory"
 }
