@@ -1,18 +1,18 @@
-import * as Easing from '../src/math/easing';
+import * as Easing from '../../../../phaser-genesis/src/math/easing';
 
-import { AddChild, AddChildren } from '../src/display';
-import { BackgroundColor, Parent, Scenes, SetCanvas, SetWebGL, Size } from '../src/config';
+import { AddChild, AddChildren } from '../../../../phaser-genesis/src/display';
+import { BackgroundColor, GlobalVar, Parent, Scenes, Size, WebGL } from '../../../../phaser-genesis/src/config';
 
-import { AddTween } from '../src/motion/tween/nano/AddTween';
-import { Game } from '../src/Game';
-import { ImageFile } from '../src/loader/files/ImageFile';
-import { Loader } from '../src/loader/Loader';
-import { Scene } from '../src/scenes/Scene';
-import { Sprite } from '../src/gameobjects';
-import { StaticWorld } from '../src/world/StaticWorld';
+import { AddTween } from '../../../../phaser-genesis/src/motion/tween/nano/AddTween';
+import { Game } from '../../../../phaser-genesis/src/Game';
+import { ImageFile } from '../../../../phaser-genesis/src/loader/files/ImageFile';
+import { Loader } from '../../../../phaser-genesis/src/loader/Loader';
+import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
+import { Sprite } from '../../../../phaser-genesis/src/gameobjects';
+import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
 
-// import { ITweenPlugin } from '../src/motion/tween/ITweenPlugin';
-// import { TweenPlugin } from '../src/motion/tween/TweenPlugin';
+// import { ITweenPlugin } from '../../../../phaser-genesis/src/motion/tween/ITweenPlugin';
+// import { TweenPlugin } from '../../../../phaser-genesis/src/motion/tween/TweenPlugin';
 
 class Demo extends Scene
 {
@@ -24,8 +24,7 @@ class Demo extends Scene
 
         const loader = new Loader();
 
-        loader.setPath('/phaser4-examples/public/assets/');
-        // loader.setPath('/examples/public/assets/');
+        loader.setPath('assets/');
 
         loader.add(ImageFile('logo', 'logo.png'));
         loader.add(ImageFile('rocket', 'rocket.png'));
@@ -59,13 +58,11 @@ class Demo extends Scene
     }
 }
 
-export default function (): void
-{
-    new Game(
-        SetWebGL(),
-        Size(800, 600),
-        Parent('gameParent'),
-        BackgroundColor(0x2d2d2d),
-        Scenes(Demo)
-    );
-}
+new Game(
+    WebGL(),
+    Size(800, 600),
+    Parent('gameParent'),
+    GlobalVar('Phaser4'),
+    BackgroundColor(0x2d2d2d),
+    Scenes(Demo)
+);
