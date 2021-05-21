@@ -1,16 +1,16 @@
-import { AddChild, AddChildren } from '../src/display/';
-import { BackgroundColor, Parent, Scenes, Size, WebGLRenderer } from '../src/config';
+import { AddChild, AddChildren } from '../../../../phaser-genesis/src/display/';
+import { BackgroundColor, GlobalVar, Parent, Scenes, Size, WebGL } from '../../../../phaser-genesis/src/config';
 
-import { Between } from '../src/math';
-import { Game } from '../src/Game';
-import { Keyboard } from '../src/input/keyboard';
-import { Loader } from '../src/loader/Loader';
-import { On } from '../src/events';
-import { Scene } from '../src/scenes/Scene';
-import { Sprite } from '../src/gameobjects/';
-import { SpriteSheetFile } from '../src/loader/files/';
-import { WebGLRenderer as W } from '../src/renderer/webgl1/WebGLRenderer';
-import { World } from '../src/world/World';
+import { Between } from '../../../../phaser-genesis/src/math';
+import { Game } from '../../../../phaser-genesis/src/Game';
+import { Keyboard } from '../../../../phaser-genesis/src/input/keyboard';
+import { Loader } from '../../../../phaser-genesis/src/loader/Loader';
+import { On } from '../../../../phaser-genesis/src/events';
+import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
+import { Sprite } from '../../../../phaser-genesis/src/gameobjects/';
+import { SpriteSheetFile } from '../../../../phaser-genesis/src/loader/files/';
+import { WebGLRenderer as W } from '../../../../phaser-genesis/src/renderer/webgl1/WebGLRenderer';
+import { World } from '../../../../phaser-genesis/src/world/World';
 
 class Demo extends Scene
 {
@@ -20,11 +20,11 @@ class Demo extends Scene
 
         const loader = new Loader();
 
-        loader.setPath('/phaser4-examples/public/assets/');
+        loader.setPath('assets/');
 
         loader.add(SpriteSheetFile('fruits', '32x32-item-pack.png', { frameWidth: 32 }));
 
-        loader.start(() => this.create());
+        loader.start().then(() => this.create());
     }
 
     create ()
@@ -71,13 +71,11 @@ class Demo extends Scene
     }
 }
 
-export default function (): void
-{
-    new Game(
-        WebGLRenderer(),
-        Size(800, 600),
-        Parent('gameParent'),
-        BackgroundColor(0x2d2d2d),
-        Scenes(Demo)
-    );
-}
+new Game(
+    WebGL(),
+    Size(800, 600),
+    Parent('gameParent'),
+    GlobalVar('Phaser4'),
+    BackgroundColor(0x2d2d2d),
+    Scenes(Demo)
+);
