@@ -6,10 +6,12 @@ import { ImageFile } from '../../../../../phaser-genesis/src/loader/files/ImageF
 import { Loader } from '../../../../../phaser-genesis/src/loader/Loader';
 import { LocalMatrix2DComponent } from '../../../../../phaser-genesis/src/components/transform/LocalMatrix2DComponent';
 import { On } from '../../../../../phaser-genesis/src/events';
+import { QuadVertexComponent } from '../../../../../phaser-genesis/src/components/vertices/QuadVertexComponent';
 import { Scene } from '../../../../../phaser-genesis/src/scenes/Scene';
 import { Sprite } from '../../../../../phaser-genesis/src/gameobjects/';
 import { StaticWorld } from '../../../../../phaser-genesis/src/world/StaticWorld';
 import { Transform2DComponent } from '../../../../../phaser-genesis/src/components/transform/Transform2DComponent';
+import { VertexComponent } from '../../../../../phaser-genesis/src/components/vertices/VertexComponent';
 import { WorldMatrix2DComponent } from '../../../../../phaser-genesis/src/components/transform/WorldMatrix2DComponent';
 
 class Demo extends Scene
@@ -34,6 +36,10 @@ class Demo extends Scene
             AddChild(world, rocket2);
             AddChild(world, rocket3);
 
+            // console.log(rocket);
+            // console.log(rocket2);
+            // console.log(rocket3);
+
             window.addEventListener('mousedown', () => {
 
                 Transform2DComponent.x[world.id] += 10;
@@ -43,8 +49,8 @@ class Demo extends Scene
             On(this, 'update', () => {
 
                 rocket.rotation += 0.01;
-                rocket2.rotation -= 0.01;
-                rocket3.rotation -= 0.01;
+                rocket2.rotation -= 0.02;
+                rocket3.rotation -= 0.03;
 
             });
 

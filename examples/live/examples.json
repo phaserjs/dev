@@ -208,6 +208,13 @@
               "type": "file"
             },
             {
+              "path": "examples/live/gameobjects/sprite/mass sprite ecs.js",
+              "name": "mass sprite ecs.js",
+              "size": 144942,
+              "extension": ".js",
+              "type": "file"
+            },
+            {
               "path": "examples/live/gameobjects/sprite/modify sprite verts.js",
               "name": "modify sprite verts.js",
               "size": 376105,
@@ -224,12 +231,12 @@
             {
               "path": "examples/live/gameobjects/sprite/sprite ecs.js",
               "name": "sprite ecs.js",
-              "size": 130403,
+              "size": 131151,
               "extension": ".js",
               "type": "file"
             }
           ],
-          "size": 1348004,
+          "size": 1493694,
           "type": "directory"
         },
         {
@@ -262,7 +269,7 @@
           "type": "directory"
         }
       ],
-      "size": 2224680,
+      "size": 2370370,
       "type": "directory"
     },
     {
@@ -346,6 +353,6 @@
       "type": "directory"
     }
   ],
-  "size": 4535015,
+  "size": 4680705,
   "type": "directory"
 }
