@@ -133,7 +133,7 @@
         {
           "path": "examples/live/display/draw tiles.js",
           "name": "draw tiles.js",
-          "size": 125733,
+          "size": 146091,
           "extension": ".js",
           "type": "file"
         },
@@ -173,7 +173,7 @@
           "type": "file"
         }
       ],
-      "size": 960187,
+      "size": 980545,
       "type": "directory"
     },
     {
@@ -432,6 +432,6 @@
       "type": "directory"
     }
   ],
-  "size": 5789023,
+  "size": 5809381,
   "type": "directory"
 }
