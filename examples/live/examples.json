@@ -117,9 +117,30 @@
       "name": "display",
       "children": [
         {
+          "path": "examples/live/display/draw frame.js",
+          "name": "draw frame.js",
+          "size": 123284,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/display/draw image.js",
+          "name": "draw image.js",
+          "size": 121158,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/display/draw tiles.js",
+          "name": "draw tiles.js",
+          "size": 125733,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
           "path": "examples/live/display/fill line.js",
           "name": "fill line.js",
-          "size": 114554,
+          "size": 115019,
           "extension": ".js",
           "type": "file"
         },
@@ -152,7 +173,7 @@
           "type": "file"
         }
       ],
-      "size": 589547,
+      "size": 960187,
       "type": "directory"
     },
     {
@@ -411,6 +432,6 @@
       "type": "directory"
     }
   ],
-  "size": 5418383,
+  "size": 5789023,
   "type": "directory"
 }
