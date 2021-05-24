@@ -126,14 +126,28 @@
         {
           "path": "examples/live/display/draw image.js",
           "name": "draw image.js",
-          "size": 121158,
+          "size": 118047,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/display/draw scaled frame.js",
+          "name": "draw scaled frame.js",
+          "size": 120143,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/display/draw scaled image.js",
+          "name": "draw scaled image.js",
+          "size": 118069,
           "extension": ".js",
           "type": "file"
         },
         {
           "path": "examples/live/display/draw tiles.js",
           "name": "draw tiles.js",
-          "size": 146091,
+          "size": 147349,
           "extension": ".js",
           "type": "file"
         },
@@ -173,7 +187,7 @@
           "type": "file"
         }
       ],
-      "size": 980545,
+      "size": 1216904,
       "type": "directory"
     },
     {
@@ -432,6 +446,6 @@
       "type": "directory"
     }
   ],
-  "size": 5809381,
+  "size": 6045740,
   "type": "directory"
 }

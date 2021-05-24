@@ -4,8 +4,6 @@ import { DrawFrame } from '../../../../phaser-genesis/src/renderer/webgl1/draw/D
 import { Game } from '../../../../phaser-genesis/src/Game';
 import { GetTexture } from '../../../../phaser-genesis/src/textures/GetTexture';
 import { IRenderPass } from '../../../../phaser-genesis/src/renderer/webgl1/renderpass/IRenderPass';
-import { ImageFile } from '../../../../phaser-genesis/src/loader/files/ImageFile';
-import { Loader } from '../../../../phaser-genesis/src/loader/Loader';
 import { On } from '../../../../phaser-genesis/src/events/On';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
 import { SpriteSheetFile } from '../../../../phaser-genesis/src/loader/files/SpriteSheetFile';
@@ -18,16 +16,12 @@ class Demo extends Scene
     {
         super();
 
-        this.preload();
+        this.create();
     }
 
-    async preload ()
+    async create ()
     {
-        const loader = new Loader();
-
-        loader.add(SpriteSheetFile('tiles', 'assets/fantasy-tiles.png', { frameWidth: 64 }));
-
-        await loader.start();
+        await SpriteSheetFile('tiles', 'assets/fantasy-tiles.png', { frameWidth: 64 }).load();
 
         const texture = GetTexture('tiles');
 

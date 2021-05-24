@@ -9,6 +9,7 @@ import { On } from '../../../../phaser-genesis/src/events/On';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
 import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
 import { WorldPostRenderEvent } from '../../../../phaser-genesis/src/world/events';
+import { gl } from '../../../../phaser-genesis/src/renderer/webgl1/GL';
 
 class Demo extends Scene
 {
@@ -21,15 +22,14 @@ class Demo extends Scene
 
     async create ()
     {
-        await ImageFile('gundam', 'assets/gundam-ex-maxi-on-half.jpg').load();
-
-        const texture = GetTexture('gundam');
+        await ImageFile('g1', 'assets/gundam1.png', { minFilter: gl.NEAREST, magFilter: gl.NEAREST }).load();
 
         const world = new StaticWorld(this);
 
         On(world, WorldPostRenderEvent, (renderPass: IRenderPass) => {
 
-            DrawImage(renderPass, texture, -80, 30);
+            //  Scale this image by 4 when drawing it
+            DrawImage(renderPass, GetTexture('g1'), 0, 110, 1, 4, 4);
 
         });
     }
@@ -39,6 +39,6 @@ new Game(
     WebGL(),
     Parent('gameParent'),
     GlobalVar('Phaser4'),
-    BackgroundColor(0x0a0a0a),
+    BackgroundColor(0x2d2d2d),
     Scenes(Demo)
 );
