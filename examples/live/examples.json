@@ -126,7 +126,14 @@
         {
           "path": "examples/live/display/draw image.js",
           "name": "draw image.js",
-          "size": 118047,
+          "size": 118052,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/display/draw quad.js",
+          "name": "draw quad.js",
+          "size": 117921,
           "extension": ".js",
           "type": "file"
         },
@@ -187,7 +194,7 @@
           "type": "file"
         }
       ],
-      "size": 1216904,
+      "size": 1334830,
       "type": "directory"
     },
     {
@@ -446,6 +453,6 @@
       "type": "directory"
     }
   ],
-  "size": 6045740,
+  "size": 6163666,
   "type": "directory"
 }
