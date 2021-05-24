@@ -9,26 +9,26 @@
         {
           "path": "examples/live/3d/edit cube.js",
           "name": "edit cube.js",
-          "size": 427734,
+          "size": 439048,
           "extension": ".js",
           "type": "file"
         },
         {
           "path": "examples/live/3d/primitives.js",
           "name": "primitives.js",
-          "size": 145072,
+          "size": 149836,
           "extension": ".js",
           "type": "file"
         },
         {
           "path": "examples/live/3d/rotating cube.js",
           "name": "rotating cube.js",
-          "size": 136511,
+          "size": 141041,
           "extension": ".js",
           "type": "file"
         }
       ],
-      "size": 709317,
+      "size": 729925,
       "type": "directory"
     },
     {
@@ -60,12 +60,12 @@
         {
           "path": "examples/live/camera/camera test 1.js",
           "name": "camera test 1.js",
-          "size": 135784,
+          "size": 140355,
           "extension": ".js",
           "type": "file"
         }
       ],
-      "size": 135784,
+      "size": 140355,
       "type": "directory"
     },
     {
@@ -75,12 +75,12 @@
         {
           "path": "examples/live/canvas/render sprite.js",
           "name": "render sprite.js",
-          "size": 72968,
+          "size": 75477,
           "extension": ".js",
           "type": "file"
         }
       ],
-      "size": 72968,
+      "size": 75477,
       "type": "directory"
     },
     {
@@ -90,26 +90,104 @@
         {
           "path": "examples/live/container/add children.js",
           "name": "add children.js",
-          "size": 108094,
+          "size": 111738,
           "extension": ".js",
           "type": "file"
         },
         {
           "path": "examples/live/container/armature.js",
           "name": "armature.js",
-          "size": 133635,
+          "size": 138249,
           "extension": ".js",
           "type": "file"
         },
         {
           "path": "examples/live/container/water in container.js",
           "name": "water in container.js",
-          "size": 103567,
+          "size": 107066,
           "extension": ".js",
           "type": "file"
         }
       ],
-      "size": 345296,
+      "size": 357053,
+      "type": "directory"
+    },
+    {
+      "path": "examples/live/direct mode",
+      "name": "direct mode",
+      "children": [
+        {
+          "path": "examples/live/direct mode/draw frame.js",
+          "name": "draw frame.js",
+          "size": 120165,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/direct mode/draw image.js",
+          "name": "draw image.js",
+          "size": 118056,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/direct mode/draw quad.js",
+          "name": "draw quad.js",
+          "size": 138220,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/direct mode/draw scaled frame.js",
+          "name": "draw scaled frame.js",
+          "size": 120147,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/direct mode/draw scaled image.js",
+          "name": "draw scaled image.js",
+          "size": 118073,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/direct mode/draw tiles.js",
+          "name": "draw tiles.js",
+          "size": 147475,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/direct mode/fill line.js",
+          "name": "fill line.js",
+          "size": 115023,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/direct mode/fill lots of rects.js",
+          "name": "fill lots of rects.js",
+          "size": 126560,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/direct mode/fill rect.js",
+          "name": "fill rect.js",
+          "size": 114857,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/direct mode/fill triangle.js",
+          "name": "fill triangle.js",
+          "size": 114566,
+          "extension": ".js",
+          "type": "file"
+        }
+      ],
+      "size": 1233142,
       "type": "directory"
     },
     {
@@ -117,84 +195,14 @@
       "name": "display",
       "children": [
         {
-          "path": "examples/live/display/draw frame.js",
-          "name": "draw frame.js",
-          "size": 123284,
-          "extension": ".js",
-          "type": "file"
-        },
-        {
-          "path": "examples/live/display/draw image.js",
-          "name": "draw image.js",
-          "size": 118052,
-          "extension": ".js",
-          "type": "file"
-        },
-        {
-          "path": "examples/live/display/draw quad.js",
-          "name": "draw quad.js",
-          "size": 117921,
-          "extension": ".js",
-          "type": "file"
-        },
-        {
-          "path": "examples/live/display/draw scaled frame.js",
-          "name": "draw scaled frame.js",
-          "size": 120143,
-          "extension": ".js",
-          "type": "file"
-        },
-        {
-          "path": "examples/live/display/draw scaled image.js",
-          "name": "draw scaled image.js",
-          "size": 118069,
-          "extension": ".js",
-          "type": "file"
-        },
-        {
-          "path": "examples/live/display/draw tiles.js",
-          "name": "draw tiles.js",
-          "size": 147349,
-          "extension": ".js",
-          "type": "file"
-        },
-        {
-          "path": "examples/live/display/fill line.js",
-          "name": "fill line.js",
-          "size": 115019,
-          "extension": ".js",
-          "type": "file"
-        },
-        {
-          "path": "examples/live/display/fill lots of rects.js",
-          "name": "fill lots of rects.js",
-          "size": 126556,
-          "extension": ".js",
-          "type": "file"
-        },
-        {
-          "path": "examples/live/display/fill rect.js",
-          "name": "fill rect.js",
-          "size": 114853,
-          "extension": ".js",
-          "type": "file"
-        },
-        {
-          "path": "examples/live/display/fill triangle.js",
-          "name": "fill triangle.js",
-          "size": 114562,
-          "extension": ".js",
-          "type": "file"
-        },
-        {
           "path": "examples/live/display/overlap bounds.js",
           "name": "overlap bounds.js",
-          "size": 119022,
+          "size": 122951,
           "extension": ".js",
           "type": "file"
         }
       ],
-      "size": 1334830,
+      "size": 122951,
       "type": "directory"
     },
     {
@@ -223,26 +231,26 @@
             {
               "path": "examples/live/gameobjects/rectangle/1024 rectangles.js",
               "name": "1024 rectangles.js",
-              "size": 109939,
+              "size": 113721,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/rectangle/create rectangle.js",
               "name": "create rectangle.js",
-              "size": 98420,
+              "size": 101721,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/rectangle/random rectangles.js",
               "name": "random rectangles.js",
-              "size": 109752,
+              "size": 113524,
               "extension": ".js",
               "type": "file"
             }
           ],
-          "size": 318111,
+          "size": 328966,
           "type": "directory"
         },
         {
@@ -252,12 +260,12 @@
             {
               "path": "examples/live/gameobjects/renderlayer/create render layer.js",
               "name": "create render layer.js",
-              "size": 110407,
+              "size": 114069,
               "extension": ".js",
               "type": "file"
             }
           ],
-          "size": 110407,
+          "size": 114069,
           "type": "directory"
         },
         {
@@ -267,42 +275,42 @@
             {
               "path": "examples/live/gameobjects/sprite/add sprite on click.js",
               "name": "add sprite on click.js",
-              "size": 110626,
+              "size": 114323,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/sprite/bounce sprite.js",
               "name": "bounce sprite.js",
-              "size": 119460,
+              "size": 123569,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/sprite/create sprite.js",
               "name": "create sprite.js",
-              "size": 104750,
+              "size": 108290,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/sprite/debug sprite.js",
               "name": "debug sprite.js",
-              "size": 402806,
+              "size": 413329,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/sprite/mass sprite ecs.js",
               "name": "mass sprite ecs.js",
-              "size": 144952,
+              "size": 149698,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/sprite/modify sprite verts.js",
               "name": "modify sprite verts.js",
-              "size": 376105,
+              "size": 386154,
               "extension": ".js",
               "type": "file"
             },
@@ -316,12 +324,12 @@
             {
               "path": "examples/live/gameobjects/sprite/sprite ecs.js",
               "name": "sprite ecs.js",
-              "size": 131151,
+              "size": 135359,
               "extension": ".js",
               "type": "file"
             }
           ],
-          "size": 1493704,
+          "size": 1534576,
           "type": "directory"
         },
         {
@@ -331,30 +339,30 @@
             {
               "path": "examples/live/gameobjects/text/create text.js",
               "name": "create text.js",
-              "size": 105877,
+              "size": 109397,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/text/fill style.js",
               "name": "fill style.js",
-              "size": 112917,
+              "size": 116680,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/text/text stroke.js",
               "name": "text stroke.js",
-              "size": 106263,
+              "size": 109799,
               "extension": ".js",
               "type": "file"
             }
           ],
-          "size": 325057,
+          "size": 335876,
           "type": "directory"
         }
       ],
-      "size": 2370380,
+      "size": 2436588,
       "type": "directory"
     },
     {
@@ -368,23 +376,23 @@
             {
               "path": "examples/live/input/keyboard/keydown.js",
               "name": "keydown.js",
-              "size": 119621,
+              "size": 123752,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/input/keyboard/left and right.js",
               "name": "left and right.js",
-              "size": 109822,
+              "size": 113559,
               "extension": ".js",
               "type": "file"
             }
           ],
-          "size": 229443,
+          "size": 237311,
           "type": "directory"
         }
       ],
-      "size": 229443,
+      "size": 237311,
       "type": "directory"
     },
     {
@@ -394,12 +402,12 @@
         {
           "path": "examples/live/loader/async start.js",
           "name": "async start.js",
-          "size": 131359,
+          "size": 135579,
           "extension": ".js",
           "type": "file"
         }
       ],
-      "size": 131359,
+      "size": 135579,
       "type": "directory"
     },
     {
@@ -409,50 +417,50 @@
         {
           "path": "examples/live/textures/linear gradient texture 1.js",
           "name": "linear gradient texture 1.js",
-          "size": 100131,
+          "size": 103498,
           "extension": ".js",
           "type": "file"
         },
         {
           "path": "examples/live/textures/linear gradient texture 2.js",
           "name": "linear gradient texture 2.js",
-          "size": 100340,
+          "size": 103712,
           "extension": ".js",
           "type": "file"
         },
         {
           "path": "examples/live/textures/linear gradient texture 3.js",
           "name": "linear gradient texture 3.js",
-          "size": 100277,
+          "size": 103648,
           "extension": ".js",
           "type": "file"
         },
         {
           "path": "examples/live/textures/pixel texture 1.js",
           "name": "pixel texture 1.js",
-          "size": 101382,
+          "size": 104824,
           "extension": ".js",
           "type": "file"
         },
         {
           "path": "examples/live/textures/texture atlas.js",
           "name": "texture atlas.js",
-          "size": 119332,
+          "size": 123448,
           "extension": ".js",
           "type": "file"
         },
         {
           "path": "examples/live/textures/trimmed texture atlas.js",
           "name": "trimmed texture atlas.js",
-          "size": 119535,
+          "size": 123658,
           "extension": ".js",
           "type": "file"
         }
       ],
-      "size": 640997,
+      "size": 662788,
       "type": "directory"
     }
   ],
-  "size": 6163666,
+  "size": 6324461,
   "type": "directory"
 }

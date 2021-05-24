@@ -3717,7 +3717,7 @@ void main (void)
     }
   };
 
-  // examples/src/display/draw scaled image.ts
+  // examples/src/direct mode/draw image.ts
   var Demo = class extends Scene {
     constructor() {
       super();
@@ -3725,15 +3725,16 @@ void main (void)
     }
     create() {
       return __async(this, null, function* () {
-        yield ImageFile("g1", "assets/gundam1.png", { minFilter: gl.NEAREST, magFilter: gl.NEAREST }).load();
+        yield ImageFile("gundam", "assets/gundam-ex-maxi-on-half.jpg").load();
+        const texture = GetTexture("gundam");
         const world3 = new StaticWorld(this);
         On(world3, WorldPostRenderEvent, (renderPass) => {
-          DrawImage(renderPass, GetTexture("g1"), 0, 110, 1, 4, 4);
+          DrawImage(renderPass, texture, -80, 30);
         });
       });
     }
   };
-  new Game(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(2960685), Scenes(Demo));
+  new Game(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(657930), Scenes(Demo));
 })();
 /**
  * @author       Niklas von Hertzen (https://github.com/niklasvh/base64-arraybuffer)
@@ -3746,4 +3747,4 @@ void main (void)
  * @copyright    2020 Photon Storm Ltd.
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
  */
-//# sourceMappingURL=draw scaled image.js.map
+//# sourceMappingURL=draw image.js.map

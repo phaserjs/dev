@@ -19,6 +19,26 @@
     return a;
   };
   var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
+  var __async = (__this, __arguments, generator) => {
+    return new Promise((resolve, reject) => {
+      var fulfilled = (value) => {
+        try {
+          step(generator.next(value));
+        } catch (e) {
+          reject(e);
+        }
+      };
+      var rejected = (value) => {
+        try {
+          step(generator.throw(value));
+        } catch (e) {
+          reject(e);
+        }
+      };
+      var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
+      step((generator = generator.apply(__this, __arguments)).next());
+    });
+  };
 
   // ../phaser-genesis/src/config/const.ts
   var CONFIG_DEFAULTS = {
@@ -2503,55 +2523,42 @@ void main (void)
     ConfigStore.set(CONFIG_DEFAULTS.WEBGL_CONTEXT, contextAttributes);
   }
 
-  // ../phaser-genesis/src/textures/TextureManagerInstance.ts
-  var instance3;
-  var TextureManagerInstance = {
-    get: () => {
-      return instance3;
-    },
-    set: (manager) => {
-      instance3 = manager;
-    }
-  };
-
-  // ../phaser-genesis/src/textures/GetTexture.ts
-  function GetTexture(key) {
-    return TextureManagerInstance.get().get(key);
-  }
-
   // ../phaser-genesis/src/renderer/webgl1/colors/PackColor.ts
   function PackColor(rgb, alpha) {
     const ua = (alpha * 255 | 0) & 255;
     return (ua << 24 | rgb) >>> 0;
   }
 
-  // ../phaser-genesis/src/renderer/webgl1/draw/FillRect.ts
-  function FillRect(renderPass, x, y, width, height, color, alpha = 1) {
+  // ../phaser-genesis/src/renderer/webgl1/draw/DrawImage.ts
+  function DrawImage(renderPass, texture, x, y, alpha = 1, scaleX = 1, scaleY = 1) {
     const { F32, U32, offset } = GetVertexBufferEntry(renderPass, 1);
-    const packedColor = PackColor(color, alpha);
-    const textureIndex = SetTexture(renderPass, GetTexture("__WHITE"));
+    const packedColor = PackColor(16777215, alpha);
+    const frame2 = texture.firstFrame;
+    const textureIndex = SetTexture(renderPass, texture);
+    const displayWidth = frame2.width * scaleX;
+    const displayHeight = frame2.height * scaleY;
     F32[offset + 0] = x;
     F32[offset + 1] = y;
-    F32[offset + 2] = 0;
-    F32[offset + 3] = 1;
+    F32[offset + 2] = frame2.u0;
+    F32[offset + 3] = frame2.v0;
     F32[offset + 4] = textureIndex;
     U32[offset + 5] = packedColor;
     F32[offset + 6] = x;
-    F32[offset + 7] = y + height;
-    F32[offset + 8] = 0;
-    F32[offset + 9] = 0;
+    F32[offset + 7] = y + displayHeight;
+    F32[offset + 8] = frame2.u0;
+    F32[offset + 9] = frame2.v1;
     F32[offset + 10] = textureIndex;
     U32[offset + 11] = packedColor;
-    F32[offset + 12] = x + width;
-    F32[offset + 13] = y + height;
-    F32[offset + 14] = 1;
-    F32[offset + 15] = 0;
+    F32[offset + 12] = x + displayWidth;
+    F32[offset + 13] = y + displayHeight;
+    F32[offset + 14] = frame2.u1;
+    F32[offset + 15] = frame2.v1;
     F32[offset + 16] = textureIndex;
     U32[offset + 17] = packedColor;
-    F32[offset + 18] = x + width;
+    F32[offset + 18] = x + displayWidth;
     F32[offset + 19] = y;
-    F32[offset + 20] = 1;
-    F32[offset + 21] = 1;
+    F32[offset + 20] = frame2.u1;
+    F32[offset + 21] = frame2.v0;
     F32[offset + 22] = textureIndex;
     U32[offset + 23] = packedColor;
   }
@@ -2713,13 +2720,13 @@ void main (void)
   }
 
   // ../phaser-genesis/src/scenes/SceneManagerInstance.ts
-  var instance4;
+  var instance3;
   var SceneManagerInstance = {
     get: () => {
-      return instance4;
+      return instance3;
     },
     set: (manager) => {
-      instance4 = manager;
+      instance3 = manager;
     }
   };
 
@@ -2778,6 +2785,17 @@ void main (void)
     canvas.height = height;
     return canvas.getContext("2d");
   }
+
+  // ../phaser-genesis/src/textures/TextureManagerInstance.ts
+  var instance4;
+  var TextureManagerInstance = {
+    get: () => {
+      return instance4;
+    },
+    set: (manager) => {
+      instance4 = manager;
+    }
+  };
 
   // ../phaser-genesis/src/textures/TextureManager.ts
   var TextureManager = class {
@@ -2891,6 +2909,94 @@ void main (void)
     destroy() {
     }
   };
+
+  // ../phaser-genesis/src/textures/GetTexture.ts
+  function GetTexture(key) {
+    return TextureManagerInstance.get().get(key);
+  }
+
+  // ../phaser-genesis/src/loader/File.ts
+  var File = class {
+    constructor(key, url, config) {
+      this.responseType = "text";
+      this.crossOrigin = void 0;
+      this.skipCache = false;
+      this.hasLoaded = false;
+      this.key = key;
+      this.url = url;
+      this.config = config;
+    }
+  };
+
+  // ../phaser-genesis/src/loader/GetURL.ts
+  function GetURL(key, url, extension, loader) {
+    if (!url) {
+      url = key + extension;
+    }
+    if (/^(?:blob:|data:|http:\/\/|https:\/\/|\/\/)/.exec(url)) {
+      return url;
+    } else if (loader) {
+      return loader.baseURL + loader.path + url;
+    } else {
+      return url;
+    }
+  }
+
+  // ../phaser-genesis/src/loader/ImageTagLoader.ts
+  function ImageTagLoader(file) {
+    file.data = new Image();
+    if (file.crossOrigin) {
+      file.data.crossOrigin = file.crossOrigin;
+    }
+    return new Promise((resolve, reject) => {
+      file.data.onload = () => {
+        if (file.data.onload) {
+          file.data.onload = null;
+          file.data.onerror = null;
+          resolve(file);
+        }
+      };
+      file.data.onerror = (event) => {
+        if (file.data.onload) {
+          file.data.onload = null;
+          file.data.onerror = null;
+          file.error = event;
+          reject(file);
+        }
+      };
+      file.data.src = file.url;
+      if (file.data.complete && file.data.width && file.data.height) {
+        file.data.onload = null;
+        file.data.onerror = null;
+        resolve(file);
+      }
+    });
+  }
+
+  // ../phaser-genesis/src/loader/files/ImageFile.ts
+  function ImageFile(key, url, glConfig) {
+    const file = new File(key, url);
+    file.load = () => {
+      file.url = GetURL(file.key, file.url, ".png", file.loader);
+      if (file.loader) {
+        file.crossOrigin = file.loader.crossOrigin;
+      }
+      return new Promise((resolve, reject) => {
+        const textureManager = TextureManagerInstance.get();
+        if (textureManager.has(file.key)) {
+          resolve(file);
+        } else {
+          ImageTagLoader(file).then((file2) => {
+            textureManager.add(file2.key, file2.data, glConfig);
+            resolve(file2);
+          }).catch((file2) => {
+            reject(file2);
+          });
+        }
+      });
+    };
+    return file;
+  }
 
   // ../phaser-genesis/src/scenes/GetConfigValue.ts
   function GetConfigValue(config, property, defaultValue) {
@@ -3611,15 +3717,19 @@ void main (void)
     }
   };
 
-  // examples/src/display/fill rect.ts
+  // examples/src/direct mode/draw scaled image.ts
   var Demo = class extends Scene {
     constructor() {
       super();
-      const world3 = new StaticWorld(this);
-      On(world3, WorldPostRenderEvent, (renderPass) => {
-        FillRect(renderPass, 100, 100, 64, 64, 16711680);
-        FillRect(renderPass, 200, 200, 128, 32, 16776960);
-        FillRect(renderPass, 300, 300, 16, 128, 16711935);
+      this.create();
+    }
+    create() {
+      return __async(this, null, function* () {
+        yield ImageFile("g1", "assets/gundam1.png", { minFilter: gl.NEAREST, magFilter: gl.NEAREST }).load();
+        const world3 = new StaticWorld(this);
+        On(world3, WorldPostRenderEvent, (renderPass) => {
+          DrawImage(renderPass, GetTexture("g1"), 0, 110, 1, 4, 4);
+        });
       });
     }
   };
@@ -3636,4 +3746,4 @@ void main (void)
  * @copyright    2020 Photon Storm Ltd.
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
  */
-//# sourceMappingURL=fill rect.js.map
+//# sourceMappingURL=draw scaled image.js.map

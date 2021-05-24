@@ -2529,11 +2529,11 @@ void main (void)
     return (ua << 24 | rgb) >>> 0;
   }
 
-  // ../phaser-genesis/src/renderer/webgl1/draw/DrawImage.ts
-  function DrawImage(renderPass, texture, x, y, alpha = 1, scaleX = 1, scaleY = 1) {
+  // ../phaser-genesis/src/renderer/webgl1/draw/DrawFrame.ts
+  function DrawFrame(renderPass, texture, frame2, x, y, alpha = 1, scaleX = 1, scaleY = 1) {
     const { F32, U32, offset } = GetVertexBufferEntry(renderPass, 1);
     const packedColor = PackColor(16777215, alpha);
-    const frame2 = texture.firstFrame;
+    frame2 = texture.getFrame(frame2);
     const textureIndex = SetTexture(renderPass, texture);
     const displayWidth = frame2.width * scaleX;
     const displayHeight = frame2.height * scaleY;
@@ -2915,6 +2915,44 @@ void main (void)
     return TextureManagerInstance.get().get(key);
   }
 
+  // ../phaser-genesis/src/scenes/GetConfigValue.ts
+  function GetConfigValue(config, property, defaultValue) {
+    if (Object.prototype.hasOwnProperty.call(config, property)) {
+      return config[property];
+    } else {
+      return defaultValue;
+    }
+  }
+
+  // ../phaser-genesis/src/scenes/Install.ts
+  function Install(scene, config = {}) {
+    const sceneManager = SceneManagerInstance.get();
+    const size = sceneManager.scenes.size;
+    const sceneIndex = sceneManager.sceneIndex;
+    const firstScene = size === 0;
+    if (typeof config === "string") {
+      scene.key = config;
+    } else if (config || !config && firstScene) {
+      scene.key = GetConfigValue(config, "key", "scene" + sceneIndex.toString());
+    }
+    if (sceneManager.scenes.has(scene.key)) {
+      console.warn("Scene key already in use: " + scene.key);
+    } else {
+      sceneManager.scenes.set(scene.key, scene);
+      sceneManager.flush = true;
+      sceneManager.sceneIndex++;
+    }
+  }
+
+  // ../phaser-genesis/src/scenes/Scene.ts
+  var Scene = class {
+    constructor(config) {
+      this.game = GameInstance.get();
+      this.events = new Map();
+      Install(this, config);
+    }
+  };
+
   // ../phaser-genesis/src/loader/File.ts
   var File = class {
     constructor(key, url, config) {
@@ -2973,8 +3011,65 @@ void main (void)
     });
   }
 
-  // ../phaser-genesis/src/loader/files/ImageFile.ts
-  function ImageFile(key, url, glConfig) {
+  // ../phaser-genesis/src/textures/parsers/SpriteSheetParser.ts
+  function SpriteSheetParser(texture, x, y, width, height, frameConfig) {
+    const {
+      frameWidth = null,
+      endFrame = -1,
+      margin = 0,
+      spacing = 0
+    } = frameConfig;
+    let {
+      frameHeight = null,
+      startFrame = 0
+    } = frameConfig;
+    if (!frameHeight) {
+      frameHeight = frameWidth;
+    }
+    if (frameWidth === null) {
+      throw new Error("SpriteSheetParser: Invalid frameWidth");
+    }
+    const row = Math.floor((width - margin + spacing) / (frameWidth + spacing));
+    const column = Math.floor((height - margin + spacing) / (frameHeight + spacing));
+    let total = row * column;
+    if (total === 0) {
+      console.warn("SpriteSheetParser: Frame config will result in zero frames");
+    }
+    if (startFrame > total || startFrame < -total) {
+      startFrame = 0;
+    }
+    if (startFrame < 0) {
+      startFrame = total + startFrame;
+    }
+    if (endFrame !== -1) {
+      total = startFrame + (endFrame + 1);
+    }
+    let fx = margin;
+    let fy = margin;
+    let ax = 0;
+    let ay = 0;
+    for (let i = 0; i < total; i++) {
+      ax = 0;
+      ay = 0;
+      const w = fx + frameWidth;
+      const h = fy + frameHeight;
+      if (w > width) {
+        ax = w - width;
+      }
+      if (h > height) {
+        ay = h - height;
+      }
+      texture.addFrame(i, x + fx, y + fy, frameWidth - ax, frameHeight - ay);
+      fx += frameWidth + spacing;
+      if (fx + frameWidth > width) {
+        fx = margin;
+        fy += frameHeight + spacing;
+      }
+    }
+  }
+
+  // ../phaser-genesis/src/loader/files/SpriteSheetFile.ts
+  function SpriteSheetFile(key, url, frameConfig, glConfig) {
     const file = new File(key, url);
     file.load = () => {
       file.url = GetURL(file.key, file.url, ".png", file.loader);
@@ -2987,8 +3082,13 @@ void main (void)
           resolve(file);
         } else {
           ImageTagLoader(file).then((file2) => {
-            textureManager.add(file2.key, file2.data, glConfig);
-            resolve(file2);
+            const texture = textureManager.add(file2.key, file2.data, glConfig);
+            if (texture) {
+              SpriteSheetParser(texture, 0, 0, texture.width, texture.height, frameConfig);
+              resolve(file2);
+            } else {
+              reject(file2);
+            }
           }).catch((file2) => {
             reject(file2);
           });
@@ -2997,44 +3097,6 @@ void main (void)
     };
     return file;
   }
-
-  // ../phaser-genesis/src/scenes/GetConfigValue.ts
-  function GetConfigValue(config, property, defaultValue) {
-    if (Object.prototype.hasOwnProperty.call(config, property)) {
-      return config[property];
-    } else {
-      return defaultValue;
-    }
-  }
-
-  // ../phaser-genesis/src/scenes/Install.ts
-  function Install(scene, config = {}) {
-    const sceneManager = SceneManagerInstance.get();
-    const size = sceneManager.scenes.size;
-    const sceneIndex = sceneManager.sceneIndex;
-    const firstScene = size === 0;
-    if (typeof config === "string") {
-      scene.key = config;
-    } else if (config || !config && firstScene) {
-      scene.key = GetConfigValue(config, "key", "scene" + sceneIndex.toString());
-    }
-    if (sceneManager.scenes.has(scene.key)) {
-      console.warn("Scene key already in use: " + scene.key);
-    } else {
-      sceneManager.scenes.set(scene.key, scene);
-      sceneManager.flush = true;
-      sceneManager.sceneIndex++;
-    }
-  }
-
-  // ../phaser-genesis/src/scenes/Scene.ts
-  var Scene = class {
-    constructor(config) {
-      this.game = GameInstance.get();
-      this.events = new Map();
-      Install(this, config);
-    }
-  };
 
   // ../phaser-genesis/src/gameobjects/events/AddedToWorldEvent.ts
   var AddedToWorldEvent = "addedtoworld";
@@ -3717,7 +3779,7 @@ void main (void)
     }
   };
 
-  // examples/src/display/draw image.ts
+  // examples/src/direct mode/draw scaled frame.ts
   var Demo = class extends Scene {
     constructor() {
       super();
@@ -3725,16 +3787,19 @@ void main (void)
     }
     create() {
       return __async(this, null, function* () {
-        yield ImageFile("gundam", "assets/gundam-ex-maxi-on-half.jpg").load();
-        const texture = GetTexture("gundam");
+        yield SpriteSheetFile("fruit", "assets/32x32-item-pack.png", { frameWidth: 32 }, { minFilter: gl.NEAREST, magFilter: gl.NEAREST }).load();
+        const texture = GetTexture("fruit");
         const world3 = new StaticWorld(this);
         On(world3, WorldPostRenderEvent, (renderPass) => {
-          DrawImage(renderPass, texture, -80, 30);
+          DrawFrame(renderPass, texture, 0, 56, 6, 1, 9, 9);
+          DrawFrame(renderPass, texture, 1, 456, 6, 1, 9, 9);
+          DrawFrame(renderPass, texture, 2, 56, 306, 1, 9, 9);
+          DrawFrame(renderPass, texture, 3, 456, 306, 1, 9, 9);
         });
       });
     }
   };
-  new Game(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(657930), Scenes(Demo));
+  new Game(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(2960685), Scenes(Demo));
 })();
 /**
  * @author       Niklas von Hertzen (https://github.com/niklasvh/base64-arraybuffer)
@@ -3747,4 +3812,4 @@ void main (void)
  * @copyright    2020 Photon Storm Ltd.
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
  */
-//# sourceMappingURL=draw image.js.map
+//# sourceMappingURL=draw scaled frame.js.map

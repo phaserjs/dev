@@ -19,30 +19,6 @@
     return a;
   };
   var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
-  var __export = (target, all) => {
-    for (var name in all)
-      __defProp(target, name, { get: all[name], enumerable: true });
-  };
-  var __async = (__this, __arguments, generator) => {
-    return new Promise((resolve, reject) => {
-      var fulfilled = (value) => {
-        try {
-          step(generator.next(value));
-        } catch (e) {
-          reject(e);
-        }
-      };
-      var rejected = (value) => {
-        try {
-          step(generator.throw(value));
-        } catch (e) {
-          reject(e);
-        }
-      };
-      var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
-      step((generator = generator.apply(__this, __arguments)).next());
-    });
-  };
 
   // ../phaser-genesis/src/config/const.ts
   var CONFIG_DEFAULTS = {
@@ -2203,36 +2179,9 @@ void main (void)
     renderPass.defaultViewport = entry;
   }
 
-  // ../phaser-genesis/src/math/vec3/Vec3.ts
-  var Vec3 = class {
-    constructor(x = 0, y = 0, z = 0) {
-      this.set(x, y, z);
-    }
-    set(x = 0, y = 0, z = 0) {
-      this.x = x;
-      this.y = y;
-      this.z = z;
-      return this;
-    }
-    toArray(dst = [], index = 0) {
-      const { x, y, z } = this;
-      dst[index] = x;
-      dst[index + 1] = y;
-      dst[index + 2] = z;
-      return dst;
-    }
-    fromArray(src, index = 0) {
-      return this.set(src[index], src[index + 1], src[index + 2]);
-    }
-    toString() {
-      const { x, y, z } = this;
-      return `{ x=${x}, y=${y}, z=${z} }`;
-    }
-  };
-
   // ../phaser-genesis/src/math/mat4/Mat4Identity.ts
-  function Mat4Identity(matrix2 = new Matrix4()) {
-    return matrix2.set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+  function Mat4Identity(matrix = new Matrix4()) {
+    return matrix.set(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
   }
 
   // ../phaser-genesis/src/math/mat2d/Matrix2D.ts
@@ -2271,12 +2220,6 @@ void main (void)
     MIN_SAFE_INTEGER: Number.MIN_SAFE_INTEGER || -9007199254740991,
     MAX_SAFE_INTEGER: Number.MAX_SAFE_INTEGER || 9007199254740991
   };
-
-  // ../phaser-genesis/src/math/Wrap.ts
-  function Wrap(value, min, max) {
-    const range = max - min;
-    return min + ((value - min) % range + range) % range;
-  }
 
   // ../phaser-genesis/src/camera/StaticCamera.ts
   var StaticCamera = class {
@@ -2560,555 +2503,95 @@ void main (void)
     ConfigStore.set(CONFIG_DEFAULTS.WEBGL_CONTEXT, contextAttributes);
   }
 
-  // ../phaser-genesis/src/math/easing/index.ts
-  var easing_exports = {};
-  __export(easing_exports, {
-    Back: () => back_exports,
-    Bounce: () => bounce_exports,
-    Circular: () => circular_exports,
-    Cubic: () => cubic_exports,
-    Elastic: () => elastic_exports,
-    Expo: () => expo_exports,
-    GetEase: () => GetEase_exports,
-    Linear: () => Linear_exports,
-    Quadratic: () => quadratic_exports,
-    Quartic: () => quartic_exports,
-    Quintic: () => quintic_exports,
-    Sine: () => sine_exports,
-    Stepped: () => Stepped_exports
-  });
-
-  // ../phaser-genesis/src/math/easing/back/index.ts
-  var back_exports = {};
-  __export(back_exports, {
-    In: () => In,
-    InOut: () => InOut,
-    Out: () => Out
-  });
-
-  // ../phaser-genesis/src/math/easing/back/In.ts
-  function In(v, overshoot = 1.70158) {
-    return v * v * ((overshoot + 1) * v - overshoot);
-  }
-
-  // ../phaser-genesis/src/math/easing/back/InOut.ts
-  function InOut(v, overshoot = 1.70158) {
-    const s = overshoot * 1.525;
-    if ((v *= 2) < 1) {
-      return 0.5 * (v * v * ((s + 1) * v - s));
-    } else {
-      return 0.5 * ((v -= 2) * v * ((s + 1) * v + s) + 2);
-    }
-  }
-
-  // ../phaser-genesis/src/math/easing/back/Out.ts
-  function Out(v, overshoot = 1.70158) {
-    return --v * v * ((overshoot + 1) * v + overshoot) + 1;
-  }
-
-  // ../phaser-genesis/src/math/easing/bounce/index.ts
-  var bounce_exports = {};
-  __export(bounce_exports, {
-    In: () => In2,
-    InOut: () => InOut2,
-    Out: () => Out2
-  });
-
-  // ../phaser-genesis/src/math/easing/bounce/In.ts
-  function In2(v) {
-    v = 1 - v;
-    if (v < 1 / 2.75) {
-      return 1 - 7.5625 * v * v;
-    } else if (v < 2 / 2.75) {
-      return 1 - (7.5625 * (v -= 1.5 / 2.75) * v + 0.75);
-    } else if (v < 2.5 / 2.75) {
-      return 1 - (7.5625 * (v -= 2.25 / 2.75) * v + 0.9375);
-    } else {
-      return 1 - (7.5625 * (v -= 2.625 / 2.75) * v + 0.984375);
-    }
-  }
-
-  // ../phaser-genesis/src/math/easing/bounce/InOut.ts
-  function InOut2(v) {
-    let reverse = false;
-    if (v < 0.5) {
-      v = 1 - v * 2;
-      reverse = true;
-    } else {
-      v = v * 2 - 1;
-    }
-    if (v < 1 / 2.75) {
-      v = 7.5625 * v * v;
-    } else if (v < 2 / 2.75) {
-      v = 7.5625 * (v -= 1.5 / 2.75) * v + 0.75;
-    } else if (v < 2.5 / 2.75) {
-      v = 7.5625 * (v -= 2.25 / 2.75) * v + 0.9375;
-    } else {
-      v = 7.5625 * (v -= 2.625 / 2.75) * v + 0.984375;
-    }
-    if (reverse) {
-      return (1 - v) * 0.5;
-    } else {
-      return v * 0.5 + 0.5;
-    }
-  }
-
-  // ../phaser-genesis/src/math/easing/bounce/Out.ts
-  function Out2(v) {
-    if (v < 1 / 2.75) {
-      return 7.5625 * v * v;
-    } else if (v < 2 / 2.75) {
-      return 7.5625 * (v -= 1.5 / 2.75) * v + 0.75;
-    } else if (v < 2.5 / 2.75) {
-      return 7.5625 * (v -= 2.25 / 2.75) * v + 0.9375;
-    } else {
-      return 7.5625 * (v -= 2.625 / 2.75) * v + 0.984375;
-    }
-  }
-
-  // ../phaser-genesis/src/math/easing/circular/index.ts
-  var circular_exports = {};
-  __export(circular_exports, {
-    In: () => In3,
-    InOut: () => InOut3,
-    Out: () => Out3
-  });
-
-  // ../phaser-genesis/src/math/easing/circular/In.ts
-  function In3(v) {
-    return 1 - Math.sqrt(1 - v * v);
-  }
-
-  // ../phaser-genesis/src/math/easing/circular/InOut.ts
-  function InOut3(v) {
-    if ((v *= 2) < 1) {
-      return -0.5 * (Math.sqrt(1 - v * v) - 1);
-    } else {
-      return 0.5 * (Math.sqrt(1 - (v -= 2) * v) + 1);
-    }
-  }
-
-  // ../phaser-genesis/src/math/easing/circular/Out.ts
-  function Out3(v) {
-    return Math.sqrt(1 - --v * v);
-  }
-
-  // ../phaser-genesis/src/math/easing/cubic/index.ts
-  var cubic_exports = {};
-  __export(cubic_exports, {
-    In: () => In4,
-    InOut: () => InOut4,
-    Out: () => Out4
-  });
-
-  // ../phaser-genesis/src/math/easing/cubic/In.ts
-  function In4(v) {
-    return v * v * v;
-  }
-
-  // ../phaser-genesis/src/math/easing/cubic/InOut.ts
-  function InOut4(v) {
-    if ((v *= 2) < 1) {
-      return 0.5 * v * v * v;
-    } else {
-      return 0.5 * ((v -= 2) * v * v + 2);
-    }
-  }
-
-  // ../phaser-genesis/src/math/easing/cubic/Out.ts
-  function Out4(v) {
-    return --v * v * v + 1;
-  }
-
-  // ../phaser-genesis/src/math/easing/elastic/index.ts
-  var elastic_exports = {};
-  __export(elastic_exports, {
-    In: () => In5,
-    InOut: () => InOut5,
-    Out: () => Out5
-  });
-
-  // ../phaser-genesis/src/math/easing/elastic/In.ts
-  function In5(v, amplitude = 0.1, period = 0.1) {
-    if (v === 0) {
-      return 0;
-    } else if (v === 1) {
-      return 1;
-    } else {
-      let s = period / 4;
-      if (amplitude < 1) {
-        amplitude = 1;
-      } else {
-        s = period * Math.asin(1 / amplitude) / (2 * Math.PI);
-      }
-      return -(amplitude * Math.pow(2, 10 * (v -= 1)) * Math.sin((v - s) * (2 * Math.PI) / period));
-    }
-  }
-
-  // ../phaser-genesis/src/math/easing/elastic/InOut.ts
-  function InOut5(v, amplitude = 0.1, period = 0.1) {
-    if (v === 0) {
-      return 0;
-    } else if (v === 1) {
-      return 1;
-    } else {
-      let s = period / 4;
-      if (amplitude < 1) {
-        amplitude = 1;
-      } else {
-        s = period * Math.asin(1 / amplitude) / (2 * Math.PI);
-      }
-      if ((v *= 2) < 1) {
-        return -0.5 * (amplitude * Math.pow(2, 10 * (v -= 1)) * Math.sin((v - s) * (2 * Math.PI) / period));
-      } else {
-        return amplitude * Math.pow(2, -10 * (v -= 1)) * Math.sin((v - s) * (2 * Math.PI) / period) * 0.5 + 1;
-      }
-    }
-  }
-
-  // ../phaser-genesis/src/math/easing/elastic/Out.ts
-  function Out5(v, amplitude = 0.1, period = 0.1) {
-    if (v === 0) {
-      return 0;
-    } else if (v === 1) {
-      return 1;
-    } else {
-      let s = period / 4;
-      if (amplitude < 1) {
-        amplitude = 1;
-      } else {
-        s = period * Math.asin(1 / amplitude) / (2 * Math.PI);
-      }
-      return amplitude * Math.pow(2, -10 * v) * Math.sin((v - s) * (2 * Math.PI) / period) + 1;
-    }
-  }
-
-  // ../phaser-genesis/src/math/easing/expo/index.ts
-  var expo_exports = {};
-  __export(expo_exports, {
-    In: () => In6,
-    InOut: () => InOut6,
-    Out: () => Out6
-  });
-
-  // ../phaser-genesis/src/math/easing/expo/In.ts
-  function In6(v) {
-    return Math.pow(2, 10 * (v - 1)) - 1e-3;
-  }
-
-  // ../phaser-genesis/src/math/easing/expo/InOut.ts
-  function InOut6(v) {
-    if (v == 0) {
-      return 0;
-    }
-    if (v == 1) {
-      return 1;
-    }
-    if ((v *= 2) < 1) {
-      return 0.5 * Math.pow(2, 10 * (v - 1));
-    } else {
-      return 0.5 * (2 - Math.pow(2, -10 * (v - 1)));
-    }
-  }
-
-  // ../phaser-genesis/src/math/easing/expo/Out.ts
-  function Out6(v) {
-    return 1 - Math.pow(2, -10 * v);
-  }
-
-  // ../phaser-genesis/src/math/easing/GetEase.ts
-  var GetEase_exports = {};
-  __export(GetEase_exports, {
-    GetEase: () => GetEase
-  });
-
-  // ../phaser-genesis/src/math/easing/quadratic/index.ts
-  var quadratic_exports = {};
-  __export(quadratic_exports, {
-    In: () => In7,
-    InOut: () => InOut7,
-    Out: () => Out7
-  });
-
-  // ../phaser-genesis/src/math/easing/quadratic/In.ts
-  function In7(v) {
-    return v * v;
-  }
-
-  // ../phaser-genesis/src/math/easing/quadratic/InOut.ts
-  function InOut7(v) {
-    if ((v *= 2) < 1) {
-      return 0.5 * v * v;
-    } else {
-      return -0.5 * (--v * (v - 2) - 1);
-    }
-  }
-
-  // ../phaser-genesis/src/math/easing/quadratic/Out.ts
-  function Out7(v) {
-    return v * (2 - v);
-  }
-
-  // ../phaser-genesis/src/math/easing/quartic/index.ts
-  var quartic_exports = {};
-  __export(quartic_exports, {
-    In: () => In8,
-    InOut: () => InOut8,
-    Out: () => Out8
-  });
-
-  // ../phaser-genesis/src/math/easing/quartic/In.ts
-  function In8(v) {
-    return v * v * v * v;
-  }
-
-  // ../phaser-genesis/src/math/easing/quartic/InOut.ts
-  function InOut8(v) {
-    if ((v *= 2) < 1) {
-      return 0.5 * v * v * v * v;
-    } else {
-      return -0.5 * ((v -= 2) * v * v * v - 2);
-    }
-  }
-
-  // ../phaser-genesis/src/math/easing/quartic/Out.ts
-  function Out8(v) {
-    return -(--v * v * v * v - 1);
-  }
-
-  // ../phaser-genesis/src/math/easing/quintic/index.ts
-  var quintic_exports = {};
-  __export(quintic_exports, {
-    In: () => In9,
-    InOut: () => InOut9,
-    Out: () => Out9
-  });
-
-  // ../phaser-genesis/src/math/easing/quintic/In.ts
-  function In9(v) {
-    return v * v * v * v * v;
-  }
-
-  // ../phaser-genesis/src/math/easing/quintic/InOut.ts
-  function InOut9(v) {
-    if ((v *= 2) < 1) {
-      return 0.5 * v * v * v * v * v;
-    } else {
-      return 0.5 * ((v -= 2) * v * v * v * v + 2);
-    }
-  }
-
-  // ../phaser-genesis/src/math/easing/quintic/Out.ts
-  function Out9(v) {
-    return (v = v - 1) * v * v * v * v + 1;
-  }
-
-  // ../phaser-genesis/src/math/easing/sine/index.ts
-  var sine_exports = {};
-  __export(sine_exports, {
-    In: () => In10,
-    InOut: () => InOut10,
-    Out: () => Out10
-  });
-
-  // ../phaser-genesis/src/math/easing/sine/In.ts
-  function In10(v) {
-    if (v === 0) {
-      return 0;
-    } else if (v === 1) {
-      return 1;
-    } else {
-      return 1 - Math.cos(v * Math.PI / 2);
-    }
-  }
-
-  // ../phaser-genesis/src/math/easing/sine/InOut.ts
-  function InOut10(v) {
-    if (v === 0) {
-      return 0;
-    } else if (v === 1) {
-      return 1;
-    } else {
-      return 0.5 * (1 - Math.cos(Math.PI * v));
-    }
-  }
-
-  // ../phaser-genesis/src/math/easing/sine/Out.ts
-  function Out10(v) {
-    if (v === 0) {
-      return 0;
-    } else if (v === 1) {
-      return 1;
-    } else {
-      return Math.sin(v * Math.PI / 2);
-    }
-  }
-
-  // ../phaser-genesis/src/math/easing/Linear.ts
-  var Linear_exports = {};
-  __export(Linear_exports, {
-    Linear: () => Linear
-  });
-  function Linear(v) {
-    return v;
-  }
-
-  // ../phaser-genesis/src/math/easing/Stepped.ts
-  var Stepped_exports = {};
-  __export(Stepped_exports, {
-    Stepped: () => Stepped
-  });
-  function Stepped(v, steps = 1) {
-    if (v <= 0) {
-      return 0;
-    } else if (v >= 1) {
-      return 1;
-    } else {
-      return ((steps * v | 0) + 1) * (1 / steps);
-    }
-  }
-
-  // ../phaser-genesis/src/math/easing/GetEase.ts
-  var EaseMap = new Map([
-    ["power0", Linear],
-    ["power1", Out7],
-    ["power2", Out4],
-    ["power3", Out8],
-    ["power4", Out9],
-    ["linear", Linear],
-    ["quad", Out7],
-    ["cubic", Out4],
-    ["quart", Out8],
-    ["quint", Out9],
-    ["sine", Out10],
-    ["expo", Out6],
-    ["circ", Out3],
-    ["elastic", Out5],
-    ["back", Out],
-    ["bounce", Out2],
-    ["stepped", Stepped],
-    ["quad.in", In7],
-    ["cubic.in", In4],
-    ["quart.in", In8],
-    ["quint.in", In9],
-    ["sine.in", In10],
-    ["expo.in", In6],
-    ["circ.in", In3],
-    ["elastic.in", In5],
-    ["back.in", In],
-    ["bounce.in", In2],
-    ["quad.out", Out7],
-    ["cubic.out", Out4],
-    ["quart.out", Out8],
-    ["quint.out", Out9],
-    ["sine.out", Out10],
-    ["expo.out", Out6],
-    ["circ.out", Out3],
-    ["elastic.out", Out5],
-    ["back.out", Out],
-    ["bounce.out", Out2],
-    ["quad.inout", InOut7],
-    ["cubic.inout", InOut4],
-    ["quart.inout", InOut8],
-    ["quint.inout", InOut9],
-    ["sine.inout", InOut10],
-    ["expo.inout", InOut6],
-    ["circ.inout", InOut3],
-    ["elastic.inout", InOut5],
-    ["back.inout", InOut],
-    ["bounce.inout", InOut2]
-  ]);
-  function GetEase(name) {
-    name = name.toLowerCase();
-    name = name.replace("ease", "");
-    if (EaseMap.has(name)) {
-      return EaseMap.get(name);
-    } else {
-      return Linear;
-    }
-  }
-
-  // ../phaser-genesis/src/math/mat2d/Mat2dEquals.ts
-  function Mat2dEquals(a, b) {
-    return a.a === b.a && a.b === b.b && a.c === b.c && a.d === b.d && a.tx === b.tx && a.ty === b.ty;
-  }
-
-  // ../phaser-genesis/src/math/vec2/Vec2.ts
-  var Vec2 = class {
-    constructor(x = 0, y = 0) {
-      this.set(x, y);
-    }
-    set(x = 0, y = 0) {
-      this.x = x;
-      this.y = y;
-      return this;
-    }
-    toArray(dst = [], index = 0) {
-      const { x, y } = this;
-      dst[index] = x;
-      dst[index + 1] = y;
-      return dst;
-    }
-    fromArray(src, index = 0) {
-      return this.set(src[index], src[index + 1]);
-    }
-    toString() {
-      const { x, y } = this;
-      return `{ x=${x}, y=${y} }`;
+  // ../phaser-genesis/src/textures/TextureManagerInstance.ts
+  var instance3;
+  var TextureManagerInstance = {
+    get: () => {
+      return instance3;
+    },
+    set: (manager) => {
+      instance3 = manager;
     }
   };
 
-  // ../phaser-genesis/src/math/vec3/Vec3Backward.ts
-  function Vec3Backward() {
-    return new Vec3(0, 0, -1);
+  // ../phaser-genesis/src/textures/GetTexture.ts
+  function GetTexture(key) {
+    return TextureManagerInstance.get().get(key);
   }
 
-  // ../phaser-genesis/src/math/vec3/Vec3Down.ts
-  function Vec3Down() {
-    return new Vec3(0, -1, 0);
+  // ../phaser-genesis/src/renderer/webgl1/colors/PackColor.ts
+  function PackColor(rgb, alpha) {
+    const ua = (alpha * 255 | 0) & 255;
+    return (ua << 24 | rgb) >>> 0;
   }
 
-  // ../phaser-genesis/src/math/vec3/Vec3Forward.ts
-  function Vec3Forward() {
-    return new Vec3(0, 0, 1);
+  // ../phaser-genesis/src/renderer/webgl1/draw/FillLine.ts
+  function FillLine(renderPass, x0, y0, x1, y1, width, color, alpha = 1) {
+    const { F32, U32, offset } = GetVertexBufferEntry(renderPass, 1);
+    const packedColor = PackColor(color, alpha);
+    const textureIndex = SetTexture(renderPass, GetTexture("__WHITE"));
+    const dx = x1 - x0;
+    const dy = y1 - y0;
+    const len = Math.sqrt(dx * dx + dy * dy);
+    const al0 = width * (y1 - y0) / len;
+    const al1 = width * (x0 - x1) / len;
+    const bl0 = width * (y1 - y0) / len;
+    const bl1 = width * (x0 - x1) / len;
+    F32[offset + 0] = x0 + al0;
+    F32[offset + 1] = y0 + al1;
+    F32[offset + 2] = 0;
+    F32[offset + 3] = 1;
+    F32[offset + 4] = textureIndex;
+    U32[offset + 5] = packedColor;
+    F32[offset + 6] = x0 - al0;
+    F32[offset + 7] = y0 - al1;
+    F32[offset + 8] = 0;
+    F32[offset + 9] = 0;
+    F32[offset + 10] = textureIndex;
+    U32[offset + 11] = packedColor;
+    F32[offset + 12] = x1 - bl0;
+    F32[offset + 13] = y1 - bl1;
+    F32[offset + 14] = 1;
+    F32[offset + 15] = 0;
+    F32[offset + 16] = textureIndex;
+    U32[offset + 17] = packedColor;
+    F32[offset + 18] = x1 + bl0;
+    F32[offset + 19] = y1 + bl1;
+    F32[offset + 20] = 1;
+    F32[offset + 21] = 1;
+    F32[offset + 22] = textureIndex;
+    U32[offset + 23] = packedColor;
   }
 
-  // ../phaser-genesis/src/math/vec3/Vec3Left.ts
-  function Vec3Left() {
-    return new Vec3(-1, 0, 0);
+  // ../phaser-genesis/src/dom/AddToDOM.ts
+  function AddToDOM(element, parent) {
+    const target = GetElement(parent);
+    target.appendChild(element);
+    return element;
   }
 
-  // ../phaser-genesis/src/math/vec3/Vec3Right.ts
-  function Vec3Right() {
-    return new Vec3(1, 0, 0);
+  // ../phaser-genesis/src/dom/DOMContentLoaded.ts
+  function DOMContentLoaded(callback) {
+    const readyState = document.readyState;
+    if (readyState === "complete" || readyState === "interactive") {
+      callback();
+      return;
+    }
+    const check = () => {
+      document.removeEventListener("deviceready", check, true);
+      document.removeEventListener("DOMContentLoaded", check, true);
+      window.removeEventListener("load", check, true);
+      callback();
+    };
+    if (!document.body) {
+      window.setTimeout(check, 20);
+    } else if (window.hasOwnProperty("cordova")) {
+      document.addEventListener("deviceready", check, true);
+    } else {
+      document.addEventListener("DOMContentLoaded", check, true);
+      window.addEventListener("load", check, true);
+    }
   }
-
-  // ../phaser-genesis/src/math/vec3/Vec3Up.ts
-  function Vec3Up() {
-    return new Vec3(0, 1, 0);
-  }
-
-  // ../phaser-genesis/src/math/vec3/Vec3Zero.ts
-  function Vec3Zero() {
-    return new Vec3(0, 0, 0);
-  }
-
-  // ../phaser-genesis/src/math/vec3/const.ts
-  var UP = Vec3Up();
-  var DOWN = Vec3Down();
-  var LEFT = Vec3Left();
-  var RIGHT = Vec3Right();
-  var FORWARD = Vec3Forward();
-  var BACKWARD = Vec3Backward();
-  var ZERO = Vec3Zero();
-
-  // ../phaser-genesis/src/math/vec3/Vec3Project.ts
-  var tempMatrix1 = new Matrix4();
-  var tempMatrix2 = new Matrix4();
-
-  // ../phaser-genesis/src/math/vec3/Vec3Unproject.ts
-  var matrix = new Matrix4();
-  var screenSource = new Vec3();
 
   // ../phaser-genesis/src/events/Emit.ts
   function Emit(emitter, event, ...args) {
@@ -3185,542 +2668,6 @@ void main (void)
   // ../phaser-genesis/src/events/Once.ts
   function Once(emitter, event, callback, context = emitter) {
     return On(emitter, event, callback, context, true);
-  }
-
-  // ../phaser-genesis/src/motion/tween/TweenProperty.ts
-  var TweenProperty = class {
-    constructor(name, end) {
-      this.name = name;
-      if (typeof end === "string") {
-        this.modifier = end.substr(0, 1);
-        this.end = parseFloat(end.substring(1));
-      } else {
-        this.end = end;
-      }
-    }
-    getEnd(start) {
-      const modifier = this.modifier;
-      const end = this.end;
-      if (modifier === "+") {
-        return start + end;
-      } else if (modifier === "-") {
-        return start - end;
-      } else {
-        return end;
-      }
-    }
-    to(target) {
-      const current = target[this.name];
-      const end = this.getEnd(current);
-      this.start = current;
-      this.end = end;
-    }
-    from(target) {
-      const current = target[this.name];
-      const end = this.getEnd(current);
-      this.start = end;
-      this.end = current;
-      target[this.name] = end;
-    }
-    update(target, v) {
-      target[this.name] = this.start + (this.end - this.start) * v;
-    }
-  };
-
-  // ../phaser-genesis/src/gameobjects/events/AddedToWorldEvent.ts
-  var AddedToWorldEvent = "addedtoworld";
-
-  // ../phaser-genesis/src/gameobjects/events/DestroyEvent.ts
-  var DestroyEvent = "destroy";
-
-  // ../phaser-genesis/src/gameobjects/events/PostUpdateEvent.ts
-  var PostUpdateEvent = "postupdate";
-
-  // ../phaser-genesis/src/gameobjects/events/RemovedFromWorldEvent.ts
-  var RemovedFromWorldEvent = "removedfromworld";
-
-  // ../phaser-genesis/src/gameobjects/events/UpdateEvent.ts
-  var UpdateEvent = "update";
-
-  // ../phaser-genesis/src/motion/tween/nano/NanoTween.ts
-  var NanoTween = class {
-    constructor(target, emitter, autoStart = true) {
-      this.state = { running: false, repeat: false, hold: false, delay: false, yoyo: false, yoyoing: false, autoStart: true, reversed: false };
-      this.init = { duration: 0, repeat: 0, repeatDelay: 0, hold: 0, delay: 0 };
-      this.counters = { repeat: 0, delay: 0, progress: 0, elapsed: 0 };
-      this.ease = Linear;
-      this.properties = [];
-      if (!emitter) {
-        emitter = GameInstance.get();
-      }
-      this.target = target;
-      this.state.autoStart = autoStart;
-      this.emitter = emitter;
-    }
-    to(duration, properties = null) {
-      return this.add(duration, properties, false);
-    }
-    from(duration, properties = null) {
-      return this.add(duration, properties, true);
-    }
-    add(duration, props, reversed) {
-      const state = this.state;
-      const init = this.init;
-      if (state.running) {
-        return this;
-      }
-      const properties = this.properties;
-      for (const [name, value] of Object.entries(props)) {
-        properties.push(new TweenProperty(name, value));
-      }
-      init.duration = duration;
-      state.reversed = reversed;
-      if (state.autoStart) {
-        this.start();
-      }
-      return this;
-    }
-    start() {
-      const state = this.state;
-      if (state.running) {
-        return this;
-      }
-      const target = this.target;
-      const properties = this.properties;
-      properties.forEach((property) => {
-        if (state.reversed) {
-          property.from(target);
-        } else {
-          property.to(target);
-        }
-      });
-      state.running = true;
-      this.listener = On(this.emitter, UpdateEvent, (delta) => this.update(delta));
-      return this;
-    }
-    restart() {
-      const state = this.state;
-      const init = this.init;
-      const counters = this.counters;
-      if (!state) {
-        throw "Cannot restart destroyed tween";
-      }
-      counters.delay = init.delay;
-      counters.elapsed = 0;
-      counters.progress = 0;
-      counters.repeat = init.repeat;
-      state.yoyoing = false;
-      state.running = true;
-      return this;
-    }
-    update(delta) {
-      const state = this.state;
-      const init = this.init;
-      const counters = this.counters;
-      if (!state.running) {
-        return false;
-      }
-      if (counters.delay > 0) {
-        counters.delay -= delta;
-        if (counters.delay <= 0) {
-          counters.elapsed = Math.abs(counters.delay) - delta;
-          counters.delay = 0;
-        } else {
-          return false;
-        }
-      }
-      counters.elapsed += delta;
-      const progress = Math.min(counters.elapsed / init.duration, 1);
-      counters.progress = progress;
-      const v = state.yoyoing ? this.ease(1 - progress) : this.ease(progress);
-      const target = this.target;
-      const properties = this.properties;
-      properties.forEach((property) => {
-        property.update(target, v);
-      });
-      if (progress < 1) {
-        return false;
-      }
-      const diff2 = counters.elapsed - init.duration;
-      if (state.yoyo && !state.yoyoing) {
-        counters.elapsed = diff2;
-        counters.delay = init.hold - diff2;
-        state.yoyoing = true;
-        return false;
-      }
-      if (counters.repeat > 0) {
-        counters.repeat--;
-        counters.elapsed = diff2;
-        counters.delay = init.repeatDelay - diff2;
-        state.yoyoing = false;
-        return false;
-      }
-      this.destroy();
-      return true;
-    }
-    delay(duration) {
-      const delay = duration;
-      this.init.delay = delay;
-      this.counters.delay = delay;
-      return this;
-    }
-    hold(duration) {
-      this.init.hold = duration;
-      return this;
-    }
-    yoyo(value = true) {
-      this.state.yoyo = value;
-      return this;
-    }
-    repeat(repeatCount = 1, delay = 0) {
-      const init = this.init;
-      if (repeatCount === -1) {
-        repeatCount = Number.MAX_SAFE_INTEGER;
-      }
-      this.state.repeat = repeatCount > 0;
-      this.counters.repeat = repeatCount;
-      init.repeat = repeatCount;
-      init.repeatDelay = delay;
-      return this;
-    }
-    easing(f) {
-      this.ease = f;
-      return this;
-    }
-    destroy() {
-      Off(this.emitter, UpdateEvent, this.listener);
-      this.properties.length = 0;
-      this.target = null;
-      this.ease = null;
-      this.emitter = null;
-      this.state = null;
-      this.init = null;
-      this.counters = null;
-    }
-  };
-
-  // ../phaser-genesis/src/motion/tween/nano/AddTween.ts
-  function AddTween(target, emitter = null, autoStart = true) {
-    return new NanoTween(target, emitter, autoStart);
-  }
-
-  // ../phaser-genesis/src/loader/File.ts
-  var File = class {
-    constructor(key, url, config) {
-      this.responseType = "text";
-      this.crossOrigin = void 0;
-      this.skipCache = false;
-      this.hasLoaded = false;
-      this.key = key;
-      this.url = url;
-      this.config = config;
-    }
-  };
-
-  // ../phaser-genesis/src/loader/GetURL.ts
-  function GetURL(key, url, extension, loader) {
-    if (!url) {
-      url = key + extension;
-    }
-    if (/^(?:blob:|data:|http:\/\/|https:\/\/|\/\/)/.exec(url)) {
-      return url;
-    } else if (loader) {
-      return loader.baseURL + loader.path + url;
-    } else {
-      return url;
-    }
-  }
-
-  // ../phaser-genesis/src/loader/ImageTagLoader.ts
-  function ImageTagLoader(file) {
-    file.data = new Image();
-    if (file.crossOrigin) {
-      file.data.crossOrigin = file.crossOrigin;
-    }
-    return new Promise((resolve, reject) => {
-      file.data.onload = () => {
-        if (file.data.onload) {
-          file.data.onload = null;
-          file.data.onerror = null;
-          resolve(file);
-        }
-      };
-      file.data.onerror = (event) => {
-        if (file.data.onload) {
-          file.data.onload = null;
-          file.data.onerror = null;
-          file.error = event;
-          reject(file);
-        }
-      };
-      file.data.src = file.url;
-      if (file.data.complete && file.data.width && file.data.height) {
-        file.data.onload = null;
-        file.data.onerror = null;
-        resolve(file);
-      }
-    });
-  }
-
-  // ../phaser-genesis/src/textures/TextureManagerInstance.ts
-  var instance3;
-  var TextureManagerInstance = {
-    get: () => {
-      return instance3;
-    },
-    set: (manager) => {
-      instance3 = manager;
-    }
-  };
-
-  // ../phaser-genesis/src/cache/Cache.ts
-  var caches = new Map();
-  var Cache = {
-    get: (type) => {
-      if (!caches.has(type)) {
-        caches.set(type, new Map());
-      }
-      return caches.get(type);
-    },
-    getEntry: (cache, entry) => {
-      if (caches.has(cache)) {
-        return caches.get(cache).get(entry);
-      }
-    }
-  };
-
-  // ../phaser-genesis/src/loader/XHRLoader.ts
-  function XHRLoader(file) {
-    const xhr = new XMLHttpRequest();
-    xhr.open("GET", file.url, true);
-    xhr.responseType = file.responseType;
-    return new Promise((resolve, reject) => {
-      xhr.onload = () => {
-        file.data = xhr.responseText;
-        file.hasLoaded = true;
-        resolve(file);
-      };
-      xhr.onerror = () => {
-        file.hasLoaded = true;
-        reject(file);
-      };
-      xhr.send();
-    });
-  }
-
-  // ../phaser-genesis/src/loader/files/CSVFile.ts
-  function CSVFile(key, url) {
-    const file = new File(key, url);
-    file.load = () => {
-      file.url = GetURL(file.key, file.url, ".csv", file.loader);
-      return new Promise((resolve, reject) => {
-        const cache = Cache.get("CSV");
-        if (!file.skipCache && cache.has(file.key)) {
-          resolve(file);
-        } else {
-          XHRLoader(file).then((file2) => {
-            if (!file2.skipCache) {
-              cache.set(file2.key, file2.data);
-            }
-            resolve(file2);
-          }).catch((file2) => {
-            reject(file2);
-          });
-        }
-      });
-    };
-    return file;
-  }
-
-  // ../phaser-genesis/src/textures/parsers/SpriteSheetParser.ts
-  function SpriteSheetParser(texture, x, y, width, height, frameConfig) {
-    const {
-      frameWidth = null,
-      endFrame = -1,
-      margin = 0,
-      spacing = 0
-    } = frameConfig;
-    let {
-      frameHeight = null,
-      startFrame = 0
-    } = frameConfig;
-    if (!frameHeight) {
-      frameHeight = frameWidth;
-    }
-    if (frameWidth === null) {
-      throw new Error("SpriteSheetParser: Invalid frameWidth");
-    }
-    const row = Math.floor((width - margin + spacing) / (frameWidth + spacing));
-    const column = Math.floor((height - margin + spacing) / (frameHeight + spacing));
-    let total = row * column;
-    if (total === 0) {
-      console.warn("SpriteSheetParser: Frame config will result in zero frames");
-    }
-    if (startFrame > total || startFrame < -total) {
-      startFrame = 0;
-    }
-    if (startFrame < 0) {
-      startFrame = total + startFrame;
-    }
-    if (endFrame !== -1) {
-      total = startFrame + (endFrame + 1);
-    }
-    let fx = margin;
-    let fy = margin;
-    let ax = 0;
-    let ay = 0;
-    for (let i = 0; i < total; i++) {
-      ax = 0;
-      ay = 0;
-      const w = fx + frameWidth;
-      const h = fy + frameHeight;
-      if (w > width) {
-        ax = w - width;
-      }
-      if (h > height) {
-        ay = h - height;
-      }
-      texture.addFrame(i, x + fx, y + fy, frameWidth - ax, frameHeight - ay);
-      fx += frameWidth + spacing;
-      if (fx + frameWidth > width) {
-        fx = margin;
-        fy += frameHeight + spacing;
-      }
-    }
-  }
-
-  // ../phaser-genesis/src/loader/files/SpriteSheetFile.ts
-  function SpriteSheetFile(key, url, frameConfig, glConfig) {
-    const file = new File(key, url);
-    file.load = () => {
-      file.url = GetURL(file.key, file.url, ".png", file.loader);
-      if (file.loader) {
-        file.crossOrigin = file.loader.crossOrigin;
-      }
-      return new Promise((resolve, reject) => {
-        const textureManager = TextureManagerInstance.get();
-        if (textureManager.has(file.key)) {
-          resolve(file);
-        } else {
-          ImageTagLoader(file).then((file2) => {
-            const texture = textureManager.add(file2.key, file2.data, glConfig);
-            if (texture) {
-              SpriteSheetParser(texture, 0, 0, texture.width, texture.height, frameConfig);
-              resolve(file2);
-            } else {
-              reject(file2);
-            }
-          }).catch((file2) => {
-            reject(file2);
-          });
-        }
-      });
-    };
-    return file;
-  }
-
-  // ../phaser-genesis/src/renderer/webgl1/colors/PackColor.ts
-  function PackColor(rgb, alpha) {
-    const ua = (alpha * 255 | 0) & 255;
-    return (ua << 24 | rgb) >>> 0;
-  }
-
-  // ../phaser-genesis/src/renderer/webgl1/draw/DrawFrame.ts
-  function DrawFrame(renderPass, texture, frame2, x, y, alpha = 1) {
-    const { F32, U32, offset } = GetVertexBufferEntry(renderPass, 1);
-    const packedColor = PackColor(16777215, alpha);
-    frame2 = texture.getFrame(frame2);
-    const textureIndex = SetTexture(renderPass, texture);
-    F32[offset + 0] = x;
-    F32[offset + 1] = y;
-    F32[offset + 2] = frame2.u0;
-    F32[offset + 3] = frame2.v0;
-    F32[offset + 4] = textureIndex;
-    U32[offset + 5] = packedColor;
-    F32[offset + 6] = x;
-    F32[offset + 7] = y + frame2.height;
-    F32[offset + 8] = frame2.u0;
-    F32[offset + 9] = frame2.v1;
-    F32[offset + 10] = textureIndex;
-    U32[offset + 11] = packedColor;
-    F32[offset + 12] = x + frame2.width;
-    F32[offset + 13] = y + frame2.height;
-    F32[offset + 14] = frame2.u1;
-    F32[offset + 15] = frame2.v1;
-    F32[offset + 16] = textureIndex;
-    U32[offset + 17] = packedColor;
-    F32[offset + 18] = x + frame2.width;
-    F32[offset + 19] = y;
-    F32[offset + 20] = frame2.u1;
-    F32[offset + 21] = frame2.v0;
-    F32[offset + 22] = textureIndex;
-    U32[offset + 23] = packedColor;
-  }
-
-  // ../phaser-genesis/src/textures/GetTexture.ts
-  function GetTexture(key) {
-    return TextureManagerInstance.get().get(key);
-  }
-
-  // ../phaser-genesis/src/renderer/webgl1/draw/FillRect.ts
-  function FillRect(renderPass, x, y, width, height, color, alpha = 1) {
-    const { F32, U32, offset } = GetVertexBufferEntry(renderPass, 1);
-    const packedColor = PackColor(color, alpha);
-    const textureIndex = SetTexture(renderPass, GetTexture("__WHITE"));
-    F32[offset + 0] = x;
-    F32[offset + 1] = y;
-    F32[offset + 2] = 0;
-    F32[offset + 3] = 1;
-    F32[offset + 4] = textureIndex;
-    U32[offset + 5] = packedColor;
-    F32[offset + 6] = x;
-    F32[offset + 7] = y + height;
-    F32[offset + 8] = 0;
-    F32[offset + 9] = 0;
-    F32[offset + 10] = textureIndex;
-    U32[offset + 11] = packedColor;
-    F32[offset + 12] = x + width;
-    F32[offset + 13] = y + height;
-    F32[offset + 14] = 1;
-    F32[offset + 15] = 0;
-    F32[offset + 16] = textureIndex;
-    U32[offset + 17] = packedColor;
-    F32[offset + 18] = x + width;
-    F32[offset + 19] = y;
-    F32[offset + 20] = 1;
-    F32[offset + 21] = 1;
-    F32[offset + 22] = textureIndex;
-    U32[offset + 23] = packedColor;
-  }
-
-  // ../phaser-genesis/src/dom/AddToDOM.ts
-  function AddToDOM(element, parent) {
-    const target = GetElement(parent);
-    target.appendChild(element);
-    return element;
-  }
-
-  // ../phaser-genesis/src/dom/DOMContentLoaded.ts
-  function DOMContentLoaded(callback) {
-    const readyState = document.readyState;
-    if (readyState === "complete" || readyState === "interactive") {
-      callback();
-      return;
-    }
-    const check = () => {
-      document.removeEventListener("deviceready", check, true);
-      document.removeEventListener("DOMContentLoaded", check, true);
-      window.removeEventListener("load", check, true);
-      callback();
-    };
-    if (!document.body) {
-      window.setTimeout(check, 20);
-    } else if (window.hasOwnProperty("cordova")) {
-      document.addEventListener("deviceready", check, true);
-    } else {
-      document.addEventListener("DOMContentLoaded", check, true);
-      window.addEventListener("load", check, true);
-    }
   }
 
   // ../phaser-genesis/src/config/banner/GetBanner.ts
@@ -3952,167 +2899,6 @@ void main (void)
     }
   };
 
-  // ../phaser-genesis/src/color/GetColorFromRGB.ts
-  function GetColorFromRGB(red, green, blue) {
-    return red << 16 | green << 8 | blue;
-  }
-
-  // ../phaser-genesis/src/color/GetColorSpectrum.ts
-  function GetColorSpectrum(limit = 1024) {
-    const colors = [];
-    const range = 255;
-    let i;
-    let r = 255;
-    let g = 0;
-    let b = 0;
-    for (i = 0; i <= range; i++) {
-      colors.push(GetColorFromRGB(r, i, b));
-    }
-    g = 255;
-    for (i = range; i >= 0; i--) {
-      colors.push(GetColorFromRGB(i, g, b));
-    }
-    r = 0;
-    for (i = 0; i <= range; i++, g--) {
-      colors.push(GetColorFromRGB(r, g, i));
-    }
-    g = 0;
-    b = 255;
-    for (i = 0; i <= range; i++, b--, r++) {
-      colors.push(GetColorFromRGB(r, g, b));
-    }
-    if (limit === 1024) {
-      return colors;
-    } else {
-      const out = [];
-      let t = 0;
-      const inc = 1024 / limit;
-      for (i = 0; i < limit; i++) {
-        out.push(colors[Math.floor(t)]);
-        t += inc;
-      }
-      return out;
-    }
-  }
-
-  // ../phaser-genesis/src/loader/Loader.ts
-  var Loader = class extends EventEmitter {
-    constructor() {
-      super();
-      this.baseURL = "";
-      this.path = "";
-      this.crossOrigin = "anonymous";
-      this.maxParallelDownloads = -1;
-      this.isLoading = false;
-      this.reset();
-    }
-    reset() {
-      this.isLoading = false;
-      this.queue = new Set();
-      this.inflight = new Set();
-      this.completed = new Set();
-      this.progress = 0;
-    }
-    add(...file) {
-      file.forEach((entity) => {
-        entity.loader = this;
-        this.queue.add(entity);
-      });
-      return this;
-    }
-    start() {
-      if (this.isLoading) {
-        return null;
-      }
-      return new Promise((resolve, reject) => {
-        this.completed.clear();
-        this.progress = 0;
-        if (this.queue.size > 0) {
-          this.isLoading = true;
-          this.onComplete = resolve;
-          this.onError = reject;
-          Emit(this, "start");
-          this.nextFile();
-        } else {
-          this.progress = 1;
-          Emit(this, "complete");
-          resolve(this);
-        }
-      });
-    }
-    nextFile() {
-      let limit = this.queue.size;
-      if (this.maxParallelDownloads !== -1) {
-        limit = Math.min(limit, this.maxParallelDownloads) - this.inflight.size;
-      }
-      if (limit) {
-        const iterator = this.queue.values();
-        while (limit > 0) {
-          const file = iterator.next().value;
-          this.inflight.add(file);
-          this.queue.delete(file);
-          file.load().then((file2) => this.fileComplete(file2)).catch((file2) => this.fileError(file2));
-          limit--;
-        }
-      } else if (this.inflight.size === 0) {
-        this.stop();
-      }
-    }
-    stop() {
-      if (!this.isLoading) {
-        return;
-      }
-      this.isLoading = false;
-      Emit(this, "complete", this.completed);
-      this.onComplete();
-      this.completed.clear();
-    }
-    updateProgress(file) {
-      this.inflight.delete(file);
-      this.completed.add(file);
-      const totalCompleted = this.completed.size;
-      const totalQueued = this.queue.size + this.inflight.size;
-      if (totalCompleted > 0) {
-        this.progress = totalCompleted / (totalCompleted + totalQueued);
-      }
-      Emit(this, "progress", this.progress, totalCompleted, totalQueued);
-      this.nextFile();
-    }
-    fileComplete(file) {
-      Emit(this, "filecomplete", file);
-      this.updateProgress(file);
-    }
-    fileError(file) {
-      Emit(this, "fileerror", file);
-      this.updateProgress(file);
-    }
-    totalFilesToLoad() {
-      return this.queue.size + this.inflight.size;
-    }
-    setBaseURL(url = "") {
-      if (url !== "" && url.substr(-1) !== "/") {
-        url = url.concat("/");
-      }
-      this.baseURL = url;
-      return this;
-    }
-    setPath(path = "") {
-      if (path !== "" && path.substr(-1) !== "/") {
-        path = path.concat("/");
-      }
-      this.path = path;
-      return this;
-    }
-    setCORS(crossOrigin) {
-      this.crossOrigin = crossOrigin;
-      return this;
-    }
-    setMaxParallelDownloads(max) {
-      this.maxParallelDownloads = max;
-      return this;
-    }
-  };
-
   // ../phaser-genesis/src/scenes/GetConfigValue.ts
   function GetConfigValue(config, property, defaultValue) {
     if (Object.prototype.hasOwnProperty.call(config, property)) {
@@ -4150,6 +2936,21 @@ void main (void)
       Install(this, config);
     }
   };
+
+  // ../phaser-genesis/src/gameobjects/events/AddedToWorldEvent.ts
+  var AddedToWorldEvent = "addedtoworld";
+
+  // ../phaser-genesis/src/gameobjects/events/DestroyEvent.ts
+  var DestroyEvent = "destroy";
+
+  // ../phaser-genesis/src/gameobjects/events/PostUpdateEvent.ts
+  var PostUpdateEvent = "postupdate";
+
+  // ../phaser-genesis/src/gameobjects/events/RemovedFromWorldEvent.ts
+  var RemovedFromWorldEvent = "removedfromworld";
+
+  // ../phaser-genesis/src/gameobjects/events/UpdateEvent.ts
+  var UpdateEvent = "update";
 
   // ../phaser-genesis/src/world/events/WorldPostRenderEvent.ts
   var WorldPostRenderEvent = "worldpostrender";
@@ -4639,6 +3440,11 @@ void main (void)
     }
   };
 
+  // ../phaser-genesis/src/math/mat2d/Mat2dEquals.ts
+  function Mat2dEquals(a, b) {
+    return a.a === b.a && a.b === b.b && a.c === b.c && a.d === b.d && a.tx === b.tx && a.ty === b.ty;
+  }
+
   // ../phaser-genesis/src/world/MergeRenderData.ts
   function MergeRenderData(sceneRenderData, worldRenderData) {
     sceneRenderData.numDirtyFrames += worldRenderData.dirtyFrame;
@@ -4812,48 +3618,17 @@ void main (void)
     }
   };
 
-  // examples/src/display/draw tiles.ts
+  // examples/src/direct mode/fill line.ts
   var Demo = class extends Scene {
     constructor() {
       super();
-      this.preload();
-    }
-    preload() {
-      return __async(this, null, function* () {
-        const loader = new Loader();
-        loader.add(SpriteSheetFile("tiles", "assets/fantasy-tiles.png", { frameWidth: 64 }));
-        loader.add(CSVFile("map", "assets/minimap.csv"));
-        yield loader.start();
-        const data = Cache.getEntry("CSV", "map").split("\n").flatMap((row) => row.split(","));
-        const mapData = data.map((tile) => Number(tile));
-        const texture = GetTexture("tiles");
-        const world3 = new StaticWorld(this);
-        const offset = new Vec2(0, 0);
-        const colors = GetColorSpectrum(512);
-        AddTween(offset).to(3e3, { x: -224 }).yoyo(true).repeat(-1).easing(easing_exports.Sine.InOut);
-        AddTween(offset).to(6e3, { y: -424 }).yoyo(true).repeat(-1);
-        On(world3, WorldPostRenderEvent, (renderPass) => {
-          for (let y2 = 0; y2 < 600; y2 += 8) {
-            let f = Wrap((Math.abs(offset.y) + y2) * 0.4, 0, colors.length - 1);
-            FillRect(renderPass, 0, y2, 800, 8, colors[Math.floor(f)]);
-          }
-          let x = 0;
-          let y = 0;
-          mapData.forEach((tile) => {
-            if (tile !== -1) {
-              DrawFrame(renderPass, texture, tile, Math.floor(offset.x + x), Math.floor(offset.y + y));
-            }
-            x += 64;
-            if (x === 1024) {
-              x = 0;
-              y += 64;
-            }
-          });
-        });
+      const world3 = new StaticWorld(this);
+      On(world3, WorldPostRenderEvent, (renderPass) => {
+        FillLine(renderPass, 100, 100, 300, 300, 1, 65280);
       });
     }
   };
-  new Game(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(706259), Scenes(Demo));
+  new Game(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(2960685), Scenes(Demo));
 })();
 /**
  * @author       Niklas von Hertzen (https://github.com/niklasvh/base64-arraybuffer)
@@ -4866,4 +3641,4 @@ void main (void)
  * @copyright    2020 Photon Storm Ltd.
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
  */
-//# sourceMappingURL=draw tiles.js.map
+//# sourceMappingURL=fill line.js.map
