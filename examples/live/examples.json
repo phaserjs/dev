@@ -126,7 +126,7 @@
         {
           "path": "examples/live/direct mode/draw image.js",
           "name": "draw image.js",
-          "size": 118056,
+          "size": 118144,
           "extension": ".js",
           "type": "file"
         },
@@ -187,7 +187,7 @@
           "type": "file"
         }
       ],
-      "size": 1233142,
+      "size": 1233230,
       "type": "directory"
     },
     {
@@ -461,6 +461,6 @@
       "type": "directory"
     }
   ],
-  "size": 6324461,
+  "size": 6324549,
   "type": "directory"
 }

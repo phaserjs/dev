@@ -285,7 +285,9 @@
       entry = renderPass.currentFramebuffer;
     }
     const { framebuffer, viewport } = entry;
-    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+    if (renderPass.currentFramebuffer.framebuffer !== framebuffer) {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+    }
     if (clear) {
       gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -652,6 +654,7 @@
       this.isDynamic = false;
       this.count = 0;
       this.offset = 0;
+      this.isBound = false;
       const {
         batchSize = 1,
         dataSize = 4,
@@ -687,6 +690,7 @@
       const type = this.isDynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW;
       gl.bufferData(gl.ARRAY_BUFFER, data, type);
       gl.bindBuffer(gl.ARRAY_BUFFER, null);
+      this.isBound = false;
     }
     add(count) {
       this.count += count;
@@ -1816,7 +1820,8 @@ void main (void)
     texture: Types.ui8,
     tint: Types.ui32,
     alpha: Types.f32,
-    color: Types.ui32
+    color: Types.ui32,
+    offset: Types.f32
   });
   var VertexComponent = Vertex;
 
@@ -1991,6 +1996,7 @@ void main (void)
     constructor(config) {
       this.renderToFramebuffer = false;
       this.renderToDepthbuffer = false;
+      this.isActive = false;
       if (config) {
         this.fromConfig(config);
       }
@@ -2042,6 +2048,7 @@ void main (void)
       }
       this.attributes = CreateAttributes(program, attribs);
       gl.useProgram(currentProgram);
+      this.isActive = false;
     }
     updateUniforms(renderPass) {
     }
@@ -2065,6 +2072,7 @@ void main (void)
         return false;
       }
       gl.useProgram(this.program);
+      this.isActive = true;
       const uniforms = this.uniforms;
       for (const [name, setter] of this.uniformSetters.entries()) {
         setter(uniforms.get(name));
@@ -2322,12 +2330,20 @@ void main (void)
 
   // ../phaser-genesis/src/renderer/webgl1/renderpass/BindShader.ts
   function BindShader(renderPass, entry) {
+    let prevShader;
     if (!entry) {
       entry = renderPass.currentShader;
+    } else {
+      prevShader = renderPass.currentShader.shader;
     }
-    const success = entry.shader.bind(renderPass, entry.textureID);
-    if (success) {
-      entry.shader.setAttributes(renderPass);
+    if (!entry.shader.isActive) {
+      const success = entry.shader.bind(renderPass, entry.textureID);
+      if (success) {
+        entry.shader.setAttributes(renderPass);
+        if (prevShader && prevShader !== entry.shader) {
+          prevShader.isActive = false;
+        }
+      }
     }
   }
 
@@ -2344,8 +2360,10 @@ void main (void)
       entry = renderPass.currentBlendMode;
     }
     if (entry.enable) {
-      gl.enable(gl.BLEND);
-      gl.blendFunc(entry.sfactor, entry.dfactor);
+      if (renderPass.currentBlendMode.sfactor !== entry.sfactor || renderPass.currentBlendMode.dfactor !== entry.dfactor) {
+        gl.enable(gl.BLEND);
+        gl.blendFunc(entry.sfactor, entry.dfactor);
+      }
     } else {
       gl.disable(gl.BLEND);
     }
@@ -2353,12 +2371,17 @@ void main (void)
 
   // ../phaser-genesis/src/renderer/webgl1/renderpass/BindVertexBuffer.ts
   function BindVertexBuffer(renderPass, buffer) {
-    if (!buffer) {
+    if (buffer) {
+      buffer.isBound = false;
+    } else {
       buffer = renderPass.currentVertexBuffer;
     }
-    const indexBuffer = buffer.indexed ? buffer.indexBuffer : null;
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer.vertexBuffer);
+    if (!buffer.isBound) {
+      const indexBuffer = buffer.indexed ? buffer.indexBuffer : null;
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer.vertexBuffer);
+      buffer.isBound = true;
+    }
   }
 
   // ../phaser-genesis/src/renderer/webgl1/renderpass/GetVertexBufferEntry.ts
