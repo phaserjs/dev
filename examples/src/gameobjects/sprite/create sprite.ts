@@ -17,12 +17,26 @@ class Demo extends Scene
         const loader = new Loader();
 
         loader.add(ImageFile('rocket', 'assets/rocket.png'));
+        loader.add(ImageFile('8', 'assets/8x8.png'));
 
         loader.start().then(() => {
 
             const world = new StaticWorld(this);
 
             const rocket = new Sprite(400, 300, 'rocket');
+
+            const bit1 = new Sprite(0, 100, '8');
+            const bit2 = new Sprite(50, 100, '8');
+            const bit3 = new Sprite(100, 100, '8');
+
+            window.top['rocket'] = rocket;
+            window.top['bit1'] = bit1;
+            window.top['bit2'] = bit2;
+            window.top['bit3'] = bit3;
+
+            AddChild(rocket, bit1);
+            AddChild(rocket, bit2);
+            AddChild(rocket, bit3);
 
             AddChild(world, rocket);
 
