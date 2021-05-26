@@ -24,7 +24,7 @@
     "boxen": "^5.0.1",
     "chalk": "^4.1.1",
     "directory-tree": "^2.2.9",
-    "esbuild": "^0.12.2",
+    "esbuild": "^0.12.3",
     "filesize": "^6.3.0",
     "fs-extra": "^10.0.0",
     "gradient-string": "^1.2.0",
