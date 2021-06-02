@@ -204,14 +204,21 @@
         {
           "path": "examples/live/display/add child.js",
           "name": "add child.js",
-          "size": 132320,
+          "size": 136511,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/display/add children.js",
+          "name": "add children.js",
+          "size": 135687,
           "extension": ".js",
           "type": "file"
         },
         {
           "path": "examples/live/display/call add child multiple times.js",
           "name": "call add child multiple times.js",
-          "size": 135617,
+          "size": 139921,
           "extension": ".js",
           "type": "file"
         },
@@ -223,7 +230,7 @@
           "type": "file"
         }
       ],
-      "size": 390888,
+      "size": 535070,
       "type": "directory"
     },
     {
@@ -482,6 +489,6 @@
       "type": "directory"
     }
   ],
-  "size": 6740805,
+  "size": 6884987,
   "type": "directory"
 }
