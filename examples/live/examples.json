@@ -202,6 +202,13 @@
       "name": "display",
       "children": [
         {
+          "path": "examples/live/display/add child on click.js",
+          "name": "add child on click.js",
+          "size": 138858,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
           "path": "examples/live/display/add child.js",
           "name": "add child.js",
           "size": 136511,
@@ -211,7 +218,7 @@
         {
           "path": "examples/live/display/add children.js",
           "name": "add children.js",
-          "size": 135687,
+          "size": 136335,
           "extension": ".js",
           "type": "file"
         },
@@ -230,7 +237,7 @@
           "type": "file"
         }
       ],
-      "size": 535070,
+      "size": 674576,
       "type": "directory"
     },
     {
@@ -489,6 +496,6 @@
       "type": "directory"
     }
   ],
-  "size": 6884987,
+  "size": 7024493,
   "type": "directory"
 }

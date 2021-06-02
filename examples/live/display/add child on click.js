@@ -19,6 +19,26 @@
     return a;
   };
   var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
+  var __async = (__this, __arguments, generator) => {
+    return new Promise((resolve, reject) => {
+      var fulfilled = (value) => {
+        try {
+          step(generator.next(value));
+        } catch (e) {
+          reject(e);
+        }
+      };
+      var rejected = (value) => {
+        try {
+          step(generator.throw(value));
+        } catch (e) {
+          reject(e);
+        }
+      };
+      var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
+      step((generator = generator.apply(__this, __arguments)).next());
+    });
+  };
 
   // ../phaser-genesis/src/config/const.ts
   var CONFIG_DEFAULTS = {
@@ -2708,14 +2728,6 @@ void main (void)
     return children;
   }
 
-  // ../phaser-genesis/src/display/AddChildren.ts
-  function AddChildren(parent, ...children) {
-    children.forEach((child) => {
-      AddChild(parent, child);
-    });
-    return children;
-  }
-
   // ../phaser-genesis/src/gameobjects/DIRTY_CONST.ts
   var DIRTY_CONST = {
     CLEAR: 0,
@@ -3345,124 +3357,181 @@ void main (void)
     return file;
   }
 
-  // ../phaser-genesis/src/cache/Cache.ts
-  var caches = new Map();
+  // ../phaser-genesis/src/math/mat2d/Mat2dAppend.ts
+  function Mat2dAppend(mat1, mat2, out = new Matrix2D()) {
+    const { a: a1, b: b1, c: c1, d: d1, tx: tx1, ty: ty1 } = mat1;
+    const { a: a2, b: b2, c: c2, d: d2, tx: tx2, ty: ty2 } = mat2;
+    return out.set(a2 * a1 + b2 * c1, a2 * b1 + b2 * d1, c2 * a1 + d2 * c1, c2 * b1 + d2 * d1, tx2 * a1 + ty2 * c1 + tx1, tx2 * b1 + ty2 * d1 + ty1);
+  }
 
-  // ../phaser-genesis/src/loader/Loader.ts
-  var Loader = class extends EventEmitter {
-    constructor() {
+  // ../phaser-genesis/src/math/vec2/Vec2.ts
+  var Vec2 = class {
+    constructor(x = 0, y = 0) {
+      this.set(x, y);
+    }
+    set(x = 0, y = 0) {
+      this.x = x;
+      this.y = y;
+      return this;
+    }
+    toArray(dst = [], index = 0) {
+      const { x, y } = this;
+      dst[index] = x;
+      dst[index + 1] = y;
+      return dst;
+    }
+    fromArray(src, index = 0) {
+      return this.set(src[index], src[index + 1]);
+    }
+    toString() {
+      const { x, y } = this;
+      return `{ x=${x}, y=${y} }`;
+    }
+  };
+
+  // ../phaser-genesis/src/math/mat2d/Mat2dGlobalToLocal.ts
+  function Mat2dGlobalToLocal(mat, x, y, out = new Vec2()) {
+    const { a, b, c, d, tx, ty } = mat;
+    const id = 1 / (a * d + c * -b);
+    return out.set(d * id * x + -c * id * y + (ty * c - tx * d) * id, a * id * y + -b * id * x + (-ty * a + tx * b) * id);
+  }
+
+  // ../phaser-genesis/src/input/mouse/Mouse.ts
+  var Mouse = class extends EventEmitter {
+    constructor(target) {
       super();
-      this.baseURL = "";
-      this.path = "";
-      this.crossOrigin = "anonymous";
-      this.maxParallelDownloads = -1;
-      this.isLoading = false;
-      this.reset();
-    }
-    reset() {
-      this.isLoading = false;
-      this.queue = new Set();
-      this.inflight = new Set();
-      this.completed = new Set();
-      this.progress = 0;
-    }
-    add(...file) {
-      file.forEach((entity) => {
-        entity.loader = this;
-        this.queue.add(entity);
-      });
-      return this;
-    }
-    start() {
-      if (this.isLoading) {
-        return null;
+      this.primaryDown = false;
+      this.auxDown = false;
+      this.secondaryDown = false;
+      this.blockContextMenu = true;
+      this.resolution = 1;
+      this.mousedownHandler = (event) => this.onMouseDown(event);
+      this.mouseupHandler = (event) => this.onMouseUp(event);
+      this.mousemoveHandler = (event) => this.onMouseMove(event);
+      this.mousewheelHandler = (event) => this.onMouseWheel(event);
+      this.contextmenuHandler = (event) => this.onContextMenuEvent(event);
+      this.blurHandler = () => this.onBlur();
+      this.localPoint = new Vec2();
+      this.hitPoint = new Vec2();
+      this.transPoint = new Vec2();
+      if (!target) {
+        target = GameInstance.get().renderer.canvas;
       }
-      return new Promise((resolve, reject) => {
-        this.completed.clear();
-        this.progress = 0;
-        if (this.queue.size > 0) {
-          this.isLoading = true;
-          this.onComplete = resolve;
-          this.onError = reject;
-          Emit(this, "start");
-          this.nextFile();
-        } else {
-          this.progress = 1;
-          Emit(this, "complete");
-          resolve(this);
+      target.addEventListener("mousedown", this.mousedownHandler);
+      target.addEventListener("mouseup", this.mouseupHandler);
+      target.addEventListener("wheel", this.mousewheelHandler, { passive: false });
+      target.addEventListener("contextmenu", this.contextmenuHandler);
+      window.addEventListener("mouseup", this.mouseupHandler);
+      window.addEventListener("mousemove", this.mousemoveHandler);
+      window.addEventListener("blur", this.blurHandler);
+      this.target = target;
+    }
+    onBlur() {
+    }
+    onMouseDown(event) {
+      this.positionToPoint(event);
+      this.primaryDown = event.button === 0;
+      this.auxDown = event.button === 1;
+      this.secondaryDown = event.button === 2;
+      Emit(this, "pointerdown", this.localPoint.x, this.localPoint.y, event.button, event);
+    }
+    onMouseUp(event) {
+      this.positionToPoint(event);
+      this.primaryDown = !(event.button === 0);
+      this.auxDown = !(event.button === 1);
+      this.secondaryDown = !(event.button === 2);
+      Emit(this, "pointerup", this.localPoint.x, this.localPoint.y, event.button, event);
+    }
+    onMouseMove(event) {
+      this.positionToPoint(event);
+      Emit(this, "pointermove", this.localPoint.x, this.localPoint.y, event);
+    }
+    onMouseWheel(event) {
+      Emit(this, "wheel", event.deltaX, event.deltaY, event.deltaZ, event);
+    }
+    onContextMenuEvent(event) {
+      if (this.blockContextMenu) {
+        event.preventDefault();
+      }
+      Emit(this, "contextmenu", event);
+    }
+    positionToPoint(event) {
+      return this.localPoint.set(event.offsetX, event.offsetY);
+    }
+    getInteractiveChildren(parent, results) {
+      const children = parent.children;
+      for (let i = 0; i < children.length; i++) {
+        const child = children[i];
+        if (!child.visible || !child.input.enabled) {
+          continue;
         }
-      });
-    }
-    nextFile() {
-      let limit = this.queue.size;
-      if (this.maxParallelDownloads !== -1) {
-        limit = Math.min(limit, this.maxParallelDownloads) - this.inflight.size;
-      }
-      if (limit) {
-        const iterator = this.queue.values();
-        while (limit > 0) {
-          const file = iterator.next().value;
-          this.inflight.add(file);
-          this.queue.delete(file);
-          file.load().then((file2) => this.fileComplete(file2)).catch((file2) => this.fileError(file2));
-          limit--;
+        results.push(child);
+        if (child.input.enabledChildren && child.numChildren) {
+          this.getInteractiveChildren(child, results);
         }
-      } else if (this.inflight.size === 0) {
-        this.stop();
       }
     }
-    stop() {
-      if (!this.isLoading) {
-        return;
+    checkHitArea(entity, px, py) {
+      if (entity.input.hitArea) {
+        if (entity.input.hitArea.contains(px, py)) {
+          return true;
+        }
+      } else {
+        return entity.transformExtent.contains(px, py);
       }
-      this.isLoading = false;
-      Emit(this, "complete", this.completed);
-      this.onComplete();
-      this.completed.clear();
+      return false;
     }
-    updateProgress(file) {
-      this.inflight.delete(file);
-      this.completed.add(file);
-      const totalCompleted = this.completed.size;
-      const totalQueued = this.queue.size + this.inflight.size;
-      if (totalCompleted > 0) {
-        this.progress = totalCompleted / (totalCompleted + totalQueued);
+    hitTest(...entities2) {
+      const localX = this.localPoint.x;
+      const localY = this.localPoint.y;
+      const point = this.transPoint;
+      for (let i = 0; i < entities2.length; i++) {
+        const entity = entities2[i];
+        if (!entity.world) {
+          continue;
+        }
+        const mat = Mat2dAppend(entity.world.camera.worldTransform, entity.worldTransform);
+        Mat2dGlobalToLocal(mat, localX, localY, point);
+        if (this.checkHitArea(entity, point.x, point.y)) {
+          this.hitPoint.set(point.x, point.y);
+          return true;
+        }
       }
-      Emit(this, "progress", this.progress, totalCompleted, totalQueued);
-      this.nextFile();
+      return false;
     }
-    fileComplete(file) {
-      Emit(this, "filecomplete", file);
-      this.updateProgress(file);
-    }
-    fileError(file) {
-      Emit(this, "fileerror", file);
-      this.updateProgress(file);
-    }
-    totalFilesToLoad() {
-      return this.queue.size + this.inflight.size;
-    }
-    setBaseURL(url = "") {
-      if (url !== "" && url.substr(-1) !== "/") {
-        url = url.concat("/");
+    hitTestChildren(parent, topOnly = true) {
+      const output = [];
+      if (!parent.visible) {
+        return output;
       }
-      this.baseURL = url;
-      return this;
-    }
-    setPath(path = "") {
-      if (path !== "" && path.substr(-1) !== "/") {
-        path = path.concat("/");
+      const candidates = [];
+      const parentInput = parent.input;
+      if (parentInput && parentInput.enabled) {
+        candidates.push(parent);
       }
-      this.path = path;
-      return this;
+      if (parentInput.enabledChildren && parent.numChildren) {
+        this.getInteractiveChildren(parent, candidates);
+      }
+      for (let i = candidates.length - 1; i >= 0; i--) {
+        const entity = candidates[i];
+        if (this.hitTest(entity)) {
+          output.push(entity);
+          if (topOnly) {
+            break;
+          }
+        }
+      }
+      return output;
     }
-    setCORS(crossOrigin) {
-      this.crossOrigin = crossOrigin;
-      return this;
-    }
-    setMaxParallelDownloads(max) {
-      this.maxParallelDownloads = max;
-      return this;
+    shutdown() {
+      const target = this.target;
+      target.removeEventListener("mousedown", this.mousedownHandler);
+      target.removeEventListener("mouseup", this.mouseupHandler);
+      target.removeEventListener("wheel", this.mousewheelHandler);
+      target.removeEventListener("contextmenu", this.contextmenuHandler);
+      window.removeEventListener("mouseup", this.mouseupHandler);
+      window.removeEventListener("mousemove", this.mousemoveHandler);
+      window.removeEventListener("blur", this.blurHandler);
     }
   };
 
@@ -3582,31 +3651,6 @@ void main (void)
     WorldMatrix2DComponent.tx[id] = x;
     WorldMatrix2DComponent.ty[id] = y;
   }
-
-  // ../phaser-genesis/src/math/vec2/Vec2.ts
-  var Vec2 = class {
-    constructor(x = 0, y = 0) {
-      this.set(x, y);
-    }
-    set(x = 0, y = 0) {
-      this.x = x;
-      this.y = y;
-      return this;
-    }
-    toArray(dst = [], index = 0) {
-      const { x, y } = this;
-      dst[index] = x;
-      dst[index + 1] = y;
-      return dst;
-    }
-    fromArray(src, index = 0) {
-      return this.set(src[index], src[index + 1]);
-    }
-    toString() {
-      const { x, y } = this;
-      return `{ x=${x}, y=${y} }`;
-    }
-  };
 
   // ../phaser-genesis/src/renderer/webgl1/colors/PackColors.ts
   function PackColors(vertices) {
@@ -4291,28 +4335,26 @@ void main (void)
     }
   };
 
-  // examples/src/display/add children.ts
+  // examples/src/display/add child on click.ts
   var Demo = class extends Scene {
     constructor() {
       super();
-      const loader = new Loader();
-      loader.add(ImageFile("frog", "assets/frog.png"));
-      loader.add(ImageFile("redfrog", "assets/redfrog.png"));
-      loader.add(ImageFile("knight", "assets/knight.png"));
-      loader.start().then(() => {
+      this.create();
+    }
+    create() {
+      return __async(this, null, function* () {
+        yield ImageFile("frog", "assets/frog.png").load();
         const world3 = new StaticWorld(this);
-        const child1 = new Sprite(100, 300, "knight");
-        const child2 = new Sprite(200, 250, "frog");
-        const child3 = new Sprite(300, 300, "knight");
-        const child4 = new Sprite(400, 200, "redfrog");
-        const child5 = new Sprite(500, 300, "knight");
-        const child6 = new Sprite(600, 250, "frog");
-        const child7 = new Sprite(700, 300, "knight");
-        AddChildren(world3, child1, child2, child3, child4, child5, child6, child7);
+        const sprite = new Sprite(400, 300, "frog");
+        AddChild(world3, sprite);
+        const mouse = new Mouse();
+        On(mouse, "pointerdown", (x, y, button) => {
+          AddChild(world3, new Sprite(x, y, "frog"));
+        });
       });
     }
   };
-  new Game(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(22456), Scenes(Demo));
+  new Game(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(657930), Scenes(Demo));
 })();
 /**
  * @author       Niklas von Hertzen (https://github.com/niklasvh/base64-arraybuffer)
@@ -4325,4 +4367,4 @@ void main (void)
  * @copyright    2020 Photon Storm Ltd.
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
  */
-//# sourceMappingURL=add children.js.map
+//# sourceMappingURL=add child on click.js.map
