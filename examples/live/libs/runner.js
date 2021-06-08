@@ -226,6 +226,7 @@ window.onload = () => {
         const params = new URLSearchParams(document.location.search);
     
         const filename = params.get('f');
+        const autoShowStats = params.get('s');
 
         const autoRun = (filename) ? decodeURI(filename).split('\\').join('/') : null;
         
@@ -257,6 +258,13 @@ window.onload = () => {
         if (autoRunExample)
         {
             selectHandler(autoRunExample);
+
+            if (autoShowStats)
+            {
+                setTimeout(() => {
+                    onExampleStats(autoRunExample, 1);
+                }, 100);
+            }
         }
     
     });

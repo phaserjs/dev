@@ -6,9 +6,23 @@ window.linkGame = (game) =>
     // const stepAfter  = stepped({ align:  1 });
     // const spline     = spline();
     
-    const a = []; // gameFrame
-    const b = []; // numGameObjects
-    const c = []; // numDirtyLocalTransforms
+    //  renderStats:
+    // gameFrame: number;
+    // numScenes: number;
+    // numWorlds: number;
+    // numGameObjects: number;
+    // numGameObjectsRendered: number;
+    // numDirtyLocalTransforms: number;
+    // numDirtyWorldTransforms: number;
+    // numDirtyVertices: number;
+    // numDirtyWorldLists: number;
+    // numDirtyCameras: number;
+
+    const a = [];
+    const b = [];
+    const c = [];
+    const d = [];
+    const e = [];
 
     const renderStats = game.renderStats;
 
@@ -16,12 +30,14 @@ window.linkGame = (game) =>
     
     for (let i = 0; i < 300; i++)
     {
-        a[i] = Number(startFrame + i);
-        b[i] = Number(renderStats.numGameObjects);
-        c[i] = Number(renderStats.numDirtyLocalTransforms);
+        a[i] = startFrame + i;
+        b[i] = renderStats.numGameObjects;
+        c[i] = renderStats.numGameObjectsRendered;
+        d[i] = renderStats.numDirtyLocalTransforms;
+        e[i] = renderStats.numDirtyWorldTransforms;
     }
     
-    let data = [ a, b, c ];
+    let data = [ a, b, c, d, e ];
     
     let opts = {
         id: 'chart',
@@ -59,25 +75,35 @@ window.linkGame = (game) =>
         scales: {
             x: {
                 time: false,
-            },
-            y: {
             }
         },
         series: [
             {
-                label: 'Game Frame'
+                label: 'Frame'
             },
             {
                 label: 'Game Objects',
                 stroke: 'red',
-                fill: 'rgba(255, 0, 0, 0.3)',
-                paths: spline()
+                fill: 'rgba(255, 0, 0, 0.5)',
+                paths: linear()
             },
             {
-                label: 'Local Updates',
+                label: 'Rendered',
                 stroke: 'green',
-                fill: 'rgba(0, 255, 0, 0.3)',
-                paths: spline()
+                fill: 'rgba(0, 255, 0, 0.5)',
+                paths: linear()
+            },
+            {
+                label: 'Local',
+                stroke: 'orange',
+                // fill: 'rgba(0, 255, 0, 0.3)',
+                paths: linear()
+            },
+            {
+                label: 'World',
+                stroke: 'yellow',
+                // fill: 'rgba(0, 255, 0, 0.3)',
+                paths: linear()
             }
         ]
     };
@@ -90,34 +116,35 @@ window.linkGame = (game) =>
     
         if (game.isPaused)
         {
-            //  TODO - Keep recording data into another array
-            //  while paused and then re-sync the data when resumed
             return;
         }
-    
-        // const v = 50 + Math.abs(Math.random() * 30);
-        // const v2 = v - (10 + Math.abs(Math.random() * 30));
     
         if (f > 300)
         {
             data[0].shift();
             data[1].shift();
             data[2].shift();
+            data[3].shift();
+            data[4].shift();
     
             data[0].push(renderStats.gameFrame);
             data[1].push(renderStats.numGameObjects);
-            data[2].push(renderStats.numDirtyLocalTransforms);
+            data[2].push(renderStats.numGameObjectsRendered);
+            data[3].push(renderStats.numDirtyLocalTransforms);
+            data[4].push(renderStats.numDirtyWorldTransforms);
         }
         else
         {
             data[0][f] = renderStats.gameFrame;
             data[1][f] = renderStats.numGameObjects;
-            data[2][f] = renderStats.numDirtyLocalTransforms;
+            data[2][f] = renderStats.numGameObjectsRendered;
+            data[3][f] = renderStats.numDirtyLocalTransforms;
+            data[4][f] = renderStats.numDirtyWorldTransforms;
         }
     
         uplot.setData(data);
     
         f++;
     
-    }, 20);
+    }, 14);
 }
