@@ -38,11 +38,14 @@ window.linkGame = (game) =>
     }
     
     let data = [ a, b, c, d, e ];
+
+    //  padding: [ top, right, bottom, left ]
     
     let opts = {
         id: 'chart',
         width: 800,
         height: 300,
+        padding: [ 16, 0, 0, 0 ],
         axes: [
             {
                 stroke: '#00ff00',
