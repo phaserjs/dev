@@ -64,6 +64,24 @@ const onExamplePlayPause = (win, iframe, item) =>
     }
 }
 
+const onExampleStats = (win, iframe, item) =>
+{
+    const phaserExample = document.getElementById(iframe).contentWindow['Phaser4'];
+
+    const statsFrame = `<iframe src="stats.html"></iframe>`;
+
+    const statsWindow = new WinBox({ 
+        title: `Render Stats: ${item.data.ts}`,
+        class: [ 'no-full' ],
+        root: document.body,
+        html: statsFrame
+    });
+
+    setTimeout(() => {
+        statsWindow.focus();
+    }, 10);
+}
+
 const selectHandler = (item) =>
 {
     const id = `demo${demoCount}`;
@@ -91,6 +109,7 @@ const selectHandler = (item) =>
     createIcon(icons, 'wb-edit', 'View Example Code', event => onExampleEdit(win, item));
     createIcon(icons, 'wb-git', 'View Source on GitHub', event => onExampleGit(win, item));
     createIcon(icons, 'wb-playPause', 'Play / Pause Example', event => onExamplePlayPause(win, id, item));
+    createIcon(icons, 'wb-stats', 'View Render Stats', event => onExampleStats(win, id, item));
 
     demoCount++;
 }

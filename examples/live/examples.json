@@ -253,12 +253,12 @@
         {
           "path": "examples/live/display/world transform stats.js",
           "name": "world transform stats.js",
-          "size": 154313,
+          "size": 552867,
           "extension": ".js",
           "type": "file"
         }
       ],
-      "size": 1120760,
+      "size": 1519314,
       "type": "directory"
     },
     {
@@ -517,6 +517,6 @@
       "type": "directory"
     }
   ],
-  "size": 7322794,
+  "size": 7721348,
   "type": "directory"
 }

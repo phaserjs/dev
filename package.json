@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/phaserjs/dev#readme",
   "devDependencies": {
+    "@tweakpane/core": "^1.0.2",
     "boxen": "^5.0.1",
     "chalk": "^4.1.1",
     "directory-tree": "^2.2.9",

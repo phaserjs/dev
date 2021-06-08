@@ -98,3 +98,8 @@ iframe {
     background-image: url(pause.svg);
     background-size: 30px auto;
 }
+
+.wb-stats {
+    background-image: url(chart.svg);
+    background-size: 20px auto;
+}
