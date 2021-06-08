@@ -2,8 +2,47 @@ import WinBox from './winbox/js/winbox.js';
 import { decodeURI } from './decodeURI.js';
 import { loadJSON } from './loadJSON.js'
 
-let demoCount = 1;
+let demoCount = 0;
 let autoRunExample;
+
+const getIframeWindow = (id) =>
+{
+    const element = document.getElementById(id);
+
+    let doc;
+  
+    if (element.contentWindow)
+    {
+        return element.contentWindow;
+    }
+
+    if (element.window)
+    {
+        return element.window;
+    } 
+  
+    if (!doc && element.contentDocument)
+    {
+        doc = element.contentDocument;
+    } 
+  
+    if (!doc && element.document)
+    {
+        doc = element.document;
+    }
+  
+    if (doc && doc.defaultView)
+    {
+        return doc.defaultView;
+    }
+  
+    if (doc && doc.parentWindow)
+    {
+        return doc.parentWindow;
+    }
+  
+    return undefined;
+}
 
 const createIcon = (parent, className, alt, onClick) =>
 {
@@ -64,26 +103,51 @@ const onExamplePlayPause = (win, iframe, item) =>
     }
 }
 
-const onExampleStats = (win, iframe, item) =>
+const onExampleStats = (item, demoID) =>
 {
-    const phaserExample = document.getElementById(iframe).contentWindow['Phaser4'];
+    const onStatsIFrameLoaded = (id) => {
 
-    const statsFrame = `<iframe src="stats.html"></iframe>`;
+        const phaserExample = getIframeWindow(`demo${id}`);
+        const statsIFrame = getIframeWindow(`stats${id}`);
+
+        //  If the example doesn't have `GlobalVar('Phaser4')` this won't work:
+        const game = phaserExample.Phaser4;
+
+        if (game)
+        {
+            statsIFrame.linkGame(game);
+        }
+
+    };
+
+    const statsFrame = document.createElement('iframe');
+
+    statsFrame.id = `stats${demoID}`;
+    statsFrame.src = 'stats.html';
+    statsFrame.onload = event => onStatsIFrameLoaded(demoID);
 
     const statsWindow = new WinBox({ 
         title: `Render Stats: ${item.data.ts}`,
         class: [ 'no-full' ],
         root: document.body,
-        html: statsFrame
+        x: 300,
+        y: 500,
+        width: 850,
+        height: 420,
+        mount: statsFrame
     });
 
     setTimeout(() => {
+
         statsWindow.focus();
+
     }, 10);
 }
 
 const selectHandler = (item) =>
 {
+    demoCount++;
+
     const id = `demo${demoCount}`;
     const iframe = `<iframe id="${id}" src="view.html?f=${decodeURI(item.data.path)}"></iframe>`;
 
@@ -109,9 +173,7 @@ const selectHandler = (item) =>
     createIcon(icons, 'wb-edit', 'View Example Code', event => onExampleEdit(win, item));
     createIcon(icons, 'wb-git', 'View Source on GitHub', event => onExampleGit(win, item));
     createIcon(icons, 'wb-playPause', 'Play / Pause Example', event => onExamplePlayPause(win, id, item));
-    createIcon(icons, 'wb-stats', 'View Render Stats', event => onExampleStats(win, id, item));
-
-    demoCount++;
+    createIcon(icons, 'wb-stats', 'View Render Stats', event => onExampleStats(item, demoCount));
 }
 
 const addFolder = (data, treeView, autoRun) => {
