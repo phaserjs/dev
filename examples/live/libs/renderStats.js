@@ -1,4 +1,4 @@
-window.linkGame = (game) =>
+window.OLDlinkGame = (game) =>
 {
     const { linear, spline, stepped, bars } = uPlot.paths;
 
@@ -150,4 +150,98 @@ window.linkGame = (game) =>
         f++;
     
     }, 14);
+}
+
+window.linkGame = (game) => {
+
+    const { linear, bars } = uPlot.paths;
+
+	const renderStats = game.renderStats;
+
+	let data = [ [], [] ];
+
+	//  padding: [ top, right, bottom, left ]
+
+	const opts = {
+		id: 'fps',
+		title: 'FPS',
+		width: 300,
+		height: 200,
+		select: {
+			show: false,
+		},
+		legend: {
+			live: true,
+			isolate: true
+		},
+        padding: [ 16, 0, 16, 16 ],
+        axes: [
+            {
+				show: false
+			},
+            {
+				incrs: [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ],
+                stroke: '#00ff00',
+                font: `10px 'MonoLisa'`,
+                labelFont: `10px 'MonoLisa'`,
+                grid: {
+                    width: 1 / devicePixelRatio,
+                    stroke: 'rgb(140, 140, 140)',
+                }
+            }
+        ],
+		scales: {
+			x: {
+				time: false
+			},
+			y: {
+				range: (u, dataMin, dataMax) => {
+					return [ 0, dataMax + 20 ]
+				}
+			}
+		},
+		series: [
+			{
+				label: 'Frame',
+			},
+			{
+				label: 'FPS',
+				stroke: '#0ff',
+				fill: 'rgba(0, 255, 255, 0.5)',
+				points: {
+					show: false
+				},
+				paths: linear()
+			},
+		],
+	};
+
+    const uplot = new uPlot(opts, data, document.body);
+
+    let f = 0;
+
+	window.data = data;
+
+	setInterval(() => {
+    
+        if (game.isPaused)
+        {
+            return;
+        }
+
+		if (f > 30)
+		{
+			data[0].shift();
+			data[1].shift();
+		}
+
+		data[0].push(renderStats.gameFrame);
+		data[1].push(renderStats.fps);
+    
+        uplot.setData(data);
+
+		f++;
+    
+    }, 100);
+
 }
