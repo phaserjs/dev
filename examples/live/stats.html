@@ -4,17 +4,105 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <title>Phaser 4 RenderStats</title>
-        <link rel="stylesheet" href="libs/css/uPlot.min.css">
+        <link rel="stylesheet" href="libs/css/bootstrap.min.css">
+        <link rel="stylesheet" href="libs/css/uPlot.css">
+        <script src="libs/bootstrap.bundle.min.js"></script>
         <script src="libs/uPlot.iife.js"></script>
-        <script src="libs/renderStats.js"></script>
         <style>
             body {
                 margin: 0;
                 background-color: rgb(50, 50, 50);
-                color: white;
+            }
+
+            .uplot {
+                background-color: black;
+            }
+
+            .u-select {
+                background: rgba(0, 255, 0, 0.6);
+            }
+
+            .u-hz .u-cursor-x,
+            .u-vt .u-cursor-y {
+                border-right: 1px dashed #00ff00;
+            }
+
+            .u-hz .u-cursor-y,
+            .u-vt .u-cursor-x {
+                border-bottom: 1px dashed #00ff00;
+            }
+
+            #fps, #ms {
+                width: 300px;
+                font-size: 12px;
+                font-family: Consolas, 'Courier New', monospace;
+                color: #00ff00;
+            }
+
+            #stats table {
+                font-size: 12px;
             }
         </style>
     </head>
     <body>
+
+        <div class="row justify-content-start g-0">
+
+            <div id="fps" class="col">
+
+                <div class="row">
+                    <div id="fpsContainer"></div>
+                </div>
+                <div class="row" style="width: 300px">
+                    <div class="col text-center" id="fpsText">FPS: 60</div>
+                </div>
+
+            </div>
+            <div id="ms" class="col">
+
+                <div class="row">
+                    <div id="msContainer"></div>
+                </div>
+                <div class="row" style="width: 300px">
+                    <div class="col text-center" id="msText">MS: 0</div>
+                </div>
+
+            </div>
+
+            <div id="stats" class="col">
+
+                <table class="table table-dark table-striped">
+                <tr>
+                    <th>Game Frame:</th>
+                    <td id="statsFrame">0</td>
+                </tr>
+                <tr>
+                    <th>Scenes:</th>
+                    <td id="statsScenes">0</td>
+                </tr>
+                <tr>
+                    <th>Worlds:</th>
+                    <td id="statsWorlds">0</td>
+                </tr>
+                <tr>
+                    <th>Game Objects:</th>
+                    <td id="statsGameObjects">0</td>
+                </tr>
+                <tr>
+                    <th>Rendered:</th>
+                    <td id="statsRendered">0</td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <td><button type="button" id="pauseButton" class="btn btn-primary btn-sm">Pause</button></td>
+                </tr>
+                </table>
+
+            </div>
+
+        </div>
+
+        <script src="libs/renderStats.js" type="module"></script>
+
     </body>
 </html>

@@ -4268,7 +4268,7 @@ void main (void)
   function GetRenderStatsAsObject(obj) {
     const id = SceneManagerInstance.get().id;
     if (!obj) {
-      obj = { gameFrame: 0, numScenes: 0, numWorlds: 0, numGameObjects: 0, numGameObjectsRendered: 0, numDirtyLocalTransforms: 0, numDirtyWorldTransforms: 0, numDirtyVertices: 0, numDirtyWorldLists: 0, numDirtyCameras: 0 };
+      obj = { fps: 0, delta: 0, gameFrame: 0, numScenes: 0, numWorlds: 0, numGameObjects: 0, numGameObjectsRendered: 0, numDirtyLocalTransforms: 0, numDirtyWorldTransforms: 0, numDirtyVertices: 0, numDirtyWorldLists: 0, numDirtyCameras: 0 };
     }
     obj.gameFrame = RenderStatsComponent.gameFrame[id];
     obj.numScenes = RenderStatsComponent.numScenes[id];
@@ -4476,7 +4476,11 @@ void main (void)
       __publicField(this, "willRender", true);
       __publicField(this, "lastTick", 0);
       __publicField(this, "elapsed", 0);
+      __publicField(this, "delta", 0);
+      __publicField(this, "fps", 0);
       __publicField(this, "frame", 0);
+      __publicField(this, "frames", 0);
+      __publicField(this, "prevFrame", 0);
       __publicField(this, "renderStats");
       __publicField(this, "renderer");
       __publicField(this, "textureManager");
@@ -4503,6 +4507,7 @@ void main (void)
       GetBanner();
       Emit(this, "boot");
       this.lastTick = performance.now();
+      this.prevFrame = performance.now();
       this.renderStats = GetRenderStatsAsObject();
       this.step(this.lastTick);
     }
@@ -4514,14 +4519,11 @@ void main (void)
       this.lastTick = performance.now();
     }
     step(time) {
-      const delta = time - this.lastTick;
-      this.lastTick = time;
-      this.elapsed += delta;
       const renderer = this.renderer;
       const sceneManager = this.sceneManager;
       if (!this.isPaused) {
         if (this.willUpdate) {
-          sceneManager.update(delta, time, this.frame);
+          sceneManager.update(this.delta, time, this.frame);
         }
         if (this.willRender) {
           sceneManager.preRender(this.frame);
@@ -4529,12 +4531,25 @@ void main (void)
           sceneManager.flush = false;
         }
       }
+      const now = performance.now();
+      const delta = now - time;
+      this.frames++;
+      if (now >= this.prevFrame + 1e3) {
+        this.fps = this.frames * 1e3 / (now - this.prevFrame);
+        this.prevFrame = now;
+        this.frames = 0;
+      }
+      this.lastTick = now;
+      this.elapsed += delta;
+      this.delta = delta;
       GetRenderStatsAsObject(this.renderStats);
+      this.renderStats.fps = this.fps;
+      this.renderStats.delta = delta;
       Emit(this, "step");
       this.frame++;
       GameInstance.setFrame(this.frame);
       GameInstance.setElapsed(this.elapsed);
-      requestAnimationFrame((now) => this.step(now));
+      requestAnimationFrame((now2) => this.step(now2));
     }
     destroy() {
     }
@@ -5179,9 +5194,17 @@ void main (void)
           const x = Between(0, 800);
           const y = Between(0, 600);
           if (pointerX < 400) {
-            AddChild(world3, new Sprite(x, y, "frog"));
+            for (let i = 0; i < 100; i++) {
+              const x2 = Between(0, 800);
+              const y2 = Between(0, 600);
+              AddChild(world3, new Sprite(x2, y2, "frog"));
+            }
           } else {
-            frogs.push(AddChild(world3, new Sprite(x, y, "redfrog")));
+            for (let i = 0; i < 100; i++) {
+              const x2 = Between(0, 800);
+              const y2 = Between(0, 600);
+              frogs.push(AddChild(world3, new Sprite(x2, y2, "redfrog")));
+            }
           }
         });
       });

@@ -263,7 +263,7 @@ window.onload = () => {
             {
                 setTimeout(() => {
                     onExampleStats(autoRunExample, 1);
-                }, 100);
+                }, 1000);
             }
         }
     

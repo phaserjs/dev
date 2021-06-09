@@ -62,11 +62,23 @@ class Demo extends Scene
 
                 if (pointerX < 400)
                 {
-                    AddChild(world, new Sprite(x, y, 'frog'));
+                    for (let i = 0; i < 100; i++)
+                    {
+                        const x = Between(0, 800);
+                        const y = Between(0, 600);
+        
+                        AddChild(world, new Sprite(x, y, 'frog'));
+                    }
                 }
                 else
                 {
-                    frogs.push(AddChild(world, new Sprite(x, y, 'redfrog')));
+                    for (let i = 0; i < 100; i++)
+                    {
+                        const x = Between(0, 800);
+                        const y = Between(0, 600);
+        
+                        frogs.push(AddChild(world, new Sprite(x, y, 'redfrog')));
+                    }
                 }
 
             });
