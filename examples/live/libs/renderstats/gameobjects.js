@@ -1,15 +1,8 @@
-window.OLDlinkGame = (game) =>
+export function GameObjects (game)
 {
     const { linear, spline, stepped, bars } = uPlot.paths;
 
-    // const stepBefore = stepped({ align: -1 });
-    // const stepAfter  = stepped({ align:  1 });
-    // const spline     = spline();
-    
     //  renderStats:
-    // gameFrame: number;
-    // numScenes: number;
-    // numWorlds: number;
     // numGameObjects: number;
     // numGameObjectsRendered: number;
     // numDirtyLocalTransforms: number;
@@ -25,6 +18,8 @@ window.OLDlinkGame = (game) =>
     const e = [];
 
     const renderStats = game.renderStats;
+
+    const container = document.getElementById('goContainer');
 
     const startFrame = renderStats.gameFrame;
     
@@ -42,34 +37,31 @@ window.OLDlinkGame = (game) =>
     //  padding: [ top, right, bottom, left ]
     
     let opts = {
-        id: 'chart',
-        width: 800,
+        width: 600,
         height: 300,
-        padding: [ 16, 0, 0, 0 ],
+        legend: {
+            show: false
+        },
+        padding: [ 10, 10, 10, 10 ],
         axes: [
             {
                 stroke: '#00ff00',
-                font: `10px 'MonoLisa'`,
+                font: `12px Consolas, 'Courier New', monospace`,
                 labelFont: `10px 'MonoLisa'`,
+                size: 20,
+                gap: 0,
                 grid: {
                     width: 1 / devicePixelRatio,
                     stroke: 'rgb(20, 20, 20)',
-                },
-                ticks: {
-                    width: 1 / devicePixelRatio,
-                    stroke: 'rgb(20, 20, 20)',
-                },
-                space: 60
+                }
             },
             {
                 stroke: '#00ff00',
-                font: `10px 'MonoLisa'`,
+                font: `12px Consolas, 'Courier New', monospace`,
                 labelFont: `10px 'MonoLisa'`,
+                size: 20,
+                gap: 0,
                 grid: {
-                    width: 1 / devicePixelRatio,
-                    stroke: 'rgb(20, 20, 20)',
-                },
-                ticks: {
                     width: 1 / devicePixelRatio,
                     stroke: 'rgb(20, 20, 20)',
                 }
@@ -111,7 +103,7 @@ window.OLDlinkGame = (game) =>
         ]
     };
     
-    let uplot = new uPlot(opts, data, document.body);
+    let uplot = new uPlot(opts, data, container);
     
     let f = 0;
 
@@ -150,113 +142,4 @@ window.OLDlinkGame = (game) =>
         f++;
     
     }, 14);
-}
-
-window.linkGame = (game) => {
-
-    const { linear, bars } = uPlot.paths;
-
-    const renderStats = game.renderStats;
-
-    const frameText = document.getElementById('fps0');
-    const fpsText = document.getElementById('fps1');
-
-    let data = [ [], [] ];
-
-    const opts = {
-        width: 300,
-        height: 200,
-        // cursor: {
-           
-        // },
-        select: {
-            show: false
-        },
-        legend: {
-            show: false
-        },
-        //  padding: [ top, right, bottom, left ]
-        padding: [ 10, 10, 10, 10 ],
-        axes: [
-            {
-                show: false
-            },
-            {
-                incrs: [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ],
-                stroke: '#00ff00',
-                font: `12px Consolas, 'Courier New', monospace`,
-                size: 20,
-                gap: 0,
-                space: 0,
-                grid: {
-                    width: 1 / devicePixelRatio,
-                    stroke: 'rgb(140, 140, 140)',
-                }
-            }
-        ],
-        scales: {
-            x: {
-                time: false
-            },
-            y: {
-                range: (u, dataMin, dataMax) => {
-                    return [ 0, dataMax + 10 ]
-                }
-            }
-        },
-        series: [
-            {},
-            {
-                stroke: '#0ff',
-                fill: 'rgba(0, 255, 255, 0.5)',
-                points: {
-                    show: false
-                },
-                paths: linear()
-            },
-        ]
-    };
-
-    const uplot = new uPlot(opts, data, document.getElementById('fpsContainer'));
-
-    console.log(uplot);
-
-    let f = 0;
-
-    window.data = data;
-
-    setInterval(() => {
-
-        const c = uplot.cursor;
-
-        const frame = (c.idx) ? data[0][c.idx] : game.frame;
-        const fps = (c.idx) ? data[1][c.idx] : game.fps;
-
-        frameText.innerText = `Frame: ${frame}`;
-        fpsText.innerText = `FPS: ${fps.toFixed(2)}`;
-
-    }, 13);
-
-    setInterval(() => {
-    
-        if (game.isPaused)
-        {
-            return;
-        }
-
-        if (f > 30)
-        {
-            data[0].shift();
-            data[1].shift();
-        }
-
-        data[0].push(renderStats.gameFrame);
-        data[1].push(renderStats.fps);
-    
-        uplot.setData(data);
-
-        f++;
-    
-    }, 100);
-
 }

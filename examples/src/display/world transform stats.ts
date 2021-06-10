@@ -29,7 +29,8 @@ class Demo extends Scene
 
             const frogs = [];
 
-            for (let i = 0; i < 10; i++)
+			/*
+			for (let i = 0; i < 10; i++)
             {
                 const x = Between(0, 800);
                 const y = Between(0, 600);
@@ -44,6 +45,7 @@ class Demo extends Scene
 
                 frogs.push(AddChild(world, new Sprite(x, y, 'redfrog')));
             }
+			*/
 
             On(world, 'update', () => {
 

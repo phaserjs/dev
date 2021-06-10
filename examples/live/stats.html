@@ -8,14 +8,13 @@
         <link rel="stylesheet" href="libs/css/uPlot.css">
         <script src="libs/bootstrap.bundle.min.js"></script>
         <script src="libs/uPlot.iife.js"></script>
+        <script src="libs/gauge.js"></script>
         <style>
             body {
-                margin: 0;
-                background-color: rgb(50, 50, 50);
-            }
-
-            .uplot {
-                background-color: black;
+                margin-top: 10px;
+                background-color: #1c1c27;
+                color: #00ff00;
+                /* overflow: hidden; */
             }
 
             .u-select {
@@ -32,46 +31,54 @@
                 border-bottom: 1px dashed #00ff00;
             }
 
+            #msGauge {
+                width: 180px;
+                height: 90px;
+            }
+
             #fps, #ms {
                 width: 300px;
                 font-size: 12px;
                 font-family: Consolas, 'Courier New', monospace;
                 color: #00ff00;
+                background-color: #27293b;
             }
 
-            #stats table {
+            #fpsText, #msText {
+                padding-bottom: 8px;
+            }
+
+            #stats th, #stats td {
                 font-size: 12px;
+                color: #00ff00;
             }
         </style>
     </head>
     <body>
 
-        <div class="row justify-content-start g-0">
+        <div class="container-fluid">
 
-            <div id="fps" class="col">
+        <div class="row g-1">
 
-                <div class="row">
+            <div class="col">
+
+                <div id="fps" class="rounded-2">
                     <div id="fpsContainer"></div>
-                </div>
-                <div class="row" style="width: 300px">
-                    <div class="col text-center" id="fpsText">FPS: 60</div>
+                    <div class="text-center" id="fpsText">FPS: 60</div>
                 </div>
 
             </div>
-            <div id="ms" class="col">
+            <div class="col">
 
-                <div class="row">
+                <div id="ms" class="rounded-2">
                     <div id="msContainer"></div>
-                </div>
-                <div class="row" style="width: 300px">
-                    <div class="col text-center" id="msText">MS: 0</div>
+                    <div class="text-center" id="msText">MS: 0</div>
                 </div>
 
             </div>
+            <div class="col">
 
-            <div id="stats" class="col">
-
-                <table class="table table-dark table-striped">
+                <table id="stats" class="table table-dark table-striped">
                 <tr>
                     <th>Game Frame:</th>
                     <td id="statsFrame">0</td>
@@ -99,6 +106,27 @@
                 </table>
 
             </div>
+
+        </div>
+
+        <div class="row">
+
+            <div id="go" class="col">
+
+                <div class="row">
+                    <div id="goContainer"></div>
+                </div>
+                <div class="row" style="width: 600px">
+                    <div class="col text-center" id="goText">Game Objects: 0</div>
+                </div>
+
+            </div>
+
+            <div class="col">
+                <canvas id="msGauge"></canvas>
+            </div>
+
+        </div>
 
         </div>
 

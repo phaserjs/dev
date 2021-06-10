@@ -5174,16 +5174,6 @@ void main (void)
       loader.start().then(() => {
         const world3 = new StaticWorld(this);
         const frogs = [];
-        for (let i = 0; i < 10; i++) {
-          const x = Between(0, 800);
-          const y = Between(0, 600);
-          AddChild(world3, new Sprite(x, y, "frog"));
-        }
-        for (let i = 0; i < 10; i++) {
-          const x = Between(0, 800);
-          const y = Between(0, 600);
-          frogs.push(AddChild(world3, new Sprite(x, y, "redfrog")));
-        }
         On(world3, "update", () => {
           frogs.forEach((frog) => {
             frog.rotation += 0.01;

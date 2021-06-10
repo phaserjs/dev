@@ -9,6 +9,13 @@ export function FPS (game)
 
     let data = [ [], [] ];
 
+    const ctx = document.createElement('canvas').getContext('2d');
+
+    const fill = ctx.createLinearGradient(0, 0, 0, 400);
+
+    fill.addColorStop(0, 'rgba(69, 140, 234, 0.70)');
+    fill.addColorStop(1, 'rgba(69, 140, 234, 0.25)');
+
     const opts = {
         width: 300,
         height: 200,
@@ -26,11 +33,14 @@ export function FPS (game)
                 stroke: '#00ff00',
                 font: `12px Consolas, 'Courier New', monospace`,
                 size: 20,
-                gap: 0,
+                gap: 8,
                 space: 0,
                 grid: {
                     width: 1 / devicePixelRatio,
-                    stroke: 'rgb(140, 140, 140)',
+                    stroke: '#3062a4',
+                },
+                ticks: {
+                    show: false
                 }
             }
         ],
@@ -47,8 +57,8 @@ export function FPS (game)
         series: [
             {},
             {
-                stroke: '#0ff',
-                fill: 'rgba(0, 255, 255, 0.5)',
+                stroke: '#458cea',
+                fill,
                 points: {
                     show: false
                 },

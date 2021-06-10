@@ -131,9 +131,9 @@ const onExampleStats = (item, demoID) =>
         class: [ 'no-full' ],
         root: document.body,
         x: 300,
-        y: 500,
-        width: 830,
-        height: 380,
+        y: 300,
+        width: 860,
+        height: 600,
         mount: statsFrame
     });
 
