@@ -25,6 +25,9 @@ export function GameObjects (game)
         legend: {
             show: false
         },
+        cursor: {
+            show: false
+        },
         //  padding: [ top, right, bottom, left ]
         padding: [ 10, 10, 4, 0 ],
         axes: [

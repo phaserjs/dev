@@ -11,8 +11,9 @@
         <script src="libs/gauge.js"></script>
         <style>
             body {
-                margin-top: 10px;
+                margin: 0;
                 background-color: #1c1c27;
+                font-family: Consolas, 'Courier New', monospace;
                 color: #00ff00;
                 overflow: hidden;
             }
@@ -49,15 +50,38 @@
                 width: 150px;
             }
 
-            #stats th, #stats td {
+            #stats {
+                background-color: #27293b;
+                margin-top: 4px;
+                margin-bottom: 4px;
+            }
+
+            ul li.list-group-item {
                 font-size: 12px;
+                color: #00aa00;
+                background-color: #27293b;
+            }
+
+            ul li.list-group-item span {
                 color: #00ff00;
+            }
+
+            #pauseButton {
+                cursor: pointer;
             }
         </style>
     </head>
     <body>
 
     <div class="container-fluid">
+
+        <ul id="stats" class="list-group list-group-horizontal">
+            <li class="list-group-item">Frame: <span id="statsFrame">0</span></li>
+            <li class="list-group-item">Scenes: <span id="statsScenes">0</span></li>
+            <li class="list-group-item">Worlds: <span id="statsWorlds">0</span></li>
+            <li class="list-group-item">Game Objects: <span id="statsGameObjects">0</span></li>
+            <li class="list-group-item"><img src="libs/css/pause.svg" width="20" height="20" id="pauseButton"></li>
+        </ul>
 
         <div class="row g-1 justify-content-around">
 
@@ -118,38 +142,6 @@
                 </div>
 
             </div>
-
-
-            <!-- <div class="col">
-
-                <table id="stats" class="table table-dark table-striped">
-                <tr>
-                    <th>Game Frame:</th>
-                    <td id="statsFrame">0</td>
-                </tr>
-                <tr>
-                    <th>Scenes:</th>
-                    <td id="statsScenes">0</td>
-                </tr>
-                <tr>
-                    <th>Worlds:</th>
-                    <td id="statsWorlds">0</td>
-                </tr>
-                <tr>
-                    <th>Game Objects:</th>
-                    <td id="statsGameObjects">0</td>
-                </tr>
-                <tr>
-                    <th>Rendered:</th>
-                    <td id="statsRendered">0</td>
-                </tr>
-                <tr>
-                    <th></th>
-                    <td><button type="button" id="pauseButton" class="btn btn-primary btn-sm">Pause</button></td>
-                </tr>
-                </table>
-
-            </div> -->
 
         </div>
 

@@ -7,19 +7,19 @@ export function Stats (game)
     const scenes = document.getElementById('statsScenes');
     const worlds = document.getElementById('statsWorlds');
     const gameObjects = document.getElementById('statsGameObjects');
-    const rendered = document.getElementById('statsRendered');
+
     const pauseButton = document.getElementById('pauseButton');
 
     pauseButton.onclick = () => {
 
         if (game.isPaused)
         {
-            pauseButton.innerText = 'Pause';
+            pauseButton.src = 'libs/css/pause.svg';
             game.resume();
         }
         else
         {
-            pauseButton.innerText = 'Resume';
+            pauseButton.src = 'libs/css/play.svg';
             game.pause();
         }
 
@@ -32,7 +32,6 @@ export function Stats (game)
         scenes.innerText = renderStats.numScenes;
         worlds.innerText = renderStats.numWorlds;
         gameObjects.innerText = renderStats.numGameObjects;
-        rendered.innerText = renderStats.numGameObjectsRendered;
 
     }, 13);
 }

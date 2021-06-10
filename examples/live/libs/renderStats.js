@@ -16,7 +16,6 @@ window.linkGame = (game) => {
     MSGauge(game);
     GameObjects(game);
     Vertices(game);
-
-    // Stats(game);
+    Stats(game);
 
 }
