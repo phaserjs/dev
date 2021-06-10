@@ -36,7 +36,7 @@
                 height: 90px;
             }
 
-            #fps, #ms {
+            #fps, #ms, #local, #world {
                 width: 300px;
                 font-size: 12px;
                 font-family: Consolas, 'Courier New', monospace;
@@ -44,7 +44,7 @@
                 background-color: #27293b;
             }
 
-            #fpsText, #msText {
+            #fpsText, #msText, #localText, #worldText {
                 padding-bottom: 8px;
             }
 
@@ -78,6 +78,24 @@
             </div>
             <div class="col">
 
+                <div id="local" class="rounded-2">
+                    <div id="localContainer"></div>
+                    <div class="text-center" id="localText">Local Transforms: 0</div>
+                </div>
+
+            </div>
+            <div class="col">
+
+                <div id="world" class="rounded-2">
+                    <div id="worldContainer"></div>
+                    <div class="text-center" id="worldText">World Transforms: 0</div>
+                </div>
+
+            </div>
+
+
+            <!-- <div class="col">
+
                 <table id="stats" class="table table-dark table-striped">
                 <tr>
                     <th>Game Frame:</th>
@@ -105,11 +123,11 @@
                 </tr>
                 </table>
 
-            </div>
+            </div> -->
 
         </div>
 
-        <div class="row">
+        <!-- <div class="row">
 
             <div id="go" class="col">
 
@@ -126,7 +144,7 @@
                 <canvas id="msGauge"></canvas>
             </div>
 
-        </div>
+        </div> -->
 
         </div>
 

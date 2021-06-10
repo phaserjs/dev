@@ -132,7 +132,7 @@ const onExampleStats = (item, demoID) =>
         root: document.body,
         x: 300,
         y: 300,
-        width: 860,
+        width: 960,
         height: 600,
         mount: statsFrame
     });
