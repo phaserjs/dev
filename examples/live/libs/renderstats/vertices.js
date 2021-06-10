@@ -1,31 +1,26 @@
-export function LocalTransforms (game)
+export function Vertices (game)
 {
-    const { linear } = uPlot.paths;
+    const { bars } = uPlot.paths;
 
     const renderStats = game.renderStats;
 
-    const container = document.getElementById('localContainer');
-    const localText = document.getElementById('localText');
+    const container = document.getElementById('verticesContainer');
+    const verticesText = document.getElementById('verticesText');
 
-    let data = [ [], [] ];
-
-    let startFrame = game.frame - 100;
-
-    for (let i = 0; i < 100; i++)
-    {
-        data[0][i] = startFrame + i;
-        data[1][i] = 0;
-    }
+    let data = [
+        [ 0 ], // Total Game Objects
+        [ 0 ], // Vertices
+    ];
 
     const ctx = document.createElement('canvas').getContext('2d');
 
     const fill = ctx.createLinearGradient(0, 0, 0, 400);
 
-    fill.addColorStop(0, 'rgba(236, 101, 145, 0.50)');
-    fill.addColorStop(1, 'rgba(236, 101, 145, 0.10)');
+    fill.addColorStop(0, 'rgba(255, 138, 118, 0.50)');
+    fill.addColorStop(1, 'rgba(255, 138, 118, 0.10)');
 
     const opts = {
-        width: 300,
+        width: 150,
         height: 200,
         legend: {
             show: false
@@ -43,7 +38,7 @@ export function LocalTransforms (game)
                 gap: 8,
                 grid: {
                     width: 1 / devicePixelRatio,
-                    stroke: '#4b3c57',
+                    stroke: '#8c483d',
                 },
                 ticks: {
                     show: false
@@ -57,7 +52,7 @@ export function LocalTransforms (game)
             y: {
                 range: (u, dataMin, dataMax) => {
 
-                    return [ 0, renderStats.numGameObjectsRendered ]
+                    return [ 0, renderStats.numGameObjects + 20 ]
 
                 }
             }
@@ -65,36 +60,19 @@ export function LocalTransforms (game)
         series: [
             {},
             {
-                stroke: '#ec6591',
+                stroke: '#ff8a76',
                 fill,
                 points: {
                     show: false
                 },
-                paths: linear()
-            },
+                drawStyle: 1,
+                lineInterpolation: null,
+                paths: bars({ _size: [ 0.8, 80 ]})
+            }
         ]
     };
 
     const uplot = new uPlot(opts, data, container);
-
-    setInterval(() => {
-
-        const c = uplot.cursor;
-
-        const frame = (c.idx) ? data[0][c.idx] : game.frame;
-        const local = (c.idx) ? data[1][c.idx] : renderStats.numDirtyLocalTransforms;
-
-        if (c.idx)
-        {
-            //  Mouse is over the graph
-            localText.innerText = `Frame: ${frame} - Local Transforms: ${local}`;
-        }
-        else
-        {
-            localText.innerText = `Local Transforms: ${local}`;
-        }
-
-    }, 13);
 
     setInterval(() => {
     
@@ -103,12 +81,11 @@ export function LocalTransforms (game)
             return;
         }
 
-        data[0].shift();
-        data[1].shift();
-
-        data[0].push(renderStats.gameFrame);
-        data[1].push(renderStats.numDirtyLocalTransforms);
+        data[0][0] = renderStats.numGameObjects;
+        data[1][0] = renderStats.numDirtyVertices;
     
+        verticesText.innerText = `Vertices: ${renderStats.numDirtyVertices}`;
+        
         uplot.setData(data);
     
     }, 100);

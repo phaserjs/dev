@@ -9,12 +9,20 @@ export function MS (game)
 
     let data = [ [], [] ];
 
+    let startFrame = game.frame - 100;
+
+    for (let i = 0; i < 100; i++)
+    {
+        data[0][i] = startFrame + i;
+        data[1][i] = 0;
+    }
+
     const ctx = document.createElement('canvas').getContext('2d');
 
     const fill = ctx.createLinearGradient(0, 0, 0, 400);
 
-    fill.addColorStop(0, 'rgba(193, 82, 177, 0.75)');
-    fill.addColorStop(1, 'rgba(193, 82, 177, 0.15)');
+    fill.addColorStop(0, 'rgba(193, 82, 177, 0.50)');
+    fill.addColorStop(1, 'rgba(193, 82, 177, 0.10)');
 
     const opts = {
         width: 300,
@@ -23,15 +31,15 @@ export function MS (game)
             show: false
         },
         //  padding: [ top, right, bottom, left ]
-        padding: [ 10, 10, 10, 10 ],
+        padding: [ 10, 10, 4, 0 ],
         axes: [
             {
                 show: false
             },
             {
                 stroke: '#00ff00',
-                font: `12px Consolas, 'Courier New', monospace`,
-                size: 20,
+                font: `11px Consolas, 'Courier New', monospace`,
+                size: 32,
                 gap: 8,
                 grid: {
                     width: 1 / devicePixelRatio,
@@ -71,39 +79,6 @@ export function MS (game)
 
     const uplot = new uPlot(opts, data, container);
 
-    //  ms gauge
-
-    /*
-    const gaugeOpts = {
-        angle: 0,
-        lineWidth: 0.3,
-        pointer: {
-            length: 0.5,
-            strokeWidth: 0.05,
-            color: '#000'
-        },
-        limitMax: true,     // If false, max value increases automatically if value > maxValue
-        limitMin: true,
-        // colorStart: '#FF0000',
-        // colorStop: '#00FF00',
-        strokeColor: '#4A4A4A',
-        generateGradient: true,
-        highDpiSupport: true,
-        percentColors: [ [ 0.0, "#00ff00" ], [ 0.50, "#ffff00" ], [ 1.0, "#ff0000" ] ]
-    };
-
-    const gaugeTarget = document.getElementById('msGauge');
-
-    const gauge = new Gauge(gaugeTarget).setOptions(gaugeOpts);
-
-    gauge.maxValue = 30;
-    gauge.setMinValue(0);
-    gauge.animationSpeed = 25;
-    gauge.set(0);
-    */
-
-    let f = 0;
-
     setInterval(() => {
 
         const c = uplot.cursor;
@@ -130,20 +105,13 @@ export function MS (game)
             return;
         }
 
-        if (f > 100)
-        {
-            data[0].shift();
-            data[1].shift();
-        }
+        data[0].shift();
+        data[1].shift();
 
         data[0].push(renderStats.gameFrame);
         data[1].push(renderStats.delta);
     
         uplot.setData(data);
-
-        f++;
-
-        // gauge.set(renderStats.delta);
     
     }, 100);
 }

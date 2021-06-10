@@ -9,12 +9,20 @@ export function FPS (game)
 
     let data = [ [], [] ];
 
+    let startFrame = game.frame - 100;
+
+    for (let i = 0; i < 100; i++)
+    {
+        data[0][i] = startFrame + i;
+        data[1][i] = 0;
+    }
+
     const ctx = document.createElement('canvas').getContext('2d');
 
     const fill = ctx.createLinearGradient(0, 0, 0, 400);
 
-    fill.addColorStop(0, 'rgba(69, 140, 234, 0.70)');
-    fill.addColorStop(1, 'rgba(69, 140, 234, 0.25)');
+    fill.addColorStop(0, 'rgba(69, 140, 234, 0.50)');
+    fill.addColorStop(1, 'rgba(69, 140, 234, 0.10)');
 
     const opts = {
         width: 300,
@@ -23,21 +31,21 @@ export function FPS (game)
             show: false
         },
         //  padding: [ top, right, bottom, left ]
-        padding: [ 10, 10, 10, 10 ],
+        padding: [ 10, 10, 4, 0 ],
         axes: [
             {
                 show: false
             },
             {
-                incrs: [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ],
+                incrs: [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120 ],
                 stroke: '#00ff00',
                 font: `12px Consolas, 'Courier New', monospace`,
-                size: 20,
+                size: 32,
                 gap: 8,
                 space: 0,
                 grid: {
                     width: 1 / devicePixelRatio,
-                    stroke: '#3062a4',
+                    stroke: '#214471',
                 },
                 ticks: {
                     show: false
@@ -69,8 +77,6 @@ export function FPS (game)
 
     const uplot = new uPlot(opts, data, container);
 
-    let f = 0;
-
     setInterval(() => {
 
         const c = uplot.cursor;
@@ -97,18 +103,13 @@ export function FPS (game)
             return;
         }
 
-        if (f > 30)
-        {
-            data[0].shift();
-            data[1].shift();
-        }
+        data[0].shift();
+        data[1].shift();
 
         data[0].push(renderStats.gameFrame);
         data[1].push(renderStats.fps);
     
         uplot.setData(data);
-
-        f++;
     
     }, 100);
 }

@@ -1,111 +1,78 @@
 export function GameObjects (game)
 {
-    const { linear, spline, stepped, bars } = uPlot.paths;
-
-    //  renderStats:
-    // numGameObjects: number;
-    // numGameObjectsRendered: number;
-    // numDirtyLocalTransforms: number;
-    // numDirtyWorldTransforms: number;
-    // numDirtyVertices: number;
-    // numDirtyWorldLists: number;
-    // numDirtyCameras: number;
-
-    const a = [];
-    const b = [];
-    const c = [];
-    const d = [];
-    const e = [];
+    const { bars } = uPlot.paths;
 
     const renderStats = game.renderStats;
 
-    const container = document.getElementById('goContainer');
+    const container = document.getElementById('gameObjectsContainer');
+    const gameObjectsText = document.getElementById('gameObjectsText');
 
-    const startFrame = renderStats.gameFrame;
-    
-    for (let i = 0; i < 300; i++)
-    {
-        a[i] = startFrame + i;
-        b[i] = renderStats.numGameObjects;
-        c[i] = renderStats.numGameObjectsRendered;
-        d[i] = renderStats.numDirtyLocalTransforms;
-        e[i] = renderStats.numDirtyWorldTransforms;
-    }
-    
-    let data = [ a, b, c, d, e ];
+    let data = [
+        [ 0 ], // Total Game Objects
+        [ 0 ], // Rendered
+    ];
 
-    //  padding: [ top, right, bottom, left ]
-    
-    let opts = {
-        width: 600,
-        height: 300,
+    const ctx = document.createElement('canvas').getContext('2d');
+
+    const fill = ctx.createLinearGradient(0, 0, 0, 400);
+
+    fill.addColorStop(0, 'rgba(204, 222, 57, 0.50)');
+    fill.addColorStop(1, 'rgba(204, 222, 57, 0.10)');
+
+    const opts = {
+        width: 150,
+        height: 200,
         legend: {
             show: false
         },
-        padding: [ 10, 10, 10, 10 ],
+        //  padding: [ top, right, bottom, left ]
+        padding: [ 10, 10, 4, 0 ],
         axes: [
             {
-                stroke: '#00ff00',
-                font: `12px Consolas, 'Courier New', monospace`,
-                labelFont: `10px 'MonoLisa'`,
-                size: 20,
-                gap: 0,
-                grid: {
-                    width: 1 / devicePixelRatio,
-                    stroke: 'rgb(20, 20, 20)',
-                }
+                show: false
             },
             {
                 stroke: '#00ff00',
-                font: `12px Consolas, 'Courier New', monospace`,
-                labelFont: `10px 'MonoLisa'`,
-                size: 20,
-                gap: 0,
+                font: `10px Consolas, 'Courier New', monospace`,
+                size: 40,
+                gap: 8,
                 grid: {
                     width: 1 / devicePixelRatio,
-                    stroke: 'rgb(20, 20, 20)',
+                    stroke: '#818c25',
+                },
+                ticks: {
+                    show: false
                 }
-            },
+            }
         ],
         scales: {
             x: {
-                time: false,
+                time: false
+            },
+            y: {
+                range: (u, dataMin, dataMax) => {
+
+                    return [ 0, renderStats.numGameObjects + 20 ]
+
+                }
             }
         },
         series: [
+            {},
             {
-                label: 'Frame'
-            },
-            {
-                label: 'Game Objects',
-                stroke: 'red',
-                fill: 'rgba(255, 0, 0, 0.5)',
-                paths: linear()
-            },
-            {
-                label: 'Rendered',
-                stroke: 'green',
-                fill: 'rgba(0, 255, 0, 0.5)',
-                paths: linear()
-            },
-            {
-                label: 'Local',
-                stroke: 'orange',
-                // fill: 'rgba(0, 255, 0, 0.3)',
-                paths: linear()
-            },
-            {
-                label: 'World',
-                stroke: 'yellow',
-                // fill: 'rgba(0, 255, 0, 0.3)',
-                paths: linear()
+                stroke: '#ccde39',
+                fill,
+                points: {
+                    show: false
+                },
+                drawStyle: 1,
+                lineInterpolation: null,
+                paths: bars({ _size: [ 0.8, 80 ]})
             }
         ]
     };
-    
-    let uplot = new uPlot(opts, data, container);
-    
-    let f = 0;
+
+    const uplot = new uPlot(opts, data, container);
 
     setInterval(() => {
     
@@ -113,33 +80,13 @@ export function GameObjects (game)
         {
             return;
         }
-    
-        if (f > 300)
-        {
-            data[0].shift();
-            data[1].shift();
-            data[2].shift();
-            data[3].shift();
-            data[4].shift();
-    
-            data[0].push(renderStats.gameFrame);
-            data[1].push(renderStats.numGameObjects);
-            data[2].push(renderStats.numGameObjectsRendered);
-            data[3].push(renderStats.numDirtyLocalTransforms);
-            data[4].push(renderStats.numDirtyWorldTransforms);
-        }
-        else
-        {
-            data[0][f] = renderStats.gameFrame;
-            data[1][f] = renderStats.numGameObjects;
-            data[2][f] = renderStats.numGameObjectsRendered;
-            data[3][f] = renderStats.numDirtyLocalTransforms;
-            data[4][f] = renderStats.numDirtyWorldTransforms;
-        }
+
+        data[0][0] = renderStats.numGameObjects;
+        data[1][0] = renderStats.numGameObjectsRendered;
+
+        gameObjectsText.innerText = `Rendered: ${renderStats.numGameObjectsRendered}`;
     
         uplot.setData(data);
     
-        f++;
-    
-    }, 14);
+    }, 100);
 }

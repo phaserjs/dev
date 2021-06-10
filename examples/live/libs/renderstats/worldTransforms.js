@@ -9,12 +9,20 @@ export function WorldTransforms (game)
 
     let data = [ [], [] ];
 
+    let startFrame = game.frame - 100;
+
+    for (let i = 0; i < 100; i++)
+    {
+        data[0][i] = startFrame + i;
+        data[1][i] = 0;
+    }
+
     const ctx = document.createElement('canvas').getContext('2d');
 
     const fill = ctx.createLinearGradient(0, 0, 0, 400);
 
-    fill.addColorStop(0, 'rgba(97, 211, 181, 0.75)');
-    fill.addColorStop(1, 'rgba(97, 211, 181, 0.15)');
+    fill.addColorStop(0, 'rgba(97, 211, 181, 0.50)');
+    fill.addColorStop(1, 'rgba(97, 211, 181, 0.10)');
 
     const opts = {
         width: 300,
@@ -23,7 +31,7 @@ export function WorldTransforms (game)
             show: false
         },
         //  padding: [ top, right, bottom, left ]
-        padding: [ 10, 10, 10, 10 ],
+        padding: [ 10, 10, 4, 0 ],
         axes: [
             {
                 show: false
@@ -69,8 +77,6 @@ export function WorldTransforms (game)
 
     const uplot = new uPlot(opts, data, container);
 
-    let f = 0;
-
     setInterval(() => {
 
         const c = uplot.cursor;
@@ -97,18 +103,13 @@ export function WorldTransforms (game)
             return;
         }
 
-        if (f > 100)
-        {
-            data[0].shift();
-            data[1].shift();
-        }
+        data[0].shift();
+        data[1].shift();
 
         data[0].push(renderStats.gameFrame);
         data[1].push(renderStats.numDirtyWorldTransforms);
     
         uplot.setData(data);
-
-        f++;
     
     }, 100);
 }

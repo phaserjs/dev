@@ -14,7 +14,7 @@
                 margin-top: 10px;
                 background-color: #1c1c27;
                 color: #00ff00;
-                /* overflow: hidden; */
+                overflow: hidden;
             }
 
             .u-select {
@@ -31,21 +31,22 @@
                 border-bottom: 1px dashed #00ff00;
             }
 
-            #msGauge {
-                width: 180px;
-                height: 90px;
+            #msGaugeCanvas {
+                width: 300px;
+                height: 195px;
             }
 
-            #fps, #ms, #local, #world {
+            #fps, #ms, #local, #world, #msGauge, #gos {
                 width: 300px;
+                padding-bottom: 4px;
                 font-size: 12px;
                 font-family: Consolas, 'Courier New', monospace;
                 color: #00ff00;
                 background-color: #27293b;
             }
 
-            #fpsText, #msText, #localText, #worldText {
-                padding-bottom: 8px;
+            #gameObjects, #vertices {
+                width: 150px;
             }
 
             #stats th, #stats td {
@@ -56,9 +57,9 @@
     </head>
     <body>
 
-        <div class="container-fluid">
+    <div class="container-fluid">
 
-        <div class="row g-1">
+        <div class="row g-1 justify-content-around">
 
             <div class="col">
 
@@ -89,6 +90,31 @@
                 <div id="world" class="rounded-2">
                     <div id="worldContainer"></div>
                     <div class="text-center" id="worldText">World Transforms: 0</div>
+                </div>
+
+            </div>
+            <div class="col">
+
+                <div id="msGauge" class="rounded-2">
+                    <canvas id="msGaugeCanvas"></canvas>
+                    <div class="text-center" id="msGaugeText">Performance</div>
+                </div>
+
+            </div>
+            <div class="col">
+
+                <div id="gos" class="row rounded-2 g-0">
+
+                    <div id="gameObjects" class="col">
+                        <div id="gameObjectsContainer"></div>
+                        <div class="text-center" id="gameObjectsText">Rendered: 0</div>
+                    </div>
+
+                    <div id="vertices" class="col">
+                        <div id="verticesContainer"></div>
+                        <div class="text-center" id="verticesText">Vertices: 0</div>
+                    </div>
+
                 </div>
 
             </div>
@@ -127,28 +153,9 @@
 
         </div>
 
-        <!-- <div class="row">
+    </div>
 
-            <div id="go" class="col">
-
-                <div class="row">
-                    <div id="goContainer"></div>
-                </div>
-                <div class="row" style="width: 600px">
-                    <div class="col text-center" id="goText">Game Objects: 0</div>
-                </div>
-
-            </div>
-
-            <div class="col">
-                <canvas id="msGauge"></canvas>
-            </div>
-
-        </div> -->
-
-        </div>
-
-        <script src="libs/renderStats.js" type="module"></script>
+    <script src="libs/renderStats.js" type="module"></script>
 
     </body>
 </html>
