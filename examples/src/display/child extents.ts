@@ -32,14 +32,17 @@ class Demo extends Scene
 
             AddChild(world, new Sprite(100, 100, 'frog'));
             AddChild(world, new Sprite(200, 100, 'frog'));
-            AddChild(world, new Sprite(300, 100, 'atlas', 'brain'));
+            const b = AddChild(world, new Sprite(300, 100, 'atlas', 'logo'));
+
+            b.alpha = 0.5;
+            // b.tint = 0x00ffff;
 
             for (let i = 0; i < 100; i++)
             {
                 const x = Between(0, 800);
                 const y = Between(0, 600);
 
-                AddChild(world, new Sprite(x, y, 'atlas', 'lemming'));
+                // AddChild(world, new Sprite(x, y, 'atlas', 'lemming'));
             }
 
             On(world, 'update', () => {

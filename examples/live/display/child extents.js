@@ -1833,11 +1833,6 @@ void main (void)
     DirtyComponent.transform[id] = 1;
   }
 
-  // ../phaser-genesis/src/components/dirty/SetDirtyVertexColors.ts
-  function SetDirtyVertexColors(id) {
-    DirtyComponent.vertexColors[id] = 1;
-  }
-
   // ../phaser-genesis/src/components/transform/SetExtent.ts
   function SetExtent(id, x, y, width, height) {
     Extent2DComponent.x[id] = x;
@@ -3088,12 +3083,6 @@ void main (void)
     get height() {
       return Extent2DComponent.height[this.id];
     }
-    get right() {
-      return Extent2DComponent.right[this.id];
-    }
-    get bottom() {
-      return Extent2DComponent.bottom[this.id];
-    }
     set x(value) {
       this.width = value;
     }
@@ -3320,6 +3309,12 @@ void main (void)
     return entities2;
   };
 
+  // ../phaser-genesis/src/renderer/webgl1/colors/PackColor.ts
+  function PackColor(rgb, alpha) {
+    const ua = (alpha * 255 | 0) & 255;
+    return (ua << 24 | rgb) >>> 0;
+  }
+
   // ../phaser-genesis/src/renderer/webgl1/draw/AddVertexToBatch.ts
   function AddVertexToBatch(id, offset, textureIndex, F32, U32) {
     VertexComponent.offset[id] = offset;
@@ -3524,12 +3519,14 @@ void main (void)
     }
     set visible(value) {
       PermissionsComponent.visible[this.id] = Number(value);
+      SetDirtyDisplayList(GetWorldID(this.id));
     }
     get visible() {
       return Boolean(PermissionsComponent.visible[this.id]);
     }
     set visibleChildren(value) {
       PermissionsComponent.visibleChildren[this.id] = Number(value);
+      SetDirtyDisplayList(GetWorldID(this.id));
     }
     get visibleChildren() {
       return Boolean(PermissionsComponent.visibleChildren[this.id]);
@@ -3691,6 +3688,7 @@ void main (void)
       __publicField(this, "texture");
       __publicField(this, "frame");
       __publicField(this, "hasTexture", false);
+      __publicField(this, "_alpha", 1);
       __publicField(this, "_tint", 16777215);
       const id = this.id;
       addComponent(GameObjectWorld, QuadVertexComponent, id);
@@ -3722,8 +3720,35 @@ void main (void)
     }
     set tint(value) {
       if (value !== this._tint) {
+        const id = this.id;
         this._tint = value;
-        SetDirtyVertexColors(this.id);
+        const v1 = QuadVertexComponent.v1[id];
+        const v2 = QuadVertexComponent.v2[id];
+        const v3 = QuadVertexComponent.v3[id];
+        const v4 = QuadVertexComponent.v4[id];
+        const color = PackColor(value, this.alpha);
+        VertexComponent.color[v1] = color;
+        VertexComponent.color[v2] = color;
+        VertexComponent.color[v3] = color;
+        VertexComponent.color[v4] = color;
+      }
+    }
+    get alpha() {
+      return this._alpha;
+    }
+    set alpha(value) {
+      if (value !== this._alpha) {
+        const id = this.id;
+        this._alpha = value;
+        const v1 = QuadVertexComponent.v1[id];
+        const v2 = QuadVertexComponent.v2[id];
+        const v3 = QuadVertexComponent.v3[id];
+        const v4 = QuadVertexComponent.v4[id];
+        const color = PackColor(this._tint, value);
+        VertexComponent.color[v1] = color;
+        VertexComponent.color[v2] = color;
+        VertexComponent.color[v3] = color;
+        VertexComponent.color[v4] = color;
       }
     }
     destroy(reparentChildren) {
@@ -5365,11 +5390,11 @@ void main (void)
         const frogs = [];
         AddChild(world3, new Sprite(100, 100, "frog"));
         AddChild(world3, new Sprite(200, 100, "frog"));
-        AddChild(world3, new Sprite(300, 100, "atlas", "brain"));
+        const b = AddChild(world3, new Sprite(300, 100, "atlas", "logo"));
+        b.alpha = 0.5;
         for (let i = 0; i < 100; i++) {
           const x = Between(0, 800);
           const y = Between(0, 600);
-          AddChild(world3, new Sprite(x, y, "atlas", "lemming"));
         }
         On(world3, "update", () => {
           frogs.forEach((frog) => {

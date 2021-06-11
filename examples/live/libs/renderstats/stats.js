@@ -190,7 +190,7 @@ export function Stats (game)
         const displayFolder = pane2.addFolder({ title: 'Display' });
 
         displayFolder.addInput(target, 'visible');
-        displayFolder.addInput(target, 'tint', { view: 'color', _picker: 'inline', _expanded: true });
+        displayFolder.addInput(target, 'tint', { view: 'color', picker: 'inline' });
         displayFolder.addInput(target, 'alpha', { min: 0, max: 1, step: 0.1 });
 
     };

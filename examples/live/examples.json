@@ -246,7 +246,7 @@
         {
           "path": "examples/live/display/child extents.js",
           "name": "child extents.js",
-          "size": 156296,
+          "size": 170261,
           "extension": ".js",
           "type": "file"
         },
@@ -265,7 +265,7 @@
           "type": "file"
         }
       ],
-      "size": 1344390,
+      "size": 1358355,
       "type": "directory"
     },
     {
@@ -524,6 +524,6 @@
       "type": "directory"
     }
   ],
-  "size": 7694307,
+  "size": 7708272,
   "type": "directory"
 }
