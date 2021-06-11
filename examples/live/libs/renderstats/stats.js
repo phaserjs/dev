@@ -13,8 +13,13 @@ export function Stats (game)
     const metricsPanel = document.getElementById('metrics');
     const analyticsPanel = document.getElementById('analytics');
     const gameObjectsTable = document.getElementById('goTable');
+    const transformPaneContainer = document.getElementById('transformPaneContainer');
+    const spritePaneContainer = document.getElementById('spritePaneContainer');
 
     let metricsVisible = true;
+
+    let pane1;
+    let pane2;
 
     pauseButton.onclick = () => {
 
@@ -89,35 +94,110 @@ export function Stats (game)
 
     const createSpriteEditor = (target) => {
 
-        console.log('sprite ed');
+        if (pane1)
+        {
+            pane1.dispose();
+        }
 
-        const pane = new Tweakpane.Pane();
+        if (pane2)
+        {
+            pane2.dispose();
+        }
 
-        const transformFolder = pane.addFolder({ title: 'Transform' });
+        pane1 = new Tweakpane.Pane({
+            title: target.toString(),
+            container: transformPaneContainer
+        });
+
+        const transformFolder = pane1.addFolder({ title: 'Transform' });
 
         const step01 = { step: 0.1 };
 
-        // transformFolder.addInput(target, 'x');
-        // transformFolder.addInput(target, 'y');
         transformFolder.addInput(target, 'position');
         transformFolder.addInput(target, 'rotation', step01);
-        transformFolder.addInput(target, 'scaleX', step01);
-        transformFolder.addInput(target, 'scaleY', step01);
-        transformFolder.addInput(target, 'skewX', step01);
-        transformFolder.addInput(target, 'skewY', step01);
-        // transformFolder.addInput(target, 'origin', { min: 0, max: 1, step: 0.1 });
+        transformFolder.addInput(target, 'scale', { x: step01, y: step01 });
+        transformFolder.addInput(target, 'skew', { x: step01, y: step01 });
+        transformFolder.addInput(target, 'origin', { min: 0, max: 1, step: 0.1 });
 
-        const displayFolder = pane.addFolder({ title: 'Display' });
+        const extentsFolder = pane1.addFolder({ title: 'Extents' });
+
+        extentsFolder.addInput(target.size, 'width', { format: (v) => v.toFixed(0) });
+        extentsFolder.addInput(target.size, 'height', { format: (v) => v.toFixed(0) });
+
+        //  Pane 2 - Texture & Tint
+
+        pane2 = new Tweakpane.Pane({
+            title: target.toString(),
+            container: spritePaneContainer
+        });
+
+        if (target.texture)
+        {
+            const textureFolder = pane2.addFolder({ title: 'Texture' });
+
+            let frameOptions = {};
+
+            for (let frame of target.texture.frames.keys())
+            {
+                frameOptions[frame] = frame;
+            }
+
+            const textureInput = textureFolder.addInput(target.texture, 'key', { label: 'texture' }).on('change', event => {
+
+                target.setTexture(event.value);
+
+                frameOptions = {};
+
+                for (let frame of target.texture.frames.keys())
+                {
+                    frameOptions[frame] = frame;
+                }
+
+            });
+
+            let frameInput = textureFolder.addInput(target.frame, 'key', { label: 'frame', options: frameOptions }).on('change', event => {
+
+                target.setFrame(event.value);
+
+                pane1.refresh();
+
+            });
+
+            textureInput.on('change', event => {
+
+                target.setTexture(event.value);
+
+                frameOptions = {};
+
+                for (let frame of target.texture.frames.keys())
+                {
+                    frameOptions[frame] = frame;
+                }
+
+                frameInput.dispose();
+
+                frameInput = textureFolder.addInput(target.frame, 'key', { label: 'frame', options: frameOptions }).on('change', event => {
+
+                    target.setFrame(event.value);
+
+                    pane1.refresh();
+    
+                });
+    
+            });
+        }
+
+        const displayFolder = pane2.addFolder({ title: 'Display' });
 
         displayFolder.addInput(target, 'visible');
-        displayFolder.addInput(target, 'tint', { view: 'color', picker: 'inline', expanded: true });
+        displayFolder.addInput(target, 'tint', { view: 'color', _picker: 'inline', _expanded: true });
         displayFolder.addInput(target, 'alpha', { min: 0, max: 1, step: 0.1 });
 
     };
 
     setInterval(() => {
 
-        if (metricsVisible)
+        if (metricsVisible || game.isPaused)
         {
             return;
         }

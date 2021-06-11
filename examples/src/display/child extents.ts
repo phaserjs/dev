@@ -1,6 +1,7 @@
 import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../phaser-genesis/src/config';
 
 import { AddChild } from '../../../../phaser-genesis/src/display';
+import { AtlasFile } from '../../../../phaser-genesis/src/loader/files';
 import { Between } from '../../../../phaser-genesis/src/math';
 import { Game } from '../../../../phaser-genesis/src/Game';
 import { ImageFile } from '../../../../phaser-genesis/src/loader/files/ImageFile';
@@ -21,6 +22,7 @@ class Demo extends Scene
 
         loader.add(ImageFile('frog', 'assets/frog.png'));
         loader.add(ImageFile('redfrog', 'assets/redfrog.png'));
+        loader.add(AtlasFile('atlas', 'assets/atlas-notrim.png', 'assets/atlas-notrim.json'));
 
         loader.start().then(() => {
 
@@ -30,8 +32,15 @@ class Demo extends Scene
 
             AddChild(world, new Sprite(100, 100, 'frog'));
             AddChild(world, new Sprite(200, 100, 'frog'));
-            AddChild(world, new Sprite(300, 100, 'frog'));
+            AddChild(world, new Sprite(300, 100, 'atlas', 'brain'));
 
+            for (let i = 0; i < 100; i++)
+            {
+                const x = Between(0, 800);
+                const y = Between(0, 600);
+
+                AddChild(world, new Sprite(x, y, 'atlas', 'lemming'));
+            }
 
             On(world, 'update', () => {
 
