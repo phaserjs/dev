@@ -2868,6 +2868,18 @@ void main (void)
     WorldMatrix2DComponent.ty[id] = y;
   }
 
+  // ../phaser-genesis/src/math/vec2/Vec2FromArray.ts
+  function Vec2FromArray(dst, src = [], index = 0) {
+    return dst.set(src[index], src[index + 1]);
+  }
+
+  // ../phaser-genesis/src/math/vec2/Vec2ToArray.ts
+  function Vec2ToArray(v, dst = [], index = 0) {
+    dst[index] = v.x;
+    dst[index + 1] = v.y;
+    return dst;
+  }
+
   // ../phaser-genesis/src/math/vec2/Vec2.ts
   var Vec2 = class {
     constructor(x = 0, y = 0) {
@@ -2881,17 +2893,14 @@ void main (void)
       return this;
     }
     toArray(dst = [], index = 0) {
-      const { x, y } = this;
-      dst[index] = x;
-      dst[index + 1] = y;
-      return dst;
+      return Vec2ToArray(this, dst, index);
     }
     fromArray(src, index = 0) {
-      return this.set(src[index], src[index + 1]);
+      Vec2FromArray(this, src, index);
+      return this;
     }
     toString() {
-      const { x, y } = this;
-      return `{ x=${x}, y=${y} }`;
+      return `{ x=${this.x}, y=${this.y} }`;
     }
   };
 
@@ -3286,6 +3295,7 @@ void main (void)
   var GameObject = class {
     constructor() {
       __publicField(this, "id", addEntity(GameObjectWorld));
+      __publicField(this, "type", "GameObject");
       __publicField(this, "name", "");
       __publicField(this, "events");
       const id = this.id;
@@ -3355,7 +3365,7 @@ void main (void)
       return GetNumChildren(this.id);
     }
     toString() {
-      return `[ GameObject id="${this.id}" ]`;
+      return `[ ${this.type} id="${this.id}" ]`;
     }
     destroy(reparentChildren) {
       if (reparentChildren) {
@@ -3373,8 +3383,25 @@ void main (void)
   var Container = class extends GameObject {
     constructor(x = 0, y = 0) {
       super();
+      __publicField(this, "type", "Container");
       __publicField(this, "_alpha", 1);
+      __publicField(this, "position");
+      const id = this.id;
       AddTransform2DComponent(this.id, x, y, GetDefaultOriginX(), GetDefaultOriginY());
+      this.position = {
+        get x() {
+          return Transform2DComponent.x[id];
+        },
+        set x(value) {
+          Transform2DComponent.x[id] = value;
+        },
+        get y() {
+          return Transform2DComponent.y[id];
+        },
+        set y(value) {
+          Transform2DComponent.y[id] = value;
+        }
+      };
     }
     updateWorldTransform() {
     }
@@ -3593,6 +3620,7 @@ void main (void)
   var Sprite = class extends Container {
     constructor(x, y, texture, frame2) {
       super(x, y);
+      __publicField(this, "type", "Sprite");
       __publicField(this, "texture");
       __publicField(this, "frame");
       __publicField(this, "hasTexture", false);
@@ -3631,9 +3659,6 @@ void main (void)
         this._tint = value;
         SetDirtyVertexColors(this.id);
       }
-    }
-    toString() {
-      return `[ Sprite id="${this.id}" texture="${this.texture.key}" frame="${this.frame.key}" x="${this.x}" y="${this.y}" ]`;
     }
     destroy(reparentChildren) {
       super.destroy(reparentChildren);

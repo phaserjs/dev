@@ -97,8 +97,9 @@ export function Stats (game)
 
         const step01 = { step: 0.1 };
 
-        transformFolder.addInput(target, 'x');
-        transformFolder.addInput(target, 'y');
+        // transformFolder.addInput(target, 'x');
+        // transformFolder.addInput(target, 'y');
+        transformFolder.addInput(target, 'position');
         transformFolder.addInput(target, 'rotation', step01);
         transformFolder.addInput(target, 'scaleX', step01);
         transformFolder.addInput(target, 'scaleY', step01);
