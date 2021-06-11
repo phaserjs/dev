@@ -7,7 +7,6 @@ import { ImageFile } from '../../../../phaser-genesis/src/loader/files/ImageFile
 import { Loader } from '../../../../phaser-genesis/src/loader';
 import { Mouse } from '../../../../phaser-genesis/src/input/mouse/Mouse';
 import { On } from '../../../../phaser-genesis/src/events';
-import { Pane } from 'tweakpane';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
 import { Sprite } from '../../../../phaser-genesis/src/gameobjects';
 import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
@@ -29,23 +28,10 @@ class Demo extends Scene
 
             const frogs = [];
 
-			/*
-			for (let i = 0; i < 10; i++)
-            {
-                const x = Between(0, 800);
-                const y = Between(0, 600);
+            AddChild(world, new Sprite(100, 100, 'frog'));
+            AddChild(world, new Sprite(200, 100, 'frog'));
+            AddChild(world, new Sprite(300, 100, 'frog'));
 
-                AddChild(world, new Sprite(x, y, 'frog'));
-            }
-
-            for (let i = 0; i < 10; i++)
-            {
-                const x = Between(0, 800);
-                const y = Between(0, 600);
-
-                frogs.push(AddChild(world, new Sprite(x, y, 'redfrog')));
-            }
-			*/
 
             On(world, 'update', () => {
 
@@ -57,30 +43,15 @@ class Demo extends Scene
 
             const mouse = new Mouse();
 
-            On(mouse, 'pointerdown', pointerX => {
-
-                const x = Between(0, 800);
-                const y = Between(0, 600);
+            On(mouse, 'pointerdown', (pointerX, pointerY) => {
 
                 if (pointerX < 400)
                 {
-                    for (let i = 0; i < 1; i++)
-                    {
-                        const x = Between(0, 800);
-                        const y = Between(0, 600);
-        
-                        AddChild(world, new Sprite(x, y, 'frog'));
-                    }
+                    AddChild(world, new Sprite(pointerX, pointerY, 'frog'));
                 }
                 else
                 {
-                    for (let i = 0; i < 1; i++)
-                    {
-                        const x = Between(0, 800);
-                        const y = Between(0, 600);
-        
-                        frogs.push(AddChild(world, new Sprite(x, y, 'redfrog')));
-                    }
+                    frogs.push(AddChild(world, new Sprite(pointerX, pointerY, 'redfrog')));
                 }
 
             });
