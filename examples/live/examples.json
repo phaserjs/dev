@@ -246,7 +246,14 @@
         {
           "path": "examples/live/display/child extents.js",
           "name": "child extents.js",
-          "size": 170261,
+          "size": 172887,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/display/display debug tools.js",
+          "name": "display debug tools.js",
+          "size": 168245,
           "extension": ".js",
           "type": "file"
         },
@@ -265,7 +272,7 @@
           "type": "file"
         }
       ],
-      "size": 1358355,
+      "size": 1529226,
       "type": "directory"
     },
     {
@@ -524,6 +531,6 @@
       "type": "directory"
     }
   ],
-  "size": 7708272,
+  "size": 7879143,
   "type": "directory"
 }
