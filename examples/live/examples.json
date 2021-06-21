@@ -251,6 +251,13 @@
           "type": "file"
         },
         {
+          "path": "examples/live/display/debug panel.js",
+          "name": "debug panel.js",
+          "size": 174133,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
           "path": "examples/live/display/display debug tools.js",
           "name": "display debug tools.js",
           "size": 182882,
@@ -272,7 +279,7 @@
           "type": "file"
         }
       ],
-      "size": 1543863,
+      "size": 1717996,
       "type": "directory"
     },
     {
@@ -531,6 +538,6 @@
       "type": "directory"
     }
   ],
-  "size": 8029718,
+  "size": 8203851,
   "type": "directory"
 }
