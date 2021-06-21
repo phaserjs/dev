@@ -18,9 +18,9 @@ class Demo extends Scene
 
         On(world, WorldPostRenderEvent, (renderPass: IRenderPass) => {
 
-            FillRect(renderPass, 100, 100, 64, 64, 0xff0000);
-            FillRect(renderPass, 200, 200, 128, 32, 0xffff00);
-            FillRect(renderPass, 300, 300, 16, 128, 0xff00ff);
+            FillRect(renderPass, 100, 100, 340, 240, 0xff0000);
+            FillRect(renderPass, 200, 200, 512, 64, 0xffff00, 0.6);
+            FillRect(renderPass, 300, 300, 48, 210, 0xff00ff);
 
         });
     }

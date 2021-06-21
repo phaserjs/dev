@@ -119,7 +119,7 @@
         {
           "path": "examples/live/direct mode/draw frame.js",
           "name": "draw frame.js",
-          "size": 120165,
+          "size": 139254,
           "extension": ".js",
           "type": "file"
         },
@@ -133,7 +133,7 @@
         {
           "path": "examples/live/direct mode/draw image.js",
           "name": "draw image.js",
-          "size": 122556,
+          "size": 137145,
           "extension": ".js",
           "type": "file"
         },
@@ -147,21 +147,21 @@
         {
           "path": "examples/live/direct mode/draw scaled frame.js",
           "name": "draw scaled frame.js",
-          "size": 120147,
+          "size": 139236,
           "extension": ".js",
           "type": "file"
         },
         {
           "path": "examples/live/direct mode/draw scaled image.js",
           "name": "draw scaled image.js",
-          "size": 118073,
+          "size": 137162,
           "extension": ".js",
           "type": "file"
         },
         {
           "path": "examples/live/direct mode/draw tiles.js",
           "name": "draw tiles.js",
-          "size": 147475,
+          "size": 168716,
           "extension": ".js",
           "type": "file"
         },
@@ -175,14 +175,14 @@
         {
           "path": "examples/live/direct mode/fill lots of rects.js",
           "name": "fill lots of rects.js",
-          "size": 126560,
+          "size": 145329,
           "extension": ".js",
           "type": "file"
         },
         {
           "path": "examples/live/direct mode/fill rect.js",
           "name": "fill rect.js",
-          "size": 114857,
+          "size": 133537,
           "extension": ".js",
           "type": "file"
         },
@@ -194,7 +194,7 @@
           "type": "file"
         }
       ],
-      "size": 1381549,
+      "size": 1512095,
       "type": "directory"
     },
     {
@@ -253,7 +253,7 @@
         {
           "path": "examples/live/display/display debug tools.js",
           "name": "display debug tools.js",
-          "size": 168245,
+          "size": 182882,
           "extension": ".js",
           "type": "file"
         },
@@ -272,7 +272,7 @@
           "type": "file"
         }
       ],
-      "size": 1529226,
+      "size": 1543863,
       "type": "directory"
     },
     {
@@ -531,6 +531,6 @@
       "type": "directory"
     }
   ],
-  "size": 7879143,
+  "size": 8024326,
   "type": "directory"
 }

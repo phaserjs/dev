@@ -1,11 +1,12 @@
+import { AddChild, DisplayDebugTools } from '../../../../phaser-genesis/src/display';
 import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../phaser-genesis/src/config';
 
 import { AtlasFile } from '../../../../phaser-genesis/src/loader/files';
-import { DisplayDebugTools } from '../../../../phaser-genesis/src/display';
 import { Game } from '../../../../phaser-genesis/src/Game';
 import { ImageFile } from '../../../../phaser-genesis/src/loader/files/ImageFile';
 import { Loader } from '../../../../phaser-genesis/src/loader';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
+import { Sprite } from '../../../../phaser-genesis/src/gameobjects';
 import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
 
 class Demo extends Scene
@@ -28,6 +29,14 @@ class Demo extends Scene
         loader.start().then(() => {
 
             const world = new StaticWorld(this);
+
+            // const parent = new Sprite(200, 200, '128');
+            // const child1 = new Sprite(0, 0, 'brain');
+            // const child2 = new Sprite(100, 0, 'brain');
+
+            // AddChild(world, parent);
+            // AddChild(parent, child1);
+            // AddChild(parent, child2);
 
             DisplayDebugTools(world);
 
