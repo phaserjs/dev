@@ -40,7 +40,7 @@ class Demo extends Scene
                     const x = Between(0, 800);
                     const y = Between(0, 600);
     
-                    AddChild(world, new Sprite(x, y, 'frog'));
+                    // AddChild(world, new Sprite(x, y, 'frog'));
 
                     t = 0;
                     i++;

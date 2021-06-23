@@ -200,62 +200,6 @@
     };
   }
 
-  // ../phaser-genesis/src/geom/rectangle/RectangleContains.ts
-  function RectangleContains(rect, x, y) {
-    if (rect.width <= 0 || rect.height <= 0) {
-      return false;
-    }
-    return rect.x <= x && rect.x + rect.width >= x && rect.y <= y && rect.y + rect.height >= y;
-  }
-
-  // ../phaser-genesis/src/geom/rectangle/Rectangle.ts
-  var Rectangle = class {
-    constructor(x = 0, y = 0, width = 0, height = 0) {
-      __publicField(this, "x");
-      __publicField(this, "y");
-      __publicField(this, "width");
-      __publicField(this, "height");
-      this.set(x, y, width, height);
-    }
-    set(x = 0, y = 0, width = 0, height = 0) {
-      this.x = x;
-      this.y = y;
-      this.width = width;
-      this.height = height;
-      return this;
-    }
-    contains(x, y) {
-      return RectangleContains(this, x, y);
-    }
-    set right(value) {
-      if (value <= this.x) {
-        this.width = 0;
-      } else {
-        this.width = value - this.x;
-      }
-    }
-    get right() {
-      return this.x + this.width;
-    }
-    set bottom(value) {
-      if (value <= this.y) {
-        this.height = 0;
-      } else {
-        this.height = value - this.y;
-      }
-    }
-    get bottom() {
-      return this.y + this.height;
-    }
-  };
-
-  // ../phaser-genesis/src/renderer/webgl1/renderpass/AddViewport.ts
-  function AddViewport(renderPass, x = 0, y = 0, width = 0, height = 0) {
-    const viewport = new Rectangle(x, y, width, height);
-    renderPass.viewportStack.push(viewport);
-    return viewport;
-  }
-
   // ../phaser-genesis/src/renderer/webgl1/GL.ts
   var gl;
   var GL = {
@@ -267,93 +211,17 @@
     }
   };
 
-  // ../phaser-genesis/src/renderer/webgl1/renderpass/BindViewport.ts
-  function BindViewport(renderPass, viewport) {
-    if (!viewport) {
-      viewport = renderPass.currentViewport;
-      if (!viewport) {
-        return;
-      }
-    }
-    const glv = gl.getParameter(gl.VIEWPORT);
-    if (glv[0] !== viewport.x || glv[1] !== viewport.y || glv[2] !== viewport.width || glv[3] !== viewport.height) {
-      gl.viewport(viewport.x, viewport.y, viewport.width, viewport.height);
-    }
-  }
-
-  // ../phaser-genesis/src/renderer/webgl1/renderpass/SetViewport.ts
-  function SetViewport(renderPass, x = 0, y = 0, width = 0, height = 0) {
-    const entry = AddViewport(renderPass, x, y, width, height);
-    BindViewport(renderPass, entry);
-    renderPass.currentViewport = entry;
-  }
-
-  // ../phaser-genesis/src/renderer/webgl1/renderpass/BindFramebuffer.ts
-  function BindFramebuffer(renderPass, clear = true, entry) {
-    if (!entry) {
-      entry = renderPass.currentFramebuffer;
-    }
-    const { framebuffer, viewport } = entry;
-    if (renderPass.currentFramebuffer.framebuffer !== framebuffer) {
-      gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
-    }
-    if (clear) {
-      gl.clearColor(0, 0, 0, 0);
-      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    }
-    if (viewport) {
-      SetViewport(renderPass, viewport.x, viewport.y, viewport.width, viewport.height);
-    }
-  }
-
-  // ../phaser-genesis/src/renderer/webgl1/renderpass/PopViewport.ts
-  function PopViewport(renderPass) {
-    const stack = renderPass.viewportStack;
-    if (stack.length > 1) {
-      stack.pop();
-    }
-    renderPass.currentViewport = stack[stack.length - 1];
-    BindViewport(renderPass);
-  }
-
-  // ../phaser-genesis/src/renderer/webgl1/renderpass/PopFramebuffer.ts
-  function PopFramebuffer(renderPass) {
-    const stack = renderPass.framebufferStack;
-    if (stack.length > 1) {
-      if (renderPass.currentFramebuffer.viewport) {
-        PopViewport(renderPass);
-      }
-      stack.pop();
-    }
-    renderPass.currentFramebuffer = stack[stack.length - 1];
-    BindFramebuffer(renderPass, false);
-  }
-
-  // ../phaser-genesis/src/renderer/webgl1/renderpass/AddFramebuffer.ts
-  function AddFramebuffer(renderPass, framebuffer, viewport) {
-    const entry = { framebuffer, viewport };
-    renderPass.framebufferStack.push(entry);
-    return entry;
-  }
-
-  // ../phaser-genesis/src/renderer/webgl1/renderpass/SetFramebuffer.ts
-  function SetFramebuffer(renderPass, framebuffer, clear = true, viewport) {
-    const entry = AddFramebuffer(renderPass, framebuffer, viewport);
-    BindFramebuffer(renderPass, clear, entry);
-    renderPass.currentFramebuffer = entry;
-  }
-
   // ../phaser-genesis/src/renderer/webgl1/renderpass/Draw.ts
   function Draw(renderPass) {
     const count = renderPass.count;
     if (count === 0) {
       return;
     }
-    const currentBuffer = renderPass.currentVertexBuffer;
-    const currentShader = renderPass.currentShader;
+    const currentBuffer = renderPass.vertexbuffer.current;
+    const currentShader = renderPass.shader.current;
     const renderToFramebuffer = currentShader.shader.renderToFramebuffer;
     if (renderToFramebuffer) {
-      SetFramebuffer(renderPass, currentShader.shader.framebuffer, true);
+      renderPass.framebuffer.set(currentShader.shader.framebuffer, true);
     }
     if (count === currentBuffer.batchSize) {
       const type = currentBuffer.isDynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW;
@@ -369,7 +237,7 @@
       gl.drawArrays(gl.TRIANGLES, 0, count);
     }
     if (renderToFramebuffer) {
-      PopFramebuffer(renderPass);
+      renderPass.framebuffer.pop();
     }
   }
 
@@ -582,75 +450,115 @@
     BindingQueue.clear();
   }
 
-  // ../phaser-genesis/src/config/maxtextures/GetMaxTextures.ts
-  function GetMaxTextures() {
-    return ConfigStore.get(CONFIG_DEFAULTS.MAX_TEXTURES);
-  }
-
-  // ../phaser-genesis/src/renderer/webgl1/shaders/CheckShaderMaxIfStatements.ts
-  var fragTemplate = [
-    "precision mediump float;",
-    "void main(void){",
-    "float test = 0.1;",
-    "%forloop%",
-    "gl_FragColor = vec4(0.0);",
-    "}"
-  ].join("\n");
-  function GenerateSrc(maxIfs) {
-    let src = "";
-    for (let i = 0; i < maxIfs; ++i) {
-      if (i > 0) {
-        src += "\nelse ";
-      }
-      if (i < maxIfs - 1) {
-        src += `if(test == ${i}.0){}`;
-      }
+  // ../phaser-genesis/src/renderer/webgl1/renderpass/BlendModeStack.ts
+  var BlendModeStack = class {
+    constructor(renderPass) {
+      __publicField(this, "renderPass");
+      __publicField(this, "stack");
+      __publicField(this, "current");
+      __publicField(this, "default");
+      this.renderPass = renderPass;
+      this.stack = [];
     }
-    return src;
-  }
-  function CheckShaderMaxIfStatements(maxIfs) {
-    const shader = gl.createShader(gl.FRAGMENT_SHADER);
-    while (true) {
-      const fragmentSrc = fragTemplate.replace(/%forloop%/gi, GenerateSrc(maxIfs));
-      gl.shaderSource(shader, fragmentSrc);
-      gl.compileShader(shader);
-      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        maxIfs = maxIfs / 2 | 0;
+    add(enable, sfactor, dfactor) {
+      const entry = { enable, sfactor, dfactor };
+      this.stack.push(entry);
+      return entry;
+    }
+    bindDefault() {
+      this.bind(this.default);
+    }
+    bind(entry) {
+      if (!entry) {
+        entry = this.current;
+      }
+      if (entry.enable) {
+        if (!gl.isEnabled(gl.BLEND) || (this.current.sfactor !== entry.sfactor || this.current.dfactor !== entry.dfactor)) {
+          gl.enable(gl.BLEND);
+          gl.blendFunc(entry.sfactor, entry.dfactor);
+        }
       } else {
-        break;
+        gl.disable(gl.BLEND);
       }
     }
-    return maxIfs;
-  }
+    pop() {
+      const stack = this.stack;
+      if (stack.length > 1) {
+        stack.pop();
+      }
+      this.current = stack[stack.length - 1];
+      this.bind();
+    }
+    set(enable, sfactor, dfactor) {
+      const entry = this.add(enable, sfactor, dfactor);
+      this.bind(entry);
+      this.current = entry;
+    }
+    setDefault(enable, sfactor, dfactor) {
+      const entry = { enable, sfactor, dfactor };
+      this.stack[0] = entry;
+      this.current = entry;
+      this.default = entry;
+    }
+  };
 
-  // ../phaser-genesis/src/renderer/webgl1/renderpass/CreateTempTextures.ts
-  function CreateTempTextures(renderPass) {
-    let maxGPUTextures = CheckShaderMaxIfStatements(gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS));
-    const maxConfigTextures = GetMaxTextures();
-    if (maxConfigTextures === 0 || maxConfigTextures > 0 && maxConfigTextures > maxGPUTextures) {
-      SetMaxTextures(maxGPUTextures);
-    } else if (maxConfigTextures > 0 && maxConfigTextures < maxGPUTextures) {
-      maxGPUTextures = Math.max(8, maxConfigTextures);
+  // ../phaser-genesis/src/renderer/webgl1/renderpass/FramebufferStack.ts
+  var FramebufferStack = class {
+    constructor(renderPass) {
+      __publicField(this, "renderPass");
+      __publicField(this, "stack");
+      __publicField(this, "current");
+      __publicField(this, "default");
+      this.renderPass = renderPass;
+      this.stack = [];
     }
-    const tempTextures = renderPass.tempTextures;
-    if (tempTextures.length) {
-      tempTextures.forEach((texture) => {
-        gl.deleteTexture(texture);
-      });
+    add(framebuffer, viewport) {
+      const entry = { framebuffer, viewport };
+      this.stack.push(entry);
+      return entry;
     }
-    const index = [];
-    for (let texturesIndex = 0; texturesIndex < maxGPUTextures; texturesIndex++) {
-      const tempTexture = gl.createTexture();
-      gl.activeTexture(gl.TEXTURE0 + texturesIndex);
-      gl.bindTexture(gl.TEXTURE_2D, tempTexture);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 255, 255]));
-      tempTextures[texturesIndex] = tempTexture;
-      index.push(texturesIndex);
+    bindDefault() {
+      this.bind(false, this.default);
     }
-    renderPass.maxTextures = maxGPUTextures;
-    renderPass.textureIndex = index;
-    renderPass.currentActiveTexture = 1;
-  }
+    bind(clear = true, entry) {
+      if (!entry) {
+        entry = this.current;
+      }
+      const { framebuffer, viewport } = entry;
+      if (this.current.framebuffer !== framebuffer) {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+      }
+      if (clear) {
+        gl.clearColor(0, 0, 0, 0);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      }
+      if (viewport) {
+        this.renderPass.viewport.set(viewport.x, viewport.y, viewport.width, viewport.height);
+      }
+    }
+    pop() {
+      const stack = this.stack;
+      if (stack.length > 1) {
+        if (this.current.viewport) {
+          this.renderPass.viewport.pop();
+        }
+        stack.pop();
+      }
+      this.current = stack[stack.length - 1];
+      this.bind(false);
+    }
+    set(framebuffer, clear = true, viewport) {
+      const entry = this.add(framebuffer, viewport);
+      this.bind(clear, entry);
+      this.current = entry;
+    }
+    setDefault(framebuffer = null, viewport) {
+      const entry = { framebuffer, viewport };
+      this.stack[0] = entry;
+      this.current = entry;
+      this.default = entry;
+    }
+  };
 
   // ../phaser-genesis/src/config/batchsize/GetBatchSize.ts
   function GetBatchSize() {
@@ -882,6 +790,42 @@
     const bt = 1 / (bottom - top);
     const nf = 1 / (near - far);
     return out.set(-2 * lr, 0, 0, 0, 0, -2 * bt, 0, 0, 0, 0, 2 * nf, 0, (left + right) * lr, (top + bottom) * bt, (far + near) * nf, 1);
+  }
+
+  // ../phaser-genesis/src/renderer/webgl1/shaders/CheckShaderMaxIfStatements.ts
+  var fragTemplate = [
+    "precision mediump float;",
+    "void main(void){",
+    "float test = 0.1;",
+    "%forloop%",
+    "gl_FragColor = vec4(0.0);",
+    "}"
+  ].join("\n");
+  function GenerateSrc(maxIfs) {
+    let src = "";
+    for (let i = 0; i < maxIfs; ++i) {
+      if (i > 0) {
+        src += "\nelse ";
+      }
+      if (i < maxIfs - 1) {
+        src += `if(test == ${i}.0){}`;
+      }
+    }
+    return src;
+  }
+  function CheckShaderMaxIfStatements(maxIfs) {
+    const shader = gl.createShader(gl.FRAGMENT_SHADER);
+    while (true) {
+      const fragmentSrc = fragTemplate.replace(/%forloop%/gi, GenerateSrc(maxIfs));
+      gl.shaderSource(shader, fragmentSrc);
+      gl.compileShader(shader);
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        maxIfs = maxIfs / 2 | 0;
+      } else {
+        break;
+      }
+    }
+    return maxIfs;
   }
 
   // ../phaser-genesis/src/renderer/webgl1/shaders/CreateAttributes.ts
@@ -1396,30 +1340,55 @@ void main (void)
       return stores[$store];
     }
   };
+  var SparseSet = () => {
+    const dense = [];
+    const sparse = [];
+    const has = (val) => dense[sparse[val]] === val;
+    const add = (val) => {
+      if (has(val))
+        return;
+      sparse[val] = dense.push(val) - 1;
+    };
+    const remove = (val) => {
+      if (!has(val))
+        return;
+      const index = sparse[val];
+      const swapped = dense.pop();
+      if (swapped !== val) {
+        dense[index] = swapped;
+        sparse[swapped] = index;
+      }
+    };
+    return {
+      add,
+      remove,
+      has,
+      sparse,
+      dense
+    };
+  };
   var resized = false;
   var setSerializationResized = (v) => {
     resized = v;
   };
   var newEntities = new Map();
   var $entityMasks = Symbol("entityMasks");
-  var $entityEnabled = Symbol("entityEnabled");
+  var $entitySparseSet = Symbol("entitySparseSet");
   var $entityArray = Symbol("entityArray");
   var $entityIndices = Symbol("entityIndices");
-  var NONE$1 = __pow(2, 32) - 1;
   var defaultSize = 1e5;
   var globalEntityCursor = 0;
   var globalSize = defaultSize;
-  var resizeThreshold = () => globalSize - globalSize / 5;
+  var threshold = globalSize - globalSize / 5;
+  var resizeThreshold = () => threshold;
   var getGlobalSize = () => globalSize;
   var removed = [];
   var getDefaultSize = () => defaultSize;
   var getEntityCursor = () => globalEntityCursor;
   var eidToWorld = new Map();
   var addEntity = (world3) => {
-    const enabled = world3[$entityEnabled];
     const eid = removed.length > 0 ? removed.shift() : globalEntityCursor++;
-    enabled[eid] = 1;
-    world3[$entityIndices][eid] = world3[$entityArray].push(eid) - 1;
+    world3[$entitySparseSet].add(eid);
     eidToWorld.set(eid, world3);
     if (globalEntityCursor >= resizeThreshold()) {
       const size = globalSize;
@@ -1433,6 +1402,17 @@ void main (void)
     }
     return eid;
   };
+  var removeEntity = (world3, eid) => {
+    if (!world3[$entitySparseSet].has(eid))
+      return;
+    world3[$queries].forEach((q) => {
+      queryRemoveEntity(world3, q, eid);
+    });
+    removed.push(eid);
+    world3[$entitySparseSet].remove(eid);
+    for (let i = 0; i < world3[$entityMasks].length; i++)
+      world3[$entityMasks][i][eid] = 0;
+  };
   function Changed(c) {
     return function QueryChanged() {
       return c;
@@ -1442,35 +1422,36 @@ void main (void)
   var $queryMap = Symbol("queryMap");
   var $dirtyQueries = Symbol("$dirtyQueries");
   var $queryComponents = Symbol("queryComponents");
-  var NONE = __pow(2, 32) - 1;
   var registerQuery = (world3, query) => {
-    let components2 = [];
-    let notComponents = [];
-    let changedComponents = [];
+    const components2 = [];
+    const notComponents = [];
+    const changedComponents = [];
     query[$queryComponents].forEach((c) => {
       if (typeof c === "function") {
+        const comp = c();
+        if (!world3[$componentMap].has(comp))
+          registerComponent(world3, comp);
         if (c.name === "QueryNot") {
-          notComponents.push(c());
+          notComponents.push(comp);
         }
         if (c.name === "QueryChanged") {
-          changedComponents.push(c());
-          components2.push(c());
+          changedComponents.push(comp);
+          components2.push(comp);
         }
       } else {
+        if (!world3[$componentMap].has(c))
+          registerComponent(world3, c);
         components2.push(c);
       }
     });
     const mapComponents = (c) => world3[$componentMap].get(c);
-    const size = components2.concat(notComponents).reduce((a, c) => c[$storeSize] > a ? c[$storeSize] : a, 0);
-    const entities3 = [];
+    const sparseSet = SparseSet();
+    const archetypes = [];
     const changed = [];
-    const indices = new Uint32Array(size).fill(NONE);
-    const enabled = new Uint8Array(size);
-    const generations = components2.concat(notComponents).map((c) => {
-      if (!world3[$componentMap].has(c))
-        registerComponent(world3, c);
-      return c;
-    }).map(mapComponents).map((c) => c.generationId).reduce((a, v) => {
+    const toRemove = [];
+    const entered = [];
+    const exited = [];
+    const generations = components2.concat(notComponents).map(mapComponents).map((c) => c.generationId).reduce((a, v) => {
       if (a.includes(v))
         return a;
       a.push(v);
@@ -1490,32 +1471,28 @@ void main (void)
       }
       return a;
     }, {});
-    const flatProps = components2.map((c) => Object.getOwnPropertySymbols(c).includes($storeFlattened) ? c[$storeFlattened] : [c]).reduce((a, v) => a.concat(v), []);
-    const toRemove = [];
-    const entered = [];
-    const exited = [];
-    world3[$queryMap].set(query, {
-      entities: entities3,
+    const flatProps = components2.filter((c) => !c[$tagStore]).map((c) => Object.getOwnPropertySymbols(c).includes($storeFlattened) ? c[$storeFlattened] : [c]).reduce((a, v) => a.concat(v), []);
+    const q = Object.assign(sparseSet, {
+      archetypes,
       changed,
-      enabled,
       components: components2,
       notComponents,
       changedComponents,
       masks,
       notMasks,
       generations,
-      indices,
       flatProps,
       toRemove,
       entered,
       exited
     });
-    world3[$queries].add(query);
+    world3[$queryMap].set(query, q);
+    world3[$queries].add(q);
     for (let eid = 0; eid < getEntityCursor(); eid++) {
-      if (!world3[$entityEnabled][eid])
+      if (!world3[$entitySparseSet].has(eid))
         continue;
-      if (queryCheckEntity(world3, query, eid)) {
-        queryAddEntity(world3, query, eid);
+      if (queryCheckEntity(world3, q, eid)) {
+        queryAddEntity(world3, q, eid);
       }
     }
   };
@@ -1523,8 +1500,8 @@ void main (void)
     if (clearDiff)
       q.changed.length = 0;
     const flat = q.flatProps;
-    for (let i = 0; i < q.entities.length; i++) {
-      const eid = q.entities[i];
+    for (let i = 0; i < q.dense.length; i++) {
+      const eid = q.dense[i];
       let dirty = false;
       for (let pid = 0; pid < flat.length; pid++) {
         const prop = flat[pid];
@@ -1558,17 +1535,17 @@ void main (void)
       queryCommitRemovals(world3, q);
       if (q.changedComponents.length)
         return diff(q, clearDiff);
-      return q.entities;
+      return q.dense;
     };
     query[$queryComponents] = components2;
     return query;
   };
-  var queryCheckEntity = (world3, query, eid) => {
+  var queryCheckEntity = (world3, q, eid) => {
     const {
       masks,
       notMasks,
       generations
-    } = world3[$queryMap].get(query);
+    } = q;
     for (let i = 0; i < generations.length; i++) {
       const generationId = generations[i];
       const qMask = masks[generationId];
@@ -1583,38 +1560,26 @@ void main (void)
     }
     return true;
   };
-  var queryCheckComponent = (world3, query, component) => {
+  var queryCheckComponent = (world3, q, component) => {
     const {
       generationId,
       bitflag
     } = world3[$componentMap].get(component);
     const {
       masks
-    } = world3[$queryMap].get(query);
+    } = q;
     const mask = masks[generationId];
     return (mask & bitflag) === bitflag;
   };
-  var queryAddEntity = (world3, query, eid) => {
-    const q = world3[$queryMap].get(query);
-    if (q.enabled[eid])
+  var queryAddEntity = (world3, q, eid) => {
+    if (q.has(eid))
       return;
-    q.enabled[eid] = true;
-    q.entities.push(eid);
-    q.indices[eid] = q.entities.length - 1;
+    q.add(eid);
     q.entered.push(eid);
   };
   var queryCommitRemovals = (world3, q) => {
     while (q.toRemove.length) {
-      const eid = q.toRemove.pop();
-      const index = q.indices[eid];
-      if (index === NONE)
-        continue;
-      const swapped = q.entities.pop();
-      if (swapped !== eid) {
-        q.entities[index] = swapped;
-        q.indices[swapped] = index;
-      }
-      q.indices[eid] = NONE;
+      q.remove(q.toRemove.pop());
     }
     world3[$dirtyQueries].delete(q);
   };
@@ -1622,6 +1587,14 @@ void main (void)
     world3[$dirtyQueries].forEach((q) => {
       queryCommitRemovals(world3, q);
     });
+  };
+  var queryRemoveEntity = (world3, q, eid) => {
+    if (!q.has(eid))
+      return;
+    q.remove(eid);
+    q.toRemove.push(eid);
+    world3[$dirtyQueries].add(q);
+    q.exited.push(eid);
   };
   var $componentMap = Symbol("componentMap");
   var components = [];
@@ -1678,29 +1651,47 @@ void main (void)
       bitflag
     } = world3[$componentMap].get(component);
     world3[$entityMasks][generationId][eid] |= bitflag;
-    world3[$queries].forEach((query) => {
-      if (!queryCheckComponent(world3, query, component))
+    world3[$queries].forEach((q) => {
+      if (!queryCheckComponent(world3, q, component))
         return;
-      const match = queryCheckEntity(world3, query, eid);
+      const match = queryCheckEntity(world3, q, eid);
       if (match)
-        queryAddEntity(world3, query, eid);
+        queryAddEntity(world3, q, eid);
     });
+    if (reset)
+      resetStoreFor(component, eid);
+  };
+  var removeComponent = (world3, component, eid, reset = true) => {
+    if (!Number.isInteger(eid)) {
+      component = world3;
+      world3 = eidToWorld.get(eid);
+      reset = eid || reset;
+    }
+    const {
+      generationId,
+      bitflag
+    } = world3[$componentMap].get(component);
+    if (!(world3[$entityMasks][generationId][eid] & bitflag))
+      return;
+    world3[$queries].forEach((q) => {
+      if (!queryCheckComponent(world3, q, component))
+        return;
+      const match = queryCheckEntity(world3, q, eid);
+      if (match)
+        queryRemoveEntity(world3, q, eid);
+    });
+    world3[$entityMasks][generationId][eid] &= ~bitflag;
     if (reset)
       resetStoreFor(component, eid);
   };
   var $size = Symbol("size");
   var $resizeThreshold = Symbol("resizeThreshold");
   var $bitflag = Symbol("bitflag");
+  var $archetypes = Symbol("archetypes");
   var worlds = [];
   var resizeWorlds = (size) => {
     worlds.forEach((world3) => {
       world3[$size] = size;
-      world3[$queryMap].forEach((q) => {
-        q.indices = resize(q.indices, size);
-        q.enabled = resize(q.enabled, size);
-      });
-      world3[$entityEnabled] = resize(world3[$entityEnabled], size);
-      world3[$entityIndices] = resize(world3[$entityIndices], size);
       for (let i = 0; i < world3[$entityMasks].length; i++) {
         const masks = world3[$entityMasks][i];
         world3[$entityMasks][i] = resize(masks, size);
@@ -1710,18 +1701,24 @@ void main (void)
   };
   var createWorld = () => {
     const world3 = {};
+    resetWorld(world3);
+    worlds.push(world3);
+    return world3;
+  };
+  var resetWorld = (world3) => {
     const size = getGlobalSize();
     world3[$size] = size;
-    world3[$entityEnabled] = new Uint8Array(size);
     world3[$entityMasks] = [new Uint32Array(size)];
-    world3[$entityArray] = [];
-    world3[$entityIndices] = new Uint32Array(size);
+    world3[$archetypes] = [];
+    if (world3[$entityArray])
+      world3[$entityArray].forEach((eid) => removeEntity(world3, eid));
+    world3[$entitySparseSet] = SparseSet();
+    world3[$entityArray] = world3[$entitySparseSet].dense;
     world3[$bitflag] = 1;
     world3[$componentMap] = new Map();
     world3[$queryMap] = new Map();
     world3[$queries] = new Set();
     world3[$dirtyQueries] = new Set();
-    worlds.push(world3);
     return world3;
   };
   var defineSystem = (fn1, fn2) => {
@@ -1772,11 +1769,9 @@ void main (void)
     update: Types.ui32,
     childCache: Types.ui32,
     postRender: Types.ui32,
-    vertexColors: Types.ui32,
     bounds: Types.ui32,
     texture: Types.ui32,
     textureFrame: Types.ui32,
-    alpha: Types.ui32,
     child: Types.ui32,
     displayList: Types.ui32
   });
@@ -1794,11 +1789,9 @@ void main (void)
     DirtyComponent.update[id] = 1;
     DirtyComponent.childCache[id] = 0;
     DirtyComponent.postRender[id] = 0;
-    DirtyComponent.vertexColors[id] = 1;
     DirtyComponent.bounds[id] = 1;
     DirtyComponent.texture[id] = 0;
     DirtyComponent.textureFrame[id] = 0;
-    DirtyComponent.alpha[id] = 0;
     DirtyComponent.child[id] = 0;
     DirtyComponent.displayList[id] = 0;
   }
@@ -1811,11 +1804,6 @@ void main (void)
   // ../phaser-genesis/src/components/dirty/HasDirtyDisplayList.ts
   function HasDirtyDisplayList(id) {
     return Boolean(DirtyComponent.displayList[id]);
-  }
-
-  // ../phaser-genesis/src/components/dirty/SetDirtyAlpha.ts
-  function SetDirtyAlpha(id) {
-    DirtyComponent.alpha[id] = 1;
   }
 
   // ../phaser-genesis/src/components/dirty/SetDirtyDisplayList.ts
@@ -1853,9 +1841,19 @@ void main (void)
     DirtyComponent.transform[id] = 1;
   }
 
-  // ../phaser-genesis/src/components/dirty/SetDirtyVertexColors.ts
-  function SetDirtyVertexColors(id) {
-    DirtyComponent.vertexColors[id] = 1;
+  // ../phaser-genesis/src/components/hierarchy/HierarchyComponent.ts
+  var Hierarchy = defineComponent({
+    worldID: Types.ui32,
+    parentID: Types.ui32,
+    numChildren: Types.ui32,
+    depth: Types.ui32
+  });
+  var HierarchyComponent = Hierarchy;
+
+  // ../phaser-genesis/src/components/dirty/SetDirtyWorldDisplayList.ts
+  function SetDirtyWorldDisplayList(id) {
+    const worldID = HierarchyComponent.worldID[id];
+    DirtyComponent.displayList[worldID] = 1;
   }
 
   // ../phaser-genesis/src/components/transform/SetExtent.ts
@@ -1965,8 +1963,8 @@ void main (void)
       return { left, right, top, bottom };
     }
     copyToExtent(child) {
-      const originX = child.originX;
-      const originY = child.originY;
+      const originX = child.origin.x;
+      const originY = child.origin.y;
       const sourceSizeWidth = this.sourceSizeWidth;
       const sourceSizeHeight = this.sourceSizeHeight;
       let x;
@@ -2170,7 +2168,7 @@ void main (void)
     }
     setAttributes(renderPass) {
       if (this.program) {
-        const stride = renderPass.currentVertexBuffer.vertexByteSize;
+        const stride = renderPass.vertexbuffer.current.vertexByteSize;
         this.attributes.forEach((attrib) => {
           gl.vertexAttribPointer(attrib.index, attrib.size, attrib.type, attrib.normalized, stride, attrib.offset);
         });
@@ -2203,6 +2201,11 @@ void main (void)
       return super.bind(renderPass);
     }
   };
+
+  // ../phaser-genesis/src/config/maxtextures/GetMaxTextures.ts
+  function GetMaxTextures() {
+    return ConfigStore.get(CONFIG_DEFAULTS.MAX_TEXTURES);
+  }
 
   // ../phaser-genesis/src/renderer/webgl1/glsl/MULTI_QUAD_FRAG.ts
   var MULTI_QUAD_FRAG = `#define SHADER_NAME MULTI_QUAD_FRAG
@@ -2252,49 +2255,66 @@ void main (void)
       super.create(fragmentShaderSource, vertexShaderSource, uniforms, attribs);
     }
     bind(renderPass) {
-      this.uniforms.set("uTexture", renderPass.textureIndex);
+      this.uniforms.set("uTexture", renderPass.textures.textureIndex);
       return super.bind(renderPass);
     }
   };
 
-  // ../phaser-genesis/src/renderer/webgl1/renderpass/SetDefaultBlendMode.ts
-  function SetDefaultBlendMode(renderPass, enable, sfactor, dfactor) {
-    const entry = { enable, sfactor, dfactor };
-    renderPass.blendModeStack[0] = entry;
-    renderPass.currentBlendMode = entry;
-    renderPass.defaultBlendMode = entry;
-  }
-
-  // ../phaser-genesis/src/renderer/webgl1/renderpass/SetDefaultFramebuffer.ts
-  function SetDefaultFramebuffer(renderPass, framebuffer = null, viewport) {
-    const entry = { framebuffer, viewport };
-    renderPass.framebufferStack[0] = entry;
-    renderPass.currentFramebuffer = entry;
-    renderPass.defaultFramebuffer = entry;
-  }
-
-  // ../phaser-genesis/src/renderer/webgl1/renderpass/SetDefaultShader.ts
-  function SetDefaultShader(renderPass, shader, textureID) {
-    const entry = { shader, textureID };
-    renderPass.shaderStack[0] = entry;
-    renderPass.currentShader = entry;
-    renderPass.defaultShader = entry;
-  }
-
-  // ../phaser-genesis/src/renderer/webgl1/renderpass/SetDefaultVertexBuffer.ts
-  function SetDefaultVertexBuffer(renderPass, buffer) {
-    renderPass.vertexBufferStack[0] = buffer;
-    renderPass.currentVertexBuffer = buffer;
-    renderPass.defaultVertexBuffer = buffer;
-  }
-
-  // ../phaser-genesis/src/renderer/webgl1/renderpass/SetDefaultViewport.ts
-  function SetDefaultViewport(renderPass, x = 0, y = 0, width = 0, height = 0) {
-    const entry = new Rectangle(x, y, width, height);
-    renderPass.viewportStack[0] = entry;
-    renderPass.currentViewport = entry;
-    renderPass.defaultViewport = entry;
-  }
+  // ../phaser-genesis/src/renderer/webgl1/renderpass/ShaderStack.ts
+  var ShaderStack = class {
+    constructor(renderPass) {
+      __publicField(this, "renderPass");
+      __publicField(this, "stack");
+      __publicField(this, "current");
+      __publicField(this, "default");
+      this.renderPass = renderPass;
+      this.stack = [];
+    }
+    add(shader, textureID) {
+      const stackEntry = { shader, textureID };
+      this.stack.push(stackEntry);
+      return stackEntry;
+    }
+    bindDefault() {
+      this.bind(this.default);
+    }
+    bind(entry) {
+      let prevShader;
+      if (!entry) {
+        entry = this.current;
+      } else {
+        prevShader = this.current.shader;
+      }
+      if (!entry.shader.isActive) {
+        const success = entry.shader.bind(this.renderPass, entry.textureID);
+        if (success) {
+          entry.shader.setAttributes(this.renderPass);
+          if (prevShader && prevShader !== entry.shader) {
+            prevShader.isActive = false;
+          }
+        }
+      }
+    }
+    pop() {
+      const stack = this.stack;
+      if (stack.length > 1) {
+        stack.pop();
+      }
+      this.current = stack[stack.length - 1];
+      this.bind();
+    }
+    set(shader, textureID) {
+      const entry = this.add(shader, textureID);
+      this.bind(entry);
+      this.current = entry;
+    }
+    setDefault(shader, textureID) {
+      const entry = { shader, textureID };
+      this.stack[0] = entry;
+      this.current = entry;
+      this.default = entry;
+    }
+  };
 
   // ../phaser-genesis/src/math/mat4/Mat4Identity.ts
   function Mat4Identity(matrix = new Matrix4()) {
@@ -2330,6 +2350,55 @@ void main (void)
     }
     fromArray(src) {
       return this.set(src[0], src[1], src[2], src[3], src[4], src[5]);
+    }
+  };
+
+  // ../phaser-genesis/src/geom/rectangle/RectangleContains.ts
+  function RectangleContains(rect, x, y) {
+    if (rect.width <= 0 || rect.height <= 0) {
+      return false;
+    }
+    return rect.x <= x && rect.x + rect.width >= x && rect.y <= y && rect.y + rect.height >= y;
+  }
+
+  // ../phaser-genesis/src/geom/rectangle/Rectangle.ts
+  var Rectangle = class {
+    constructor(x = 0, y = 0, width = 0, height = 0) {
+      __publicField(this, "x");
+      __publicField(this, "y");
+      __publicField(this, "width");
+      __publicField(this, "height");
+      this.set(x, y, width, height);
+    }
+    set(x = 0, y = 0, width = 0, height = 0) {
+      this.x = x;
+      this.y = y;
+      this.width = width;
+      this.height = height;
+      return this;
+    }
+    contains(x, y) {
+      return RectangleContains(this, x, y);
+    }
+    set right(value) {
+      if (value <= this.x) {
+        this.width = 0;
+      } else {
+        this.width = value - this.x;
+      }
+    }
+    get right() {
+      return this.x + this.width;
+    }
+    set bottom(value) {
+      if (value <= this.y) {
+        this.height = 0;
+      } else {
+        this.height = value - this.y;
+      }
+    }
+    get bottom() {
+      return this.y + this.height;
     }
   };
 
@@ -2383,6 +2452,196 @@ void main (void)
     }
   };
 
+  // ../phaser-genesis/src/renderer/webgl1/renderpass/CreateTempTextures.ts
+  function CreateTempTextures(textureStack) {
+    let maxGPUTextures = CheckShaderMaxIfStatements(gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS));
+    const maxConfigTextures = GetMaxTextures();
+    if (maxConfigTextures === 0 || maxConfigTextures > 0 && maxConfigTextures > maxGPUTextures) {
+      SetMaxTextures(maxGPUTextures);
+    } else if (maxConfigTextures > 0 && maxConfigTextures < maxGPUTextures) {
+      maxGPUTextures = Math.max(8, maxConfigTextures);
+    }
+    const tempTextures = textureStack.tempTextures;
+    if (tempTextures.length) {
+      tempTextures.forEach((texture) => {
+        gl.deleteTexture(texture);
+      });
+    }
+    const index = [];
+    for (let texturesIndex = 0; texturesIndex < maxGPUTextures; texturesIndex++) {
+      const tempTexture = gl.createTexture();
+      gl.activeTexture(gl.TEXTURE0 + texturesIndex);
+      gl.bindTexture(gl.TEXTURE_2D, tempTexture);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 255, 255]));
+      tempTextures[texturesIndex] = tempTexture;
+      index.push(texturesIndex);
+    }
+    textureStack.maxTextures = maxGPUTextures;
+    textureStack.textureIndex = index;
+    textureStack.currentActiveTexture = 1;
+  }
+
+  // ../phaser-genesis/src/renderer/webgl1/renderpass/TextureStack.ts
+  var TextureStack = class {
+    constructor(renderPass) {
+      __publicField(this, "renderPass");
+      __publicField(this, "maxTextures", 0);
+      __publicField(this, "currentActiveTexture", 0);
+      __publicField(this, "startActiveTexture", 0);
+      __publicField(this, "tempTextures", []);
+      __publicField(this, "textureIndex", []);
+      this.renderPass = renderPass;
+    }
+    bind(texture, index = 0) {
+      const binding = texture.binding;
+      binding.setIndex(index);
+      gl.activeTexture(gl.TEXTURE0 + index);
+      gl.bindTexture(gl.TEXTURE_2D, binding.texture);
+    }
+    unbind(index = 0) {
+      gl.activeTexture(gl.TEXTURE0 + index);
+      gl.bindTexture(gl.TEXTURE_2D, this.tempTextures[index]);
+      if (index > 0) {
+        this.startActiveTexture++;
+      }
+    }
+    set(texture) {
+      const binding = texture.binding;
+      const currentActiveTexture = this.currentActiveTexture;
+      if (binding.indexCounter < this.startActiveTexture) {
+        binding.indexCounter = this.startActiveTexture;
+        if (currentActiveTexture < this.maxTextures) {
+          binding.setIndex(currentActiveTexture);
+          gl.activeTexture(gl.TEXTURE0 + currentActiveTexture);
+          gl.bindTexture(gl.TEXTURE_2D, binding.texture);
+          this.currentActiveTexture++;
+        } else {
+          Flush(this.renderPass);
+          this.startActiveTexture++;
+          binding.indexCounter = this.startActiveTexture;
+          binding.setIndex(1);
+          gl.activeTexture(gl.TEXTURE1);
+          gl.bindTexture(gl.TEXTURE_2D, binding.texture);
+          this.currentActiveTexture = 2;
+        }
+      }
+      return binding.index;
+    }
+    setDefault() {
+      CreateTempTextures(this);
+    }
+    reset() {
+      const temp = this.tempTextures;
+      for (let i = 0; i < temp.length; i++) {
+        gl.activeTexture(gl.TEXTURE0 + i);
+        gl.bindTexture(gl.TEXTURE_2D, temp[i]);
+      }
+      this.currentActiveTexture = 1;
+      this.startActiveTexture++;
+    }
+  };
+
+  // ../phaser-genesis/src/renderer/webgl1/renderpass/VertexBufferStack.ts
+  var VertexBufferStack = class {
+    constructor(renderPass) {
+      __publicField(this, "renderPass");
+      __publicField(this, "stack");
+      __publicField(this, "current");
+      __publicField(this, "default");
+      this.renderPass = renderPass;
+      this.stack = [];
+    }
+    add(buffer) {
+      this.stack.push(buffer);
+      return buffer;
+    }
+    bindDefault() {
+      this.bind(this.default);
+    }
+    bind(buffer) {
+      if (buffer) {
+        buffer.isBound = false;
+      } else {
+        buffer = this.current;
+      }
+      if (!buffer.isBound) {
+        const indexBuffer = buffer.indexed ? buffer.indexBuffer : null;
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer.vertexBuffer);
+        buffer.isBound = true;
+      }
+    }
+    pop() {
+      const stack = this.stack;
+      if (stack.length > 1) {
+        stack.pop();
+      }
+      this.current = stack[stack.length - 1];
+      this.bind();
+    }
+    set(buffer) {
+      const entry = this.add(buffer);
+      this.bind(entry);
+      this.current = entry;
+    }
+    setDefault(buffer) {
+      this.stack[0] = buffer;
+      this.current = buffer;
+      this.default = buffer;
+    }
+  };
+
+  // ../phaser-genesis/src/renderer/webgl1/renderpass/ViewportStack.ts
+  var ViewportStack = class {
+    constructor(renderPass) {
+      __publicField(this, "renderPass");
+      __publicField(this, "stack");
+      __publicField(this, "current");
+      __publicField(this, "default");
+      this.renderPass = renderPass;
+      this.stack = [];
+    }
+    add(x = 0, y = 0, width = 0, height = 0) {
+      const viewport = new Rectangle(x, y, width, height);
+      this.stack.push(viewport);
+      return viewport;
+    }
+    bindDefault() {
+      this.bind(this.default);
+    }
+    bind(viewport) {
+      if (!viewport) {
+        viewport = this.current;
+        if (!viewport) {
+          return;
+        }
+      }
+      const glv = gl.getParameter(gl.VIEWPORT);
+      if (glv[0] !== viewport.x || glv[1] !== viewport.y || glv[2] !== viewport.width || glv[3] !== viewport.height) {
+        gl.viewport(viewport.x, viewport.y, viewport.width, viewport.height);
+      }
+    }
+    pop() {
+      const stack = this.stack;
+      if (stack.length > 1) {
+        stack.pop();
+      }
+      this.current = stack[stack.length - 1];
+      this.bind();
+    }
+    set(x = 0, y = 0, width = 0, height = 0) {
+      const entry = this.add(x, y, width, height);
+      this.bind(entry);
+      this.current = entry;
+    }
+    setDefault(x = 0, y = 0, width = 0, height = 0) {
+      const entry = new Rectangle(x, y, width, height);
+      this.stack[0] = entry;
+      this.current = entry;
+      this.default = entry;
+    }
+  };
+
   // ../phaser-genesis/src/renderer/webgl1/renderpass/RenderPass.ts
   var RenderPass = class {
     constructor(renderer) {
@@ -2392,32 +2651,24 @@ void main (void)
       __publicField(this, "count", 0);
       __publicField(this, "prevCount", 0);
       __publicField(this, "flushTotal", 0);
-      __publicField(this, "maxTextures", 0);
-      __publicField(this, "currentActiveTexture", 0);
-      __publicField(this, "startActiveTexture", 0);
-      __publicField(this, "tempTextures", []);
-      __publicField(this, "textureIndex", []);
-      __publicField(this, "framebufferStack", []);
-      __publicField(this, "currentFramebuffer", null);
-      __publicField(this, "defaultFramebuffer", null);
-      __publicField(this, "vertexBufferStack", []);
-      __publicField(this, "currentVertexBuffer", null);
-      __publicField(this, "defaultVertexBuffer", null);
-      __publicField(this, "shaderStack", []);
-      __publicField(this, "currentShader", null);
-      __publicField(this, "defaultShader", null);
-      __publicField(this, "viewportStack", []);
-      __publicField(this, "currentViewport", null);
-      __publicField(this, "defaultViewport", null);
-      __publicField(this, "blendModeStack", []);
-      __publicField(this, "currentBlendMode", null);
-      __publicField(this, "defaultBlendMode", null);
+      __publicField(this, "framebuffer");
+      __publicField(this, "vertexbuffer");
+      __publicField(this, "blendMode");
+      __publicField(this, "shader");
+      __publicField(this, "viewport");
+      __publicField(this, "textures");
       __publicField(this, "quadShader");
       __publicField(this, "quadBuffer");
       __publicField(this, "quadCamera");
       __publicField(this, "current2DCamera");
       this.renderer = renderer;
       this.projectionMatrix = new Matrix4();
+      this.framebuffer = new FramebufferStack(this);
+      this.vertexbuffer = new VertexBufferStack(this);
+      this.blendMode = new BlendModeStack(this);
+      this.shader = new ShaderStack(this);
+      this.viewport = new ViewportStack(this);
+      this.textures = new TextureStack(this);
       this.reset();
     }
     reset() {
@@ -2426,78 +2677,29 @@ void main (void)
       this.quadShader = new QuadShader();
       this.quadBuffer = new IndexedVertexBuffer({ isDynamic: false, indexLayout });
       this.quadCamera = new StaticCamera();
-      CreateTempTextures(this);
-      SetDefaultFramebuffer(this);
-      SetDefaultBlendMode(this, true, gl2.ONE, gl2.ONE_MINUS_SRC_ALPHA);
-      SetDefaultVertexBuffer(this, new IndexedVertexBuffer({ batchSize: GetBatchSize(), indexLayout }));
-      SetDefaultShader(this, new MultiTextureQuadShader());
+      this.textures.setDefault();
+      this.framebuffer.setDefault();
+      this.blendMode.setDefault(true, gl2.ONE, gl2.ONE_MINUS_SRC_ALPHA);
+      this.vertexbuffer.setDefault(new IndexedVertexBuffer({ batchSize: GetBatchSize(), indexLayout }));
+      this.shader.setDefault(new MultiTextureQuadShader());
     }
     resize(width, height) {
       Mat4Ortho(0, width, height, 0, -1e3, 1e3, this.projectionMatrix);
       this.quadCamera.reset();
-      SetDefaultViewport(this, 0, 0, width, height);
+      this.viewport.setDefault(0, 0, width, height);
     }
   };
-
-  // ../phaser-genesis/src/renderer/webgl1/renderpass/BindShader.ts
-  function BindShader(renderPass, entry) {
-    let prevShader;
-    if (!entry) {
-      entry = renderPass.currentShader;
-    } else {
-      prevShader = renderPass.currentShader.shader;
-    }
-    if (!entry.shader.isActive) {
-      const success = entry.shader.bind(renderPass, entry.textureID);
-      if (success) {
-        entry.shader.setAttributes(renderPass);
-        if (prevShader && prevShader !== entry.shader) {
-          prevShader.isActive = false;
-        }
-      }
-    }
-  }
 
   // ../phaser-genesis/src/renderer/webgl1/renderpass/Begin.ts
   function Begin(renderPass, camera2D) {
     renderPass.current2DCamera = camera2D;
     renderPass.cameraMatrix = camera2D.matrix;
-    BindShader(renderPass);
-  }
-
-  // ../phaser-genesis/src/renderer/webgl1/renderpass/BindBlendMode.ts
-  function BindBlendMode(renderPass, entry) {
-    if (!entry) {
-      entry = renderPass.currentBlendMode;
-    }
-    if (entry.enable) {
-      if (!gl.isEnabled(gl.BLEND) || (renderPass.currentBlendMode.sfactor !== entry.sfactor || renderPass.currentBlendMode.dfactor !== entry.dfactor)) {
-        gl.enable(gl.BLEND);
-        gl.blendFunc(entry.sfactor, entry.dfactor);
-      }
-    } else {
-      gl.disable(gl.BLEND);
-    }
-  }
-
-  // ../phaser-genesis/src/renderer/webgl1/renderpass/BindVertexBuffer.ts
-  function BindVertexBuffer(renderPass, buffer) {
-    if (buffer) {
-      buffer.isBound = false;
-    } else {
-      buffer = renderPass.currentVertexBuffer;
-    }
-    if (!buffer.isBound) {
-      const indexBuffer = buffer.indexed ? buffer.indexBuffer : null;
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-      gl.bindBuffer(gl.ARRAY_BUFFER, buffer.vertexBuffer);
-      buffer.isBound = true;
-    }
+    renderPass.shader.bind();
   }
 
   // ../phaser-genesis/src/renderer/webgl1/renderpass/GetVertexBufferEntry.ts
   function GetVertexBufferEntry(renderPass, addToCount = 0) {
-    const buffer = renderPass.currentVertexBuffer;
+    const buffer = renderPass.vertexbuffer.current;
     if (renderPass.count + addToCount >= buffer.batchSize) {
       Flush(renderPass);
     }
@@ -2511,40 +2713,16 @@ void main (void)
     };
   }
 
-  // ../phaser-genesis/src/renderer/webgl1/renderpass/SetTexture.ts
-  function SetTexture(renderPass, texture) {
-    const binding = texture.binding;
-    const currentActiveTexture = renderPass.currentActiveTexture;
-    if (binding.indexCounter < renderPass.startActiveTexture) {
-      binding.indexCounter = renderPass.startActiveTexture;
-      if (currentActiveTexture < renderPass.maxTextures) {
-        binding.setIndex(currentActiveTexture);
-        gl.activeTexture(gl.TEXTURE0 + currentActiveTexture);
-        gl.bindTexture(gl.TEXTURE_2D, binding.texture);
-        renderPass.currentActiveTexture++;
-      } else {
-        Flush(renderPass);
-        renderPass.startActiveTexture++;
-        binding.indexCounter = renderPass.startActiveTexture;
-        binding.setIndex(1);
-        gl.activeTexture(gl.TEXTURE1);
-        gl.bindTexture(gl.TEXTURE_2D, binding.texture);
-        renderPass.currentActiveTexture = 2;
-      }
-    }
-    return binding.index;
-  }
-
   // ../phaser-genesis/src/renderer/webgl1/renderpass/Start.ts
   function Start(renderPass) {
     renderPass.current2DCamera = renderPass.quadCamera;
     renderPass.cameraMatrix = renderPass.quadCamera.matrix;
     renderPass.count = 0;
     renderPass.flushTotal = 0;
-    BindFramebuffer(renderPass, false, renderPass.defaultFramebuffer);
-    BindBlendMode(renderPass, renderPass.defaultBlendMode);
-    BindViewport(renderPass, renderPass.defaultViewport);
-    BindVertexBuffer(renderPass, renderPass.defaultVertexBuffer);
+    renderPass.framebuffer.bindDefault();
+    renderPass.blendMode.bindDefault();
+    renderPass.viewport.bindDefault();
+    renderPass.vertexbuffer.bindDefault();
   }
 
   // ../phaser-genesis/src/renderer/webgl1/WebGLRendererInstance.ts
@@ -2645,8 +2823,8 @@ void main (void)
         for (const world3 of worlds2) {
           if (world3.runRender) {
             world3.renderGL(renderPass);
-            world3.postRenderGL(renderPass);
           }
+          world3.postRenderGL(renderPass);
         }
       }
       End(renderPass);
@@ -2673,115 +2851,171 @@ void main (void)
     ConfigStore.set(CONFIG_DEFAULTS.WORLD_SIZE, size);
   }
 
-  // ../phaser-genesis/src/components/hierarchy/HierarchyComponent.ts
-  var Hierarchy = defineComponent({
-    worldID: Types.ui32,
-    parentID: Types.ui32,
-    numChildren: Types.ui32,
-    depth: Types.ui32
-  });
-  var HierarchyComponent = Hierarchy;
-
   // ../phaser-genesis/src/components/hierarchy/AddHierarchyComponent.ts
   function AddHierarchyComponent(id) {
     addComponent(GameObjectWorld, HierarchyComponent, id);
   }
 
-  // ../phaser-genesis/src/components/hierarchy/ClearWorldAndParentID.ts
-  function ClearWorldAndParentID(id) {
-    HierarchyComponent.worldID[id] = 0;
-    HierarchyComponent.parentID[id] = 0;
-  }
-
   // ../phaser-genesis/src/gameobjects/GameObjectCache.ts
   var GameObjectCache = new Map();
 
-  // ../phaser-genesis/src/gameobjects/GameObjectTree.ts
-  var GameObjectTree = new Map();
-
-  // ../phaser-genesis/src/components/hierarchy/GetChildren.ts
-  function GetChildren(id) {
-    const out = [];
-    GameObjectTree.get(id).forEach((childID) => {
-      out.push(GameObjectCache.get(childID));
-    });
-    return out;
+  // ../phaser-genesis/src/components/hierarchy/ClearWorldAndParentID.ts
+  function ClearWorldAndParentID(id) {
+    const worldID = GetWorldID(id);
+    const parentID = GetParentID(id);
+    const world3 = GameObjectCache.get(worldID);
+    HierarchyComponent.worldID[id] = 0;
+    HierarchyComponent.parentID[id] = 0;
+    removeComponent(GameObjectWorld, world3.tag, id);
+    UpdateNumChildren(parentID);
+    SetDirtyDisplayList(worldID);
   }
 
-  // ../phaser-genesis/src/components/hierarchy/GetNumChildren.ts
-  function GetNumChildren(id) {
-    return HierarchyComponent.numChildren[id];
+  // ../phaser-genesis/src/components/bounds/BoundsComponent.ts
+  var Bounds = defineComponent({
+    x: Types.f32,
+    y: Types.f32,
+    width: Types.f32,
+    height: Types.f32,
+    right: Types.f32,
+    bottom: Types.f32
+  });
+  var BoundsComponent = Bounds;
+
+  // ../phaser-genesis/src/components/color/ColorComponent.ts
+  var Color = defineComponent({
+    alpha: Types.f32,
+    tint: Types.ui32
+  });
+  var ColorComponent = Color;
+
+  // ../phaser-genesis/src/components/color/AddColorComponent.ts
+  function AddColorComponent(id) {
+    addComponent(GameObjectWorld, ColorComponent, id);
+    ColorComponent.alpha[id] = 1;
+    ColorComponent.tint[id] = 16777215;
   }
 
-  // ../phaser-genesis/src/components/hierarchy/GetParentGameObject.ts
-  function GetParentGameObject(id) {
-    return GameObjectCache.get(HierarchyComponent.parentID[id]);
+  // ../phaser-genesis/src/components/vertices/VertexWorld.ts
+  var world2 = createWorld();
+  var VertexWorld = world2;
+
+  // ../phaser-genesis/src/components/vertices/AddVertex.ts
+  function AddVertex() {
+    const vertexID = addEntity(VertexWorld);
+    addComponent(VertexWorld, VertexComponent, vertexID);
+    VertexComponent.alpha[vertexID] = 1;
+    VertexComponent.tint[vertexID] = 16777215;
+    VertexComponent.color[vertexID] = 4294967295;
+    return vertexID;
   }
 
-  // ../phaser-genesis/src/components/hierarchy/GetParentID.ts
-  function GetParentID(id) {
-    return HierarchyComponent.parentID[id];
-  }
+  // ../phaser-genesis/src/components/transform/WorldMatrix2DComponent.ts
+  var WorldMatrix2D = defineComponent({
+    a: Types.f32,
+    b: Types.f32,
+    c: Types.f32,
+    d: Types.f32,
+    tx: Types.f32,
+    ty: Types.f32
+  });
+  var WorldMatrix2DComponent = WorldMatrix2D;
 
-  // ../phaser-genesis/src/components/hierarchy/GetWorldID.ts
-  function GetWorldID(id) {
-    return HierarchyComponent.worldID[id];
-  }
-
-  // ../phaser-genesis/src/components/hierarchy/SetParentID.ts
-  function SetParentID(childID, parentID) {
-    HierarchyComponent.parentID[childID] = parentID;
-  }
-
-  // ../phaser-genesis/src/components/hierarchy/SetWorldAndParentID.ts
-  function SetWorldAndParentID(id, worldID, parentID) {
-    HierarchyComponent.worldID[id] = worldID;
-    HierarchyComponent.parentID[id] = parentID;
-  }
-
-  // ../phaser-genesis/src/components/hierarchy/SetWorldID.ts
-  function SetWorldID(id, worldID) {
-    HierarchyComponent.worldID[id] = worldID;
-  }
-
-  // ../phaser-genesis/src/components/hierarchy/UpdateNumChildren.ts
-  function UpdateNumChildren(id) {
-    HierarchyComponent.numChildren[id] = GameObjectTree.get(id).length;
-  }
-
-  // ../phaser-genesis/src/gameobjects/DIRTY_CONST.ts
-  var DIRTY_CONST = {
-    CLEAR: 0,
-    TRANSFORM: 1,
-    UPDATE: 2,
-    CHILD_CACHE: 4,
-    POST_RENDER: 8,
-    COLORS: 16,
-    BOUNDS: 32,
-    TEXTURE: 64,
-    FRAME: 128,
-    ALPHA: 256,
-    CHILD: 512,
-    DEFAULT: 1 + 2 + 16 + 32,
-    USER1: 536870912,
-    USER2: 1073741824,
-    USER3: 2147483648,
-    USER4: 4294967296
+  // ../phaser-genesis/src/components/vertices/UpdateVertexPositionSystem.ts
+  var changedWorldExtentQuery = defineQuery([
+    Changed(WorldMatrix2DComponent),
+    Changed(Extent2DComponent)
+  ]);
+  var entities;
+  var updateVertexPositionSystem = defineSystem((world3) => {
+    for (let i = 0; i < entities.length; i++) {
+      const id = entities[i];
+      const a = WorldMatrix2DComponent.a[id];
+      const b = WorldMatrix2DComponent.b[id];
+      const c = WorldMatrix2DComponent.c[id];
+      const d = WorldMatrix2DComponent.d[id];
+      const tx = WorldMatrix2DComponent.tx[id];
+      const ty = WorldMatrix2DComponent.ty[id];
+      const x = Extent2DComponent.x[id];
+      const y = Extent2DComponent.y[id];
+      const right = Extent2DComponent.right[id];
+      const bottom = Extent2DComponent.bottom[id];
+      const v1 = QuadVertexComponent.v1[id];
+      const v2 = QuadVertexComponent.v2[id];
+      const v3 = QuadVertexComponent.v3[id];
+      const v4 = QuadVertexComponent.v4[id];
+      const x0 = x * a + y * c + tx;
+      const y0 = x * b + y * d + ty;
+      const x1 = x * a + bottom * c + tx;
+      const y1 = x * b + bottom * d + ty;
+      const x2 = right * a + bottom * c + tx;
+      const y2 = right * b + bottom * d + ty;
+      const x3 = right * a + y * c + tx;
+      const y3 = right * b + y * d + ty;
+      VertexComponent.x[v1] = x0;
+      VertexComponent.y[v1] = y0;
+      VertexComponent.x[v2] = x1;
+      VertexComponent.y[v2] = y1;
+      VertexComponent.x[v3] = x2;
+      VertexComponent.y[v3] = y2;
+      VertexComponent.x[v4] = x3;
+      VertexComponent.y[v4] = y3;
+      BoundsComponent.x[id] = Math.min(x0, x1, x2, x3);
+      BoundsComponent.y[id] = Math.min(y0, y1, y2, y3);
+      BoundsComponent.right[id] = Math.max(x0, x1, x2, x3);
+      BoundsComponent.bottom[id] = Math.max(y0, y1, y2, y3);
+      BoundsComponent.width[id] = BoundsComponent.right[id] - BoundsComponent.x[id];
+      BoundsComponent.height[id] = BoundsComponent.bottom[id] - BoundsComponent.y[id];
+    }
+    return world3;
+  });
+  var UpdateVertexPositionSystem = (world3) => {
+    entities = changedWorldExtentQuery(world3);
+    updateVertexPositionSystem(world3);
+    return entities;
   };
 
-  // ../phaser-genesis/src/components/transform/GetVertices.ts
-  function GetVertices(worldTransform, transformExtent) {
-    const { a, b, c, d, tx, ty } = worldTransform;
-    const { x, y, right, bottom } = transformExtent;
-    const x0 = x * a + y * c + tx;
-    const y0 = x * b + y * d + ty;
-    const x1 = x * a + bottom * c + tx;
-    const y1 = x * b + bottom * d + ty;
-    const x2 = right * a + bottom * c + tx;
-    const y2 = right * b + bottom * d + ty;
-    const x3 = right * a + y * c + tx;
-    const y3 = right * b + y * d + ty;
-    return { x0, y0, x1, y1, x2, y2, x3, y3 };
+  // ../phaser-genesis/src/renderer/webgl1/colors/PackColor.ts
+  function PackColor(rgb, alpha) {
+    const ua = (alpha * 255 | 0) & 255;
+    return (ua << 24 | rgb) >>> 0;
+  }
+
+  // ../phaser-genesis/src/renderer/webgl1/colors/PackColors.ts
+  function PackColors(vertices) {
+    vertices.forEach((vertex) => {
+      vertex.packColor();
+    });
+  }
+
+  // ../phaser-genesis/src/components/color/PackQuadColorsSystem.ts
+  var changedColorQuery = defineQuery([Changed(ColorComponent), QuadVertexComponent]);
+  var packQuadColorsSystem = defineSystem((world3) => {
+    const entities3 = changedColorQuery(world3);
+    for (let i = 0; i < entities3.length; i++) {
+      const id = entities3[i];
+      const v1 = QuadVertexComponent.v1[id];
+      const v2 = QuadVertexComponent.v2[id];
+      const v3 = QuadVertexComponent.v3[id];
+      const v4 = QuadVertexComponent.v4[id];
+      const color = PackColor(ColorComponent.tint[id], ColorComponent.alpha[id]);
+      VertexComponent.color[v1] = color;
+      VertexComponent.color[v2] = color;
+      VertexComponent.color[v3] = color;
+      VertexComponent.color[v4] = color;
+    }
+    return world3;
+  });
+  var PackQuadColorsSystem = packQuadColorsSystem;
+
+  // ../phaser-genesis/src/components/color/SetAlpha.ts
+  function SetAlpha(id, value) {
+    ColorComponent.alpha[id] = value;
+  }
+
+  // ../phaser-genesis/src/components/color/SetTint.ts
+  function SetTint(id, value) {
+    ColorComponent.tint[id] = value;
   }
 
   // ../phaser-genesis/src/components/permissions/PermissionsComponent.ts
@@ -2837,7 +3071,8 @@ void main (void)
     c: Types.f32,
     d: Types.f32,
     tx: Types.f32,
-    ty: Types.f32
+    ty: Types.f32,
+    dirty: Types.ui32
   });
   var LocalMatrix2DComponent = LocalMatrix2D;
 
@@ -2854,17 +3089,6 @@ void main (void)
     originY: Types.f32
   });
   var Transform2DComponent = Transform2D;
-
-  // ../phaser-genesis/src/components/transform/WorldMatrix2DComponent.ts
-  var WorldMatrix2D = defineComponent({
-    a: Types.f32,
-    b: Types.f32,
-    c: Types.f32,
-    d: Types.f32,
-    tx: Types.f32,
-    ty: Types.f32
-  });
-  var WorldMatrix2DComponent = WorldMatrix2D;
 
   // ../phaser-genesis/src/components/transform/AddTransform2DComponent.ts
   function AddTransform2DComponent(id, x = 0, y = 0, originX = 0, originY = 0) {
@@ -2888,39 +3112,120 @@ void main (void)
     WorldMatrix2DComponent.ty[id] = y;
   }
 
-  // ../phaser-genesis/src/math/vec2/Vec2.ts
-  var Vec2 = class {
-    constructor(x = 0, y = 0) {
-      __publicField(this, "x");
-      __publicField(this, "y");
-      this.set(x, y);
+  // ../phaser-genesis/src/components/transform/GetVertices.ts
+  function GetVertices(worldTransform, transformExtent) {
+    const { a, b, c, d, tx, ty } = worldTransform;
+    const { x, y, right, bottom } = transformExtent;
+    const x0 = x * a + y * c + tx;
+    const y0 = x * b + y * d + ty;
+    const x1 = x * a + bottom * c + tx;
+    const y1 = x * b + bottom * d + ty;
+    const x2 = right * a + bottom * c + tx;
+    const y2 = right * b + bottom * d + ty;
+    const x3 = right * a + y * c + tx;
+    const y3 = right * b + y * d + ty;
+    return { x0, y0, x1, y1, x2, y2, x3, y3 };
+  }
+
+  // ../phaser-genesis/src/components/transform/InvalidateLocalMatrix2DComponent.ts
+  function InvalidateLocalMatrix2DComponent(id) {
+    if (hasComponent(GameObjectWorld, LocalMatrix2DComponent, id)) {
+      LocalMatrix2DComponent.dirty[id]++;
     }
-    set(x = 0, y = 0) {
+  }
+
+  // ../phaser-genesis/src/components/transform/UpdateExtent.ts
+  function UpdateExtent(id, width, height) {
+    const x = -Transform2DComponent.originX[id] * width;
+    const y = -Transform2DComponent.originY[id] * height;
+    Extent2DComponent.x[id] = x;
+    Extent2DComponent.y[id] = y;
+    Extent2DComponent.width[id] = width;
+    Extent2DComponent.height[id] = height;
+    Extent2DComponent.right[id] = x + width;
+    Extent2DComponent.bottom[id] = y + height;
+    SetDirtyTransform(id);
+  }
+
+  // ../phaser-genesis/src/components/transform/Origin.ts
+  var Origin = class {
+    constructor(id, x = 0, y = 0) {
+      __publicField(this, "id");
+      this.id = id;
+      this.x = x;
+      this.y = y;
+    }
+    set(x, y = x) {
+      const id = this.id;
+      Transform2DComponent.originX[id] = x;
+      Transform2DComponent.originY[id] = y;
+      UpdateExtent(id, Extent2DComponent.width[id], Extent2DComponent.height[id]);
+      return this;
+    }
+    set x(value) {
+      const id = this.id;
+      Transform2DComponent.originX[id] = value;
+      UpdateExtent(id, Extent2DComponent.width[id], Extent2DComponent.height[id]);
+    }
+    get x() {
+      return Transform2DComponent.originX[this.id];
+    }
+    set y(value) {
+      const id = this.id;
+      Transform2DComponent.originY[id] = value;
+      UpdateExtent(id, Extent2DComponent.width[id], Extent2DComponent.height[id]);
+    }
+    get y() {
+      return Transform2DComponent.originY[this.id];
+    }
+  };
+
+  // ../phaser-genesis/src/components/transform/Position.ts
+  var Position = class {
+    constructor(id, x = 0, y = 0) {
+      __publicField(this, "id");
+      this.id = id;
+      this.x = x;
+      this.y = y;
+    }
+    set(x, y = x) {
       this.x = x;
       this.y = y;
       return this;
     }
-    toArray(dst = [], index = 0) {
-      const { x, y } = this;
-      dst[index] = x;
-      dst[index + 1] = y;
-      return dst;
+    set x(value) {
+      Transform2DComponent.x[this.id] = value;
     }
-    fromArray(src, index = 0) {
-      return this.set(src[index], src[index + 1]);
+    get x() {
+      return Transform2DComponent.x[this.id];
     }
-    toString() {
-      const { x, y } = this;
-      return `{ x=${x}, y=${y} }`;
+    set y(value) {
+      Transform2DComponent.y[this.id] = value;
+    }
+    get y() {
+      return Transform2DComponent.y[this.id];
     }
   };
 
-  // ../phaser-genesis/src/renderer/webgl1/colors/PackColors.ts
-  function PackColors(vertices) {
-    vertices.forEach((vertex) => {
-      vertex.packColor();
-    });
-  }
+  // ../phaser-genesis/src/gameobjects/DIRTY_CONST.ts
+  var DIRTY_CONST = {
+    CLEAR: 0,
+    TRANSFORM: 1,
+    UPDATE: 2,
+    CHILD_CACHE: 4,
+    POST_RENDER: 8,
+    COLORS: 16,
+    BOUNDS: 32,
+    TEXTURE: 64,
+    FRAME: 128,
+    ALPHA: 256,
+    CHILD: 512,
+    DEFAULT: 1 + 2 + 16 + 32,
+    USER1: 536870912,
+    USER2: 1073741824,
+    USER3: 2147483648,
+    USER4: 4294967296
+  };
 
   // ../phaser-genesis/src/components/transform/UpdateVertices.ts
   function UpdateVertices(vertices, worldTransform, transformExtent) {
@@ -2945,25 +3250,104 @@ void main (void)
     return gameObject;
   }
 
-  // ../phaser-genesis/src/components/transform/UpdateExtent.ts
-  function UpdateExtent(id, width, height) {
-    const x = -Transform2DComponent.originX[id] * width;
-    const y = -Transform2DComponent.originY[id] * height;
-    Extent2DComponent.x[id] = x;
-    Extent2DComponent.y[id] = y;
-    Extent2DComponent.width[id] = width;
-    Extent2DComponent.height[id] = height;
-    Extent2DComponent.right[id] = x + width;
-    Extent2DComponent.bottom[id] = y + height;
-    SetDirtyTransform(id);
-  }
+  // ../phaser-genesis/src/components/transform/Scale.ts
+  var Scale = class {
+    constructor(id, x = 1, y = 1) {
+      __publicField(this, "id");
+      this.id = id;
+      this.x = x;
+      this.y = y;
+    }
+    set(x, y = x) {
+      this.x = x;
+      this.y = y;
+      return this;
+    }
+    set x(value) {
+      Transform2DComponent.scaleX[this.id] = value;
+    }
+    get x() {
+      return Transform2DComponent.scaleX[this.id];
+    }
+    set y(value) {
+      Transform2DComponent.scaleY[this.id] = value;
+    }
+    get y() {
+      return Transform2DComponent.scaleY[this.id];
+    }
+  };
+
+  // ../phaser-genesis/src/components/transform/Size.ts
+  var Size2 = class {
+    constructor(id, width = 0, height = 0) {
+      __publicField(this, "id");
+      this.id = id;
+      this.set(width, height);
+    }
+    set(width, height = width) {
+      this.width = width;
+      this.height = height;
+      return this;
+    }
+    set width(value) {
+      UpdateExtent(this.id, value, this.height);
+    }
+    get width() {
+      return Extent2DComponent.width[this.id];
+    }
+    set height(value) {
+      UpdateExtent(this.id, this.width, value);
+    }
+    get height() {
+      return Extent2DComponent.height[this.id];
+    }
+    set x(value) {
+      this.width = value;
+    }
+    get x() {
+      return this.width;
+    }
+    set y(value) {
+      this.height = value;
+    }
+    get y() {
+      return this.height;
+    }
+  };
+
+  // ../phaser-genesis/src/components/transform/Skew.ts
+  var Skew = class {
+    constructor(id, x = 0, y = 0) {
+      __publicField(this, "id");
+      this.id = id;
+      this.x = x;
+      this.y = y;
+    }
+    set(x, y = x) {
+      this.x = x;
+      this.y = y;
+      return this;
+    }
+    set x(value) {
+      Transform2DComponent.skewX[this.id] = value;
+    }
+    get x() {
+      return Transform2DComponent.skewX[this.id];
+    }
+    set y(value) {
+      Transform2DComponent.skewY[this.id] = value;
+    }
+    get y() {
+      return Transform2DComponent.skewY[this.id];
+    }
+  };
 
   // ../phaser-genesis/src/components/transform/UpdateLocalTransform2DSystem.ts
   var changedLocalTransformQuery = defineQuery([Changed(Transform2DComponent)]);
-  var entities;
+  var entities2;
   var updateLocalTransformSystem = defineSystem((world3) => {
-    for (let i = 0; i < entities.length; i++) {
-      const id = entities[i];
+    for (let i = 0; i < entities2.length; i++) {
+      const id = entities2[i];
       const x = Transform2DComponent.x[id];
       const y = Transform2DComponent.y[id];
       const rotation = Transform2DComponent.rotation[id];
@@ -2981,9 +3365,9 @@ void main (void)
     return world3;
   });
   var UpdateLocalTransform2DSystem = (world3) => {
-    entities = changedLocalTransformQuery(world3);
+    entities2 = changedLocalTransformQuery(world3);
     updateLocalTransformSystem(world3);
-    return entities;
+    return entities2;
   };
 
   // ../phaser-genesis/src/components/transform/CopyLocalToWorld.ts
@@ -3061,7 +3445,7 @@ void main (void)
   // ../phaser-genesis/src/components/transform/UpdateWorldTransform.ts
   function UpdateWorldTransform(id) {
     const parentID = GetParentID(id);
-    if (parentID === 0) {
+    if (!hasComponent(GameObjectWorld, Transform2DComponent, parentID)) {
       CopyLocalToWorld(id, id);
     } else if (!WillTransformChildren(id)) {
       CopyWorldToWorld(parentID, id);
@@ -3089,60 +3473,6 @@ void main (void)
     }
   });
 
-  // ../phaser-genesis/src/components/vertices/VertexWorld.ts
-  var world2 = createWorld();
-  var VertexWorld = world2;
-
-  // ../phaser-genesis/src/components/vertices/AddVertex.ts
-  function AddVertex() {
-    const vertexID = addEntity(VertexWorld);
-    addComponent(VertexWorld, VertexComponent, vertexID);
-    VertexComponent.alpha[vertexID] = 1;
-    VertexComponent.tint[vertexID] = 16777215;
-    VertexComponent.color[vertexID] = 4294967295;
-    return vertexID;
-  }
-
-  // ../phaser-genesis/src/components/vertices/UpdateVertexPositionSystem.ts
-  var changedWorldExtentQuery = defineQuery([
-    Changed(WorldMatrix2DComponent),
-    Changed(Extent2DComponent)
-  ]);
-  var entities2;
-  var updateVertexPositionSystem = defineSystem((world3) => {
-    for (let i = 0; i < entities2.length; i++) {
-      const id = entities2[i];
-      const a = WorldMatrix2DComponent.a[id];
-      const b = WorldMatrix2DComponent.b[id];
-      const c = WorldMatrix2DComponent.c[id];
-      const d = WorldMatrix2DComponent.d[id];
-      const tx = WorldMatrix2DComponent.tx[id];
-      const ty = WorldMatrix2DComponent.ty[id];
-      const x = Extent2DComponent.x[id];
-      const y = Extent2DComponent.y[id];
-      const right = Extent2DComponent.right[id];
-      const bottom = Extent2DComponent.bottom[id];
-      const v1 = QuadVertexComponent.v1[id];
-      const v2 = QuadVertexComponent.v2[id];
-      const v3 = QuadVertexComponent.v3[id];
-      const v4 = QuadVertexComponent.v4[id];
-      VertexComponent.x[v1] = x * a + y * c + tx;
-      VertexComponent.y[v1] = x * b + y * d + ty;
-      VertexComponent.x[v2] = x * a + bottom * c + tx;
-      VertexComponent.y[v2] = x * b + bottom * d + ty;
-      VertexComponent.x[v3] = right * a + bottom * c + tx;
-      VertexComponent.y[v3] = right * b + bottom * d + ty;
-      VertexComponent.x[v4] = right * a + y * c + tx;
-      VertexComponent.y[v4] = right * b + y * d + ty;
-    }
-    return world3;
-  });
-  var UpdateVertexPositionSystem = (world3) => {
-    entities2 = changedWorldExtentQuery(world3);
-    updateVertexPositionSystem(world3);
-    return entities2;
-  };
-
   // ../phaser-genesis/src/renderer/webgl1/draw/AddVertexToBatch.ts
   function AddVertexToBatch(id, offset, textureIndex, F32, U32) {
     VertexComponent.offset[id] = offset;
@@ -3158,7 +3488,7 @@ void main (void)
   // ../phaser-genesis/src/renderer/webgl1/draw/BatchTexturedQuad.ts
   function BatchTexturedQuad(texture, id, renderPass) {
     const { F32, U32, offset } = GetVertexBufferEntry(renderPass, 1);
-    const textureIndex = SetTexture(renderPass, texture);
+    const textureIndex = renderPass.textures.set(texture);
     let vertOffset = AddVertexToBatch(QuadVertexComponent.v1[id], offset, textureIndex, F32, U32);
     vertOffset = AddVertexToBatch(QuadVertexComponent.v2[id], vertOffset, textureIndex, F32, U32);
     vertOffset = AddVertexToBatch(QuadVertexComponent.v3[id], vertOffset, textureIndex, F32, U32);
@@ -3175,19 +3505,24 @@ void main (void)
     return ConfigStore.get(CONFIG_DEFAULTS.DEFAULT_ORIGIN).y;
   }
 
+  // ../phaser-genesis/src/components/bounds/AddBoundsComponent.ts
+  function AddBoundsComponent(id) {
+    addComponent(GameObjectWorld, BoundsComponent, id);
+  }
+
   // ../phaser-genesis/src/display/RemoveChildrenBetween.ts
   function RemoveChildrenBetween(parent, beginIndex = 0, endIndex) {
-    const children = parent.children;
+    const children = GameObjectTree.get(parent.id);
     if (endIndex === void 0) {
       endIndex = children.length;
     }
     const range = endIndex - beginIndex;
     if (range > 0 && range <= endIndex) {
       const removed2 = children.splice(beginIndex, range);
-      removed2.forEach((child) => {
-        child.parent = null;
+      removed2.forEach((childID) => {
+        ClearWorldAndParentID(childID);
       });
-      return removed2;
+      return removed2.map((id) => GameObjectCache.get(id));
     } else {
       return [];
     }
@@ -3199,6 +3534,7 @@ void main (void)
     removed2.forEach((child) => {
       child.destroy();
     });
+    SetDirtyWorldDisplayList(parent.id);
   }
 
   // ../phaser-genesis/src/gameobjects/events/DestroyEvent.ts
@@ -3223,72 +3559,14 @@ void main (void)
     return true;
   }
 
-  // ../phaser-genesis/src/display/DepthFirstSearch.ts
-  function DepthFirstSearch(parent) {
-    const stack = [parent];
-    const output = [];
-    while (stack.length > 0) {
-      const node = stack.shift();
-      output.push(node);
-      const numChildren = node.numChildren;
-      if (numChildren > 0) {
-        for (let i = numChildren - 1; i >= 0; i--) {
-          stack.unshift(node.children[i]);
-        }
-      }
-    }
-    output.shift();
-    return output;
-  }
-
-  // ../phaser-genesis/src/display/GetChildIndex.ts
-  function GetChildIndex(parent, child) {
-    return GameObjectTree.get(parent.id).indexOf(child.id);
-  }
-
-  // ../phaser-genesis/src/display/RemoveChildAt.ts
-  function RemoveChildAt(parent, index) {
-    const children = GameObjectTree.get(parent.id);
-    if (index >= 0 && index < children.length) {
-      const removedID = children.splice(index, 1)[0];
-      if (removedID) {
-        const worldID = GetWorldID(removedID);
-        SetDirtyDisplayList(worldID);
-        ClearWorldAndParentID(removedID);
-        UpdateNumChildren(parent.id);
-        return GameObjectCache.get(removedID);
-      }
-    }
-  }
-
-  // ../phaser-genesis/src/display/RemoveChild.ts
-  function RemoveChild(parent, child) {
-    if (child.hasParent()) {
-      RemoveChildAt(parent, GetChildIndex(parent, child));
-    }
-    return child;
-  }
-
-  // ../phaser-genesis/src/display/SetWorld.ts
-  function SetWorld(world3, ...children) {
-    children.forEach((child) => {
-      addComponent(GameObjectWorld, world3.tag, child.id);
-    });
-    return children;
-  }
+  // ../phaser-genesis/src/gameobjects/GameObjectTree.ts
+  var GameObjectTree = new Map();
 
   // ../phaser-genesis/src/display/SetParent.ts
   function SetParent2(parent, ...children) {
     children.forEach((child) => {
-      if (child.parent) {
-        RemoveChild(child.parent, child);
-      }
-      child.parent = parent;
+      AddChildAt(parent, child);
     });
-    const parentWorld = parent.world;
-    if (parentWorld) {
-      SetWorld(parentWorld, ...DepthFirstSearch(parent));
-    }
     return children;
   }
 
@@ -3296,9 +3574,6 @@ void main (void)
   function ReparentChildren(parent, newParent, beginIndex = 0, endIndex) {
     const moved = RemoveChildrenBetween(parent, beginIndex, endIndex);
     SetParent2(newParent, ...moved);
-    moved.forEach((child) => {
-      child.updateWorldTransform();
-    });
     return moved;
   }
 
@@ -3306,6 +3581,7 @@ void main (void)
   var GameObject = class {
     constructor() {
       __publicField(this, "id", addEntity(GameObjectWorld));
+      __publicField(this, "type", "GameObject");
       __publicField(this, "name", "");
       __publicField(this, "events");
       const id = this.id;
@@ -3346,12 +3622,14 @@ void main (void)
     }
     set visible(value) {
       PermissionsComponent.visible[this.id] = Number(value);
+      SetDirtyDisplayList(GetWorldID(this.id));
     }
     get visible() {
       return Boolean(PermissionsComponent.visible[this.id]);
     }
     set visibleChildren(value) {
       PermissionsComponent.visibleChildren[this.id] = Number(value);
+      SetDirtyDisplayList(GetWorldID(this.id));
     }
     get visibleChildren() {
       return Boolean(PermissionsComponent.visibleChildren[this.id]);
@@ -3362,17 +3640,24 @@ void main (void)
     get depth() {
       return HierarchyComponent.depth[this.id];
     }
-    hasParent() {
-      return HierarchyComponent.parentID[this.id] > 0;
+    hasParent(id) {
+      if (id) {
+        return HierarchyComponent.parentID[this.id] === id;
+      } else {
+        return HierarchyComponent.parentID[this.id] > 0;
+      }
     }
     getParent() {
       return GetParentGameObject(this.id);
     }
     getChildren() {
-      return GetChildren(this.id);
+      return GetChildrenFromParentID(this.id);
     }
     getNumChildren() {
       return GetNumChildren(this.id);
+    }
+    toString() {
+      return `${this.type} id="${this.id}" name="${this.name}"`;
     }
     destroy(reparentChildren) {
       if (reparentChildren) {
@@ -3390,123 +3675,35 @@ void main (void)
   var Container = class extends GameObject {
     constructor(x = 0, y = 0) {
       super();
-      __publicField(this, "_alpha", 1);
-      AddTransform2DComponent(this.id, x, y, GetDefaultOriginX(), GetDefaultOriginY());
-    }
-    updateWorldTransform() {
+      __publicField(this, "position");
+      __publicField(this, "scale");
+      __publicField(this, "skew");
+      __publicField(this, "origin");
+      __publicField(this, "size");
+      const id = this.id;
+      AddTransform2DComponent(id, x, y, GetDefaultOriginX(), GetDefaultOriginY());
+      AddColorComponent(id);
+      AddBoundsComponent(id);
+      this.position = new Position(id, x, y);
+      this.scale = new Scale(id);
+      this.skew = new Skew(id);
+      this.size = new Size2(id);
+      this.origin = new Origin(id, GetDefaultOriginX(), GetDefaultOriginY());
     }
     getBounds() {
-      return this.bounds.get();
-    }
-    setSize(width, height = width) {
-      UpdateExtent(this.id, width, height);
-      return this;
-    }
-    setPosition(x, y) {
-      this.x = x;
-      this.y = y;
-      return this;
-    }
-    setSkew(x, y = x) {
-      this.skewX = x;
-      this.skewY = y;
-      return this;
-    }
-    setScale(x, y = x) {
-      this.scaleX = x;
-      this.scaleY = y;
-      return this;
-    }
-    setRotation(value) {
-      this.rotation = value;
-      return this;
-    }
-    setOrigin(x, y = x) {
-      const id = this.id;
-      Transform2DComponent.originX[id] = x;
-      Transform2DComponent.originY[id] = y;
-      UpdateExtent(id, this.width, this.height);
-      return this;
-    }
-    getSize(out = new Vec2()) {
-      return out.set(Extent2DComponent.width[this.id], Extent2DComponent.height[this.id]);
-    }
-    getPosition(out = new Vec2()) {
-      return out.set(this.x, this.y);
-    }
-    getOrigin(out = new Vec2()) {
-      return out.set(this.originX, this.originY);
-    }
-    getSkew(out = new Vec2()) {
-      return out.set(this.skewX, this.skewY);
-    }
-    getScale(out = new Vec2()) {
-      return out.set(this.scaleX, this.scaleY);
-    }
-    getRotation() {
-      return this.rotation;
-    }
-    set width(value) {
-      UpdateExtent(this.id, value, this.height);
-    }
-    get width() {
-      return Extent2DComponent.width[this.id];
-    }
-    set height(value) {
-      UpdateExtent(this.id, this.width, value);
-    }
-    get height() {
-      return Extent2DComponent.height[this.id];
+      return new Rectangle();
     }
     set x(value) {
-      Transform2DComponent.x[this.id] = value;
+      this.position.x = value;
     }
     get x() {
-      return Transform2DComponent.x[this.id];
+      return this.position.x;
     }
     set y(value) {
-      Transform2DComponent.y[this.id] = value;
+      this.position.y = value;
     }
     get y() {
-      return Transform2DComponent.y[this.id];
-    }
-    set originX(value) {
-      Transform2DComponent.originX[this.id] = value;
-      UpdateExtent(this.id, this.width, this.height);
-    }
-    get originX() {
-      return Transform2DComponent.originX[this.id];
-    }
-    set originY(value) {
-      Transform2DComponent.originY[this.id] = value;
-      UpdateExtent(this.id, this.width, this.height);
-    }
-    get originY() {
-      return Transform2DComponent.originY[this.id];
-    }
-    set skewX(value) {
-      Transform2DComponent.skewX[this.id] = value;
-    }
-    get skewX() {
-      return Transform2DComponent.skewX[this.id];
-    }
-    set skewY(value) {
-      Transform2DComponent.skewY[this.id] = value;
-    }
-    get skewY() {
-      return Transform2DComponent.skewY[this.id];
-    }
-    set scaleX(value) {
-      Transform2DComponent.scaleX[this.id] = value;
-    }
-    get scaleX() {
-      return Transform2DComponent.scaleX[this.id];
-    }
-    set scaleY(value) {
-      Transform2DComponent.scaleY[this.id] = value;
-    }
-    get scaleY() {
-      return Transform2DComponent.scaleY[this.id];
+      return this.position.y;
     }
     set rotation(value) {
       Transform2DComponent.rotation[this.id] = value;
@@ -3515,31 +3712,15 @@ void main (void)
       return Transform2DComponent.rotation[this.id];
     }
     get alpha() {
-      return this._alpha;
+      return ColorComponent.alpha[this.id];
     }
     set alpha(value) {
-      this._alpha = value;
-      SetDirtyAlpha(this.id);
+      SetAlpha(this.id, value);
     }
     destroy(reparentChildren) {
       super.destroy(reparentChildren);
     }
   };
-
-  // ../phaser-genesis/src/renderer/canvas/draw/DrawImage.ts
-  function DrawImage(frame2, alpha, worldTransform, transformExtent, renderer) {
-    if (!frame2) {
-      return;
-    }
-    const ctx = renderer.ctx;
-    const { a, b, c, d, tx, ty } = worldTransform;
-    const { x, y } = transformExtent;
-    ctx.save();
-    ctx.setTransform(a, b, c, d, tx, ty);
-    ctx.globalAlpha = alpha;
-    ctx.drawImage(frame2.texture.image, frame2.x, frame2.y, frame2.width, frame2.height, x, y, frame2.width, frame2.height);
-    ctx.restore();
-  }
 
   // ../phaser-genesis/src/gameobjects/sprite/SetFrame.ts
   function SetFrame(texture, key, ...children) {
@@ -3552,7 +3733,7 @@ void main (void)
       child.frame = frame2;
       child.hasTexture = true;
       if (pivot) {
-        child.setOrigin(pivot.x, pivot.y);
+        child.origin.set(pivot.x, pivot.y);
       }
       frame2.copyToExtent(child);
       frame2.copyToVertices(child.id);
@@ -3577,7 +3758,7 @@ void main (void)
   }
 
   // ../phaser-genesis/src/gameobjects/sprite/SetTexture.ts
-  function SetTexture2(key, frame2, ...children) {
+  function SetTexture(key, frame2, ...children) {
     if (!key) {
       children.forEach((child) => {
         child.texture = null;
@@ -3610,10 +3791,10 @@ void main (void)
   var Sprite = class extends Container {
     constructor(x, y, texture, frame2) {
       super(x, y);
+      __publicField(this, "type", "Sprite");
       __publicField(this, "texture");
       __publicField(this, "frame");
       __publicField(this, "hasTexture", false);
-      __publicField(this, "_tint", 16777215);
       const id = this.id;
       addComponent(GameObjectWorld, QuadVertexComponent, id);
       QuadVertexComponent.v1[id] = AddVertex();
@@ -3623,7 +3804,7 @@ void main (void)
       this.setTexture(texture, frame2);
     }
     setTexture(key, frame2) {
-      SetTexture2(key, frame2, this);
+      SetTexture(key, frame2, this);
       return this;
     }
     setFrame(key) {
@@ -3638,16 +3819,12 @@ void main (void)
     }
     renderCanvas(renderer) {
       PreRenderVertices(this);
-      DrawImage(this.frame, this.alpha, this.worldTransform, this.transformExtent, renderer);
     }
     get tint() {
-      return this._tint;
+      return ColorComponent.tint[this.id];
     }
     set tint(value) {
-      if (value !== this._tint) {
-        this._tint = value;
-        SetDirtyVertexColors(this.id);
-      }
+      SetTint(this.id, value);
     }
     destroy(reparentChildren) {
       super.destroy(reparentChildren);
@@ -3665,27 +3842,124 @@ void main (void)
     return canvas.getContext("2d");
   }
 
+  // ../phaser-genesis/src/components/hierarchy/GetChildrenFromParentID.ts
+  function GetChildrenFromParentID(id) {
+    const out = [];
+    GameObjectTree.get(id).forEach((childID) => {
+      out.push(GameObjectCache.get(childID));
+    });
+    return out;
+  }
+
+  // ../phaser-genesis/src/components/hierarchy/GetNumChildren.ts
+  function GetNumChildren(id) {
+    return HierarchyComponent.numChildren[id];
+  }
+
+  // ../phaser-genesis/src/components/hierarchy/GetParentGameObject.ts
+  function GetParentGameObject(id) {
+    return GameObjectCache.get(HierarchyComponent.parentID[id]);
+  }
+
+  // ../phaser-genesis/src/components/hierarchy/GetParentID.ts
+  function GetParentID(id) {
+    return HierarchyComponent.parentID[id];
+  }
+
+  // ../phaser-genesis/src/components/hierarchy/GetWorldID.ts
+  function GetWorldID(id) {
+    return HierarchyComponent.worldID[id];
+  }
+
+  // ../phaser-genesis/src/components/hierarchy/GetWorldFromParentID.ts
+  function GetWorldFromParentID(parentID) {
+    const worldID = GetWorldID(parentID);
+    return GameObjectCache.get(worldID);
+  }
+
+  // ../phaser-genesis/src/components/hierarchy/UpdateNumChildren.ts
+  function UpdateNumChildren(id) {
+    HierarchyComponent.numChildren[id] = GameObjectTree.get(id).length;
+  }
+
+  // ../phaser-genesis/src/components/hierarchy/SetParentID.ts
+  function SetParentID(childID, parentID) {
+    HierarchyComponent.parentID[childID] = parentID;
+    UpdateNumChildren(parentID);
+  }
+
+  // ../phaser-genesis/src/components/hierarchy/SetWorldID.ts
+  function SetWorldID(id, worldID) {
+    HierarchyComponent.worldID[id] = worldID;
+  }
+
   // ../phaser-genesis/src/display/IsValidParent.ts
   function IsValidParent(parent, child) {
     return !(child.id === parent.id || parent.id === GetParentID(child.id));
   }
 
-  // ../phaser-genesis/src/display/AddChild.ts
-  function AddChild(parent, child) {
+  // ../phaser-genesis/src/display/GetChildIndex.ts
+  function GetChildIndex(child) {
     const childID = child.id;
-    const parentID = parent.id;
-    const worldID = GetWorldID(parentID);
-    const world3 = GameObjectCache.get(worldID);
-    if (IsValidParent(parent, child)) {
-      RemoveChild(child.getParent(), child);
-      GameObjectTree.get(parentID).push(childID);
-      SetWorldAndParentID(childID, worldID, parentID);
-      SetParentID(childID, parentID);
-      SetWorld(world3, child);
-      SetDirtyDisplayList(worldID);
-      UpdateNumChildren(parentID);
+    return GameObjectTree.get(GetParentID(childID)).indexOf(childID);
+  }
+
+  // ../phaser-genesis/src/display/RemoveChildAt.ts
+  function RemoveChildAt(parent, index) {
+    const children = GameObjectTree.get(parent.id);
+    if (index >= 0 && index < children.length) {
+      const removedID = children.splice(index, 1)[0];
+      if (removedID) {
+        ClearWorldAndParentID(removedID);
+        return GameObjectCache.get(removedID);
+      }
+    }
+  }
+
+  // ../phaser-genesis/src/display/RemoveChild.ts
+  function RemoveChild(parent, child) {
+    if (parent && child.hasParent(parent.id)) {
+      RemoveChildAt(parent, GetChildIndex(child));
     }
     return child;
+  }
+
+  // ../phaser-genesis/src/display/SetWorld.ts
+  function SetWorld(world3, ...children) {
+    const worldID = world3.id;
+    const worldTag = world3.tag;
+    children.forEach((child) => {
+      addComponent(GameObjectWorld, worldTag, child.id);
+      HierarchyComponent.worldID[child.id] = worldID;
+    });
+    SetDirtyDisplayList(worldID);
+    return children;
+  }
+
+  // ../phaser-genesis/src/display/AddChildAt.ts
+  function AddChildAt(parent, child, index = -1) {
+    if (IsValidParent(parent, child)) {
+      const childID = child.id;
+      const parentID = parent.id;
+      const world3 = GetWorldFromParentID(parentID);
+      const children = GameObjectTree.get(parentID);
+      if (index === -1) {
+        index = children.length;
+      }
+      if (index >= 0 && index <= children.length && world3) {
+        RemoveChild(child.getParent(), child);
+        children.splice(index, 0, childID);
+        InvalidateLocalMatrix2DComponent(child.id);
+        SetWorld(world3, child);
+        SetParentID(childID, parentID);
+      }
+    }
+    return child;
+  }
+
+  // ../phaser-genesis/src/display/AddChild.ts
+  function AddChild(parent, child) {
+    return AddChildAt(parent, child);
   }
 
   // ../phaser-genesis/src/display/RemoveChildren.ts
@@ -3804,9 +4078,6 @@ void main (void)
   function AddRenderStatsComponent(id) {
     addComponent(GameObjectWorld, RenderStatsComponent, id);
   }
-
-  // ../phaser-genesis/src/scenes/GameObjectRenderList.ts
-  var GameObjectRenderList = new Set();
 
   // ../phaser-genesis/src/scenes/GetConfigValue.ts
   function GetConfigValue(config, property, defaultValue) {
@@ -3946,11 +4217,22 @@ void main (void)
           }
         }
       }
-      const verts = UpdateVertexPositionSystem(GameObjectWorld);
-      RenderStatsComponent.numDirtyVertices[this.id] = verts.length;
+      PackQuadColorsSystem(GameObjectWorld);
+      const updatedEntities = UpdateVertexPositionSystem(GameObjectWorld);
+      RenderStatsComponent.numDirtyVertices[this.id] = updatedEntities.length * 4;
       if (dirtyWorld) {
         this.flush = true;
       }
+    }
+    getRenderList() {
+      let output = [];
+      for (const scene of this.scenes.values()) {
+        const worlds2 = WorldList.get(scene);
+        for (const world3 of worlds2) {
+          output = output.concat(world3.getRenderList());
+        }
+      }
+      return output;
     }
     updateWorldStats(numGameObjects, numRendered, numDisplayLists, numWorldTransforms2) {
       const id = this.id;
@@ -4046,6 +4328,7 @@ void main (void)
       __publicField(this, "delta", 0);
       __publicField(this, "fps", 0);
       __publicField(this, "frame", 0);
+      __publicField(this, "framems", 0);
       __publicField(this, "frames", 0);
       __publicField(this, "prevFrame", 0);
       __publicField(this, "renderStats");
@@ -4088,10 +4371,12 @@ void main (void)
     step(time) {
       const renderer = this.renderer;
       const sceneManager = this.sceneManager;
+      this.framems = time - this.lastTick;
       if (!this.isPaused) {
         if (this.willUpdate) {
           sceneManager.update(this.delta, time, this.frame);
         }
+        Emit(this, "update", this.framems, time);
         if (this.willRender) {
           sceneManager.preRender(this.frame);
           renderer.render(sceneManager.flush, sceneManager.scenes);
@@ -4286,7 +4571,7 @@ void main (void)
       if (!forceUpdate && transformList.indexOf(parent) > -1) {
         forceUpdate = true;
       }
-      if (forceUpdate) {
+      if (forceUpdate && hasComponent(GameObjectWorld, Transform2DComponent, parent)) {
         UpdateWorldTransform(parent);
       }
       const children = GameObjectTree.get(parent);
@@ -4333,7 +4618,6 @@ void main (void)
       this.listLength = 0;
       const id = this.id;
       AddRenderDataComponent(id);
-      AddTransform2DComponent(id);
       SetWorldID(id, id);
       WorldList.get(scene).push(this);
       Once(scene, SceneDestroyEvent, () => this.destroy());
@@ -4364,6 +4648,18 @@ void main (void)
         this.renderList = newList;
       }
     }
+    getRenderList() {
+      const list = this.renderList;
+      const output = [];
+      for (let i = 0; i < this.listLength; i += 2) {
+        const eid = list[i];
+        const type = list[i + 1];
+        if (type === 0) {
+          output.push(GameObjectCache.get(eid));
+        }
+      }
+      return output;
+    }
     preRender(gameFrame, transformList) {
       const sceneManager = this.sceneManager;
       if (!this.isRenderable()) {
@@ -4388,7 +4684,8 @@ void main (void)
       }
       this.camera.dirtyRender = false;
       this.runRender = this.listLength > 0;
-      sceneManager.updateWorldStats(this.totalChildren, this.listLength / 4, Number(dirtyDisplayList), GetNumWorldTransforms());
+      const dirtyWorld = GetNumWorldTransforms();
+      sceneManager.updateWorldStats(this.totalChildren, this.listLength / 4, Number(dirtyDisplayList), dirtyWorld);
       return isDirty;
     }
     getTotalChildren() {
@@ -4418,6 +4715,9 @@ void main (void)
       }
     }
     postRenderGL(renderPass) {
+      if (!this.runRender) {
+        Begin(renderPass, this.camera);
+      }
       Emit(this, WorldPostRenderEvent, renderPass, this);
     }
     shutdown() {
@@ -4438,25 +4738,12 @@ void main (void)
     }
   };
 
-  // ../phaser-genesis/src/world/CreateWorldRenderData.ts
-  function CreateWorldRenderData(world3, camera) {
-    return {
-      world: world3,
-      camera,
-      gameFrame: 0,
-      dirtyFrame: 0,
-      numRendered: 0,
-      numRenderable: 0
-    };
-  }
-
   // ../phaser-genesis/src/world/StaticWorld.ts
   var StaticWorld = class extends BaseWorld {
     constructor(scene) {
       super(scene);
       __publicField(this, "camera");
       this.camera = new StaticCamera();
-      this.renderData = CreateWorldRenderData(this, this.camera);
     }
   };
 

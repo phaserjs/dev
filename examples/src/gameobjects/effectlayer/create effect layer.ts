@@ -2,6 +2,7 @@ import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../.
 import { EffectLayer, Sprite } from '../../../../../phaser-genesis/src/gameobjects';
 
 import { AddChildren } from '../../../../../phaser-genesis/src/display';
+import { FXShader } from '../../../../../phaser-genesis/src/renderer/webgl1/shaders/FXShader';
 import { Game } from '../../../../../phaser-genesis/src/Game';
 import { ImageFile } from '../../../../../phaser-genesis/src/loader/files/ImageFile';
 import { Loader } from '../../../../../phaser-genesis/src/loader/Loader';
@@ -433,35 +434,37 @@ class Demo extends Scene
         const red = new Shader({ fragmentShader: redFragmentShader, renderToFramebuffer: true });
         const blurX = new Shader({ fragmentShader: blurXFragmentShader, renderToFramebuffer: true });
         const blurY = new Shader({ fragmentShader: blurYFragmentShader, renderToFramebuffer: true });
-        const lazer = new Shader({ fragmentShader: lazerBeamFragmentShader, renderToFramebuffer: true });
-        const plasma = new Shader({ fragmentShader: plasmaFragmentShader, renderToFramebuffer: true });
-        const pixel = new Shader({ fragmentShader: pixelateFragmentShader, renderToFramebuffer: true });
-        const sine = new Shader({ fragmentShader: sineWaveFragmentShader, renderToFramebuffer: true });
-        const sine2 = new Shader({ fragmentShader: sineWaveFragmentShader2, renderToFramebuffer: true });
-        const underwater = new Shader({ fragmentShader: underwaterFragmentShader, renderToFramebuffer: true });
-        const vdu = new Shader({ fragmentShader: vduNoiseFragmentShader, renderToFramebuffer: true });
-        const bars = new Shader({ fragmentShader: verticalBarsFragmentShader, renderToFramebuffer: true });
-        const clouds = new Shader({ fragmentShader: cloudsFragmentShader, renderToFramebuffer: true });
-        // const empty = new Shader();
+        const lazer = new FXShader({ fragmentShader: lazerBeamFragmentShader, renderToFramebuffer: true });
+        const plasma = new FXShader({ fragmentShader: plasmaFragmentShader, renderToFramebuffer: true });
+        const pixel = new FXShader({ fragmentShader: pixelateFragmentShader, renderToFramebuffer: true });
+        const sine = new FXShader({ fragmentShader: sineWaveFragmentShader, renderToFramebuffer: true });
+        const sine2 = new FXShader({ fragmentShader: sineWaveFragmentShader2, renderToFramebuffer: true });
+        const underwater = new FXShader({ fragmentShader: underwaterFragmentShader, renderToFramebuffer: true });
+        const vdu = new FXShader({ fragmentShader: vduNoiseFragmentShader, renderToFramebuffer: true });
+        const bars = new FXShader({ fragmentShader: verticalBarsFragmentShader, renderToFramebuffer: true });
+        const clouds = new FXShader({ fragmentShader: cloudsFragmentShader, renderToFramebuffer: true });
+        const empty = new Shader();
 
         const world = new StaticWorld(this);
 
         const layer = new EffectLayer();
-        // const layer2 = new EffectLayer();
+        const layer2 = new EffectLayer();
 
         // layer.shaders.push(red);
         // layer.shaders.push(blurX, red);
         // layer.shaders.push(lazer);
         // layer.shaders.push(plasma);
-        layer.shaders.push(pixel);
+        // layer.shaders.push(pixel);
         // layer.shaders.push(sine);
         // layer.shaders.push(sine2);
         // layer.shaders.push(underwater);
         // layer.shaders.push(vdu);
         // layer.shaders.push(bars);
         // layer.shaders.push(empty);
-        // layer2.shaders.push(sine);
-        // layer.shaders.push(clouds);
+        layer.shaders.push(clouds);
+
+        layer2.shaders.push(plasma);
+        layer2.shaders.push(sine);
 
         const bg = new Sprite(400, 300, 'background');
         const logo = new Sprite(200, 300, 'logo');
@@ -471,19 +474,11 @@ class Demo extends Scene
         const bubble = new Sprite(400, 450, 'bubble');
         const star = new Sprite(650, 500, 'star');
 
-        // AddChildren(world, ayu, logo, farm, rocket, bubble, star);
-        // AddChildren(layer, ayu, logo);
+        AddChildren(layer, ayu, logo, rocket, bubble);
 
-        AddChildren(layer, ayu, logo, farm, rocket, bubble);
+        AddChildren(layer2, farm);
 
-        // AddChildren(layer2, farm);
-
-        AddChildren(world, bg, layer, star);
-
-        // AddChild(world, bg);
-        // AddChild(world, layer);
-        // AddChild(world, layer2);
-        // AddChild(world, star);
+        AddChildren(world, bg, layer, layer2, star);
     }
 }
 
