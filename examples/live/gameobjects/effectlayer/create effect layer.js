@@ -3047,7 +3047,7 @@ void main (void)
     const world3 = GameObjectCache.get(worldID);
     HierarchyComponent.worldID[id] = 0;
     HierarchyComponent.parentID[id] = 0;
-    if (worldID) {
+    if (world3 && hasComponent(GameObjectWorld, world3.tag, id)) {
       removeComponent(GameObjectWorld, world3.tag, id);
     }
     UpdateNumChildren(parentID);
