@@ -7,6 +7,7 @@ export function Stats (game)
     const scenes = document.getElementById('statsScenes');
     const worlds = document.getElementById('statsWorlds');
     const gameObjects = document.getElementById('statsGameObjects');
+    const gameObjectsRendered = document.getElementById('statsGameObjectsRendered');
 
     const pauseButton = document.getElementById('pauseButton');
     const metricsButton = document.getElementById('statsGameObjectsLabel');
@@ -62,6 +63,7 @@ export function Stats (game)
         scenes.innerText = renderStats.numScenes;
         worlds.innerText = renderStats.numWorlds;
         gameObjects.innerText = renderStats.numGameObjects;
+        gameObjectsRendered.innerText = renderStats.numGameObjectsRendered;
 
     }, 13);
 
