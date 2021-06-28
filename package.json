@@ -25,13 +25,13 @@
     "boxen": "^5.0.1",
     "chalk": "^4.1.1",
     "directory-tree": "^2.2.9",
-    "esbuild": "^0.12.9",
+    "esbuild": "^0.12.11",
     "filesize": "^6.3.0",
     "fs-extra": "^10.0.0",
     "gradient-string": "^1.2.0",
     "gzip-size": "^6.0.0",
     "tslib": "^2.3.0",
-    "typescript": "^4.3.3",
+    "typescript": "^4.3.4",
     "yargs": "^17.0.1"
   },
   "dependencies": {
