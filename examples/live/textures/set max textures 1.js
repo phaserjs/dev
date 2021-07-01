@@ -23,6 +23,26 @@
     __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
     return value;
   };
+  var __async = (__this, __arguments, generator) => {
+    return new Promise((resolve, reject) => {
+      var fulfilled = (value) => {
+        try {
+          step(generator.next(value));
+        } catch (e) {
+          reject(e);
+        }
+      };
+      var rejected = (value) => {
+        try {
+          step(generator.throw(value));
+        } catch (e) {
+          reject(e);
+        }
+      };
+      var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
+      step((generator = generator.apply(__this, __arguments)).next());
+    });
+  };
 
   // ../phaser-genesis/src/config/const.ts
   var CONFIG_DEFAULTS = {
@@ -136,6 +156,13 @@
   // ../phaser-genesis/src/config/maxtextures/SetMaxTextures.ts
   function SetMaxTextures(max) {
     ConfigStore.set(CONFIG_DEFAULTS.MAX_TEXTURES, max);
+  }
+
+  // ../phaser-genesis/src/config/maxtextures/MaxTextures.ts
+  function MaxTextures(max = 0) {
+    return () => {
+      SetMaxTextures(max);
+    };
   }
 
   // ../phaser-genesis/src/dom/GetElement.ts
@@ -258,18 +285,6 @@
     return ConfigStore.get(CONFIG_DEFAULTS.WEBGL_CONTEXT);
   }
 
-  // ../phaser-genesis/src/renderer/webgl1/fbo/CreateFramebuffer.ts
-  function CreateFramebuffer(texture, attachment) {
-    if (!attachment) {
-      attachment = gl.COLOR_ATTACHMENT0;
-    }
-    const framebuffer = gl.createFramebuffer();
-    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
-    gl.framebufferTexture2D(gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, texture, 0);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    return framebuffer;
-  }
-
   // ../phaser-genesis/src/renderer/webgl1/textures/CreateGLTexture.ts
   function CreateGLTexture(binding) {
     const { parent, flipY, unpackPremultiplyAlpha, minFilter, magFilter, wrapS, wrapT, generateMipmap, isPOT } = binding;
@@ -366,7 +381,6 @@
       const {
         texture = null,
         framebuffer = null,
-        createFramebuffer = false,
         depthbuffer = null,
         unpackPremultiplyAlpha = true,
         minFilter = this.isPOT ? gl.LINEAR_MIPMAP_LINEAR : gl.LINEAR,
@@ -383,20 +397,17 @@
       this.generateMipmap = generateMipmap;
       this.flipY = flipY;
       this.unpackPremultiplyAlpha = unpackPremultiplyAlpha;
+      if (framebuffer) {
+        this.framebuffer = framebuffer;
+      }
+      if (depthbuffer) {
+        this.depthbuffer = depthbuffer;
+      }
       if (texture) {
         this.texture = texture;
       } else {
         CreateGLTexture(this);
       }
-      if (framebuffer) {
-        this.framebuffer = framebuffer;
-      } else if (createFramebuffer) {
-        this.framebuffer = CreateFramebuffer(this.texture);
-      }
-      if (depthbuffer) {
-        this.depthbuffer = depthbuffer;
-      }
-      parent.binding = this;
     }
     setFilter(linear) {
       if (this.texture) {
@@ -1063,6 +1074,18 @@
     gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depthBuffer);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     return depthBuffer;
+  }
+
+  // ../phaser-genesis/src/renderer/webgl1/fbo/CreateFramebuffer.ts
+  function CreateFramebuffer(texture, attachment) {
+    if (!attachment) {
+      attachment = gl.COLOR_ATTACHMENT0;
+    }
+    const framebuffer = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, texture, 0);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    return framebuffer;
   }
 
   // ../phaser-genesis/src/renderer/webgl1/glsl/SINGLE_QUAD_FRAG.ts
@@ -1773,10 +1796,10 @@ void main (void)
 
   // ../phaser-genesis/src/components/vertices/QuadVertexComponent.ts
   var QuadVertex = defineComponent({
-    tl: Types.ui32,
-    bl: Types.ui32,
-    br: Types.ui32,
-    tr: Types.ui32
+    v1: Types.ui32,
+    v2: Types.ui32,
+    v3: Types.ui32,
+    v4: Types.ui32
   });
   var QuadVertexComponent = QuadVertex;
 
@@ -1823,11 +1846,6 @@ void main (void)
     DirtyComponent.textureFrame[id] = 0;
     DirtyComponent.child[id] = 0;
     DirtyComponent.displayList[id] = 0;
-  }
-
-  // ../phaser-genesis/src/components/dirty/ClearDirtyChildCache.ts
-  function ClearDirtyChildCache(id) {
-    DirtyComponent.childCache[id] = 0;
   }
 
   // ../phaser-genesis/src/components/dirty/ClearDirtyDisplayList.ts
@@ -1956,14 +1974,9 @@ void main (void)
   var VertexWorld = world2;
 
   // ../phaser-genesis/src/components/vertices/AddVertex.ts
-  function AddVertex(x = 0, y = 0, z = 0, u = 0, v = 0) {
+  function AddVertex() {
     const vertexID = addEntity(VertexWorld);
     addComponent(VertexWorld, VertexComponent, vertexID);
-    VertexComponent.x[vertexID] = x;
-    VertexComponent.y[vertexID] = y;
-    VertexComponent.z[vertexID] = z;
-    VertexComponent.u[vertexID] = u;
-    VertexComponent.v[vertexID] = v;
     VertexComponent.alpha[vertexID] = 1;
     VertexComponent.tint[vertexID] = 16777215;
     VertexComponent.color[vertexID] = 4294967295;
@@ -2006,10 +2019,10 @@ void main (void)
       const y = Extent2DComponent.y[id];
       const right = Extent2DComponent.right[id];
       const bottom = Extent2DComponent.bottom[id];
-      const v1 = QuadVertexComponent.tl[id];
-      const v2 = QuadVertexComponent.bl[id];
-      const v3 = QuadVertexComponent.br[id];
-      const v4 = QuadVertexComponent.tr[id];
+      const v1 = QuadVertexComponent.v1[id];
+      const v2 = QuadVertexComponent.v2[id];
+      const v3 = QuadVertexComponent.v3[id];
+      const v4 = QuadVertexComponent.v4[id];
       const x0 = x * a + y * c + tx;
       const y0 = x * b + y * d + ty;
       const x1 = x * a + bottom * c + tx;
@@ -2060,10 +2073,10 @@ void main (void)
     const entities3 = changedColorQuery(world3);
     for (let i = 0; i < entities3.length; i++) {
       const id = entities3[i];
-      const v1 = QuadVertexComponent.tl[id];
-      const v2 = QuadVertexComponent.bl[id];
-      const v3 = QuadVertexComponent.br[id];
-      const v4 = QuadVertexComponent.tr[id];
+      const v1 = QuadVertexComponent.v1[id];
+      const v2 = QuadVertexComponent.v2[id];
+      const v3 = QuadVertexComponent.v3[id];
+      const v4 = QuadVertexComponent.v4[id];
       const color = PackColor(ColorComponent.tint[id], ColorComponent.alpha[id]);
       VertexComponent.color[v1] = color;
       VertexComponent.color[v2] = color;
@@ -2110,14 +2123,6 @@ void main (void)
     PermissionsComponent.willRenderChildren[id] = 1;
     PermissionsComponent.willCacheChildren[id] = 0;
     PermissionsComponent.willTransformChildren[id] = 1;
-  }
-
-  // ../phaser-genesis/src/components/permissions/SetWillCacheChildren.ts
-  function SetWillCacheChildren(value, ...children) {
-    children.forEach((child) => {
-      PermissionsComponent.willCacheChildren[child.id] = Number(value);
-    });
-    return children;
   }
 
   // ../phaser-genesis/src/components/permissions/WillCacheChildren.ts
@@ -2565,10 +2570,10 @@ void main (void)
   function BatchTexturedQuad(texture, id, renderPass) {
     const textureIndex = renderPass.textures.set(texture);
     const { F32, U32, offset } = GetVertexBufferEntry(renderPass, 1);
-    let vertOffset = AddVertexToBatch(QuadVertexComponent.tl[id], offset, textureIndex, F32, U32);
-    vertOffset = AddVertexToBatch(QuadVertexComponent.bl[id], vertOffset, textureIndex, F32, U32);
-    vertOffset = AddVertexToBatch(QuadVertexComponent.br[id], vertOffset, textureIndex, F32, U32);
-    AddVertexToBatch(QuadVertexComponent.tr[id], vertOffset, textureIndex, F32, U32);
+    let vertOffset = AddVertexToBatch(QuadVertexComponent.v1[id], offset, textureIndex, F32, U32);
+    vertOffset = AddVertexToBatch(QuadVertexComponent.v2[id], vertOffset, textureIndex, F32, U32);
+    vertOffset = AddVertexToBatch(QuadVertexComponent.v3[id], vertOffset, textureIndex, F32, U32);
+    AddVertexToBatch(QuadVertexComponent.v4[id], vertOffset, textureIndex, F32, U32);
   }
 
   // ../phaser-genesis/src/config/defaultorigin/GetDefaultOriginX.ts
@@ -3013,10 +3018,10 @@ void main (void)
       __publicField(this, "hasTexture", false);
       const id = this.id;
       addComponent(GameObjectWorld, QuadVertexComponent, id);
-      QuadVertexComponent.tl[id] = AddVertex();
-      QuadVertexComponent.bl[id] = AddVertex();
-      QuadVertexComponent.br[id] = AddVertex();
-      QuadVertexComponent.tr[id] = AddVertex();
+      QuadVertexComponent.v1[id] = AddVertex();
+      QuadVertexComponent.v2[id] = AddVertex();
+      QuadVertexComponent.v3[id] = AddVertex();
+      QuadVertexComponent.v4[id] = AddVertex();
       this.setTexture(texture, frame2);
     }
     setTexture(key, frame2) {
@@ -3069,60 +3074,6 @@ void main (void)
     renderPass.vertexbuffer.bindDefault();
     renderPass.shader.bindDefault();
   }
-
-  // ../phaser-genesis/src/gameobjects/layer/Layer.ts
-  var Layer = class extends GameObject {
-    constructor() {
-      super();
-      this.passthru = true;
-      this.willRender = false;
-    }
-  };
-
-  // ../phaser-genesis/src/gameobjects/renderlayer/RenderLayer.ts
-  var RenderLayer = class extends Layer {
-    constructor() {
-      super();
-      __publicField(this, "type", "RenderLayer");
-      __publicField(this, "texture");
-      __publicField(this, "framebuffer");
-      SetWillCacheChildren(true, this);
-      const width = GetWidth();
-      const height = GetHeight();
-      const resolution = GetResolution();
-      const id = this.id;
-      const texture = new Texture(null, width * resolution, height * resolution);
-      texture.key = this.type + id.toString();
-      const binding = new GLTextureBinding(texture, {
-        createFramebuffer: true,
-        flipY: true
-      });
-      addComponent(GameObjectWorld, QuadVertexComponent, id);
-      QuadVertexComponent.tl[id] = AddVertex(0, 0, 0, 0, 1);
-      QuadVertexComponent.bl[id] = AddVertex(0, height, 0, 0, 0);
-      QuadVertexComponent.br[id] = AddVertex(width, height, 0, 1, 0);
-      QuadVertexComponent.tr[id] = AddVertex(width, 0, 0, 1, 1);
-      this.texture = texture;
-      this.framebuffer = binding.framebuffer;
-    }
-    renderGL(renderPass) {
-      const id = this.id;
-      if (this.getNumChildren() && (!WillCacheChildren(id) || HasDirtyChildCache(id))) {
-        Flush(renderPass);
-        renderPass.framebuffer.set(this.framebuffer, true);
-      }
-    }
-    postRenderGL(renderPass) {
-      const id = this.id;
-      if (!WillCacheChildren(id) || HasDirtyChildCache(id)) {
-        Flush(renderPass);
-        renderPass.framebuffer.pop();
-        ClearDirtyChildCache(id);
-        SetDirtyParents(id);
-      }
-      BatchTexturedQuad(this.texture, id, renderPass);
-    }
-  };
 
   // ../phaser-genesis/src/textures/CreateCanvas.ts
   function CreateCanvas(width, height) {
@@ -3330,10 +3281,10 @@ void main (void)
     }
     copyToVertices(id) {
       const { u0, u1, v0, v1 } = this;
-      SetUV(QuadVertexComponent.tl[id], u0, v0);
-      SetUV(QuadVertexComponent.bl[id], u0, v1);
-      SetUV(QuadVertexComponent.br[id], u1, v1);
-      SetUV(QuadVertexComponent.tr[id], u1, v0);
+      SetUV(QuadVertexComponent.v1[id], u0, v0);
+      SetUV(QuadVertexComponent.v2[id], u0, v1);
+      SetUV(QuadVertexComponent.v3[id], u1, v1);
+      SetUV(QuadVertexComponent.v4[id], u1, v0);
       return this;
     }
     updateUVs() {
@@ -3409,7 +3360,6 @@ void main (void)
         this.binding.destroy();
       }
       this.frames.clear();
-      this.binding = null;
       this.data = null;
       this.image = null;
       this.firstFrame = null;
@@ -3787,12 +3737,12 @@ void main (void)
       gl.bindTexture(gl.TEXTURE_2D, this.tempTextures[index]);
     }
     set(texture) {
-      if (!texture.binding) {
+      if (!texture.image) {
         return -1;
       }
       const binding = texture.binding;
       const textures = this.textures;
-      if (!binding.isBound) {
+      if (binding && !binding.isBound) {
         if (textures.size === this.maxTextures) {
           Flush(this.renderPass);
           textures.forEach((texture2) => texture2.binding.unbind());
@@ -3818,6 +3768,8 @@ void main (void)
       this.tempTextures.forEach((texture, index) => {
         this.textureIndex.push(index);
       });
+      console.log(this.textureIndex);
+      console.log(this.tempTextures);
     }
     reset() {
       this.tempTextures.forEach((texture, index) => {
@@ -4127,10 +4079,15 @@ void main (void)
     ConfigStore.set(CONFIG_DEFAULTS.WORLD_SIZE, size);
   }
 
-  // ../phaser-genesis/src/display/AddChildren.ts
-  function AddChildren(parent, ...children) {
+  // ../phaser-genesis/src/display/AddChild.ts
+  function AddChild(parent, child) {
+    return AddChildAt(parent, child);
+  }
+
+  // ../phaser-genesis/src/display/RemoveChildren.ts
+  function RemoveChildren(parent, ...children) {
     children.forEach((child) => {
-      AddChildAt(parent, child);
+      RemoveChild(parent, child);
     });
     return children;
   }
@@ -4663,130 +4620,6 @@ void main (void)
     return file;
   }
 
-  // ../phaser-genesis/src/loader/Loader.ts
-  var Loader = class extends EventEmitter {
-    constructor() {
-      super();
-      __publicField(this, "baseURL", "");
-      __publicField(this, "path", "");
-      __publicField(this, "crossOrigin", "anonymous");
-      __publicField(this, "maxParallelDownloads", -1);
-      __publicField(this, "isLoading", false);
-      __publicField(this, "progress");
-      __publicField(this, "queue");
-      __publicField(this, "inflight");
-      __publicField(this, "completed");
-      __publicField(this, "onComplete");
-      __publicField(this, "onError");
-      this.reset();
-    }
-    reset() {
-      this.isLoading = false;
-      this.queue = new Set();
-      this.inflight = new Set();
-      this.completed = new Set();
-      this.progress = 0;
-    }
-    add(...file) {
-      file.forEach((entity) => {
-        entity.loader = this;
-        this.queue.add(entity);
-      });
-      return this;
-    }
-    start() {
-      if (this.isLoading) {
-        return null;
-      }
-      return new Promise((resolve, reject) => {
-        this.completed.clear();
-        this.progress = 0;
-        if (this.queue.size > 0) {
-          this.isLoading = true;
-          this.onComplete = resolve;
-          this.onError = reject;
-          Emit(this, "start");
-          this.nextFile();
-        } else {
-          this.progress = 1;
-          Emit(this, "complete");
-          resolve(this);
-        }
-      });
-    }
-    nextFile() {
-      let limit = this.queue.size;
-      if (this.maxParallelDownloads !== -1) {
-        limit = Math.min(limit, this.maxParallelDownloads) - this.inflight.size;
-      }
-      if (limit) {
-        const iterator = this.queue.values();
-        while (limit > 0) {
-          const file = iterator.next().value;
-          this.inflight.add(file);
-          this.queue.delete(file);
-          file.load().then((file2) => this.fileComplete(file2)).catch((file2) => this.fileError(file2));
-          limit--;
-        }
-      } else if (this.inflight.size === 0) {
-        this.stop();
-      }
-    }
-    stop() {
-      if (!this.isLoading) {
-        return;
-      }
-      this.isLoading = false;
-      Emit(this, "complete", this.completed);
-      this.onComplete();
-      this.completed.clear();
-    }
-    updateProgress(file) {
-      this.inflight.delete(file);
-      this.completed.add(file);
-      const totalCompleted = this.completed.size;
-      const totalQueued = this.queue.size + this.inflight.size;
-      if (totalCompleted > 0) {
-        this.progress = totalCompleted / (totalCompleted + totalQueued);
-      }
-      Emit(this, "progress", this.progress, totalCompleted, totalQueued);
-      this.nextFile();
-    }
-    fileComplete(file) {
-      Emit(this, "filecomplete", file);
-      this.updateProgress(file);
-    }
-    fileError(file) {
-      Emit(this, "fileerror", file);
-      this.updateProgress(file);
-    }
-    totalFilesToLoad() {
-      return this.queue.size + this.inflight.size;
-    }
-    setBaseURL(url = "") {
-      if (url !== "" && url.substr(-1) !== "/") {
-        url = url.concat("/");
-      }
-      this.baseURL = url;
-      return this;
-    }
-    setPath(path = "") {
-      if (path !== "" && path.substr(-1) !== "/") {
-        path = path.concat("/");
-      }
-      this.path = path;
-      return this;
-    }
-    setCORS(crossOrigin) {
-      this.crossOrigin = crossOrigin;
-      return this;
-    }
-    setMaxParallelDownloads(max) {
-      this.maxParallelDownloads = max;
-      return this;
-    }
-  };
-
   // ../phaser-genesis/src/world/events/WorldAfterUpdateEvent.ts
   var WorldAfterUpdateEvent = "afterupdate";
 
@@ -4891,14 +4724,6 @@ void main (void)
         }
       }
     }
-  }
-
-  // ../phaser-genesis/src/display/RemoveChildren.ts
-  function RemoveChildren(parent, ...children) {
-    children.forEach((child) => {
-      RemoveChild(parent, child);
-    });
-    return children;
   }
 
   // ../phaser-genesis/src/world/ResetWorldRenderData.ts
@@ -5065,36 +4890,32 @@ void main (void)
     }
   };
 
-  // examples/src/gameobjects/renderlayer/create render layer.ts
+  // examples/src/textures/set max textures 1.ts
   var Demo = class extends Scene {
     constructor() {
       super();
-      const loader = new Loader();
-      loader.setPath("assets/");
-      loader.add(ImageFile("background", "farm-background.png"));
-      loader.add(ImageFile("ayu", "ayu.png"));
-      loader.add(ImageFile("logo", "logo.png"));
-      loader.add(ImageFile("rocket", "rocket.png"));
-      loader.add(ImageFile("farm", "farm-logo.png"));
-      loader.add(ImageFile("star", "star.png"));
-      loader.add(ImageFile("bubble", "bubble256.png"));
-      loader.start().then(() => this.create());
+      this.create();
     }
     create() {
-      const world3 = new StaticWorld(this);
-      const layer = new RenderLayer();
-      const bg = new Sprite(400, 300, "background");
-      const logo = new Sprite(200, 300, "logo");
-      const ayu = new Sprite(600, 300, "ayu");
-      const farm = new Sprite(200, 150, "farm");
-      const rocket = new Sprite(150, 500, "rocket");
-      const bubble = new Sprite(400, 450, "bubble");
-      const star = new Sprite(650, 500, "star");
-      AddChildren(layer, ayu, logo, farm, rocket, bubble);
-      AddChildren(world3, bg, layer, star);
+      return __async(this, null, function* () {
+        yield ImageFile("disk1", "assets/items/disk1.png").load();
+        yield ImageFile("disk2", "assets/items/disk2.png").load();
+        yield ImageFile("disk3", "assets/items/disk3.png").load();
+        yield ImageFile("disk4", "assets/items/disk4.png").load();
+        yield ImageFile("disk5", "assets/items/disk5.png").load();
+        yield ImageFile("disk6", "assets/items/disk6.png").load();
+        yield ImageFile("disk7", "assets/items/disk7.png").load();
+        const world3 = new StaticWorld(this);
+        let x = 64;
+        let y = 64;
+        for (let i = 1; i < 8; i++) {
+          AddChild(world3, new Sprite(x, y, `disk${i}`));
+          x += 64;
+        }
+      });
     }
   };
-  new Game(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(2960685), Scenes(Demo));
+  new Game(WebGL(), MaxTextures(1), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(2960685), Scenes(Demo));
 })();
 /**
  * @author       Niklas von Hertzen (https://github.com/niklasvh/base64-arraybuffer)
@@ -5107,4 +4928,4 @@ void main (void)
  * @copyright    2020 Photon Storm Ltd.
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
  */
-//# sourceMappingURL=create render layer.js.map
+//# sourceMappingURL=set max textures 1.js.map

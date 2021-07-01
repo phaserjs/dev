@@ -18,7 +18,15 @@ class Demo extends Scene
         const rect2 = new Rectangle(400, 300, 128, 128, 0x00ff00);
         const rect3 = new Rectangle(528, 300, 128, 128, 0x0000ff);
 
+        console.log(rect1);
+        // console.log(rect2);
+        // console.log(rect3);
+
         AddChildren(world, rect1, rect2, rect3);
+
+        window.bob = rect1;
+
+        // AddChildren(world, rect1);
     }
 }
 

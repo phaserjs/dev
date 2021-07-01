@@ -3695,8 +3695,8 @@ void main (void)
     const maxConfigTextures = GetMaxTextures();
     if (maxConfigTextures === 0 || maxConfigTextures > maxGPUTextures) {
       SetMaxTextures(maxGPUTextures);
-    } else if (maxConfigTextures > 0 && maxConfigTextures < maxGPUTextures) {
-      maxGPUTextures = Math.max(8, maxConfigTextures);
+    } else {
+      maxGPUTextures = maxConfigTextures;
     }
     const textures = [];
     for (let i = 0; i < maxGPUTextures; i++) {
@@ -4932,41 +4932,24 @@ void main (void)
         yield ImageFile("book6", "assets/items/book6.png").load();
         yield ImageFile("book7", "assets/items/book7.png").load();
         const world3 = new StaticWorld(this);
+        const maxTextures = GetMaxTextures();
         let x = 64;
         let y = 64;
-        for (let i = 1; i < 8; i++) {
-          AddChild(world3, new Sprite(x, y, `disk${i}`));
-          x += 64;
-        }
-        x = 64;
-        y += 64;
-        for (let i = 1; i < 8; i++) {
-          AddChild(world3, new Sprite(x, y, `floppy${i}`));
-          x += 64;
-        }
-        x = 64;
-        y += 64;
-        for (let i = 1; i < 8; i++) {
-          AddChild(world3, new Sprite(x, y, `tape${i}`));
-          x += 64;
-        }
-        x = 64;
-        y += 64;
-        for (let i = 1; i < 8; i++) {
-          AddChild(world3, new Sprite(x, y, `record${i}`));
-          x += 64;
-        }
-        x = 64;
-        y += 64;
-        for (let i = 1; i < 8; i++) {
-          AddChild(world3, new Sprite(x, y, `flower${i}`));
-          x += 64;
-        }
-        x = 64;
-        y += 64;
-        for (let i = 1; i < 8; i++) {
-          AddChild(world3, new Sprite(x, y, `book${i}`));
-          x += 64;
+        let d = 1;
+        const frames = ["floppy", "tape", "record", "flower", "book"];
+        let frame2 = "disk";
+        for (let i = 0; i < maxTextures; i++) {
+          AddChild(world3, new Sprite(x, y, `${frame2}${d}`));
+          x += 48;
+          if (x === 736) {
+            x = 64;
+            y += 48;
+          }
+          d++;
+          if (d === 8) {
+            d = 1;
+            frame2 = frames.shift();
+          }
         }
       });
     }

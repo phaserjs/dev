@@ -258,6 +258,18 @@
     return ConfigStore.get(CONFIG_DEFAULTS.WEBGL_CONTEXT);
   }
 
+  // ../phaser-genesis/src/renderer/webgl1/fbo/CreateFramebuffer.ts
+  function CreateFramebuffer(texture, attachment) {
+    if (!attachment) {
+      attachment = gl.COLOR_ATTACHMENT0;
+    }
+    const framebuffer = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, texture, 0);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    return framebuffer;
+  }
+
   // ../phaser-genesis/src/renderer/webgl1/textures/CreateGLTexture.ts
   function CreateGLTexture(binding) {
     const { parent, flipY, unpackPremultiplyAlpha, minFilter, magFilter, wrapS, wrapT, generateMipmap, isPOT } = binding;
@@ -339,9 +351,8 @@
       __publicField(this, "texture");
       __publicField(this, "framebuffer");
       __publicField(this, "depthbuffer");
-      __publicField(this, "index", 0);
-      __publicField(this, "indexCounter", -1);
-      __publicField(this, "dirtyIndex", true);
+      __publicField(this, "isBound", false);
+      __publicField(this, "textureUnit", 0);
       __publicField(this, "unpackPremultiplyAlpha", true);
       __publicField(this, "minFilter");
       __publicField(this, "magFilter");
@@ -355,6 +366,7 @@
       const {
         texture = null,
         framebuffer = null,
+        createFramebuffer = false,
         depthbuffer = null,
         unpackPremultiplyAlpha = true,
         minFilter = this.isPOT ? gl.LINEAR_MIPMAP_LINEAR : gl.LINEAR,
@@ -371,17 +383,20 @@
       this.generateMipmap = generateMipmap;
       this.flipY = flipY;
       this.unpackPremultiplyAlpha = unpackPremultiplyAlpha;
-      if (framebuffer) {
-        this.framebuffer = framebuffer;
-      }
-      if (depthbuffer) {
-        this.depthbuffer = depthbuffer;
-      }
       if (texture) {
         this.texture = texture;
       } else {
         CreateGLTexture(this);
       }
+      if (framebuffer) {
+        this.framebuffer = framebuffer;
+      } else if (createFramebuffer) {
+        this.framebuffer = CreateFramebuffer(this.texture);
+      }
+      if (depthbuffer) {
+        this.depthbuffer = depthbuffer;
+      }
+      parent.binding = this;
     }
     setFilter(linear) {
       if (this.texture) {
@@ -403,11 +418,16 @@
         return UpdateGLTexture(this);
       }
     }
-    setIndex(index) {
-      this.dirtyIndex = index !== this.index;
-      this.index = index;
+    bind(index) {
+      this.isBound = true;
+      this.textureUnit = index;
+    }
+    unbind() {
+      this.isBound = false;
+      this.textureUnit = 0;
     }
     destroy() {
+      this.unbind();
       DeleteGLTexture(this.texture);
       DeleteFramebuffer(this.framebuffer);
       this.parent = null;
@@ -551,6 +571,11 @@
   // ../phaser-genesis/src/config/batchsize/GetBatchSize.ts
   function GetBatchSize() {
     return ConfigStore.get(CONFIG_DEFAULTS.BATCH_SIZE);
+  }
+
+  // ../phaser-genesis/src/config/maxtextures/GetMaxTextures.ts
+  function GetMaxTextures() {
+    return ConfigStore.get(CONFIG_DEFAULTS.MAX_TEXTURES);
   }
 
   // ../phaser-genesis/src/renderer/webgl1/buffers/DeleteGLBuffer.ts
@@ -1038,18 +1063,6 @@
     gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depthBuffer);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     return depthBuffer;
-  }
-
-  // ../phaser-genesis/src/renderer/webgl1/fbo/CreateFramebuffer.ts
-  function CreateFramebuffer(texture, attachment) {
-    if (!attachment) {
-      attachment = gl.COLOR_ATTACHMENT0;
-    }
-    const framebuffer = gl.createFramebuffer();
-    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
-    gl.framebufferTexture2D(gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, texture, 0);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    return framebuffer;
   }
 
   // ../phaser-genesis/src/renderer/webgl1/glsl/SINGLE_QUAD_FRAG.ts
@@ -1760,10 +1773,10 @@ void main (void)
 
   // ../phaser-genesis/src/components/vertices/QuadVertexComponent.ts
   var QuadVertex = defineComponent({
-    v1: Types.ui32,
-    v2: Types.ui32,
-    v3: Types.ui32,
-    v4: Types.ui32
+    tl: Types.ui32,
+    bl: Types.ui32,
+    br: Types.ui32,
+    tr: Types.ui32
   });
   var QuadVertexComponent = QuadVertex;
 
@@ -1943,9 +1956,14 @@ void main (void)
   var VertexWorld = world2;
 
   // ../phaser-genesis/src/components/vertices/AddVertex.ts
-  function AddVertex() {
+  function AddVertex(x = 0, y = 0, z = 0, u = 0, v = 0) {
     const vertexID = addEntity(VertexWorld);
     addComponent(VertexWorld, VertexComponent, vertexID);
+    VertexComponent.x[vertexID] = x;
+    VertexComponent.y[vertexID] = y;
+    VertexComponent.z[vertexID] = z;
+    VertexComponent.u[vertexID] = u;
+    VertexComponent.v[vertexID] = v;
     VertexComponent.alpha[vertexID] = 1;
     VertexComponent.tint[vertexID] = 16777215;
     VertexComponent.color[vertexID] = 4294967295;
@@ -1988,10 +2006,10 @@ void main (void)
       const y = Extent2DComponent.y[id];
       const right = Extent2DComponent.right[id];
       const bottom = Extent2DComponent.bottom[id];
-      const v1 = QuadVertexComponent.v1[id];
-      const v2 = QuadVertexComponent.v2[id];
-      const v3 = QuadVertexComponent.v3[id];
-      const v4 = QuadVertexComponent.v4[id];
+      const v1 = QuadVertexComponent.tl[id];
+      const v2 = QuadVertexComponent.bl[id];
+      const v3 = QuadVertexComponent.br[id];
+      const v4 = QuadVertexComponent.tr[id];
       const x0 = x * a + y * c + tx;
       const y0 = x * b + y * d + ty;
       const x1 = x * a + bottom * c + tx;
@@ -2042,10 +2060,10 @@ void main (void)
     const entities3 = changedColorQuery(world3);
     for (let i = 0; i < entities3.length; i++) {
       const id = entities3[i];
-      const v1 = QuadVertexComponent.v1[id];
-      const v2 = QuadVertexComponent.v2[id];
-      const v3 = QuadVertexComponent.v3[id];
-      const v4 = QuadVertexComponent.v4[id];
+      const v1 = QuadVertexComponent.tl[id];
+      const v2 = QuadVertexComponent.bl[id];
+      const v3 = QuadVertexComponent.br[id];
+      const v4 = QuadVertexComponent.tr[id];
       const color = PackColor(ColorComponent.tint[id], ColorComponent.alpha[id]);
       VertexComponent.color[v1] = color;
       VertexComponent.color[v2] = color;
@@ -2545,12 +2563,12 @@ void main (void)
 
   // ../phaser-genesis/src/renderer/webgl1/draw/BatchTexturedQuad.ts
   function BatchTexturedQuad(texture, id, renderPass) {
-    const { F32, U32, offset } = GetVertexBufferEntry(renderPass, 1);
     const textureIndex = renderPass.textures.set(texture);
-    let vertOffset = AddVertexToBatch(QuadVertexComponent.v1[id], offset, textureIndex, F32, U32);
-    vertOffset = AddVertexToBatch(QuadVertexComponent.v2[id], vertOffset, textureIndex, F32, U32);
-    vertOffset = AddVertexToBatch(QuadVertexComponent.v3[id], vertOffset, textureIndex, F32, U32);
-    AddVertexToBatch(QuadVertexComponent.v4[id], vertOffset, textureIndex, F32, U32);
+    const { F32, U32, offset } = GetVertexBufferEntry(renderPass, 1);
+    let vertOffset = AddVertexToBatch(QuadVertexComponent.tl[id], offset, textureIndex, F32, U32);
+    vertOffset = AddVertexToBatch(QuadVertexComponent.bl[id], vertOffset, textureIndex, F32, U32);
+    vertOffset = AddVertexToBatch(QuadVertexComponent.br[id], vertOffset, textureIndex, F32, U32);
+    AddVertexToBatch(QuadVertexComponent.tr[id], vertOffset, textureIndex, F32, U32);
   }
 
   // ../phaser-genesis/src/config/defaultorigin/GetDefaultOriginX.ts
@@ -2878,11 +2896,13 @@ void main (void)
     }
     renderGL(renderPass) {
       if (this.shader) {
-        renderPass.shader.set(this.shader);
+        Flush(renderPass);
+        renderPass.shader.set(this.shader, 0);
       }
     }
     postRenderGL(renderPass) {
       if (this.shader) {
+        Flush(renderPass);
         renderPass.shader.pop();
       }
     }
@@ -2993,10 +3013,10 @@ void main (void)
       __publicField(this, "hasTexture", false);
       const id = this.id;
       addComponent(GameObjectWorld, QuadVertexComponent, id);
-      QuadVertexComponent.v1[id] = AddVertex();
-      QuadVertexComponent.v2[id] = AddVertex();
-      QuadVertexComponent.v3[id] = AddVertex();
-      QuadVertexComponent.v4[id] = AddVertex();
+      QuadVertexComponent.tl[id] = AddVertex();
+      QuadVertexComponent.bl[id] = AddVertex();
+      QuadVertexComponent.br[id] = AddVertex();
+      QuadVertexComponent.tr[id] = AddVertex();
       this.setTexture(texture, frame2);
     }
     setTexture(key, frame2) {
@@ -3116,10 +3136,18 @@ void main (void)
       const width = GetWidth();
       const height = GetHeight();
       const resolution = GetResolution();
+      const id = this.id;
       const texture = new Texture(null, width * resolution, height * resolution);
-      const binding = new GLTextureBinding(texture);
-      texture.binding = binding;
-      binding.framebuffer = CreateFramebuffer(binding.texture);
+      texture.key = this.type + id.toString();
+      const binding = new GLTextureBinding(texture, {
+        createFramebuffer: true,
+        flipY: true
+      });
+      addComponent(GameObjectWorld, QuadVertexComponent, id);
+      QuadVertexComponent.tl[id] = AddVertex(0, 0, 0, 0, 1);
+      QuadVertexComponent.bl[id] = AddVertex(0, height, 0, 0, 0);
+      QuadVertexComponent.br[id] = AddVertex(width, height, 0, 1, 0);
+      QuadVertexComponent.tr[id] = AddVertex(width, 0, 0, 1, 1);
       this.texture = texture;
       this.framebuffer = binding.framebuffer;
     }
@@ -3138,7 +3166,7 @@ void main (void)
         ClearDirtyChildCache(id);
         SetDirtyParents(id);
       }
-      DrawTexturedQuad(renderPass, this.texture);
+      BatchTexturedQuad(this.texture, id, renderPass);
     }
   };
 
@@ -3153,13 +3181,15 @@ void main (void)
       }
     }
     postRenderGL(renderPass) {
+      const id = this.id;
       const shaders = this.shaders;
       const texture = this.texture;
       Flush(renderPass);
       renderPass.framebuffer.pop();
       if (shaders.length === 0) {
-        DrawTexturedQuad(renderPass, texture);
+        BatchTexturedQuad(texture, id, renderPass);
       } else {
+        renderPass.textures.clear();
         let prevTexture = texture;
         for (let i = 0; i < shaders.length; i++) {
           const shader = shaders[i];
@@ -3377,10 +3407,10 @@ void main (void)
     }
     copyToVertices(id) {
       const { u0, u1, v0, v1 } = this;
-      SetUV(QuadVertexComponent.v1[id], u0, v0);
-      SetUV(QuadVertexComponent.v2[id], u0, v1);
-      SetUV(QuadVertexComponent.v3[id], u1, v1);
-      SetUV(QuadVertexComponent.v4[id], u1, v0);
+      SetUV(QuadVertexComponent.tl[id], u0, v0);
+      SetUV(QuadVertexComponent.bl[id], u0, v1);
+      SetUV(QuadVertexComponent.br[id], u1, v1);
+      SetUV(QuadVertexComponent.tr[id], u1, v0);
       return this;
     }
     updateUVs() {
@@ -3456,6 +3486,7 @@ void main (void)
         this.binding.destroy();
       }
       this.frames.clear();
+      this.binding = null;
       this.data = null;
       this.image = null;
       this.firstFrame = null;
@@ -3608,13 +3639,9 @@ void main (void)
     }
   };
 
-  // ../phaser-genesis/src/config/maxtextures/GetMaxTextures.ts
-  function GetMaxTextures() {
-    return ConfigStore.get(CONFIG_DEFAULTS.MAX_TEXTURES);
-  }
-
   // ../phaser-genesis/src/renderer/webgl1/glsl/MULTI_QUAD_FRAG.ts
   var MULTI_QUAD_FRAG = `#define SHADER_NAME MULTI_QUAD_FRAG
+#define numTextures %count%
 
 precision highp float;
 
@@ -3624,11 +3651,25 @@ varying vec4 vTintColor;
 
 uniform sampler2D uTexture[%count%];
 
+vec4 getSampler (int index, vec2 uv)
+{
+    for (int i = 0; i < numTextures; ++i)
+    {
+        vec4 color = texture2D(uTexture[i], uv);
+
+        if (i == index)
+        {
+            return color;
+        }
+    }
+
+    //  Return black
+    return vec4(0);
+}
+
 void main (void)
 {
-    vec4 color;
-
-    %forloop%
+    vec4 color = getSampler(int(vTextureId), vTextureCoord);
 
     gl_FragColor = color * vec4(vTintColor.bgr * vTintColor.a, vTintColor.a);
 }`;
@@ -3643,21 +3684,7 @@ void main (void)
     }
     create(fragmentShaderSource, vertexShaderSource, uniforms, attribs) {
       const maxTextures = GetMaxTextures();
-      let src = "";
-      for (let i = 1; i < maxTextures; i++) {
-        if (i > 1) {
-          src += "\n	else ";
-        }
-        if (i < maxTextures - 1) {
-          src += `if (vTextureId < ${i}.5)`;
-        }
-        src += "\n	{";
-        src += `
-		color = texture2D(uTexture[${i}], vTextureCoord);`;
-        src += "\n	}";
-      }
       fragmentShaderSource = fragmentShaderSource.replace(/%count%/gi, `${maxTextures}`);
-      fragmentShaderSource = fragmentShaderSource.replace(/%forloop%/gi, src);
       super.create(fragmentShaderSource, vertexShaderSource, uniforms, attribs);
     }
     bind(renderPass) {
@@ -3813,91 +3840,87 @@ void main (void)
   };
 
   // ../phaser-genesis/src/renderer/webgl1/renderpass/CreateTempTextures.ts
-  function CreateTempTextures(textureStack) {
+  function CreateTempTextures() {
     let maxGPUTextures = CheckShaderMaxIfStatements(gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS));
     const maxConfigTextures = GetMaxTextures();
-    if (maxConfigTextures === 0 || maxConfigTextures > 0 && maxConfigTextures > maxGPUTextures) {
+    if (maxConfigTextures === 0 || maxConfigTextures > maxGPUTextures) {
       SetMaxTextures(maxGPUTextures);
-    } else if (maxConfigTextures > 0 && maxConfigTextures < maxGPUTextures) {
-      maxGPUTextures = Math.max(8, maxConfigTextures);
+    } else {
+      maxGPUTextures = maxConfigTextures;
     }
-    const tempTextures = textureStack.tempTextures;
-    if (tempTextures.length) {
-      tempTextures.forEach((texture) => {
-        gl.deleteTexture(texture);
-      });
-    }
-    const index = [];
-    for (let texturesIndex = 0; texturesIndex < maxGPUTextures; texturesIndex++) {
+    const textures = [];
+    for (let i = 0; i < maxGPUTextures; i++) {
       const tempTexture = gl.createTexture();
-      gl.activeTexture(gl.TEXTURE0 + texturesIndex);
+      gl.activeTexture(gl.TEXTURE0 + i);
       gl.bindTexture(gl.TEXTURE_2D, tempTexture);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 255, 255]));
-      tempTextures[texturesIndex] = tempTexture;
-      index.push(texturesIndex);
+      textures.push([i, tempTexture]);
     }
-    textureStack.maxTextures = maxGPUTextures;
-    textureStack.textureIndex = index;
-    textureStack.currentActiveTexture = 1;
+    return textures;
   }
 
   // ../phaser-genesis/src/renderer/webgl1/renderpass/TextureStack.ts
   var TextureStack = class {
     constructor(renderPass) {
       __publicField(this, "renderPass");
-      __publicField(this, "maxTextures", 0);
-      __publicField(this, "currentActiveTexture", 0);
-      __publicField(this, "startActiveTexture", 0);
-      __publicField(this, "tempTextures", []);
-      __publicField(this, "textureIndex", []);
+      __publicField(this, "textures");
+      __publicField(this, "tempTextures");
+      __publicField(this, "textureIndex");
+      __publicField(this, "maxTextures");
       this.renderPass = renderPass;
     }
     bind(texture, index = 0) {
       const binding = texture.binding;
-      binding.setIndex(index);
+      binding.bind(index);
       gl.activeTexture(gl.TEXTURE0 + index);
       gl.bindTexture(gl.TEXTURE_2D, binding.texture);
     }
     unbind(index = 0) {
       gl.activeTexture(gl.TEXTURE0 + index);
       gl.bindTexture(gl.TEXTURE_2D, this.tempTextures[index]);
-      if (index > 0) {
-        this.startActiveTexture++;
-      }
     }
     set(texture) {
-      const binding = texture.binding;
-      const currentActiveTexture = this.currentActiveTexture;
-      if (binding.indexCounter < this.startActiveTexture) {
-        binding.indexCounter = this.startActiveTexture;
-        if (currentActiveTexture < this.maxTextures) {
-          binding.setIndex(currentActiveTexture);
-          gl.activeTexture(gl.TEXTURE0 + currentActiveTexture);
-          gl.bindTexture(gl.TEXTURE_2D, binding.texture);
-          this.currentActiveTexture++;
-        } else {
-          Flush(this.renderPass);
-          this.startActiveTexture++;
-          binding.indexCounter = this.startActiveTexture;
-          binding.setIndex(1);
-          gl.activeTexture(gl.TEXTURE1);
-          gl.bindTexture(gl.TEXTURE_2D, binding.texture);
-          this.currentActiveTexture = 2;
-        }
+      if (!texture.binding) {
+        return -1;
       }
-      return binding.index;
+      const binding = texture.binding;
+      const textures = this.textures;
+      if (!binding.isBound) {
+        if (textures.size === this.maxTextures) {
+          Flush(this.renderPass);
+          this.clear();
+        }
+        const textureUnit = textures.size;
+        gl.activeTexture(gl.TEXTURE0 + textureUnit);
+        gl.bindTexture(gl.TEXTURE_2D, binding.texture);
+        textures.set(textureUnit, texture);
+        binding.bind(textureUnit);
+      }
+      return binding.textureUnit;
     }
     setDefault() {
-      CreateTempTextures(this);
+      if (this.textures) {
+        this.reset();
+      }
+      const tempTextures = CreateTempTextures();
+      this.maxTextures = tempTextures.length;
+      this.tempTextures = new Map(tempTextures);
+      this.textures = new Map();
+      this.textureIndex = [];
+      this.tempTextures.forEach((texture, index) => {
+        this.textureIndex.push(index);
+      });
+    }
+    clear() {
+      this.textures.forEach((texture) => texture.binding.unbind());
+      this.textures.clear();
     }
     reset() {
-      const temp = this.tempTextures;
-      for (let i = 0; i < temp.length; i++) {
-        gl.activeTexture(gl.TEXTURE0 + i);
-        gl.bindTexture(gl.TEXTURE_2D, temp[i]);
-      }
-      this.currentActiveTexture = 1;
-      this.startActiveTexture++;
+      this.tempTextures.forEach((texture, index) => {
+        gl.activeTexture(gl.TEXTURE0 + index);
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+      });
+      this.clear();
     }
   };
 
@@ -4060,7 +4083,11 @@ void main (void)
       this.framebuffer.setDefault();
       this.blendMode.setDefault(true, gl2.ONE, gl2.ONE_MINUS_SRC_ALPHA);
       this.vertexbuffer.setDefault(new IndexedVertexBuffer({ name: "sprite", batchSize: GetBatchSize(), indexLayout }));
-      this.shader.setDefault(new MultiTextureQuadShader());
+      if (GetMaxTextures() === 1) {
+        this.shader.setDefault(new QuadShader());
+      } else {
+        this.shader.setDefault(new MultiTextureQuadShader());
+      }
     }
     resize(width, height) {
       Mat4Ortho(0, width, height, 0, -1e3, 1e3, this.projectionMatrix);

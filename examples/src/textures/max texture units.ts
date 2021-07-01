@@ -2,6 +2,7 @@ import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../p
 
 import { AddChild } from '../../../../phaser-genesis/src/display';
 import { Game } from '../../../../phaser-genesis/src/Game';
+import { GetMaxTextures } from '../../../../phaser-genesis/src/config/maxtextures';
 import { ImageFile } from '../../../../phaser-genesis/src/loader/files/ImageFile';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
 import { Sprite } from '../../../../phaser-genesis/src/gameobjects';
@@ -63,67 +64,38 @@ class Demo extends Scene
 
         const world = new StaticWorld(this);
 
+        //  How many textures does this GPU support?
+        const maxTextures = GetMaxTextures();
+
         let x = 64;
         let y = 64;
+        let d = 1;
+        const frames = [ 'floppy', 'tape', 'record', 'flower', 'book' ];
+        let frame = 'disk';
 
-        for (let i = 1; i < 8; i++)
+        //  This demo will support up to 42 texture units, but even an RTX 2080 only has 32
+
+        for (let i = 0; i < maxTextures; i++)
         {
-            AddChild(world, new Sprite(x, y, `disk${i}`));
+            AddChild(world, new Sprite(x, y, `${frame}${d}`));
 
-            x += 64;
-        }
+            x += 48;
 
-        x = 64;
-        y += 64;
+            if (x === 736)
+            {
+                x = 64;
+                y += 48;
+            }
 
-        for (let i = 1; i < 8; i++)
-        {
-            AddChild(world, new Sprite(x, y, `floppy${i}`));
+            d++;
 
-            x += 64;
-        }
-
-        x = 64;
-        y += 64;
-
-        for (let i = 1; i < 8; i++)
-        {
-            AddChild(world, new Sprite(x, y, `tape${i}`));
-
-            x += 64;
-        }
-
-        x = 64;
-        y += 64;
-
-        for (let i = 1; i < 8; i++)
-        {
-            AddChild(world, new Sprite(x, y, `record${i}`));
-
-            x += 64;
-        }
-
-        x = 64;
-        y += 64;
-
-        for (let i = 1; i < 8; i++)
-        {
-            AddChild(world, new Sprite(x, y, `flower${i}`));
-
-            x += 64;
-        }
-
-        x = 64;
-        y += 64;
-
-        for (let i = 1; i < 8; i++)
-        {
-            AddChild(world, new Sprite(x, y, `book${i}`));
-
-            x += 64;
+            if (d === 8)
+            {
+                d = 1;
+                frame = frames.shift();
+            }
         }
     }
-
 }
 
 new Game(
