@@ -23,6 +23,26 @@
     __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
     return value;
   };
+  var __async = (__this, __arguments, generator) => {
+    return new Promise((resolve, reject) => {
+      var fulfilled = (value) => {
+        try {
+          step(generator.next(value));
+        } catch (e) {
+          reject(e);
+        }
+      };
+      var rejected = (value) => {
+        try {
+          step(generator.throw(value));
+        } catch (e) {
+          reject(e);
+        }
+      };
+      var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
+      step((generator = generator.apply(__this, __arguments)).next());
+    });
+  };
 
   // ../phaser-genesis/src/config/const.ts
   var CONFIG_DEFAULTS = {
@@ -2919,6 +2939,25 @@ void main (void)
     }
   };
 
+  // ../phaser-genesis/src/gameobjects/sprite/SetFrame.ts
+  function SetFrame(texture, key, ...children) {
+    const frame2 = texture.getFrame(key);
+    const pivot = frame2.pivot;
+    children.forEach((child) => {
+      if (!child || frame2 === child.frame) {
+        return;
+      }
+      child.frame = frame2;
+      child.hasTexture = true;
+      if (pivot) {
+        child.origin.set(pivot.x, pivot.y);
+      }
+      frame2.copyToExtent(child);
+      frame2.copyToVertices(child.id);
+    });
+    return children;
+  }
+
   // ../phaser-genesis/src/textures/TextureManagerInstance.ts
   var instance2;
   var TextureManagerInstance = {
@@ -2934,6 +2973,78 @@ void main (void)
   function GetTexture(key) {
     return TextureManagerInstance.get().get(key);
   }
+
+  // ../phaser-genesis/src/gameobjects/sprite/SetTexture.ts
+  function SetTexture(key, frame2, ...children) {
+    if (!key) {
+      children.forEach((child) => {
+        child.texture = null;
+        child.frame = null;
+        child.hasTexture = false;
+      });
+    } else {
+      let texture;
+      if (key instanceof Frame) {
+        frame2 = key;
+        texture = key.texture;
+      } else if (key instanceof Texture) {
+        texture = key;
+      } else {
+        texture = GetTexture(key);
+      }
+      if (!texture) {
+        console.warn(`Invalid Texture key: ${key}`);
+      } else {
+        children.forEach((child) => {
+          child.texture = texture;
+        });
+        SetFrame(texture, frame2, ...children);
+      }
+    }
+    return children;
+  }
+
+  // ../phaser-genesis/src/gameobjects/sprite/Sprite.ts
+  var Sprite = class extends Container {
+    constructor(x, y, texture, frame2) {
+      super(x, y);
+      __publicField(this, "type", "Sprite");
+      __publicField(this, "texture");
+      __publicField(this, "frame");
+      __publicField(this, "hasTexture", false);
+      AddQuadVertex(this.id);
+      this.setTexture(texture, frame2);
+    }
+    setTexture(key, frame2) {
+      SetTexture(key, frame2, this);
+      return this;
+    }
+    setFrame(key) {
+      SetFrame(this.texture, key, this);
+      return this;
+    }
+    isRenderable() {
+      return this.visible && this.hasTexture && WillRender(this.id) && this.alpha > 0;
+    }
+    renderGL(renderPass) {
+      BatchTexturedQuad(this.texture, this.id, renderPass);
+    }
+    renderCanvas(renderer) {
+      PreRenderVertices(this);
+    }
+    get tint() {
+      return ColorComponent.tint[this.id];
+    }
+    set tint(value) {
+      SetTint(this.id, value);
+    }
+    destroy(reparentChildren) {
+      super.destroy(reparentChildren);
+      this.texture = null;
+      this.frame = null;
+      this.hasTexture = false;
+    }
+  };
 
   // ../phaser-genesis/src/renderer/webgl1/draw/BatchSingleQuad.ts
   function BatchSingleQuad(renderPass, x, y, width, height, u0, v0, u1, v1, textureIndex = 0, packedColor = 4294967295) {
@@ -3056,6 +3167,7 @@ void main (void)
     constructor(...shaders) {
       super();
       __publicField(this, "type", "EffectLayer");
+      __publicField(this, "filterArea");
       __publicField(this, "shaders", []);
       if (Array.isArray(shaders)) {
         this.shaders = shaders;
@@ -3078,49 +3190,8 @@ void main (void)
           prevTexture = shader.texture;
         }
         DrawTexturedQuad(renderPass, prevTexture);
+        renderPass.viewport.pop();
       }
-    }
-  };
-
-  // ../phaser-genesis/src/gameobjects/rectangle/Rectangle.ts
-  var Rectangle2 = class extends Container {
-    constructor(x, y, width = 64, height = 64, color = 16777215) {
-      super(x, y);
-      __publicField(this, "type", "Rectangle");
-      __publicField(this, "texture");
-      __publicField(this, "frame");
-      const id = this.id;
-      AddQuadVertex(id);
-      this.texture = GetTexture("__WHITE");
-      this.frame = this.texture.getFrame();
-      this.frame.copyToExtent(this);
-      this.frame.copyToVertices(id);
-      this.size.set(width, height);
-      this.tint = color;
-    }
-    setColor(color) {
-      this.tint = color;
-      return this;
-    }
-    isRenderable() {
-      return this.visible && WillRender(this.id) && this.alpha > 0;
-    }
-    renderGL(renderPass) {
-      BatchTexturedQuad(this.texture, this.id, renderPass);
-    }
-    renderCanvas(renderer) {
-      PreRenderVertices(this);
-    }
-    get tint() {
-      return ColorComponent.tint[this.id];
-    }
-    set tint(value) {
-      SetTint(this.id, value);
-    }
-    destroy(reparentChildren) {
-      super.destroy(reparentChildren);
-      this.texture = null;
-      this.frame = null;
     }
   };
 
@@ -3435,7 +3506,7 @@ void main (void)
     fromConfig(config) {
       const {
         attributes = DefaultQuadAttributes,
-        fragmentShader = SINGLE_QUAD_FRAG,
+        fragmentShader: fragmentShader2 = SINGLE_QUAD_FRAG,
         height = GetHeight(),
         renderToFramebuffer = false,
         renderToDepthbuffer = false,
@@ -3444,12 +3515,11 @@ void main (void)
         width = GetWidth(),
         uniforms = DefaultQuadUniforms
       } = config;
-      this.create(fragmentShader, vertexShader, uniforms, attributes);
+      this.create(fragmentShader2, vertexShader, uniforms, attributes);
       if (renderToFramebuffer) {
         this.renderToFramebuffer = true;
         const texture = new Texture(null, width * resolution, height * resolution);
         const binding = new GLTextureBinding(texture);
-        texture.binding = binding;
         binding.framebuffer = CreateFramebuffer(binding.texture);
         if (renderToDepthbuffer) {
           this.renderToDepthbuffer = true;
@@ -3460,12 +3530,12 @@ void main (void)
       }
     }
     create(fragmentShaderSource, vertexShaderSource, uniforms, attribs) {
-      const fragmentShader = CreateShader(fragmentShaderSource, gl.FRAGMENT_SHADER);
+      const fragmentShader2 = CreateShader(fragmentShaderSource, gl.FRAGMENT_SHADER);
       const vertexShader = CreateShader(vertexShaderSource, gl.VERTEX_SHADER);
-      if (!fragmentShader || !vertexShader) {
+      if (!fragmentShader2 || !vertexShader) {
         return;
       }
-      const program = CreateProgram(fragmentShader, vertexShader);
+      const program = CreateProgram(fragmentShader2, vertexShader);
       if (!program) {
         return;
       }
@@ -3537,12 +3607,6 @@ void main (void)
       config.attributes = (config == null ? void 0 : config.attributes) || DefaultQuadAttributes;
       super(config);
     }
-    bind(renderPass) {
-      const uniforms = this.uniforms;
-      uniforms.set("uProjectionMatrix", renderPass.projectionMatrix.data);
-      uniforms.set("uCameraMatrix", renderPass.cameraMatrix.data);
-      return super.bind(renderPass);
-    }
   };
 
   // ../phaser-genesis/src/renderer/webgl1/shaders/FXShader.ts
@@ -3553,10 +3617,11 @@ void main (void)
       super(config);
       __publicField(this, "timeVar");
       __publicField(this, "resolutionVar");
-      __publicField(this, "timeScale", 1);
+      __publicField(this, "timeScale");
       const {
         timeUniform = "uTime",
-        resolutionUniform = "uResolution"
+        resolutionUniform = "uResolution",
+        timeScale = 1
       } = config;
       const uniforms = [...this.uniformSetters.keys()];
       this.timeVar = uniforms.includes(timeUniform) ? timeUniform : "time";
@@ -3567,6 +3632,7 @@ void main (void)
       if (!uniforms.includes(this.resolutionVar)) {
         this.resolutionVar = void 0;
       }
+      this.timeScale = timeScale;
     }
     bind(renderPass) {
       const renderer = renderPass.renderer;
@@ -4616,6 +4682,100 @@ void main (void)
     }
   };
 
+  // ../phaser-genesis/src/loader/File.ts
+  var File = class {
+    constructor(key, url, config) {
+      __publicField(this, "key");
+      __publicField(this, "url");
+      __publicField(this, "responseType", "text");
+      __publicField(this, "crossOrigin");
+      __publicField(this, "data");
+      __publicField(this, "error");
+      __publicField(this, "config");
+      __publicField(this, "skipCache", false);
+      __publicField(this, "hasLoaded", false);
+      __publicField(this, "loader");
+      __publicField(this, "load");
+      this.key = key;
+      this.url = url;
+      this.config = config;
+    }
+  };
+
+  // ../phaser-genesis/src/loader/GetURL.ts
+  function GetURL(key, url, extension, loader) {
+    if (!url) {
+      url = key + extension;
+    }
+    if (/^(?:blob:|data:|http:\/\/|https:\/\/|\/\/)/.exec(url)) {
+      return url;
+    } else if (loader) {
+      return loader.baseURL + loader.path + url;
+    } else {
+      return url;
+    }
+  }
+
+  // ../phaser-genesis/src/loader/ImageLoader.ts
+  function ImageTagLoader(file) {
+    const fileCast = file;
+    fileCast.data = new Image();
+    if (fileCast.crossOrigin) {
+      fileCast.data.crossOrigin = file.crossOrigin;
+    }
+    return new Promise((resolve, reject) => {
+      fileCast.data.onload = () => {
+        if (fileCast.data.onload) {
+          fileCast.data.onload = null;
+          fileCast.data.onerror = null;
+          resolve(fileCast);
+        }
+      };
+      fileCast.data.onerror = (event) => {
+        if (fileCast.data.onload) {
+          fileCast.data.onload = null;
+          fileCast.data.onerror = null;
+          fileCast.error = event;
+          reject(fileCast);
+        }
+      };
+      fileCast.data.src = file.url;
+      if (fileCast.data.complete && fileCast.data.width && fileCast.data.height) {
+        fileCast.data.onload = null;
+        fileCast.data.onerror = null;
+        resolve(fileCast);
+      }
+    });
+  }
+
+  // ../phaser-genesis/src/loader/files/ImageFile.ts
+  function ImageFile(key, url, glConfig) {
+    const file = new File(key, url);
+    file.load = () => {
+      file.url = GetURL(file.key, file.url, ".png", file.loader);
+      if (file.loader) {
+        file.crossOrigin = file.loader.crossOrigin;
+      }
+      return new Promise((resolve, reject) => {
+        const textureManager = TextureManagerInstance.get();
+        if (textureManager.has(file.key)) {
+          resolve(file);
+        } else {
+          ImageTagLoader(file).then((file2) => {
+            textureManager.add(file2.key, file2.data, glConfig);
+            resolve(file2);
+          }).catch((file2) => {
+            reject(file2);
+          });
+        }
+      });
+    };
+    return file;
+  }
+
+  // ../phaser-genesis/src/cache/Cache.ts
+  var caches = new Map();
+
   // ../phaser-genesis/src/world/events/WorldAfterUpdateEvent.ts
   var WorldAfterUpdateEvent = "afterupdate";
 
@@ -4886,235 +5046,8 @@ void main (void)
     }
   };
 
-  // examples/src/gameobjects/effectlayer/rectangle effect layer.ts
-  var dotsFragmentShader = `
-precision mediump float;
-
-varying vec2 vTextureCoord;
-varying float vTextureId;
-varying vec4 vTintColor;
-
-uniform sampler2D uTexture;
-
-uniform float time;
-uniform vec2 resolution;
-
-vec2 rotate(vec2 v, float a)
-{
-	float s = sin(a);
-	float c = cos(a);
-	mat2 m = mat2(c, -s, s, c);
-	return m * v;
-}
-
-float tw()
-{
-	return sin(time) * 0.25 + 1.25;
-}
-
-float circle(vec2 pt, float radius)
-{
-	return step(length(pt), radius + sin(pt.x * radius * 44.*tw()) * cos(pt.y * radius *44.*tw()));
-}
-
-void main( void )
-{
-    vec4 tcolor = texture2D(uTexture, vTextureCoord);
-
-    vec2 uv = (gl_FragCoord.xy * 2. - resolution) / resolution.y; //* mix(0.067, 3.0, tw());
-
-	vec3 color;
-	float t = uv.x * 72. + time * 50. + tw() * 1000.;
-	for (int i = 0; i < 3; i++) {
-		float d = abs(uv.y - sin(radians(t)) * .3 * float(i) * sin(time));
-		color[i] = .05 / (d * d);
-		t += 120.;
-	}
-	uv = rotate(uv, time*1.0);
-	color *= circle(uv, 0.45);
-	
-	gl_FragColor = vec4(tcolor.rgb * color, tcolor.a);
-}`;
-  var starsFragmentShader = `
-#ifdef GL_ES
-precision highp float;
-#endif
- 
-uniform float time;
-uniform vec2 resolution;
-
-varying vec2 vTextureCoord;
-varying float vTextureId;
-varying vec4 vTintColor;
-
-uniform sampler2D uTexture;
-
-#define mouse vec2(sin(time)/48., cos(time)/48.)
-#define iterations 14
-#define formuparam2 0.79
- 
-#define volsteps 5
-#define stepsize 0.390
- 
-#define zoom 0.900
-#define tile   0.850
-#define speed2  100.0 
-#define brightness 0.003
-#define darkmatter 0.400
-#define distfading 0.560
-#define saturation 0.800
-
-
-#define transverseSpeed zoom*2.0
-#define cloud 0.11 
-
- 
-float triangle(float x, float a) { 
-	float output2 = 2.0*abs(  2.0*  ( (x/a) - floor( (x/a) + 0.5) ) ) - 1.0;
-	return output2;
-}
- 
-float field(in vec3 p) {	
-	float strength = 7. + .03 * log(1.e-6 + fract(sin(time) * 4373.11));
-	float accum = 0.;
-	float prev = 0.;
-	float tw = 0.;	
-
-	for (int i = 0; i < 6; ++i) {
-		float mag = dot(p, p);
-		p = abs(p) / mag + vec3(-.5, -.8 + 0.1*sin(time*0.7 + 2.0), -1.1+0.3*cos(time*0.3));
-		float w = exp(-float(i) / 7.);
-		accum += w * exp(-strength * pow(abs(mag - prev), 2.3));
-		tw += w;
-		prev = mag;
-	}
-	return max(0., 5. * accum / tw - .7);
-}
-
-
-
-void main() {   
-     	vec2 uv2 = 2. * gl_FragCoord.xy / vec2(512) - 1.;
-	vec2 uvs = uv2 * vec2(512)  / 512.;
-	
-	float time2 = time;               
-        float speed = speed2;
-        speed = .01 * cos(time2*0.02 + 3.1415926/4.0);          
-		
-    	float formuparam = formuparam2;
-	
-    		
-	vec2 uv = uvs;		       
-	
-	float a_xz = 0.9;
-	float a_yz = -.6;
-	float a_xy = 0.9 + time*0.08;	
-	
-	mat2 rot_xz = mat2(cos(a_xz),sin(a_xz),-sin(a_xz),cos(a_xz));	
-	mat2 rot_yz = mat2(cos(a_yz),sin(a_yz),-sin(a_yz),cos(a_yz));		
-	mat2 rot_xy = mat2(cos(a_xy),sin(a_xy),-sin(a_xy),cos(a_xy));
-	
-
-	float v2 =1.0;	
-	vec3 dir=vec3(uv*zoom,1.); 
-	vec3 from=vec3(0.0, 0.0,0.0);                               
-        from.x -= 5.0*(mouse.x-0.5);
-        from.y -= 5.0*(mouse.y-0.5);
-               
-               
-	vec3 forward = vec3(0.,0.,1.);   
-	from.x += transverseSpeed*(1.0)*cos(0.01*time) + 0.001*time;
-	from.y += transverseSpeed*(1.0)*sin(0.01*time) +0.001*time;
-	from.z += 0.003*time;	
-	
-	dir.xy*=rot_xy;
-	forward.xy *= rot_xy;
-	dir.xz*=rot_xz;
-	forward.xz *= rot_xz;	
-	dir.yz*= rot_yz;
-	forward.yz *= rot_yz;
-	
-	from.xy*=-rot_xy;
-	from.xz*=rot_xz;
-	from.yz*= rot_yz;
-	
-	float zooom = (time2-3311.)*speed;
-	from += forward* zooom;
-	float sampleShift = mod( zooom, stepsize );
-	 
-	float zoffset = -sampleShift;
-	sampleShift /= stepsize;
-	
-	
-	float s=0.24;
-	float s3 = s + stepsize/2.0;
-	vec3 v=vec3(0.);
-	float t3 = 0.0;	
-	
-	vec3 backCol2 = vec3(0.);
-	for (int r=0; r<volsteps; r++) {
-		vec3 p2=from+(s+zoffset)*dir;
-		vec3 p3=from+(s3+zoffset)*dir;
-		
-		p2 = abs(vec3(tile)-mod(p2,vec3(tile*2.)));
-		p3 = abs(vec3(tile)-mod(p3,vec3(tile*2.)));		
-		#ifdef cloud
-		t3 = field(p3);
-		#endif
-		
-		float pa,a=pa=0.;
-		for (int i=0; i<iterations; i++) {
-			p2=abs(p2)/dot(p2,p2)-formuparam;
-			
-			float D = abs(length(p2)-pa);
-			a += i > 7 ? min( 12., D) : D;
-			pa=length(p2);
-		}
-		
-		
-		
-		a*=a*a;
-		
-		float s1 = s+zoffset;
-		
-		float fade = pow(distfading,max(0.,float(r)-sampleShift));		
-			
-		v+=fade;
-	       	
-
-		
-		if( r == 0 )
-			fade *= (1. - (sampleShift));
-		
-		if( r == volsteps-1 )
-			fade *= sampleShift;
-		v+=vec3(s1,s1*s1,s1*s1*s1*s1)*a*brightness*fade;
-		
-		backCol2 += mix(.4, 1., v2) * vec3(1.8 * t3 * t3 * t3, 1.4 * t3 * t3, t3) * fade;
-
-		
-		s+=stepsize;
-		s3 += stepsize;		
-	}
-		       
-	v=mix(vec3(length(v)),v,saturation);	
-
-	vec4 forCol2 = vec4(v*.01,1.);	
-	#ifdef cloud
-	backCol2 *= cloud;
-	#endif	
-	backCol2.b *= 1.8;
-	backCol2.r *= 0.05;	
-	
-	backCol2.b = 0.5*mix(backCol2.g, backCol2.b, 0.8);
-	backCol2.g = 0.0;
-	backCol2.bg = mix(backCol2.gb, backCol2.bg, 0.5*(cos(time*0.01) + 1.0));
-
-    vec4 tcolor = texture2D(uTexture, vTextureCoord);
-
-	gl_FragColor = vec4(tcolor.rgb * (forCol2.rgb + backCol2), tcolor.a);
-}`;
-  var flowerFragmentShader = `
+  // examples/src/gameobjects/effectlayer/filter area.ts
+  var fragmentShader = `
 precision mediump float;
 
 varying vec2 vTextureCoord;
@@ -5159,17 +5092,20 @@ void main( void ) {
   var Demo = class extends Scene {
     constructor() {
       super();
-      const flower = new FXShader({ fragmentShader: flowerFragmentShader });
-      const dots = new FXShader({ fragmentShader: dotsFragmentShader });
-      const stars = new FXShader({ fragmentShader: starsFragmentShader });
-      const world3 = new StaticWorld(this);
-      const layer = new EffectLayer();
-      dots.timeScale = 1e-3;
-      stars.timeScale = 1e-3;
-      layer.shaders.push(stars);
-      const rect = new Rectangle2(400, 300, 512, 512);
-      AddChildren(layer, rect);
-      AddChildren(world3, layer);
+      this.create();
+    }
+    create() {
+      return __async(this, null, function* () {
+        const world3 = new StaticWorld(this);
+        yield ImageFile("girl", "assets/amitie1.png").load();
+        yield ImageFile("lemming", "assets/lemming.png").load();
+        const flower = new FXShader({ fragmentShader, timeScale: 5e-3 });
+        const layer = new EffectLayer(flower);
+        const ami = new Sprite(400, 300, "girl");
+        const lem = new Sprite(500, 500, "lemming");
+        AddChildren(layer, ami);
+        AddChildren(world3, layer, lem);
+      });
     }
   };
   new Game(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(2960685), Scenes(Demo));
@@ -5185,4 +5121,4 @@ void main( void ) {
  * @copyright    2020 Photon Storm Ltd.
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
  */
-//# sourceMappingURL=rectangle effect layer.js.map
+//# sourceMappingURL=filter area.js.map

@@ -67,6 +67,8 @@ class Demo extends Scene
         //  How many textures does this GPU support?
         const maxTextures = GetMaxTextures();
 
+        console.log('max?', maxTextures);
+
         let x = 64;
         let y = 64;
         let d = 1;

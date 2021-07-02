@@ -305,14 +305,28 @@
               "type": "file"
             },
             {
+              "path": "examples/live/gameobjects/effectlayer/effect layer with sampler2d.js",
+              "name": "effect layer with sampler2d.js",
+              "size": 157856,
+              "extension": ".js",
+              "type": "file"
+            },
+            {
+              "path": "examples/live/gameobjects/effectlayer/filter area.js",
+              "name": "filter area.js",
+              "size": 156543,
+              "extension": ".js",
+              "type": "file"
+            },
+            {
               "path": "examples/live/gameobjects/effectlayer/rectangle effect layer.js",
               "name": "rectangle effect layer.js",
-              "size": 176488,
+              "size": 161701,
               "extension": ".js",
               "type": "file"
             }
           ],
-          "size": 352512,
+          "size": 652124,
           "type": "directory"
         },
         {
@@ -460,7 +474,7 @@
           "type": "directory"
         }
       ],
-      "size": 2874405,
+      "size": 3174017,
       "type": "directory"
     },
     {
@@ -536,7 +550,7 @@
         {
           "path": "examples/live/textures/max texture units.js",
           "name": "max texture units.js",
-          "size": 157597,
+          "size": 157492,
           "extension": ".js",
           "type": "file"
         },
@@ -569,10 +583,10 @@
           "type": "file"
         }
       ],
-      "size": 953641,
+      "size": 953536,
       "type": "directory"
     }
   ],
-  "size": 9087426,
+  "size": 9386933,
   "type": "directory"
 }

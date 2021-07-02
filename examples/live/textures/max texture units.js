@@ -278,6 +278,18 @@
     return ConfigStore.get(CONFIG_DEFAULTS.WEBGL_CONTEXT);
   }
 
+  // ../phaser-genesis/src/renderer/webgl1/fbo/CreateFramebuffer.ts
+  function CreateFramebuffer(texture, attachment) {
+    if (!attachment) {
+      attachment = gl.COLOR_ATTACHMENT0;
+    }
+    const framebuffer = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, texture, 0);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    return framebuffer;
+  }
+
   // ../phaser-genesis/src/renderer/webgl1/textures/CreateGLTexture.ts
   function CreateGLTexture(binding) {
     const { parent, flipY, unpackPremultiplyAlpha, minFilter, magFilter, wrapS, wrapT, generateMipmap, isPOT } = binding;
@@ -374,6 +386,7 @@
       const {
         texture = null,
         framebuffer = null,
+        createFramebuffer = false,
         depthbuffer = null,
         unpackPremultiplyAlpha = true,
         minFilter = this.isPOT ? gl.LINEAR_MIPMAP_LINEAR : gl.LINEAR,
@@ -390,17 +403,20 @@
       this.generateMipmap = generateMipmap;
       this.flipY = flipY;
       this.unpackPremultiplyAlpha = unpackPremultiplyAlpha;
-      if (framebuffer) {
-        this.framebuffer = framebuffer;
-      }
-      if (depthbuffer) {
-        this.depthbuffer = depthbuffer;
-      }
       if (texture) {
         this.texture = texture;
       } else {
         CreateGLTexture(this);
       }
+      if (framebuffer) {
+        this.framebuffer = framebuffer;
+      } else if (createFramebuffer) {
+        this.framebuffer = CreateFramebuffer(this.texture);
+      }
+      if (depthbuffer) {
+        this.depthbuffer = depthbuffer;
+      }
+      parent.binding = this;
     }
     setFilter(linear) {
       if (this.texture) {
@@ -812,42 +828,6 @@
     return out.set(-2 * lr, 0, 0, 0, 0, -2 * bt, 0, 0, 0, 0, 2 * nf, 0, (left + right) * lr, (top + bottom) * bt, (far + near) * nf, 1);
   }
 
-  // ../phaser-genesis/src/renderer/webgl1/shaders/CheckShaderMaxIfStatements.ts
-  var fragTemplate = [
-    "precision mediump float;",
-    "void main(void){",
-    "float test = 0.1;",
-    "%forloop%",
-    "gl_FragColor = vec4(0.0);",
-    "}"
-  ].join("\n");
-  function GenerateSrc(maxIfs) {
-    let src = "";
-    for (let i = 0; i < maxIfs; ++i) {
-      if (i > 0) {
-        src += "\nelse ";
-      }
-      if (i < maxIfs - 1) {
-        src += `if(test == ${i}.0){}`;
-      }
-    }
-    return src;
-  }
-  function CheckShaderMaxIfStatements(maxIfs) {
-    const shader = gl.createShader(gl.FRAGMENT_SHADER);
-    while (true) {
-      const fragmentSrc = fragTemplate.replace(/%forloop%/gi, GenerateSrc(maxIfs));
-      gl.shaderSource(shader, fragmentSrc);
-      gl.compileShader(shader);
-      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        maxIfs = maxIfs / 2 | 0;
-      } else {
-        break;
-      }
-    }
-    return maxIfs;
-  }
-
   // ../phaser-genesis/src/renderer/webgl1/GL_CONST.ts
   var BYTE = 5120;
   var UNSIGNED_BYTE = 5121;
@@ -1069,18 +1049,6 @@
     return depthBuffer;
   }
 
-  // ../phaser-genesis/src/renderer/webgl1/fbo/CreateFramebuffer.ts
-  function CreateFramebuffer(texture, attachment) {
-    if (!attachment) {
-      attachment = gl.COLOR_ATTACHMENT0;
-    }
-    const framebuffer = gl.createFramebuffer();
-    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
-    gl.framebufferTexture2D(gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, texture, 0);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    return framebuffer;
-  }
-
   // ../phaser-genesis/src/renderer/webgl1/glsl/SINGLE_QUAD_FRAG.ts
   var SINGLE_QUAD_FRAG = `#define SHADER_NAME SINGLE_QUAD_FRAG
 
@@ -1192,14 +1160,14 @@ void main (void)
   };
   var createShadow = (store, key) => {
     if (!ArrayBuffer.isView(store)) {
-      const shadow = store[$parentArray].slice(0);
+      const shadow = store[$parentArray].slice(0).fill(0);
       for (const k in store[key]) {
         const from = store[key][k][$subarrayFrom];
         const to = store[key][k][$subarrayTo];
         store[key][k] = shadow.subarray(from, to);
       }
     } else {
-      store[key] = store.slice(0);
+      store[key] = store.slice(0).fill(0);
     }
   };
   var resizeSubarray = (metadata, store, size) => {
@@ -1789,10 +1757,10 @@ void main (void)
 
   // ../phaser-genesis/src/components/vertices/QuadVertexComponent.ts
   var QuadVertex = defineComponent({
-    v1: Types.ui32,
-    v2: Types.ui32,
-    v3: Types.ui32,
-    v4: Types.ui32
+    tl: Types.ui32,
+    bl: Types.ui32,
+    br: Types.ui32,
+    tr: Types.ui32
   });
   var QuadVertexComponent = QuadVertex;
 
@@ -1947,6 +1915,22 @@ void main (void)
     ColorComponent.tint[id] = 16777215;
   }
 
+  // ../phaser-genesis/src/components/vertices/AddQuadVertex.ts
+  function AddQuadVertex(id, width = 0, height = 0, flipY = true) {
+    addComponent(GameObjectWorld, QuadVertexComponent, id);
+    if (width || height) {
+      QuadVertexComponent.tl[id] = AddVertex(0, 0, 0, 0, 1);
+      QuadVertexComponent.bl[id] = AddVertex(0, height, 0, 0, 0);
+      QuadVertexComponent.br[id] = AddVertex(width, height, 0, 1, 0);
+      QuadVertexComponent.tr[id] = AddVertex(width, 0, 0, 1, 1);
+    } else {
+      QuadVertexComponent.tl[id] = AddVertex();
+      QuadVertexComponent.bl[id] = AddVertex();
+      QuadVertexComponent.br[id] = AddVertex();
+      QuadVertexComponent.tr[id] = AddVertex();
+    }
+  }
+
   // ../phaser-genesis/src/components/vertices/VertexComponent.ts
   var Vertex = defineComponent({
     x: Types.f32,
@@ -1967,9 +1951,14 @@ void main (void)
   var VertexWorld = world2;
 
   // ../phaser-genesis/src/components/vertices/AddVertex.ts
-  function AddVertex() {
+  function AddVertex(x = 0, y = 0, z = 0, u = 0, v = 0) {
     const vertexID = addEntity(VertexWorld);
     addComponent(VertexWorld, VertexComponent, vertexID);
+    VertexComponent.x[vertexID] = x;
+    VertexComponent.y[vertexID] = y;
+    VertexComponent.z[vertexID] = z;
+    VertexComponent.u[vertexID] = u;
+    VertexComponent.v[vertexID] = v;
     VertexComponent.alpha[vertexID] = 1;
     VertexComponent.tint[vertexID] = 16777215;
     VertexComponent.color[vertexID] = 4294967295;
@@ -2012,10 +2001,10 @@ void main (void)
       const y = Extent2DComponent.y[id];
       const right = Extent2DComponent.right[id];
       const bottom = Extent2DComponent.bottom[id];
-      const v1 = QuadVertexComponent.v1[id];
-      const v2 = QuadVertexComponent.v2[id];
-      const v3 = QuadVertexComponent.v3[id];
-      const v4 = QuadVertexComponent.v4[id];
+      const v1 = QuadVertexComponent.tl[id];
+      const v2 = QuadVertexComponent.bl[id];
+      const v3 = QuadVertexComponent.br[id];
+      const v4 = QuadVertexComponent.tr[id];
       const x0 = x * a + y * c + tx;
       const y0 = x * b + y * d + ty;
       const x1 = x * a + bottom * c + tx;
@@ -2066,10 +2055,10 @@ void main (void)
     const entities3 = changedColorQuery(world3);
     for (let i = 0; i < entities3.length; i++) {
       const id = entities3[i];
-      const v1 = QuadVertexComponent.v1[id];
-      const v2 = QuadVertexComponent.v2[id];
-      const v3 = QuadVertexComponent.v3[id];
-      const v4 = QuadVertexComponent.v4[id];
+      const v1 = QuadVertexComponent.tl[id];
+      const v2 = QuadVertexComponent.bl[id];
+      const v3 = QuadVertexComponent.br[id];
+      const v4 = QuadVertexComponent.tr[id];
       const color = PackColor(ColorComponent.tint[id], ColorComponent.alpha[id]);
       VertexComponent.color[v1] = color;
       VertexComponent.color[v2] = color;
@@ -2529,6 +2518,7 @@ void main (void)
         MultiplyLocalWithWorld(parent.id, id);
       }
     }
+    return world3;
   });
 
   // ../phaser-genesis/src/renderer/webgl1/draw/AddVertexToBatch.ts
@@ -2563,10 +2553,10 @@ void main (void)
   function BatchTexturedQuad(texture, id, renderPass) {
     const textureIndex = renderPass.textures.set(texture);
     const { F32, U32, offset } = GetVertexBufferEntry(renderPass, 1);
-    let vertOffset = AddVertexToBatch(QuadVertexComponent.v1[id], offset, textureIndex, F32, U32);
-    vertOffset = AddVertexToBatch(QuadVertexComponent.v2[id], vertOffset, textureIndex, F32, U32);
-    vertOffset = AddVertexToBatch(QuadVertexComponent.v3[id], vertOffset, textureIndex, F32, U32);
-    AddVertexToBatch(QuadVertexComponent.v4[id], vertOffset, textureIndex, F32, U32);
+    let vertOffset = AddVertexToBatch(QuadVertexComponent.tl[id], offset, textureIndex, F32, U32);
+    vertOffset = AddVertexToBatch(QuadVertexComponent.bl[id], vertOffset, textureIndex, F32, U32);
+    vertOffset = AddVertexToBatch(QuadVertexComponent.br[id], vertOffset, textureIndex, F32, U32);
+    AddVertexToBatch(QuadVertexComponent.tr[id], vertOffset, textureIndex, F32, U32);
   }
 
   // ../phaser-genesis/src/config/defaultorigin/GetDefaultOriginX.ts
@@ -3009,12 +2999,7 @@ void main (void)
       __publicField(this, "texture");
       __publicField(this, "frame");
       __publicField(this, "hasTexture", false);
-      const id = this.id;
-      addComponent(GameObjectWorld, QuadVertexComponent, id);
-      QuadVertexComponent.v1[id] = AddVertex();
-      QuadVertexComponent.v2[id] = AddVertex();
-      QuadVertexComponent.v3[id] = AddVertex();
-      QuadVertexComponent.v4[id] = AddVertex();
+      AddQuadVertex(this.id);
       this.setTexture(texture, frame2);
     }
     setTexture(key, frame2) {
@@ -3274,10 +3259,10 @@ void main (void)
     }
     copyToVertices(id) {
       const { u0, u1, v0, v1 } = this;
-      SetUV(QuadVertexComponent.v1[id], u0, v0);
-      SetUV(QuadVertexComponent.v2[id], u0, v1);
-      SetUV(QuadVertexComponent.v3[id], u1, v1);
-      SetUV(QuadVertexComponent.v4[id], u1, v0);
+      SetUV(QuadVertexComponent.tl[id], u0, v0);
+      SetUV(QuadVertexComponent.bl[id], u0, v1);
+      SetUV(QuadVertexComponent.br[id], u1, v1);
+      SetUV(QuadVertexComponent.tr[id], u1, v0);
       return this;
     }
     updateUVs() {
@@ -3353,6 +3338,7 @@ void main (void)
         this.binding.destroy();
       }
       this.frames.clear();
+      this.binding = null;
       this.data = null;
       this.image = null;
       this.firstFrame = null;
@@ -3477,9 +3463,8 @@ void main (void)
   // ../phaser-genesis/src/renderer/webgl1/shaders/QuadShader.ts
   var QuadShader = class extends Shader {
     constructor(config = {}) {
-      const shaderConfig = config;
-      shaderConfig.attributes = !shaderConfig.attributes ? DefaultQuadAttributes : shaderConfig.attributes;
-      super(shaderConfig);
+      config.attributes = (config == null ? void 0 : config.attributes) || DefaultQuadAttributes;
+      super(config);
     }
     bind(renderPass) {
       const uniforms = this.uniforms;
@@ -3527,9 +3512,7 @@ void main (void)
   // ../phaser-genesis/src/renderer/webgl1/shaders/MultiTextureQuadShader.ts
   var MultiTextureQuadShader = class extends QuadShader {
     constructor(config = {}) {
-      if (!config.fragmentShader) {
-        config.fragmentShader = MULTI_QUAD_FRAG;
-      }
+      config.fragmentShader = (config == null ? void 0 : config.fragmentShader) || MULTI_QUAD_FRAG;
       super(config);
     }
     create(fragmentShaderSource, vertexShaderSource, uniforms, attribs) {
@@ -3691,7 +3674,7 @@ void main (void)
 
   // ../phaser-genesis/src/renderer/webgl1/renderpass/CreateTempTextures.ts
   function CreateTempTextures() {
-    let maxGPUTextures = CheckShaderMaxIfStatements(gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS));
+    let maxGPUTextures = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
     const maxConfigTextures = GetMaxTextures();
     if (maxConfigTextures === 0 || maxConfigTextures > maxGPUTextures) {
       SetMaxTextures(maxGPUTextures);
@@ -3730,16 +3713,15 @@ void main (void)
       gl.bindTexture(gl.TEXTURE_2D, this.tempTextures[index]);
     }
     set(texture) {
-      if (!texture.image) {
+      if (!texture.binding) {
         return -1;
       }
       const binding = texture.binding;
       const textures = this.textures;
-      if (binding && !binding.isBound) {
+      if (!binding.isBound) {
         if (textures.size === this.maxTextures) {
           Flush(this.renderPass);
-          textures.forEach((texture2) => texture2.binding.unbind());
-          textures.clear();
+          this.clear();
         }
         const textureUnit = textures.size;
         gl.activeTexture(gl.TEXTURE0 + textureUnit);
@@ -3762,13 +3744,16 @@ void main (void)
         this.textureIndex.push(index);
       });
     }
+    clear() {
+      this.textures.forEach((texture) => texture.binding.unbind());
+      this.textures.clear();
+    }
     reset() {
       this.tempTextures.forEach((texture, index) => {
         gl.activeTexture(gl.TEXTURE0 + index);
         gl.bindTexture(gl.TEXTURE_2D, texture);
       });
-      this.textures.forEach((texture) => texture.binding.unbind());
-      this.textures.clear();
+      this.clear();
     }
   };
 
@@ -3984,6 +3969,7 @@ void main (void)
       WebGLRendererInstance.set(this);
       this.renderPass = new RenderPass(this);
       this.resize(this.width, this.height, this.resolution);
+      ProcessBindingQueue();
     }
     initContext() {
       const gl2 = this.canvas.getContext("webgl", GetWebGLContext());
@@ -4455,8 +4441,8 @@ void main (void)
     boot(settings) {
       settings.forEach((setting) => setting());
       const renderer = GetRenderer();
-      this.renderer = new renderer();
       this.textureManager = new TextureManager();
+      this.renderer = new renderer();
       this.sceneManager = new SceneManager();
       const parent = GetParent();
       if (parent) {
@@ -4469,10 +4455,11 @@ void main (void)
       this.isBooted = true;
       GetBanner();
       Emit(this, "boot");
-      this.lastTick = performance.now();
-      this.prevFrame = performance.now();
+      const now = performance.now();
+      this.lastTick = now;
+      this.prevFrame = now;
       this.renderStats = GetRenderStatsAsObject();
-      this.step(this.lastTick);
+      this.step(now);
     }
     pause() {
       this.isPaused = true;
@@ -4933,6 +4920,7 @@ void main (void)
         yield ImageFile("book7", "assets/items/book7.png").load();
         const world3 = new StaticWorld(this);
         const maxTextures = GetMaxTextures();
+        console.log("max?", maxTextures);
         let x = 64;
         let y = 64;
         let d = 1;
