@@ -22,31 +22,29 @@ class Demo extends Scene
 
     async create ()
     {
-        /*
-        const d = new Text(10, 10, 'Hello World', '10px monospace');
+        // const d = new Text(10, 10, 'Hello World', '12px monospace');
 
-        d.backgroundStyle = '#000000';
-        d.lineSpacing = 2;
+        // d.backgroundStyle = '#000000';
+        // d.lineSpacing = 2;
 
-        d.origin.set(0, 0);
+        // d.origin.set(0, 0);
 
-        const log = [];
+        // const log = [];
 
-        for (const [ key, value ] of Object.entries(this.game.renderer.compression))
-        {
-            log.push(`${key}: ${value}`);
+        // for (const [ key, value ] of Object.entries(this.game.renderer.compression))
+        // {
+        //     log.push(`${key}: ${value}`);
 
-            if (value !== null)
-            {
-                for (const key2 in value)
-                {
-                    log.push(`--- ${key2}`);
-                }
-            }
-        }
+        //     if (value !== null)
+        //     {
+        //         for (const key2 in value)
+        //         {
+        //             log.push(`--- ${key2}`);
+        //         }
+        //     }
+        // }
 
-        d.setText(log);
-        */
+        // d.setText(log);
 
         //  Works, but no alpha channel
         // await TextureFile('test', 'assets/compressed/atlas-pvr-dxt1.pvr').load();
@@ -60,16 +58,17 @@ class Demo extends Scene
         //  iOS
         // await TextureFile('test', 'assets/compressed/atlas-pvr-pvrtci2bpp-rgba.pvr').load();
         // await TextureFile('test', 'assets/compressed/atlas-pvr-pvrtci4bpp-rgba.pvr').load();
-        await TextureFile('test', 'assets/compressed/atlas-pvr-rgba8888.pvr').load();
+        // await TextureFile('test', 'assets/compressed/atlas-pvr-rgba-astc-4x4.pvr').load();
+        await TextureFile('test', 'assets/compressed/eac-r11-unorm-linear.pvr').load();
 
-        const d = new Text(10, 10, '', '10px monospace');
+        const d = new Text(10, 10, 'red boi', '12px monospace');
         d.origin.set(0, 0);
-        d.backgroundStyle = '#000000';
-        d.text = 'atlas-pvr-rgba8888.pvr';
+        // d.backgroundStyle = '#000000';
+        // d.text = 'RGBA knickers';
 
         const world = new StaticWorld(this);
 
-        const sprite = new Sprite(-200, 0, 'test');
+        const sprite = new Sprite(0, 0, 'test');
 
         sprite.origin.set(0, 0);
 
@@ -82,6 +81,6 @@ new Game(
     WebGL(),
     Parent('gameParent'),
     GlobalVar('Phaser4'),
-    BackgroundColor(0xee2d2d),
+    BackgroundColor(0x2d2d77),
     Scenes(Demo)
 );
