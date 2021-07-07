@@ -260,6 +260,34 @@
     Flush(renderPass);
   }
 
+  // ../phaser-genesis/src/renderer/webgl1/textures/GetCompressedTextures.ts
+  function GetCompressedTextures(gl2) {
+    const extString = "WEBGL_compressed_texture_";
+    const wkExtString = "WEBKIT_" + extString;
+    const hasExt = (format) => {
+      const results = gl2.getExtension(extString + format) || gl2.getExtension(wkExtString + format);
+      if (results) {
+        const glEnums = {};
+        for (const key in results) {
+          glEnums[results[key]] = key;
+        }
+        return glEnums;
+      }
+    };
+    return {
+      ETC: hasExt("etc"),
+      ETC1: hasExt("etc1"),
+      ATC: hasExt("atc"),
+      ASTC: hasExt("astc"),
+      BPTC: hasExt("bptc"),
+      RGTC: hasExt("rgtc"),
+      PVRTC: hasExt("pvrtc"),
+      S3TC: hasExt("s3tc"),
+      S3TCSRGB: hasExt("s3tc_srgb"),
+      IMG: true
+    };
+  }
+
   // ../phaser-genesis/src/renderer/webgl1/colors/GetRGBArray.ts
   function GetRGBArray(color, output = []) {
     const r = color >> 16 & 255;
@@ -291,9 +319,8 @@
   }
 
   // ../phaser-genesis/src/renderer/webgl1/textures/CreateGLTexture.ts
-  function CreateGLTexture(binding, data) {
-    let { generateMipmap, minFilter } = binding;
-    const { parent, compressed, format, flipY, unpackPremultiplyAlpha, magFilter, wrapS, wrapT, isPOT } = binding;
+  function CreateGLTexture(binding, mipmaps) {
+    const { generateMipmap, minFilter, parent, compressed, internalFormat, flipY, unpackPremultiplyAlpha, magFilter, wrapS, wrapT, isPOT } = binding;
     const source = parent.image;
     let width = parent.width;
     let height = parent.height;
@@ -306,24 +333,10 @@
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
       width = source.width;
       height = source.height;
-    } else if (compressed) {
-      const formats = {
-        COMPRESSED_RGB_S3TC_DXT1_EXT: 33776,
-        COMPRESSED_RGBA_S3TC_DXT1_EXT: 33777,
-        COMPRESSED_RGBA_S3TC_DXT3_EXT: 33778,
-        COMPRESSED_RGBA_S3TC_DXT5_EXT: 33779,
-        COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT: 35917,
-        COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT: 35918,
-        COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT: 35919,
-        COMPRESSED_SRGB_S3TC_DXT1_EXT: 35916,
-        COMPRESSED_RGB_PVRTC_4BPPV1_IMG: 35840,
-        COMPRESSED_RGB_PVRTC_2BPPV1_IMG: 35841,
-        COMPRESSED_RGBA_PVRTC_4BPPV1_IMG: 35842,
-        COMPRESSED_RGBA_PVRTC_2BPPV1_IMG: 35843
-      };
-      gl.compressedTexImage2D(gl.TEXTURE_2D, 0, formats[format], width, height, 0, data);
-      minFilter = gl.LINEAR;
-      generateMipmap = false;
+    } else if (compressed && mipmaps) {
+      for (let i = 0; i < mipmaps.length; i++) {
+        gl.compressedTexImage2D(gl.TEXTURE_2D, i, internalFormat, mipmaps[i].width, mipmaps[i].height, 0, mipmaps[i].data);
+      }
     } else {
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
     }
@@ -391,7 +404,9 @@
       __publicField(this, "framebuffer");
       __publicField(this, "depthbuffer");
       __publicField(this, "format");
+      __publicField(this, "internalFormat");
       __publicField(this, "compressed");
+      __publicField(this, "mipmaps");
       __publicField(this, "isBound", false);
       __publicField(this, "textureUnit", 0);
       __publicField(this, "unpackPremultiplyAlpha", true);
@@ -405,9 +420,10 @@
       this.parent = parent;
       this.isPOT = IsSizePowerOfTwo(parent.width, parent.height);
       const {
-        data = null,
+        mipmaps = null,
         compressed = false,
-        format = gl.COMPRESSED_TEXTURE_FORMATS,
+        format = "IMG",
+        internalFormat = 0,
         texture = null,
         framebuffer = null,
         createFramebuffer = false,
@@ -422,7 +438,13 @@
       } = config;
       this.compressed = compressed;
       this.format = format;
-      this.minFilter = minFilter;
+      this.internalFormat = internalFormat;
+      this.mipmaps = mipmaps;
+      if (compressed) {
+        this.minFilter = gl.LINEAR;
+      } else {
+        this.minFilter = minFilter;
+      }
       this.magFilter = magFilter;
       this.wrapS = wrapS;
       this.wrapT = wrapT;
@@ -432,7 +454,7 @@
       if (texture) {
         this.texture = texture;
       } else {
-        CreateGLTexture(this, data);
+        CreateGLTexture(this, mipmaps);
       }
       if (framebuffer) {
         this.framebuffer = framebuffer;
@@ -2948,6 +2970,26 @@ void main (void)
     set alpha(value) {
       SetAlpha(this.id, value);
     }
+    setPosition(x, y) {
+      this.position.set(x, y);
+      return this;
+    }
+    setScale(x, y) {
+      this.scale.set(x, y);
+      return this;
+    }
+    setRotation(value) {
+      this.rotation = value;
+      return this;
+    }
+    setSkew(x, y) {
+      this.skew.set(x, y);
+      return this;
+    }
+    setOrigin(x, y) {
+      this.origin.set(x, y);
+      return this;
+    }
     destroy(reparentChildren) {
       super.destroy(reparentChildren);
     }
@@ -4188,21 +4230,7 @@ void main (void)
       const gl2 = this.canvas.getContext("webgl", GetWebGLContext());
       GL.set(gl2);
       this.gl = gl2;
-      const extString = "WEBGL_compressed_texture_";
-      const wkExtString = "WEBKIT_" + extString;
-      const hasExt = (format) => gl2.getExtension(format);
-      this.compression = {
-        ETC: hasExt(extString + "etc") || hasExt(wkExtString + "etc"),
-        ETC1: hasExt(extString + "etc1") || hasExt(wkExtString + "etc1"),
-        ATC: hasExt(extString + "atc") || hasExt(wkExtString + "atc"),
-        ASTC: hasExt(extString + "astc") || hasExt(wkExtString + "astc"),
-        BPTC: hasExt(extString + "bptc") || hasExt(wkExtString + "bptc"),
-        RGTC: hasExt(extString + "rgtc") || hasExt(wkExtString + "rgtc"),
-        PVRTC: hasExt(extString + "pvrtc") || hasExt(wkExtString + "pvrtc"),
-        S3TC: hasExt(extString + "s3tc") || hasExt(wkExtString + "s3tc"),
-        S3TCSRGB: hasExt(extString + "s3tc_srgb") || hasExt(wkExtString + "s3tc_srgb")
-      };
-      console.log(this.compression);
+      this.compression = GetCompressedTextures(gl2);
       gl2.disable(gl2.DEPTH_TEST);
       gl2.disable(gl2.CULL_FACE);
     }
@@ -5005,6 +5033,41 @@ void main (void)
     }
   };
 
+  // ../phaser-genesis/src/textures/parsers/AtlasParser.ts
+  function AtlasParser(texture, data) {
+    let frames;
+    if (Array.isArray(data.textures)) {
+      frames = data.textures[0].frames;
+    } else if (Array.isArray(data.frames)) {
+      frames = data.frames;
+    } else if (data.hasOwnProperty("frames")) {
+      frames = [];
+      for (const [filename, frame2] of Object.entries(data.frames)) {
+        frame2["filename"] = filename;
+        frames.push(frame2);
+      }
+    } else {
+      console.warn("Invalid Texture Atlas JSON");
+    }
+    if (frames) {
+      let newFrame;
+      for (let i = 0; i < frames.length; i++) {
+        const src = frames[i];
+        newFrame = texture.addFrame(src.filename, src.frame.x, src.frame.y, src.frame.w, src.frame.h);
+        if (src.trimmed) {
+          newFrame.setTrim(src.sourceSize.w, src.sourceSize.h, src.spriteSourceSize.x, src.spriteSourceSize.y, src.spriteSourceSize.w, src.spriteSourceSize.h);
+        } else {
+          newFrame.setSourceSize(src.sourceSize.w, src.sourceSize.h);
+        }
+        if (src.rotated) {
+        }
+        if (src.anchor) {
+          newFrame.setPivot(src.anchor.x, src.anchor.y);
+        }
+      }
+    }
+  }
+
   // ../phaser-genesis/src/loader/File.ts
   var File = class {
     constructor(key, url, config) {
@@ -5039,8 +5102,78 @@ void main (void)
     }
   }
 
+  // ../phaser-genesis/src/loader/ImageLoader.ts
+  function ImageTagLoader(file) {
+    const fileCast = file;
+    fileCast.data = new Image();
+    if (fileCast.crossOrigin) {
+      fileCast.data.crossOrigin = file.crossOrigin;
+    }
+    return new Promise((resolve, reject) => {
+      fileCast.data.onload = () => {
+        if (fileCast.data.onload) {
+          fileCast.data.onload = null;
+          fileCast.data.onerror = null;
+          resolve(fileCast);
+        }
+      };
+      fileCast.data.onerror = (event) => {
+        if (fileCast.data.onload) {
+          fileCast.data.onload = null;
+          fileCast.data.onerror = null;
+          fileCast.error = event;
+          reject(fileCast);
+        }
+      };
+      fileCast.data.src = file.url;
+      if (fileCast.data.complete && fileCast.data.width && fileCast.data.height) {
+        fileCast.data.onload = null;
+        fileCast.data.onerror = null;
+        resolve(fileCast);
+      }
+    });
+  }
+
+  // ../phaser-genesis/src/loader/files/ImageFile.ts
+  function ImageFile(key, url, glConfig) {
+    const file = new File(key, url);
+    file.load = () => {
+      file.url = GetURL(file.key, file.url, ".png", file.loader);
+      if (file.loader) {
+        file.crossOrigin = file.loader.crossOrigin;
+      }
+      return new Promise((resolve, reject) => {
+        const textureManager = TextureManagerInstance.get();
+        if (textureManager.has(file.key)) {
+          resolve(file);
+        } else {
+          ImageTagLoader(file).then((file2) => {
+            textureManager.add(file2.key, file2.data, glConfig);
+            resolve(file2);
+          }).catch((file2) => {
+            reject(file2);
+          });
+        }
+      });
+    };
+    return file;
+  }
+
   // ../phaser-genesis/src/cache/Cache.ts
   var caches = new Map();
+  var Cache = {
+    get: (type) => {
+      if (!caches.has(type)) {
+        caches.set(type, new Map());
+      }
+      return caches.get(type);
+    },
+    getEntry: (cache, entry) => {
+      if (caches.has(cache)) {
+        return caches.get(cache).get(entry);
+      }
+    }
+  };
 
   // ../phaser-genesis/src/loader/XHRLoader.ts
   function XHRLoader(file) {
@@ -5062,165 +5195,333 @@ void main (void)
     });
   }
 
-  // ../phaser-genesis/src/loader/files/TextureFile.ts
-  function pvrtc2bppSize(width, height) {
-    width = Math.max(width, 16);
-    height = Math.max(height, 8);
-    return width * height / 4;
+  // ../phaser-genesis/src/loader/files/JSONFile.ts
+  function JSONFile(key, url) {
+    const file = new File(key, url);
+    file.load = () => {
+      file.url = GetURL(file.key, file.url, ".json", file.loader);
+      return new Promise((resolve, reject) => {
+        const cache = Cache.get("JSON");
+        if (!file.skipCache && cache.has(file.key)) {
+          resolve(file);
+        } else {
+          XHRLoader(file).then((file2) => {
+            file2.data = JSON.parse(file2.data);
+            if (!file2.skipCache) {
+              cache.set(file2.key, file2.data);
+            }
+            resolve(file2);
+          }).catch((file2) => {
+            reject(file2);
+          });
+        }
+      });
+    };
+    return file;
   }
-  function pvrtc4bppSize(width, height) {
-    width = Math.max(width, 8);
-    height = Math.max(height, 8);
-    return width * height / 2;
+
+  // ../phaser-genesis/src/loader/files/AtlasFile.ts
+  function AtlasFile(key, textureURL, atlasURL, glConfig) {
+    const json = JSONFile(key, atlasURL);
+    const image = ImageFile(key, textureURL, glConfig);
+    const file = new File(key, "");
+    file.load = () => {
+      json.url = GetURL(json.key, json.url, ".json", file.loader);
+      image.url = GetURL(image.key, image.url, ".png", file.loader);
+      return new Promise((resolve, reject) => {
+        json.skipCache = true;
+        json.load().then(() => {
+          image.load().then(() => {
+            AtlasParser(GetTexture(key), json.data);
+            resolve(file);
+          }).catch(() => {
+            reject(file);
+          });
+        }).catch(() => {
+          reject(file);
+        });
+      });
+    };
+    return file;
   }
-  function GetSize(width, height, x, y, dx, dy, mult = 16) {
-    return Math.floor((width + x) / dx) * Math.floor((height + y) / dy) * mult;
-  }
-  function dxtEtcSmallSize(width, height) {
-    return GetSize(width, height, 3, 3, 4, 4, 8);
-  }
-  function dxtEtcAstcBigSize(width, height) {
-    return GetSize(width, height, 3, 3, 4, 4);
-  }
-  function atc5x4Size(width, height) {
-    return GetSize(width, height, 4, 3, 5, 4);
-  }
-  function atc5x5Size(width, height) {
-    return GetSize(width, height, 4, 4, 5, 5);
-  }
-  function atc6x5Size(width, height) {
-    return GetSize(width, height, 5, 4, 6, 5);
-  }
-  function atc6x6Size(width, height) {
-    return GetSize(width, height, 5, 5, 6, 6);
-  }
-  function atc8x5Size(width, height) {
-    return GetSize(width, height, 7, 4, 8, 5);
-  }
-  function atc8x6Size(width, height) {
-    return GetSize(width, height, 7, 5, 8, 6);
-  }
-  function atc8x8Size(width, height) {
-    return GetSize(width, height, 7, 7, 8, 8);
-  }
-  function atc10x5Size(width, height) {
-    return GetSize(width, height, 9, 4, 10, 5);
-  }
-  function atc10x6Size(width, height) {
-    return GetSize(width, height, 9, 5, 10, 6);
-  }
-  function atc10x8Size(width, height) {
-    return GetSize(width, height, 9, 7, 10, 8);
-  }
-  function atc10x10Size(width, height) {
-    return GetSize(width, height, 9, 9, 10, 10);
-  }
-  function atc12x10Size(width, height) {
-    return GetSize(width, height, 11, 9, 12, 10);
-  }
-  function atc12x12Size(width, height) {
-    return GetSize(width, height, 11, 11, 12, 12);
-  }
-  var PVR_CONSTANTS = {
-    MAGIC_NUMBER: 55727696,
-    HEADER_LENGTH: 13,
-    HEADER_SIZE: 52,
-    MAGIC_NUMBER_INDEX: 0,
-    PIXEL_FORMAT_INDEX: 2,
-    HEIGHT_INDEX: 6,
-    WIDTH_INDEX: 7,
-    MIPMAPCOUNT_INDEX: 11,
-    METADATA_SIZE_INDEX: 12
-  };
-  var FORMATS = {
-    0: { format: "COMPRESSED_RGB_PVRTC_2BPPV1_IMG", sizeFunc: pvrtc2bppSize, glFormat: 35841 },
-    1: { format: "COMPRESSED_RGBA_PVRTC_2BPPV1_IMG", sizeFunc: pvrtc2bppSize, glFormat: 35843 },
-    2: { format: "COMPRESSED_RGB_PVRTC_4BPPV1_IMG", sizeFunc: pvrtc4bppSize, glFormat: 35840 },
-    3: { format: "COMPRESSED_RGBA_PVRTC_4BPPV1_IMG", sizeFunc: pvrtc4bppSize, glFormat: 35842 },
-    6: { format: "COMPRESSED_RGB8_ETC2", sizeFunc: dxtEtcSmallSize, glFormat: 36196 },
-    7: { format: "COMPRESSED_RGB_S3TC_DXT1_EXT", sizeFunc: dxtEtcSmallSize, glFormat: 33776 },
-    8: { format: "COMPRESSED_RGBA_S3TC_DXT1_EXT", sizeFunc: dxtEtcAstcBigSize, glFormat: 33777 },
-    9: { format: "COMPRESSED_RGBA_S3TC_DXT3_EXT", sizeFunc: dxtEtcAstcBigSize, glFormat: 33778 },
-    11: { format: "COMPRESSED_RGBA_S3TC_DXT5_EXT", sizeFunc: dxtEtcAstcBigSize, glFormat: 33779 },
-    22: { format: "COMPRESSED_RGB8_ETC2", sizeFunc: dxtEtcSmallSize, glFormat: 37492 },
-    23: { format: "COMPRESSED_RGBA8_ETC2_EAC", sizeFunc: dxtEtcAstcBigSize, glFormat: 37496 },
-    24: { format: "COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2", sizeFunc: dxtEtcSmallSize, glFormat: 37494 },
-    25: { format: "COMPRESSED_R11_EAC", sizeFunc: dxtEtcSmallSize, glFormat: 37488 },
-    26: { format: "COMPRESSED_RG11_EAC", sizeFunc: dxtEtcAstcBigSize, glFormat: 37490 },
-    27: { format: "COMPRESSED_RGBA_ASTC_4x4_KHR", sizeFunc: dxtEtcAstcBigSize, glFormat: 37808 },
-    28: { format: "COMPRESSED_RGBA_ASTC_5x4_KHR", sizeFunc: atc5x4Size, glFormat: 37809 },
-    29: { format: "COMPRESSED_RGBA_ASTC_5x5_KHR", sizeFunc: atc5x5Size, glFormat: 37810 },
-    30: { format: "COMPRESSED_RGBA_ASTC_6x5_KHR", sizeFunc: atc6x5Size, glFormat: 37811 },
-    31: { format: "COMPRESSED_RGBA_ASTC_6x6_KHR", sizeFunc: atc6x6Size, glFormat: 37812 },
-    32: { format: "COMPRESSED_RGBA_ASTC_8x5_KHR", sizeFunc: atc8x5Size, glFormat: 37813 },
-    33: { format: "COMPRESSED_RGBA_ASTC_8x6_KHR", sizeFunc: atc8x6Size, glFormat: 37814 },
-    34: { format: "COMPRESSED_RGBA_ASTC_8x8_KHR", sizeFunc: atc8x8Size, glFormat: 37815 },
-    35: { format: "COMPRESSED_RGBA_ASTC_10x5_KHR", sizeFunc: atc10x5Size, glFormat: 37816 },
-    36: { format: "COMPRESSED_RGBA_ASTC_10x6_KHR", sizeFunc: atc10x6Size, glFormat: 37817 },
-    37: { format: "COMPRESSED_RGBA_ASTC_10x8_KHR", sizeFunc: atc10x8Size, glFormat: 37818 },
-    38: { format: "COMPRESSED_RGBA_ASTC_10x10_KHR", sizeFunc: atc10x10Size, glFormat: 37819 },
-    39: { format: "COMPRESSED_RGBA_ASTC_12x10_KHR", sizeFunc: atc12x10Size, glFormat: 37820 },
-    40: { format: "COMPRESSED_RGBA_ASTC_12x12_KHR", sizeFunc: atc12x12Size, glFormat: 37821 }
-  };
-  function parsePVR(data) {
-    const header = new Uint32Array(data, 0, PVR_CONSTANTS.HEADER_LENGTH);
-    const pvrFormat = header[PVR_CONSTANTS.PIXEL_FORMAT_INDEX];
-    console.log("pvrFormat", pvrFormat);
-    const format = FORMATS[pvrFormat];
-    const formatEnum = format.format;
-    const sizeFunction = format.sizeFunc;
-    const mipMapLevels = header[PVR_CONSTANTS.MIPMAPCOUNT_INDEX];
-    const width = header[PVR_CONSTANTS.WIDTH_INDEX];
-    const height = header[PVR_CONSTANTS.HEIGHT_INDEX];
-    const dataOffset = PVR_CONSTANTS.HEADER_SIZE + header[PVR_CONSTANTS.METADATA_SIZE_INDEX];
-    const image = new Uint8Array(data, dataOffset);
-    const levels = new Array(mipMapLevels);
+
+  // ../phaser-genesis/src/textures/parsers/KTXParser.ts
+  function KTXParser(data) {
+    const idCheck = [171, 75, 84, 88, 32, 49, 49, 187, 13, 10, 26, 10];
+    const id = new Uint8Array(data, 0, 12);
+    for (let i = 0; i < id.length; i++) {
+      if (id[i] !== idCheck[i]) {
+        console.error("KTXParser - Invalid file format");
+        return;
+      }
+    }
+    const size = Uint32Array.BYTES_PER_ELEMENT;
+    const head = new DataView(data, 12, 13 * size);
+    const littleEndian = head.getUint32(0, true) === 67305985;
+    const glType = head.getUint32(1 * size, littleEndian);
+    if (glType !== 0) {
+      console.warn("KTXParser - Only compressed formats supported");
+      return;
+    }
+    const internalFormat = head.getUint32(4 * size, littleEndian);
+    const width = head.getUint32(6 * size, littleEndian);
+    const height = head.getUint32(7 * size, littleEndian);
+    const mipmapLevels = Math.max(1, head.getUint32(11 * size, littleEndian));
+    const bytesOfKeyValueData = head.getUint32(12 * size, littleEndian);
+    const mipmaps = new Array(mipmapLevels);
+    let offset = 12 + 13 * 4 + bytesOfKeyValueData;
     let levelWidth = width;
     let levelHeight = height;
-    let offset = 0;
-    for (let i = 0; i < mipMapLevels; ++i) {
-      const levelSize = sizeFunction(levelWidth, levelHeight);
-      levels[i] = new Uint8Array(image.buffer, image.byteOffset + offset, levelSize);
+    for (let i = 0; i < mipmapLevels; i++) {
+      const levelSize = new Int32Array(data, offset, 1)[0];
+      offset += 4;
+      mipmaps[i] = {
+        data: new Uint8Array(data, offset, levelSize),
+        width: levelWidth,
+        height: levelHeight
+      };
+      console.log("KTX", i, "size", levelWidth, levelHeight);
       levelWidth = Math.max(1, levelWidth >> 1);
       levelHeight = Math.max(1, levelHeight >> 1);
       offset += levelSize;
     }
     return {
-      data: levels,
+      mipmaps,
       width,
       height,
-      pvrFormat,
-      format: formatEnum
+      internalFormat,
+      compressed: true,
+      generateMipmap: false
     };
   }
-  function TextureFile(key, url, glConfig) {
-    const renderer = WebGLRendererInstance.get();
-    if (!renderer) {
+
+  // ../phaser-genesis/src/textures/parsers/PVRParser.ts
+  function GetSize(width, height, x, y, dx, dy, mult = 16) {
+    return Math.floor((width + x) / dx) * Math.floor((height + y) / dy) * mult;
+  }
+  function PVRTC2bppSize(width, height) {
+    width = Math.max(width, 16);
+    height = Math.max(height, 8);
+    return width * height / 4;
+  }
+  function PVRTC4bppSize(width, height) {
+    width = Math.max(width, 8);
+    height = Math.max(height, 8);
+    return width * height / 2;
+  }
+  function DXTEtcSmallSize(width, height) {
+    return GetSize(width, height, 3, 3, 4, 4, 8);
+  }
+  function DXTEtcAstcBigSize(width, height) {
+    return GetSize(width, height, 3, 3, 4, 4);
+  }
+  function ATC5x4Size(width, height) {
+    return GetSize(width, height, 4, 3, 5, 4);
+  }
+  function ATC5x5Size(width, height) {
+    return GetSize(width, height, 4, 4, 5, 5);
+  }
+  function ATC6x5Size(width, height) {
+    return GetSize(width, height, 5, 4, 6, 5);
+  }
+  function ATC6x6Size(width, height) {
+    return GetSize(width, height, 5, 5, 6, 6);
+  }
+  function ATC8x5Size(width, height) {
+    return GetSize(width, height, 7, 4, 8, 5);
+  }
+  function ATC8x6Size(width, height) {
+    return GetSize(width, height, 7, 5, 8, 6);
+  }
+  function ATC8x8Size(width, height) {
+    return GetSize(width, height, 7, 7, 8, 8);
+  }
+  function ATC10x5Size(width, height) {
+    return GetSize(width, height, 9, 4, 10, 5);
+  }
+  function ATC10x6Size(width, height) {
+    return GetSize(width, height, 9, 5, 10, 6);
+  }
+  function ATC10x8Size(width, height) {
+    return GetSize(width, height, 9, 7, 10, 8);
+  }
+  function ATC10x10Size(width, height) {
+    return GetSize(width, height, 9, 9, 10, 10);
+  }
+  function ATC12x10Size(width, height) {
+    return GetSize(width, height, 11, 9, 12, 10);
+  }
+  function ATC12x12Size(width, height) {
+    return GetSize(width, height, 11, 11, 12, 12);
+  }
+  var FORMATS = {
+    0: { sizeFunc: PVRTC2bppSize, glFormat: 35841 },
+    1: { sizeFunc: PVRTC2bppSize, glFormat: 35843 },
+    2: { sizeFunc: PVRTC4bppSize, glFormat: 35840 },
+    3: { sizeFunc: PVRTC4bppSize, glFormat: 35842 },
+    6: { sizeFunc: DXTEtcSmallSize, glFormat: 36196 },
+    7: { sizeFunc: DXTEtcSmallSize, glFormat: 33776 },
+    8: { sizeFunc: DXTEtcAstcBigSize, glFormat: 33777 },
+    9: { sizeFunc: DXTEtcAstcBigSize, glFormat: 33778 },
+    11: { sizeFunc: DXTEtcAstcBigSize, glFormat: 33779 },
+    22: { sizeFunc: DXTEtcSmallSize, glFormat: 37492 },
+    23: { sizeFunc: DXTEtcAstcBigSize, glFormat: 37496 },
+    24: { sizeFunc: DXTEtcSmallSize, glFormat: 37494 },
+    25: { sizeFunc: DXTEtcSmallSize, glFormat: 37488 },
+    26: { sizeFunc: DXTEtcAstcBigSize, glFormat: 37490 },
+    27: { sizeFunc: DXTEtcAstcBigSize, glFormat: 37808 },
+    28: { sizeFunc: ATC5x4Size, glFormat: 37809 },
+    29: { sizeFunc: ATC5x5Size, glFormat: 37810 },
+    30: { sizeFunc: ATC6x5Size, glFormat: 37811 },
+    31: { sizeFunc: ATC6x6Size, glFormat: 37812 },
+    32: { sizeFunc: ATC8x5Size, glFormat: 37813 },
+    33: { sizeFunc: ATC8x6Size, glFormat: 37814 },
+    34: { sizeFunc: ATC8x8Size, glFormat: 37815 },
+    35: { sizeFunc: ATC10x5Size, glFormat: 37816 },
+    36: { sizeFunc: ATC10x6Size, glFormat: 37817 },
+    37: { sizeFunc: ATC10x8Size, glFormat: 37818 },
+    38: { sizeFunc: ATC10x10Size, glFormat: 37819 },
+    39: { sizeFunc: ATC12x10Size, glFormat: 37820 },
+    40: { sizeFunc: ATC12x12Size, glFormat: 37821 }
+  };
+  function PVRParser(data) {
+    const header = new Uint32Array(data, 0, 13);
+    const pvrFormat = header[2];
+    const internalFormat = FORMATS[pvrFormat].glFormat;
+    const sizeFunction = FORMATS[pvrFormat].sizeFunc;
+    const mipmapLevels = header[11];
+    const width = header[7];
+    const height = header[6];
+    const dataOffset = 52 + header[12];
+    const image = new Uint8Array(data, dataOffset);
+    const mipmaps = new Array(mipmapLevels);
+    let offset = 0;
+    let levelWidth = width;
+    let levelHeight = height;
+    for (let i = 0; i < mipmapLevels; i++) {
+      const levelSize = sizeFunction(levelWidth, levelHeight);
+      mipmaps[i] = {
+        data: new Uint8Array(image.buffer, image.byteOffset + offset, levelSize),
+        width: levelWidth,
+        height: levelHeight
+      };
+      levelWidth = Math.max(1, levelWidth >> 1);
+      levelHeight = Math.max(1, levelHeight >> 1);
+      offset += levelSize;
     }
-    const file = new File(key, url);
+    return {
+      mipmaps,
+      width,
+      height,
+      internalFormat,
+      compressed: true,
+      generateMipmap: false
+    };
+  }
+
+  // ../phaser-genesis/src/renderer/webgl1/textures/GetCompressedTextureName.ts
+  function GetCompressedTextureName(baseFormat, format) {
+    const renderer = WebGLRendererInstance.get();
+    if (renderer) {
+      const supportedFormats = renderer.compression[baseFormat.toUpperCase()];
+      if (format in supportedFormats) {
+        return supportedFormats[format];
+      }
+    }
+  }
+
+  // ../phaser-genesis/src/renderer/webgl1/textures/SupportsCompressedTexture.ts
+  function SupportsCompressedTexture(baseFormat, format) {
+    const renderer = WebGLRendererInstance.get();
+    if (renderer) {
+      const supportedFormats = renderer.compression[baseFormat.toUpperCase()];
+      if (supportedFormats) {
+        if (format) {
+          return format in supportedFormats;
+        } else {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  // ../phaser-genesis/src/loader/files/TextureFile.ts
+  function TextureFile(key, urls, glConfig = {}) {
+    const entry = {
+      format: null,
+      type: null,
+      textureURL: null,
+      atlasURL: null
+    };
+    for (const textureBaseFormat in urls) {
+      if (SupportsCompressedTexture(textureBaseFormat)) {
+        const urlEntry = urls[textureBaseFormat];
+        if (typeof urlEntry === "string") {
+          entry.textureURL = urlEntry;
+        } else {
+          Object.assign(entry, urlEntry);
+        }
+        entry.format = textureBaseFormat.toUpperCase();
+        break;
+      }
+    }
+    if (!entry) {
+      console.warn(`TextureFile: ${key} = No supported format or IMG fallback`);
+      return;
+    }
+    if (entry.format === "IMG") {
+      if (entry.atlasURL) {
+        return AtlasFile(key, entry.textureURL, entry.atlasURL, glConfig);
+      } else {
+        return ImageFile(key, entry.textureURL, glConfig);
+      }
+    }
+    const file = new File(key, entry.textureURL);
     file.load = () => {
       file.url = GetURL(file.key, file.url, ".png", file.loader);
       file.responseType = "arraybuffer";
       if (file.loader) {
         file.crossOrigin = file.loader.crossOrigin;
       }
+      if (!entry.type) {
+        entry.type = file.url.endsWith(".ktx") ? "KTX" : "PVR";
+      }
       return new Promise((resolve, reject) => {
         const textureManager = TextureManagerInstance.get();
         if (textureManager.has(file.key)) {
           resolve(file);
         } else {
-          XHRLoader(file).then((file2) => {
-            const textureData = parsePVR(file2.data);
-            const texture = new Texture(null, textureData.width, textureData.height, {
-              data: textureData.data[0],
-              format: textureData.format,
-              compressed: true,
-              generateMipmap: false
-            });
-            console.log(textureData);
-            textureManager.add(file2.key, texture);
-            resolve(file2);
-          }).catch((file2) => {
+          XHRLoader(file).then((file2) => __async(this, null, function* () {
+            if (file2.hasLoaded) {
+              let textureData;
+              if (entry.type === "PVR") {
+                textureData = PVRParser(file2.data);
+              } else if (entry.type === "KTX") {
+                textureData = KTXParser(file2.data);
+              }
+              if (textureData && SupportsCompressedTexture(entry.format, textureData.internalFormat)) {
+                textureData.format = GetCompressedTextureName(entry.format, textureData.internalFormat);
+                const texture = new Texture(null, textureData.width, textureData.height, Object.assign(glConfig, textureData));
+                textureManager.add(file2.key, texture);
+                ProcessBindingQueue();
+                if (entry.atlasURL) {
+                  const json = JSONFile(key, entry.atlasURL);
+                  json.url = GetURL(json.key, json.url, ".json", file2.loader);
+                  json.skipCache = true;
+                  yield json.load();
+                  if (json.data) {
+                    AtlasParser(texture, json.data);
+                    resolve(file2);
+                  }
+                } else {
+                  resolve(file2);
+                }
+              }
+            } else {
+              reject(file2);
+            }
+          })).catch((file2) => {
             reject(file2);
           });
         }
@@ -5237,20 +5538,22 @@ void main (void)
     }
     create() {
       return __async(this, null, function* () {
-        yield TextureFile("test", "assets/compressed/atlas-pvr-rgba8888.pvr").load();
-        const d = new Text(10, 10, "", "10px monospace");
-        d.origin.set(0, 0);
-        d.backgroundStyle = "#000000";
-        d.text = "atlas-pvr-rgba8888.pvr";
+        yield TextureFile("labs", {
+          "ASTC": "assets/compressed/labs-astc-4x4.pvr",
+          "ETC1": "assets/compressed/labs-etc1.pvr",
+          "PVRTC": "assets/compressed/labs-pvrtc-4bpp-rgba-srgb.pvr",
+          "S3TC": "assets/compressed/labs-bc3-srgb.pvr",
+          "IMG": "assets/compressed/labs.png"
+        }).load();
         const world3 = new StaticWorld(this);
-        const sprite = new Sprite(-200, 0, "test");
-        sprite.origin.set(0, 0);
-        AddChild(world3, sprite);
-        AddChild(world3, d);
+        const labs = new Sprite(400, 300, "labs");
+        const debug = new Text(10, 10, labs.texture.binding.format, "12px monospace").setOrigin(0);
+        AddChild(world3, labs);
+        AddChild(world3, debug);
       });
     }
   };
-  new Game(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(15609133), Scenes(Demo));
+  new Game(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(2960759), Scenes(Demo));
 })();
 /**
  * @author       Niklas von Hertzen (https://github.com/niklasvh/base64-arraybuffer)

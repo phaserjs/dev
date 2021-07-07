@@ -18,21 +18,22 @@ class Demo extends Scene
 
     async create ()
     {
-        await TextureFile('labs', {
-            'ASTC': 'assets/compressed/labs-astc-4x4.pvr',
-            'ETC1': 'assets/compressed/labs-etc1.pvr',
-            'PVRTC': 'assets/compressed/labs-pvrtc-4bpp-rgba-srgb.pvr',
-            'S3TC': 'assets/compressed/labs-bc3-srgb.pvr',
-            'IMG': 'assets/compressed/labs.png'
+        await TextureFile('test', {
+            'ASTC': { type: 'PVR', textureURL: 'assets/compressed/astc-4x4-unorm-linear.pvr' },
+            'PVRTC': { type: 'PVR', textureURL: 'assets/compressed/atlas-pvr-pvrtci2bpp-rgba.pvr' },
+            'S3TC': { type: 'PVR', textureURL: 'assets/compressed/atlas-pvr-dxt5.pvr', atlasURL: 'assets/compressed/atlas-pvr-dxt5.json' },
+            'IMG': { textureURL: 'assets/compressed/atlas-png.png', atlasURL: 'assets/compressed/atlas-png.json' }
         }).load();
 
         const world = new StaticWorld(this);
 
-        const labs = new Sprite(400, 300, 'labs');
+        const bubble = new Sprite(0, 40, 'test', 'bubble256').setOrigin(0);
+        const logo = new Sprite(80, 100, 'test', 'logo').setOrigin(0);
 
-        const debug = new Text(10, 10, labs.texture.binding.format, '12px monospace').setOrigin(0);
+        const debug = new Text(10, 10, bubble.texture.binding.format, '12px monospace').setOrigin(0);
 
-        AddChild(world, labs);
+        AddChild(world, bubble);
+        AddChild(world, logo);
         AddChild(world, debug);
     }
 }

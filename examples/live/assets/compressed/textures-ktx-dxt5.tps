@@ -38,7 +38,7 @@
         <key>flipPVR</key>
         <false/>
         <key>pvrCompressionQuality</key>
-        <enum type="SettingsBase::PvrCompressionQuality">PVR_QUALITY_BEST</enum>
+        <enum type="SettingsBase::PvrCompressionQuality">PVR_QUALITY_NORMAL</enum>
         <key>atfCompressData</key>
         <false/>
         <key>mipMapMinSize</key>
@@ -82,13 +82,13 @@
         <key>atfFormats</key>
         <string></string>
         <key>textureFormat</key>
-        <enum type="SettingsBase::TextureFormat">pvr3</enum>
+        <enum type="SettingsBase::TextureFormat">ktx</enum>
         <key>borderPadding</key>
         <uint>1</uint>
         <key>maxTextureSize</key>
         <QSize>
             <key>width</key>
-            <int>2048</int>
+            <int>1024</int>
             <key>height</key>
             <int>2048</int>
         </QSize>
@@ -108,7 +108,7 @@
             <key>sizeConstraints</key>
             <enum type="AlgorithmSettings::SizeConstraints">POT</enum>
             <key>forceSquared</key>
-            <true/>
+            <false/>
             <key>maxRects</key>
             <struct type="AlgorithmMaxRectsSettings">
                 <key>heuristic</key>
@@ -132,7 +132,7 @@
             <key>data</key>
             <struct type="DataFile">
                 <key>name</key>
-                <filename>atlas-pvr-pvrtci4bpp-rgba.json</filename>
+                <filename>textures-ktx-dxt5.json</filename>
             </struct>
         </map>
         <key>multiPack</key>
@@ -140,7 +140,7 @@
         <key>forceIdenticalLayout</key>
         <false/>
         <key>outputFormat</key>
-        <enum type="SettingsBase::OutputFormat">PVRTCI_4BPP_RGBA</enum>
+        <enum type="SettingsBase::OutputFormat">DXT5</enum>
         <key>alphaHandling</key>
         <enum type="SettingsBase::AlphaHandling">PremultiplyAlpha</enum>
         <key>contentProtection</key>
@@ -181,21 +181,6 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
-            <key type="filename">../amitie1.png</key>
-            <struct type="IndividualSpriteSettings">
-                <key>pivotPoint</key>
-                <point_f>0.5,0.5</point_f>
-                <key>spriteScale</key>
-                <double>1</double>
-                <key>scale9Enabled</key>
-                <false/>
-                <key>scale9Borders</key>
-                <rect>130,150,259,299</rect>
-                <key>scale9Paddings</key>
-                <rect>130,150,259,299</rect>
-                <key>scale9FromFile</key>
-                <false/>
-            </struct>
             <key type="filename">../boxing-glove.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
@@ -208,6 +193,21 @@
                 <rect>22,32,45,63</rect>
                 <key>scale9Paddings</key>
                 <rect>22,32,45,63</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
+            <key type="filename">../brain.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>spriteScale</key>
+                <double>1</double>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>32,28,64,56</rect>
+                <key>scale9Paddings</key>
+                <rect>32,28,64,56</rect>
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
@@ -226,7 +226,7 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">../cybertank-body.png</key>
+            <key type="filename">../cream.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
@@ -235,84 +235,9 @@
                 <key>scale9Enabled</key>
                 <false/>
                 <key>scale9Borders</key>
-                <rect>24,30,48,60</rect>
+                <rect>99,141,198,283</rect>
                 <key>scale9Paddings</key>
-                <rect>24,30,48,60</rect>
-                <key>scale9FromFile</key>
-                <false/>
-            </struct>
-            <key type="filename">../cybertank-bullet.png</key>
-            <struct type="IndividualSpriteSettings">
-                <key>pivotPoint</key>
-                <point_f>0.5,0.5</point_f>
-                <key>spriteScale</key>
-                <double>1</double>
-                <key>scale9Enabled</key>
-                <false/>
-                <key>scale9Borders</key>
-                <rect>2,2,4,4</rect>
-                <key>scale9Paddings</key>
-                <rect>2,2,4,4</rect>
-                <key>scale9FromFile</key>
-                <false/>
-            </struct>
-            <key type="filename">../cybertank-grenade.png</key>
-            <struct type="IndividualSpriteSettings">
-                <key>pivotPoint</key>
-                <point_f>0.5,0.5</point_f>
-                <key>spriteScale</key>
-                <double>1</double>
-                <key>scale9Enabled</key>
-                <false/>
-                <key>scale9Borders</key>
-                <rect>2,3,4,6</rect>
-                <key>scale9Paddings</key>
-                <rect>2,3,4,6</rect>
-                <key>scale9FromFile</key>
-                <false/>
-            </struct>
-            <key type="filename">../cybertank-gun.png</key>
-            <struct type="IndividualSpriteSettings">
-                <key>pivotPoint</key>
-                <point_f>0.5,0.5</point_f>
-                <key>spriteScale</key>
-                <double>1</double>
-                <key>scale9Enabled</key>
-                <false/>
-                <key>scale9Borders</key>
-                <rect>12,7,24,13</rect>
-                <key>scale9Paddings</key>
-                <rect>12,7,24,13</rect>
-                <key>scale9FromFile</key>
-                <false/>
-            </struct>
-            <key type="filename">../cybertank-wheel.png</key>
-            <struct type="IndividualSpriteSettings">
-                <key>pivotPoint</key>
-                <point_f>0.5,0.5</point_f>
-                <key>spriteScale</key>
-                <double>1</double>
-                <key>scale9Enabled</key>
-                <false/>
-                <key>scale9Borders</key>
-                <rect>11,12,21,24</rect>
-                <key>scale9Paddings</key>
-                <rect>11,12,21,24</rect>
-                <key>scale9FromFile</key>
-                <false/>
-            </struct>
-            <key type="filename">../fantasy-tiles.png</key>
-            <struct type="IndividualSpriteSettings">
-                <key>pivotPoint</key>
-                <point_f>0.5,0.5</point_f>
-                <key>spriteScale</key>
-                <double>1</double>
-                <key>scale9Enabled</key>
-                <false/>
-                <key>scale9Borders</key>
-                <rect>128,128,256,256</rect>
-                <key>scale9Paddings</key>
-                <rect>128,128,256,256</rect>
+                <rect>99,141,198,283</rect>
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
@@ -331,7 +256,22 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">../muzzleflash2.png</key>
+            <key type="filename">../orange-cat1.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>spriteScale</key>
+                <double>1</double>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>7,10,13,19</rect>
+                <key>scale9Paddings</key>
+                <rect>7,10,13,19</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
+            <key type="filename">../red.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
@@ -346,20 +286,48 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
+            <key type="filename">../sonic.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>spriteScale</key>
+                <double>1</double>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>10,11,19,21</rect>
+                <key>scale9Paddings</key>
+                <rect>10,11,19,21</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
+            <key type="filename">../textures/stonegrass.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>spriteScale</key>
+                <double>1</double>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>128,128,256,256</rect>
+                <key>scale9Paddings</key>
+                <rect>128,128,256,256</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
         </map>
         <key>fileList</key>
         <array>
-            <filename>../amitie1.png</filename>
-            <filename>../boxing-glove.png</filename>
-            <filename>../bubble256.png</filename>
-            <filename>../cybertank-body.png</filename>
-            <filename>../cybertank-bullet.png</filename>
-            <filename>../cybertank-grenade.png</filename>
-            <filename>../cybertank-gun.png</filename>
-            <filename>../cybertank-wheel.png</filename>
+            <filename>../textures/stonegrass.png</filename>
+            <filename>../cream.png</filename>
             <filename>../logo.png</filename>
-            <filename>../muzzleflash2.png</filename>
-            <filename>../fantasy-tiles.png</filename>
+            <filename>../orange-cat1.png</filename>
+            <filename>../red.png</filename>
+            <filename>../sonic.png</filename>
+            <filename>../bubble256.png</filename>
+            <filename>../brain.png</filename>
+            <filename>../boxing-glove.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>

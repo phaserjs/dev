@@ -529,7 +529,7 @@
         {
           "path": "examples/live/textures/compressed textures.js",
           "name": "compressed textures.js",
-          "size": 162155,
+          "size": 177196,
           "extension": ".js",
           "type": "file"
         },
@@ -590,10 +590,10 @@
           "type": "file"
         }
       ],
-      "size": 1142440,
+      "size": 1157481,
       "type": "directory"
     }
   ],
-  "size": 9740346,
+  "size": 9755387,
   "type": "directory"
 }
