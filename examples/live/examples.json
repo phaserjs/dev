@@ -294,6 +294,28 @@
       "name": "gameobjects",
       "children": [
         {
+          "path": "examples/live/gameobjects/directdraw",
+          "name": "directdraw",
+          "children": [
+            {
+              "path": "examples/live/gameobjects/directdraw/draw rect.js",
+              "name": "draw rect.js",
+              "size": 162381,
+              "extension": ".js",
+              "type": "file"
+            },
+            {
+              "path": "examples/live/gameobjects/directdraw/layered drawing.js",
+              "name": "layered drawing.js",
+              "size": 177818,
+              "extension": ".js",
+              "type": "file"
+            }
+          ],
+          "size": 340199,
+          "type": "directory"
+        },
+        {
           "path": "examples/live/gameobjects/effectlayer",
           "name": "effectlayer",
           "children": [
@@ -474,7 +496,7 @@
           "type": "directory"
         }
       ],
-      "size": 3263649,
+      "size": 3603848,
       "type": "directory"
     },
     {
@@ -529,7 +551,7 @@
         {
           "path": "examples/live/textures/compressed textures.js",
           "name": "compressed textures.js",
-          "size": 177196,
+          "size": 177427,
           "extension": ".js",
           "type": "file"
         },
@@ -590,10 +612,10 @@
           "type": "file"
         }
       ],
-      "size": 1157481,
+      "size": 1157712,
       "type": "directory"
     }
   ],
-  "size": 9755387,
+  "size": 10095817,
   "type": "directory"
 }
