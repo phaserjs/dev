@@ -3,13 +3,9 @@ import { Sprite, Text } from '../../../../phaser-genesis/src/gameobjects/';
 
 import { AddChild } from '../../../../phaser-genesis/src/display/';
 import { Game } from '../../../../phaser-genesis/src/Game';
-import { GameInstance } from '../../../../phaser-genesis/src/GameInstance';
-import { GetRenderer } from '../../../../phaser-genesis/src/config/renderer';
-import { IWebGLRenderer } from '../../../../phaser-genesis/src/renderer/webgl1/IWebGLRenderer';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
 import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
 import { TextureFile } from '../../../../phaser-genesis/src/loader/files';
-import { WebGLRenderer } from '../../../../phaser-genesis/src/renderer/webgl1';
 
 class Demo extends Scene
 {
@@ -22,58 +18,23 @@ class Demo extends Scene
 
     async create ()
     {
-        // const d = new Text(10, 10, 'Hello World', '12px monospace');
-
-        // d.backgroundStyle = '#000000';
-        // d.lineSpacing = 2;
-
-        // d.origin.set(0, 0);
-
-        // const log = [];
-
-        // for (const [ key, value ] of Object.entries(this.game.renderer.compression))
-        // {
-        //     log.push(`${key}: ${value}`);
-
-        //     if (value !== null)
-        //     {
-        //         for (const key2 in value)
-        //         {
-        //             log.push(`--- ${key2}`);
-        //         }
-        //     }
-        // }
-
-        // d.setText(log);
-
-        //  Works, but no alpha channel
-        // await TextureFile('test', 'assets/compressed/atlas-pvr-dxt1.pvr').load();
-
-        //  Works on Windows / Mac OS with alpha channel
-        // await TextureFile('test', 'assets/compressed/atlas-pvr-dxt5.pvr').load();
-
-        //  Android?
-        // await TextureFile('test', 'assets/compressed/atlas-pvr-etc2-rgba.pvr').load();
-
-        //  iOS
-        // await TextureFile('test', 'assets/compressed/atlas-pvr-pvrtci2bpp-rgba.pvr').load();
-        // await TextureFile('test', 'assets/compressed/atlas-pvr-pvrtci4bpp-rgba.pvr').load();
-        // await TextureFile('test', 'assets/compressed/atlas-pvr-rgba-astc-4x4.pvr').load();
-        await TextureFile('test', 'assets/compressed/eac-r11-unorm-linear.pvr').load();
-
-        const d = new Text(10, 10, 'red boi', '12px monospace');
-        d.origin.set(0, 0);
-        // d.backgroundStyle = '#000000';
-        // d.text = 'RGBA knickers';
+        await TextureFile('test', {
+            'ASTC': { type: 'PVR', textureURL: 'assets/compressed/astc-4x4-unorm-linear.pvr' },
+            'PVRTC': { type: 'PVR', textureURL: 'assets/compressed/atlas-pvr-pvrtci2bpp-rgba.pvr' },
+            'S3TC': { type: 'PVR', textureURL: 'assets/compressed/atlas-pvr-dxt5.pvr', atlasURL: 'assets/compressed/atlas-pvr-dxt5.json' },
+            'IMG': { textureURL: 'assets/compressed/atlas-png.png', atlasURL: 'assets/compressed/atlas-png.json' }
+        }).load();
 
         const world = new StaticWorld(this);
 
-        const sprite = new Sprite(0, 0, 'test');
+        const bubble = new Sprite(0, 40, 'test', 'bubble256').setOrigin(0);
+        const logo = new Sprite(80, 100, 'test', 'logo').setOrigin(0);
 
-        sprite.origin.set(0, 0);
+        const debug = new Text(10, 10, bubble.texture.binding.format, '12px monospace').setOrigin(0);
 
-        AddChild(world, sprite);
-        AddChild(world, d);
+        AddChild(world, bubble);
+        AddChild(world, logo);
+        AddChild(world, debug);
     }
 }
 
