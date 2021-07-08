@@ -647,9 +647,9 @@
   }
 
   // ../phaser-genesis/src/renderer/webgl1/buffers/DeleteGLBuffer.ts
-  function DeleteGLBuffer(buffer) {
-    if (gl.isBuffer(buffer)) {
-      gl.deleteBuffer(buffer);
+  function DeleteGLBuffer(buffer3) {
+    if (gl.isBuffer(buffer3)) {
+      gl.deleteBuffer(buffer3);
     }
   }
 
@@ -665,7 +665,6 @@
       __publicField(this, "bufferByteSize");
       __publicField(this, "data");
       __publicField(this, "vertexViewF32");
-      __publicField(this, "vertexViewU32");
       __publicField(this, "vertexBuffer");
       __publicField(this, "entryElementSize");
       __publicField(this, "indexed", false);
@@ -706,7 +705,6 @@
       const data = new ArrayBuffer(this.bufferByteSize);
       this.data = data;
       this.vertexViewF32 = new Float32Array(data);
-      this.vertexViewU32 = new Uint32Array(data);
       this.vertexBuffer = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
       const type = this.isDynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW;
@@ -736,7 +734,6 @@
       DeleteGLBuffer(this.vertexBuffer);
       this.data = null;
       this.vertexViewF32 = null;
-      this.vertexViewU32 = null;
       this.vertexBuffer = null;
     }
   };
@@ -1287,8 +1284,8 @@ void main (void)
   };
   var createTypeStore = (type, length) => {
     const totalBytes = length * TYPES[type].BYTES_PER_ELEMENT;
-    const buffer = new ArrayBuffer(totalBytes);
-    return new TYPES[type](buffer);
+    const buffer3 = new ArrayBuffer(totalBytes);
+    return new TYPES[type](buffer3);
   };
   var createArrayStore = (metadata, type, length) => {
     const size = metadata[$storeSize];
@@ -2324,19 +2321,21 @@ void main (void)
   });
 
   // ../phaser-genesis/src/renderer/webgl1/renderpass/GetVertexBufferEntry.ts
+  var bufferEntry = {
+    buffer: null,
+    F32: null,
+    offset: 0
+  };
   function GetVertexBufferEntry(renderPass, addToCount = 0) {
-    const buffer = renderPass.vertexbuffer.current;
-    if (renderPass.count + addToCount >= buffer.batchSize) {
+    const buffer3 = renderPass.vertexbuffer.current;
+    if (renderPass.count + addToCount >= buffer3.batchSize) {
       Flush(renderPass);
     }
-    const offset = renderPass.count * buffer.entryElementSize;
+    bufferEntry.buffer = buffer3;
+    bufferEntry.F32 = buffer3.vertexViewF32;
+    bufferEntry.offset = renderPass.count * buffer3.entryElementSize;
     renderPass.count += addToCount;
-    return {
-      buffer,
-      F32: buffer.vertexViewF32,
-      U32: buffer.vertexViewU32,
-      offset
-    };
+    return bufferEntry;
   }
 
   // ../phaser-genesis/src/display/RemoveChildrenBetween.ts
@@ -2636,11 +2635,6 @@ void main (void)
       instance2 = manager;
     }
   };
-
-  // ../phaser-genesis/src/textures/GetTexture.ts
-  function GetTexture(key) {
-    return TextureManagerInstance.get().get(key);
-  }
 
   // ../phaser-genesis/src/renderer/webgl1/draw/DrawFrame.ts
   function DrawFrame(renderPass, texture, frame2, x, y, alpha = 1, scaleX = 1, scaleY = 1) {
@@ -3286,11 +3280,11 @@ void main (void)
   }
 
   // ../phaser-genesis/src/geom/circle/CircleContains.ts
-  function CircleContains(circle, x, y) {
-    if (circle.radius > 0 && x >= circle.left && x <= circle.right && y >= circle.top && y <= circle.bottom) {
-      const dx = (circle.x - x) * (circle.x - x);
-      const dy = (circle.y - y) * (circle.y - y);
-      return dx + dy <= circle.radius * circle.radius;
+  function CircleContains(circle2, x, y) {
+    if (circle2.radius > 0 && x >= circle2.left && x <= circle2.right && y >= circle2.top && y <= circle2.bottom) {
+      const dx = (circle2.x - x) * (circle2.x - x);
+      const dy = (circle2.y - y) * (circle2.y - y);
+      return dx + dy <= circle2.radius * circle2.radius;
     } else {
       return false;
     }
@@ -3355,25 +3349,94 @@ void main (void)
   };
 
   // ../phaser-genesis/src/geom/circle/GetCircleCircumference.ts
-  function GetCircleCircumference(circle) {
-    return 2 * (Math.PI * circle.radius);
+  function GetCircleCircumference(circle2) {
+    return 2 * (Math.PI * circle2.radius);
   }
 
   // ../phaser-genesis/src/geom/circle/GetCircleCircumferencePoint.ts
-  function GetCircleCircumferencePoint(circle, angle, out = new Vec2()) {
-    return out.set(circle.x + circle.radius * Math.cos(angle), circle.y + circle.radius * Math.sin(angle));
+  function GetCircleCircumferencePoint(circle2, angle, out = new Vec2()) {
+    return out.set(circle2.x + circle2.radius * Math.cos(angle), circle2.y + circle2.radius * Math.sin(angle));
   }
 
-  // ../phaser-genesis/src/geom/circle/GetCirclePoints.ts
-  function GetCirclePoints(circle, step, quantity = 0, out = []) {
+  // ../phaser-genesis/src/geom/circle/GetCirclePointsBetween.ts
+  function GetCirclePointsBetween(circle2, startAngle, endAngle, step, anticlockwise = false, includeCenter = false, quantity = 0, out = []) {
     if (!quantity) {
-      quantity = GetCircleCircumference(circle) / step;
+      quantity = GetCircleCircumference(circle2) / step;
     }
     for (let i = 0; i < quantity; i++) {
       const angle = FromPercent(i / quantity, 0, MATH_CONST.PI2);
-      out.push(GetCircleCircumferencePoint(circle, angle));
+      if (angle >= startAngle && angle <= endAngle) {
+        out.push(GetCircleCircumferencePoint(circle2, angle));
+      }
+    }
+    if (anticlockwise) {
+      out = out.reverse();
+    }
+    if (includeCenter) {
+      out.push(new Vec2(circle2.x, circle2.y));
     }
     return out;
+  }
+
+  // ../phaser-genesis/src/renderer/webgl1/draw/GetTriBuffer.ts
+  function GetTriBuffer() {
+    return new Float32Array([
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]);
+  }
+
+  // ../phaser-genesis/src/renderer/webgl1/draw/BatchTriangle.ts
+  var buffer = GetTriBuffer();
+  function BatchTriangle(F32, offset, textureIndex, x1, y1, x2, y2, x3, y3, r, g, b, a) {
+    buffer[0] = x1;
+    buffer[1] = y1;
+    buffer[4] = textureIndex;
+    buffer[5] = r;
+    buffer[6] = g;
+    buffer[7] = b;
+    buffer[8] = a;
+    buffer[9] = x2;
+    buffer[10] = y2;
+    buffer[13] = textureIndex;
+    buffer[14] = r;
+    buffer[15] = g;
+    buffer[16] = b;
+    buffer[17] = a;
+    buffer[18] = x3;
+    buffer[19] = y3;
+    buffer[22] = textureIndex;
+    buffer[23] = r;
+    buffer[24] = g;
+    buffer[25] = b;
+    buffer[26] = a;
+    F32.set(buffer, offset);
+    return offset + 27;
   }
 
   // ../phaser-genesis/src/geom/PolyPartition.ts
@@ -3562,137 +3625,158 @@ void main (void)
   }
 
   // ../phaser-genesis/src/renderer/webgl1/draw/FillArc.ts
-  function FillArc(renderPass, x, y, radius, startAngle, endAngle, anticlockwise, color, alpha = 1) {
-    const packedColor = PackColor(color, alpha);
-    const textureIndex = renderPass.textures.set(GetTexture("__WHITE"));
-    const points = GetCirclePoints(new Circle(x, y, radius), 8);
+  var circle = new Circle();
+  function FillArc(renderPass, x, y, radius, startAngle, endAngle, steps, anticlockwise, includeCenter, red, green, blue, alpha) {
+    circle.set(x, y, radius);
+    const points = GetCirclePointsBetween(circle, startAngle, endAngle, steps, anticlockwise, includeCenter);
     const tris = Triangulate(points);
-    const { F32, U32, offset } = GetVertexBufferEntry(renderPass, tris.length);
+    if (!tris.length) {
+      return;
+    }
+    const { F32, offset } = GetVertexBufferEntry(renderPass, tris.length);
+    const textureIndex = renderPass.textures.setWhite();
     let idx = offset;
     tris.forEach((tri) => {
-      F32[idx + 0] = tri[0].x;
-      F32[idx + 1] = tri[0].y;
-      F32[idx + 2] = 0;
-      F32[idx + 3] = 0;
-      F32[idx + 4] = textureIndex;
-      U32[idx + 5] = packedColor;
-      F32[idx + 6] = tri[1].x;
-      F32[idx + 7] = tri[1].y;
-      F32[idx + 8] = 0;
-      F32[idx + 9] = 1;
-      F32[idx + 10] = textureIndex;
-      U32[idx + 11] = packedColor;
-      F32[idx + 12] = tri[2].x;
-      F32[idx + 13] = tri[2].y;
-      F32[idx + 14] = 1;
-      F32[idx + 15] = 1;
-      F32[idx + 16] = textureIndex;
-      U32[idx + 17] = packedColor;
-      idx += 18;
+      idx = BatchTriangle(F32, idx, textureIndex, tri[0].x, tri[0].y, tri[1].x, tri[1].y, tri[2].x, tri[2].y, red, green, blue, alpha);
     });
   }
 
+  // ../phaser-genesis/src/renderer/webgl1/draw/GetQuadBuffer.ts
+  function GetQuadBuffer() {
+    return new Float32Array([
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]);
+  }
+
+  // ../phaser-genesis/src/renderer/webgl1/draw/BatchQuad.ts
+  var buffer2 = GetQuadBuffer();
+  function BatchQuad(F32, offset, textureIndex, x1, y1, x2, y2, x3, y3, x4, y4, r, g, b, a) {
+    buffer2[0] = x1;
+    buffer2[1] = y1;
+    buffer2[4] = textureIndex;
+    buffer2[5] = r;
+    buffer2[6] = g;
+    buffer2[7] = b;
+    buffer2[8] = a;
+    buffer2[9] = x2;
+    buffer2[10] = y2;
+    buffer2[13] = textureIndex;
+    buffer2[14] = r;
+    buffer2[15] = g;
+    buffer2[16] = b;
+    buffer2[17] = a;
+    buffer2[18] = x3;
+    buffer2[19] = y3;
+    buffer2[22] = textureIndex;
+    buffer2[23] = r;
+    buffer2[24] = g;
+    buffer2[25] = b;
+    buffer2[26] = a;
+    buffer2[27] = x1;
+    buffer2[28] = y1;
+    buffer2[31] = textureIndex;
+    buffer2[32] = r;
+    buffer2[33] = g;
+    buffer2[34] = b;
+    buffer2[35] = a;
+    buffer2[36] = x3;
+    buffer2[37] = y3;
+    buffer2[40] = textureIndex;
+    buffer2[41] = r;
+    buffer2[42] = g;
+    buffer2[43] = b;
+    buffer2[44] = a;
+    buffer2[45] = x4;
+    buffer2[46] = y4;
+    buffer2[49] = textureIndex;
+    buffer2[50] = r;
+    buffer2[51] = g;
+    buffer2[52] = b;
+    buffer2[53] = a;
+    F32.set(buffer2, offset);
+    return offset + 54;
+  }
+
   // ../phaser-genesis/src/renderer/webgl1/draw/FillLine.ts
-  function FillLine(renderPass, x0, y0, x1, y1, width, color, alpha = 1) {
-    const { F32, U32, offset } = GetVertexBufferEntry(renderPass, 1);
-    const packedColor = PackColor(color, alpha);
-    const textureIndex = renderPass.textures.set(GetTexture("__WHITE"));
-    const dx = x1 - x0;
-    const dy = y1 - y0;
+  function FillLine(renderPass, x1, y1, x2, y2, width, red, green, blue, alpha) {
+    const { F32, offset } = GetVertexBufferEntry(renderPass, 2);
+    const textureIndex = renderPass.textures.setWhite();
+    const dx = x2 - x1;
+    const dy = y2 - y1;
     const len = Math.sqrt(dx * dx + dy * dy);
-    const al0 = width * (y1 - y0) / len;
-    const al1 = width * (x0 - x1) / len;
-    const bl0 = width * (y1 - y0) / len;
-    const bl1 = width * (x0 - x1) / len;
-    F32[offset + 0] = x0 + al0;
-    F32[offset + 1] = y0 + al1;
-    F32[offset + 2] = 0;
-    F32[offset + 3] = 1;
-    F32[offset + 4] = textureIndex;
-    U32[offset + 5] = packedColor;
-    F32[offset + 6] = x0 - al0;
-    F32[offset + 7] = y0 - al1;
-    F32[offset + 8] = 0;
-    F32[offset + 9] = 0;
-    F32[offset + 10] = textureIndex;
-    U32[offset + 11] = packedColor;
-    F32[offset + 12] = x1 - bl0;
-    F32[offset + 13] = y1 - bl1;
-    F32[offset + 14] = 1;
-    F32[offset + 15] = 0;
-    F32[offset + 16] = textureIndex;
-    U32[offset + 17] = packedColor;
-    F32[offset + 18] = x1 + bl0;
-    F32[offset + 19] = y1 + bl1;
-    F32[offset + 20] = 1;
-    F32[offset + 21] = 1;
-    F32[offset + 22] = textureIndex;
-    U32[offset + 23] = packedColor;
+    width *= 0.5;
+    const al0 = width * (y2 - y1) / len;
+    const al1 = width * (x1 - x2) / len;
+    const bl0 = width * (y2 - y1) / len;
+    const bl1 = width * (x1 - x2) / len;
+    BatchQuad(F32, offset, textureIndex, Math.round(x1 + al0), Math.round(y1 + al1), Math.round(x1 - al0), Math.round(y1 - al1), Math.round(x2 - bl0), Math.round(y2 - bl1), Math.round(x2 + bl0), Math.round(y2 + bl1), red, green, blue, alpha);
   }
 
   // ../phaser-genesis/src/renderer/webgl1/draw/FillRect.ts
-  function FillRect(renderPass, x, y, width, height, color, alpha = 1) {
-    const { F32, U32, offset } = GetVertexBufferEntry(renderPass, 1);
-    const packedColor = PackColor(color, alpha);
-    const textureIndex = renderPass.textures.set(GetTexture("__WHITE"));
-    F32[offset + 0] = x;
-    F32[offset + 1] = y;
-    F32[offset + 2] = 0;
-    F32[offset + 3] = 1;
-    F32[offset + 4] = textureIndex;
-    U32[offset + 5] = packedColor;
-    F32[offset + 6] = x;
-    F32[offset + 7] = y + height;
-    F32[offset + 8] = 0;
-    F32[offset + 9] = 0;
-    F32[offset + 10] = textureIndex;
-    U32[offset + 11] = packedColor;
-    F32[offset + 12] = x + width;
-    F32[offset + 13] = y + height;
-    F32[offset + 14] = 1;
-    F32[offset + 15] = 0;
-    F32[offset + 16] = textureIndex;
-    U32[offset + 17] = packedColor;
-    F32[offset + 18] = x + width;
-    F32[offset + 19] = y;
-    F32[offset + 20] = 1;
-    F32[offset + 21] = 1;
-    F32[offset + 22] = textureIndex;
-    U32[offset + 23] = packedColor;
+  function FillRect(renderPass, x, y, width, height, red, green, blue, alpha) {
+    const { F32, offset } = GetVertexBufferEntry(renderPass, 2);
+    const textureIndex = renderPass.textures.setWhite();
+    BatchQuad(F32, offset, textureIndex, x, y, x, y + height, x + width, y + height, x + width, y, red, green, blue, alpha);
   }
 
   // ../phaser-genesis/src/renderer/webgl1/draw/FillTriangle.ts
-  function FillTriangle(renderPass, x1, y1, x2, y2, x3, y3, color, alpha = 1) {
-    const { F32, U32, offset } = GetVertexBufferEntry(renderPass, 1);
-    const packedColor = GetRGBArray(color);
-    const textureIndex = renderPass.textures.set(GetTexture("__WHITE"));
-    F32[offset + 0] = x1;
-    F32[offset + 1] = y1;
-    F32[offset + 2] = 0;
-    F32[offset + 3] = 1;
-    F32[offset + 4] = textureIndex;
-    F32[offset + 5] = packedColor[0];
-    F32[offset + 6] = packedColor[1];
-    F32[offset + 7] = packedColor[2];
-    F32[offset + 8] = packedColor[3];
-    F32[offset + 9] = x2;
-    F32[offset + 10] = y2;
-    F32[offset + 11] = 0;
-    F32[offset + 12] = 0;
-    F32[offset + 13] = textureIndex;
-    F32[offset + 14] = packedColor[0];
-    F32[offset + 15] = packedColor[1];
-    F32[offset + 16] = packedColor[2];
-    F32[offset + 17] = packedColor[3];
-    F32[offset + 18] = x3;
-    F32[offset + 19] = y3;
-    F32[offset + 20] = 1;
-    F32[offset + 21] = 0;
-    F32[offset + 22] = textureIndex;
-    F32[offset + 23] = packedColor[0];
-    F32[offset + 24] = packedColor[1];
-    F32[offset + 25] = packedColor[2];
-    F32[offset + 26] = packedColor[3];
+  function FillTriangle(renderPass, x1, y1, x2, y2, x3, y3, red, green, blue, alpha) {
+    const { F32, offset } = GetVertexBufferEntry(renderPass, 1);
+    const textureIndex = renderPass.textures.setWhite();
+    BatchTriangle(F32, offset, textureIndex, x1, y1, x2, y2, x3, y3, red, green, blue, alpha);
   }
 
   // ../phaser-genesis/src/gameobjects/directdraw/DirectDraw.ts
@@ -3700,34 +3784,76 @@ void main (void)
     constructor() {
       super();
       __publicField(this, "type", "DirectDraw");
+      __publicField(this, "red", 1);
+      __publicField(this, "green", 1);
+      __publicField(this, "blue", 1);
       __publicField(this, "alpha", 1);
+      __publicField(this, "smoothness", 8);
       __publicField(this, "renderPass");
     }
-    circle(x, y, radius, color, alpha = 1) {
-      FillArc(this.renderPass, x, y, radius, 0, 0, false, color, alpha);
+    set color(value) {
+      this.red = (value >> 16 & 255) / 255;
+      this.green = (value >> 8 & 255) / 255;
+      this.blue = (value & 255) / 255;
+    }
+    setRGB(red, green, blue, alpha = 1) {
+      this.red = red / 255;
+      this.green = green / 255;
+      this.blue = blue / 255;
+      this.alpha = alpha;
       return this;
     }
-    plot(x, y, color, alpha = 1) {
-      FillRect(this.renderPass, x, y, 1, 1, color, this.alpha * alpha);
+    arc(x, y, radius, startAngle = 0, endAngle = 6.283185307179586, anticlockwise = false, includeCenter = false, color) {
+      if (color !== void 0) {
+        this.color = color;
+      }
+      FillArc(this.renderPass, x, y, radius, startAngle, endAngle, this.smoothness, anticlockwise, includeCenter, this.red, this.green, this.blue, this.alpha);
       return this;
     }
-    box(x, y, width, height, color, thickness = 1, alpha = 1) {
-      this.line(x, y, x + width, y, thickness, color, alpha);
-      this.line(x, y + height - thickness, x + width, y + height - thickness, thickness, color, alpha);
-      this.line(x + thickness, y + thickness, x, y + height - thickness - thickness, thickness, color, alpha);
-      this.line(x + width - thickness, y + thickness, x + width, y + height - thickness - thickness, thickness, color, alpha);
+    circle(x, y, radius, color) {
+      if (color !== void 0) {
+        this.color = color;
+      }
+      FillArc(this.renderPass, x, y, radius, 0, Math.PI * 2, this.smoothness, false, false, this.red, this.green, this.blue, this.alpha);
       return this;
     }
-    rect(x, y, width, height, color, alpha = 1) {
-      FillRect(this.renderPass, x, y, width, height, color, this.alpha * alpha);
+    plot(x, y, color) {
+      if (color !== void 0) {
+        this.color = color;
+      }
+      FillRect(this.renderPass, x, y, 1, 1, this.red, this.green, this.blue, this.alpha);
       return this;
     }
-    triangle(x1, y1, x2, y2, x3, y3, color, alpha = 1) {
-      FillTriangle(this.renderPass, x1, y1, x2, y2, x3, y3, color, this.alpha * alpha);
+    box(x, y, width, height, thickness = 1, color) {
+      if (color !== void 0) {
+        this.color = color;
+      }
+      const tw = thickness * 0.5;
+      this.line(x, y + tw, x + width, y + tw, thickness);
+      this.line(x, y + height - tw, x + width, y + height - tw, thickness);
+      this.line(x + tw, y + thickness, x + tw, y + height - thickness, thickness);
+      this.line(x + width - tw, y + thickness, x + width - tw, y + height - thickness, thickness);
       return this;
     }
-    line(x0, y0, x1, y1, width, color, alpha = 1) {
-      FillLine(this.renderPass, x0, y0, x1, y1, width, color, this.alpha * alpha);
+    rect(x, y, width, height, color) {
+      if (color !== void 0) {
+        this.color = color;
+      }
+      FillRect(this.renderPass, x, y, width, height, this.red, this.green, this.blue, this.alpha);
+      return this;
+    }
+    triangle(x1, y1, x2, y2, x3, y3, color) {
+      if (color !== void 0) {
+        this.color = color;
+      }
+      FillTriangle(this.renderPass, x1, y1, x2, y2, x3, y3, this.red, this.green, this.blue, this.alpha);
+      return this;
+    }
+    line(x1, y1, x2, y2, width, color) {
+      if (color !== void 0) {
+        this.color = color;
+      }
+      FillLine(this.renderPass, x1, y1, x2, y2, width, this.red, this.green, this.blue, this.alpha);
       return this;
     }
     image(texture, x, y, alpha = 1, scaleX = 1, scaleY = 1) {
@@ -4338,6 +4464,67 @@ void main (void)
     }
   };
 
+  // ../phaser-genesis/src/textures/WhiteTexture.ts
+  var instance3;
+  var WhiteTexture = {
+    get: () => {
+      return instance3;
+    },
+    set: (texture) => {
+      instance3 = texture;
+    }
+  };
+
+  // ../phaser-genesis/src/textures/TextureManager.ts
+  var TextureManager = class {
+    constructor() {
+      __publicField(this, "textures");
+      this.textures = new Map();
+      this.createDefaultTextures();
+      TextureManagerInstance.set(this);
+    }
+    createDefaultTextures() {
+      this.add("__BLANK", new Texture(CreateCanvas(32, 32).canvas));
+      const missing = CreateCanvas(32, 32);
+      missing.strokeStyle = "#0f0";
+      missing.moveTo(0, 0);
+      missing.lineTo(32, 32);
+      missing.stroke();
+      missing.strokeRect(0.5, 0.5, 31, 31);
+      this.add("__MISSING", new Texture(missing.canvas));
+      const white = CreateCanvas(2, 2);
+      white.fillStyle = "#fff";
+      white.fillRect(0, 0, 2, 2);
+      const whiteTexture = this.add("__WHITE", new Texture(white.canvas));
+      WhiteTexture.set(whiteTexture);
+    }
+    get(key) {
+      const textures = this.textures;
+      if (textures.has(key)) {
+        return textures.get(key);
+      } else {
+        return textures.get("__MISSING");
+      }
+    }
+    has(key) {
+      return this.textures.has(key);
+    }
+    add(key, source, glConfig) {
+      let texture;
+      const textures = this.textures;
+      if (!textures.has(key)) {
+        if (source instanceof Texture) {
+          texture = source;
+        } else {
+          texture = new Texture(source, 0, 0, glConfig);
+        }
+        texture.key = key;
+        textures.set(key, texture);
+      }
+      return texture;
+    }
+  };
+
   // ../phaser-genesis/src/renderer/webgl1/renderpass/CreateTempTextures.ts
   function CreateTempTextures() {
     let maxGPUTextures = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
@@ -4377,6 +4564,9 @@ void main (void)
     unbind(index = 0) {
       gl.activeTexture(gl.TEXTURE0 + index);
       gl.bindTexture(gl.TEXTURE_2D, this.tempTextures[index]);
+    }
+    setWhite() {
+      return this.set(WhiteTexture.get());
     }
     set(texture) {
       if (!texture.binding) {
@@ -4437,46 +4627,46 @@ void main (void)
     get current() {
       return this.stack[this.index];
     }
-    add(buffer) {
+    add(buffer3) {
       this.index++;
       if (this.index === this.stack.length) {
-        this.stack.push(buffer);
+        this.stack.push(buffer3);
       } else {
-        this.stack[this.index] = buffer;
+        this.stack[this.index] = buffer3;
       }
-      return buffer;
+      return buffer3;
     }
     bindDefault() {
       this.index = 0;
       this.bind(this.default);
     }
-    bind(buffer) {
-      if (!buffer) {
-        buffer = this.current;
+    bind(buffer3) {
+      if (!buffer3) {
+        buffer3 = this.current;
       }
-      if (!buffer.isBound) {
-        const indexBuffer = buffer.indexed ? buffer.indexBuffer : null;
+      if (!buffer3.isBound) {
+        const indexBuffer = buffer3.indexed ? buffer3.indexBuffer : null;
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffer.vertexBuffer);
-        buffer.isBound = true;
-        if (this.active && this.active !== buffer) {
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer3.vertexBuffer);
+        buffer3.isBound = true;
+        if (this.active && this.active !== buffer3) {
           this.active.isBound = false;
         }
-        this.active = buffer;
+        this.active = buffer3;
       }
     }
     pop() {
       this.index--;
       this.bind();
     }
-    set(buffer) {
-      const entry = this.add(buffer);
+    set(buffer3) {
+      const entry = this.add(buffer3);
       this.bind(entry);
     }
-    setDefault(buffer) {
-      this.stack[0] = buffer;
+    setDefault(buffer3) {
+      this.stack[0] = buffer3;
       this.index = 0;
-      this.default = buffer;
+      this.default = buffer3;
     }
   };
 
@@ -4596,13 +4786,13 @@ void main (void)
   };
 
   // ../phaser-genesis/src/renderer/webgl1/WebGLRendererInstance.ts
-  var instance3;
+  var instance4;
   var WebGLRendererInstance = {
     get: () => {
-      return instance3;
+      return instance4;
     },
     set: (renderer) => {
-      instance3 = renderer;
+      instance4 = renderer;
     }
   };
 
@@ -4856,16 +5046,16 @@ void main (void)
   }
 
   // ../phaser-genesis/src/scenes/SceneManagerInstance.ts
-  var instance4;
+  var instance5;
   var SceneManagerInstance = {
     get: () => {
-      return instance4;
+      return instance5;
     },
     set: (manager) => {
-      if (instance4) {
+      if (instance5) {
         throw new Error("SceneManager should not be instantiated more than once");
       }
-      instance4 = manager;
+      instance5 = manager;
     }
   };
 
@@ -5030,55 +5220,6 @@ void main (void)
     });
     SetWorldSize(512);
   }
-
-  // ../phaser-genesis/src/textures/TextureManager.ts
-  var TextureManager = class {
-    constructor() {
-      __publicField(this, "textures");
-      this.textures = new Map();
-      this.createDefaultTextures();
-      TextureManagerInstance.set(this);
-    }
-    createDefaultTextures() {
-      this.add("__BLANK", new Texture(CreateCanvas(32, 32).canvas));
-      const missing = CreateCanvas(32, 32);
-      missing.strokeStyle = "#0f0";
-      missing.moveTo(0, 0);
-      missing.lineTo(32, 32);
-      missing.stroke();
-      missing.strokeRect(0.5, 0.5, 31, 31);
-      this.add("__MISSING", new Texture(missing.canvas));
-      const white = CreateCanvas(32, 32);
-      white.fillStyle = "#fff";
-      white.fillRect(0, 0, 32, 32);
-      this.add("__WHITE", new Texture(white.canvas));
-    }
-    get(key) {
-      const textures = this.textures;
-      if (textures.has(key)) {
-        return textures.get(key);
-      } else {
-        return textures.get("__MISSING");
-      }
-    }
-    has(key) {
-      return this.textures.has(key);
-    }
-    add(key, source, glConfig) {
-      let texture;
-      const textures = this.textures;
-      if (!textures.has(key)) {
-        if (source instanceof Texture) {
-          texture = source;
-        } else {
-          texture = new Texture(source, 0, 0, glConfig);
-        }
-        texture.key = key;
-        textures.set(key, texture);
-      }
-      return texture;
-    }
-  };
 
   // ../phaser-genesis/src/Game.ts
   var Game = class extends EventEmitter {
@@ -5451,9 +5592,13 @@ void main (void)
         const world3 = new StaticWorld(this);
         const dd = new DirectDraw();
         dd.render = () => {
-          dd.triangle(300, 200, 300, 400, 500, 400, 4294967040);
-          dd.triangle(100, 100, 300, 330, 500, 60, 2298413311);
+          dd.box(100, 100, 600, 400, 3, 16776960);
+          dd.circle(400, 300, 128, 16711680);
+          dd.triangle(350, 250, 350, 450, 550, 450, 42577);
+          dd.rect(90, 50, 256, 128, 15466636);
+          dd.line(100, 100, 700, 500, 1, 16776960);
         };
+        console.log(dd);
         AddChild(world3, dd);
       });
     }

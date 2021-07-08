@@ -1,6 +1,7 @@
 import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../../phaser-genesis/src/config';
 
 import { AddChild } from '../../../../../phaser-genesis/src/display';
+import { Between } from '../../../../../phaser-genesis/src/math';
 import { DirectDraw } from '../../../../../phaser-genesis/src/gameobjects';
 import { Game } from '../../../../../phaser-genesis/src/Game';
 import { ImageFile } from '../../../../../phaser-genesis/src/loader/files';
@@ -24,13 +25,18 @@ class Demo extends Scene
 
         dd.render = () =>
         {
-            // dd.circle(400, 300, 128, 0xff0000);
+            dd.box(100, 100, 600, 400, 3, 0xffff00);
 
-            dd.triangle(300, 200, 300, 400, 500, 400, 0xffffff00);
-            dd.triangle(100, 100, 300, 330, 500, 60, 0x88ff00ff);
+            dd.circle(400, 300, 128, 0xff0000);
 
-            // dd.rect(0, 0, 128, 128, 0xffffff);
+            dd.triangle(350, 250, 350, 450, 550, 450, 0x00a651);
+
+            dd.rect(90, 50, 256, 128, 0xec008c);
+
+            dd.line(100, 100, 700, 500, 1, 0xffff00);
         };
+
+        console.log(dd);
 
         AddChild(world, dd);
     }
