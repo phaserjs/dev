@@ -1,4 +1,5 @@
 import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../../phaser-genesis/src/config';
+import { Circle, GetCirclePoints } from '../../../../../phaser-genesis/src/geom/circle';
 import { DirectDraw, Sprite } from '../../../../../phaser-genesis/src/gameobjects';
 
 import { AddChildren } from '../../../../../phaser-genesis/src/display';
@@ -6,6 +7,7 @@ import { Game } from '../../../../../phaser-genesis/src/Game';
 import { ImageFile } from '../../../../../phaser-genesis/src/loader/files';
 import { Scene } from '../../../../../phaser-genesis/src/scenes/Scene';
 import { StaticWorld } from '../../../../../phaser-genesis/src/world/StaticWorld';
+import { Triangulate } from '../../../../../phaser-genesis/src/geom/PolyPartition';
 
 class Demo extends Scene
 {
@@ -20,6 +22,12 @@ class Demo extends Scene
     {
         await ImageFile('logo', 'assets/logo.png').load();
         await ImageFile('brain', 'assets/brain.png').load();
+
+        // const points = GetCirclePoints(new Circle(100, 100, 100), 8);
+
+        // const data = Triangulate(points);
+
+        // console.log(data);
 
         const world = new StaticWorld(this);
 
