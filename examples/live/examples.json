@@ -465,7 +465,7 @@
             {
               "path": "examples/live/gameobjects/sprite/lots of sprites.js",
               "name": "lots of sprites.js",
-              "size": 172580,
+              "size": 172595,
               "extension": ".js",
               "type": "file"
             },
@@ -496,9 +496,16 @@
               "size": 135359,
               "extension": ".js",
               "type": "file"
+            },
+            {
+              "path": "examples/live/gameobjects/sprite/sprite prerender.js",
+              "name": "sprite prerender.js",
+              "size": 169186,
+              "extension": ".js",
+              "type": "file"
             }
           ],
-          "size": 1770884,
+          "size": 1940085,
           "type": "directory"
         },
         {
@@ -531,7 +538,7 @@
           "type": "directory"
         }
       ],
-      "size": 4570513,
+      "size": 4739714,
       "type": "directory"
     },
     {
@@ -651,6 +658,6 @@
       "type": "directory"
     }
   ],
-  "size": 11062482,
+  "size": 11231683,
   "type": "directory"
 }
