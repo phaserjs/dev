@@ -3,6 +3,7 @@ import { DirectDraw, Sprite } from '../../../../../phaser-genesis/src/gameobject
 
 import { AddChildren } from '../../../../../phaser-genesis/src/display';
 import { Game } from '../../../../../phaser-genesis/src/Game';
+import { GetTexture } from '../../../../../phaser-genesis/src/textures';
 import { ImageFile } from '../../../../../phaser-genesis/src/loader/files';
 import { Scene } from '../../../../../phaser-genesis/src/scenes/Scene';
 import { StaticWorld } from '../../../../../phaser-genesis/src/world/StaticWorld';
@@ -23,8 +24,8 @@ class Demo extends Scene
 
         const world = new StaticWorld(this);
 
-        // const logo = new Sprite(400, 90, 'logo');
-        // const brain = new Sprite(400, 300, 'brain');
+        const logo = GetTexture('logo');
+        const brain = GetTexture('brain');
 
         const dd = new DirectDraw();
 
@@ -64,11 +65,11 @@ class Demo extends Scene
 
                 dd.plot(x, y);
             }
+
+            dd.image(logo, 400 - (logo.width / 2), 300 - (logo.height / 2));
         };
 
         AddChildren(world, dd);
-
-        // AddChildren(world, logo, dd, brain);
     }
 }
 

@@ -3832,6 +3832,26 @@ void main (void)
       DrawQuad(this.renderPass, texture, frame2, x0, y0, x1, y1, x2, y2, x3, y3, this.alpha * alpha);
       return this;
     }
+    tiles(texture, tileWidth, tileHeight, mapData, mapWidth, x = 0, y = 0) {
+      let tx = 0;
+      let ty = 0;
+      let i = 0;
+      const renderPass = this.renderPass;
+      const alpha = this.alpha;
+      mapData.forEach((tile) => {
+        if (tile !== -1) {
+          DrawFrame(renderPass, texture, tile, Math.floor(x + tx), Math.floor(y + ty), alpha);
+        }
+        i++;
+        tx += tileWidth;
+        if (i === mapWidth) {
+          tx = 0;
+          ty += tileHeight;
+          i = 0;
+        }
+      });
+      return this;
+    }
     render() {
     }
     renderGL(renderPass) {
@@ -4424,6 +4444,63 @@ void main (void)
     }
   };
 
+  // ../phaser-genesis/src/textures/parsers/SpriteSheetParser.ts
+  function SpriteSheetParser(texture, x, y, width, height, frameConfig) {
+    const {
+      frameWidth = null,
+      endFrame = -1,
+      margin = 0,
+      spacing = 0
+    } = frameConfig;
+    let {
+      frameHeight = null,
+      startFrame = 0
+    } = frameConfig;
+    if (!frameHeight) {
+      frameHeight = frameWidth;
+    }
+    if (frameWidth === null) {
+      throw new Error("SpriteSheetParser: Invalid frameWidth");
+    }
+    const row = Math.floor((width - margin + spacing) / (frameWidth + spacing));
+    const column = Math.floor((height - margin + spacing) / (frameHeight + spacing));
+    let total = row * column;
+    if (total === 0) {
+      console.warn("SpriteSheetParser: Frame config will result in zero frames");
+    }
+    if (startFrame > total || startFrame < -total) {
+      startFrame = 0;
+    }
+    if (startFrame < 0) {
+      startFrame = total + startFrame;
+    }
+    if (endFrame !== -1) {
+      total = startFrame + (endFrame + 1);
+    }
+    let fx = margin;
+    let fy = margin;
+    let ax = 0;
+    let ay = 0;
+    for (let i = 0; i < total; i++) {
+      ax = 0;
+      ay = 0;
+      const w = fx + frameWidth;
+      const h = fy + frameHeight;
+      if (w > width) {
+        ax = w - width;
+      }
+      if (h > height) {
+        ay = h - height;
+      }
+      texture.addFrame(i, x + fx, y + fy, frameWidth - ax, frameHeight - ay);
+      fx += frameWidth + spacing;
+      if (fx + frameWidth > width) {
+        fx = margin;
+        fy += frameHeight + spacing;
+      }
+    }
+  }
+
   // ../phaser-genesis/src/textures/WhiteTexture.ts
   var instance3;
   var WhiteTexture = {
@@ -4874,6 +4951,162 @@ void main (void)
     ConfigStore.set(CONFIG_DEFAULTS.WORLD_SIZE, size);
   }
 
+  // ../phaser-genesis/src/loader/File.ts
+  var File = class {
+    constructor(key, url, config) {
+      __publicField(this, "key");
+      __publicField(this, "url");
+      __publicField(this, "responseType", "text");
+      __publicField(this, "crossOrigin");
+      __publicField(this, "data");
+      __publicField(this, "error");
+      __publicField(this, "config");
+      __publicField(this, "skipCache", false);
+      __publicField(this, "hasLoaded", false);
+      __publicField(this, "loader");
+      __publicField(this, "load");
+      this.key = key;
+      this.url = url;
+      this.config = config;
+    }
+  };
+
+  // ../phaser-genesis/src/loader/GetURL.ts
+  function GetURL(key, url, extension, loader) {
+    if (!url) {
+      url = key + extension;
+    }
+    if (/^(?:blob:|data:|http:\/\/|https:\/\/|\/\/)/.exec(url)) {
+      return url;
+    } else if (loader) {
+      return loader.baseURL + loader.path + url;
+    } else {
+      return url;
+    }
+  }
+
+  // ../phaser-genesis/src/loader/ImageLoader.ts
+  function ImageTagLoader(file) {
+    const fileCast = file;
+    fileCast.data = new Image();
+    if (fileCast.crossOrigin) {
+      fileCast.data.crossOrigin = file.crossOrigin;
+    }
+    return new Promise((resolve, reject) => {
+      fileCast.data.onload = () => {
+        if (fileCast.data.onload) {
+          fileCast.data.onload = null;
+          fileCast.data.onerror = null;
+          resolve(fileCast);
+        }
+      };
+      fileCast.data.onerror = (event) => {
+        if (fileCast.data.onload) {
+          fileCast.data.onload = null;
+          fileCast.data.onerror = null;
+          fileCast.error = event;
+          reject(fileCast);
+        }
+      };
+      fileCast.data.src = file.url;
+      if (fileCast.data.complete && fileCast.data.width && fileCast.data.height) {
+        fileCast.data.onload = null;
+        fileCast.data.onerror = null;
+        resolve(fileCast);
+      }
+    });
+  }
+
+  // ../phaser-genesis/src/cache/Cache.ts
+  var caches = new Map();
+  var Cache = {
+    get: (type) => {
+      if (!caches.has(type)) {
+        caches.set(type, new Map());
+      }
+      return caches.get(type);
+    },
+    getEntry: (cache, entry) => {
+      if (caches.has(cache)) {
+        return caches.get(cache).get(entry);
+      }
+    }
+  };
+
+  // ../phaser-genesis/src/loader/XHRLoader.ts
+  function XHRLoader(file) {
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", file.url, true);
+    xhr.responseType = file.responseType;
+    return new Promise((resolve, reject) => {
+      xhr.onload = () => {
+        const type = file.responseType;
+        file.data = type === "text" || type === "" ? xhr.responseText : xhr.response;
+        file.hasLoaded = true;
+        resolve(file);
+      };
+      xhr.onerror = () => {
+        file.hasLoaded = true;
+        reject(file);
+      };
+      xhr.send();
+    });
+  }
+
+  // ../phaser-genesis/src/loader/files/CSVFile.ts
+  function CSVFile(key, url) {
+    const file = new File(key, url);
+    file.load = () => {
+      file.url = GetURL(file.key, file.url, ".csv", file.loader);
+      return new Promise((resolve, reject) => {
+        const cache = Cache.get("CSV");
+        if (!file.skipCache && cache.has(file.key)) {
+          resolve(file);
+        } else {
+          XHRLoader(file).then((file2) => {
+            if (!file2.skipCache) {
+              cache.set(file2.key, file2.data);
+            }
+            resolve(file2);
+          }).catch((file2) => {
+            reject(file2);
+          });
+        }
+      });
+    };
+    return file;
+  }
+
+  // ../phaser-genesis/src/loader/files/SpriteSheetFile.ts
+  function SpriteSheetFile(key, url, frameConfig, glConfig) {
+    const file = new File(key, url);
+    file.load = () => {
+      file.url = GetURL(file.key, file.url, ".png", file.loader);
+      if (file.loader) {
+        file.crossOrigin = file.loader.crossOrigin;
+      }
+      return new Promise((resolve, reject) => {
+        const textureManager = TextureManagerInstance.get();
+        if (textureManager.has(file.key)) {
+          resolve(file);
+        } else {
+          ImageTagLoader(file).then((file2) => {
+            const texture = textureManager.add(file2.key, file2.data, glConfig);
+            if (texture) {
+              SpriteSheetParser(texture, 0, 0, texture.width, texture.height, frameConfig);
+              resolve(file2);
+            } else {
+              reject(file2);
+            }
+          }).catch((file2) => {
+            reject(file2);
+          });
+        }
+      });
+    };
+    return file;
+  }
+
   // ../phaser-genesis/src/display/AddChildren.ts
   function AddChildren(parent, ...children) {
     children.forEach((child) => {
@@ -5279,100 +5512,6 @@ void main (void)
     }
   };
 
-  // ../phaser-genesis/src/loader/File.ts
-  var File = class {
-    constructor(key, url, config) {
-      __publicField(this, "key");
-      __publicField(this, "url");
-      __publicField(this, "responseType", "text");
-      __publicField(this, "crossOrigin");
-      __publicField(this, "data");
-      __publicField(this, "error");
-      __publicField(this, "config");
-      __publicField(this, "skipCache", false);
-      __publicField(this, "hasLoaded", false);
-      __publicField(this, "loader");
-      __publicField(this, "load");
-      this.key = key;
-      this.url = url;
-      this.config = config;
-    }
-  };
-
-  // ../phaser-genesis/src/loader/GetURL.ts
-  function GetURL(key, url, extension, loader) {
-    if (!url) {
-      url = key + extension;
-    }
-    if (/^(?:blob:|data:|http:\/\/|https:\/\/|\/\/)/.exec(url)) {
-      return url;
-    } else if (loader) {
-      return loader.baseURL + loader.path + url;
-    } else {
-      return url;
-    }
-  }
-
-  // ../phaser-genesis/src/loader/ImageLoader.ts
-  function ImageTagLoader(file) {
-    const fileCast = file;
-    fileCast.data = new Image();
-    if (fileCast.crossOrigin) {
-      fileCast.data.crossOrigin = file.crossOrigin;
-    }
-    return new Promise((resolve, reject) => {
-      fileCast.data.onload = () => {
-        if (fileCast.data.onload) {
-          fileCast.data.onload = null;
-          fileCast.data.onerror = null;
-          resolve(fileCast);
-        }
-      };
-      fileCast.data.onerror = (event) => {
-        if (fileCast.data.onload) {
-          fileCast.data.onload = null;
-          fileCast.data.onerror = null;
-          fileCast.error = event;
-          reject(fileCast);
-        }
-      };
-      fileCast.data.src = file.url;
-      if (fileCast.data.complete && fileCast.data.width && fileCast.data.height) {
-        fileCast.data.onload = null;
-        fileCast.data.onerror = null;
-        resolve(fileCast);
-      }
-    });
-  }
-
-  // ../phaser-genesis/src/loader/files/ImageFile.ts
-  function ImageFile(key, url, glConfig) {
-    const file = new File(key, url);
-    file.load = () => {
-      file.url = GetURL(file.key, file.url, ".png", file.loader);
-      if (file.loader) {
-        file.crossOrigin = file.loader.crossOrigin;
-      }
-      return new Promise((resolve, reject) => {
-        const textureManager = TextureManagerInstance.get();
-        if (textureManager.has(file.key)) {
-          resolve(file);
-        } else {
-          ImageTagLoader(file).then((file2) => {
-            textureManager.add(file2.key, file2.data, glConfig);
-            resolve(file2);
-          }).catch((file2) => {
-            reject(file2);
-          });
-        }
-      });
-    };
-    return file;
-  }
-
-  // ../phaser-genesis/src/cache/Cache.ts
-  var caches = new Map();
-
   // ../phaser-genesis/src/world/events/WorldAfterUpdateEvent.ts
   var WorldAfterUpdateEvent = "afterupdate";
 
@@ -5638,7 +5777,7 @@ void main (void)
     }
   };
 
-  // examples/src/gameobjects/directdraw/layered drawing.ts
+  // examples/src/gameobjects/directdraw/tiles.ts
   var Demo = class extends Scene {
     constructor() {
       super();
@@ -5646,37 +5785,15 @@ void main (void)
     }
     create() {
       return __async(this, null, function* () {
-        yield ImageFile("logo", "assets/logo.png").load();
-        yield ImageFile("brain", "assets/brain.png").load();
+        yield SpriteSheetFile("tiles", "assets/fantasy-tiles.png", { frameWidth: 64, frameHeight: 64 }).load();
+        yield CSVFile("map", "assets/minimap.csv").load();
+        const data = Cache.getEntry("CSV", "map").split("\n").flatMap((row) => row.split(","));
+        const mapData = data.map((tile) => Number(tile));
         const world3 = new StaticWorld(this);
-        const logo = GetTexture("logo");
-        const brain = GetTexture("brain");
+        const tiles = GetTexture("tiles");
         const dd = new DirectDraw();
-        const distance = 300;
-        const speed = 6;
-        const max = 400;
-        const xx = [];
-        const yy = [];
-        const zz = [];
-        for (var i = 0; i < max; i++) {
-          xx[i] = Math.floor(Math.random() * 800) - 400;
-          yy[i] = Math.floor(Math.random() * 600) - 300;
-          zz[i] = Math.floor(Math.random() * 1700) - 100;
-        }
         dd.render = () => {
-          dd.rect(100, 100, 600, 400, 0);
-          dd.box(100, 100, 600, 400, 1, 16777215);
-          for (let i2 = 0; i2 < max; i2++) {
-            const perspective = distance / (distance - zz[i2]);
-            const x = 400 + xx[i2] * perspective;
-            const y = 300 + yy[i2] * perspective;
-            zz[i2] += speed;
-            if (zz[i2] > 300) {
-              zz[i2] -= 600;
-            }
-            dd.plot(x, y);
-          }
-          dd.image(logo, 400 - logo.width / 2, 300 - logo.height / 2);
+          dd.tiles(tiles, 64, 64, mapData, 16);
         };
         AddChildren(world3, dd);
       });
@@ -5695,4 +5812,4 @@ void main (void)
  * @copyright    2020 Photon Storm Ltd.
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
  */
-//# sourceMappingURL=layered drawing.js.map
+//# sourceMappingURL=tiles.js.map

@@ -19,6 +19,12 @@
     return a;
   };
   var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
+  var __markAsModule = (target) => __defProp(target, "__esModule", { value: true });
+  var __export = (target, all) => {
+    __markAsModule(target);
+    for (var name in all)
+      __defProp(target, name, { get: all[name], enumerable: true });
+  };
   var __publicField = (obj, key, value) => {
     __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
     return value;
@@ -2793,6 +2799,32 @@ void main (void)
     MAX_SAFE_INTEGER: Number.MAX_SAFE_INTEGER || 9007199254740991
   };
 
+  // ../phaser-genesis/src/math/easing/index.ts
+  var easing_exports = {};
+  __export(easing_exports, {
+    Back: () => back_exports,
+    Bounce: () => bounce_exports,
+    Circular: () => circular_exports,
+    Cubic: () => cubic_exports,
+    Elastic: () => elastic_exports,
+    Expo: () => expo_exports,
+    GetEase: () => GetEase_exports,
+    Linear: () => Linear_exports,
+    Quadratic: () => quadratic_exports,
+    Quartic: () => quartic_exports,
+    Quintic: () => quintic_exports,
+    Sine: () => sine_exports,
+    Stepped: () => Stepped_exports
+  });
+
+  // ../phaser-genesis/src/math/easing/back/index.ts
+  var back_exports = {};
+  __export(back_exports, {
+    In: () => In,
+    InOut: () => InOut,
+    Out: () => Out
+  });
+
   // ../phaser-genesis/src/math/easing/back/In.ts
   function In(v, overshoot = 1.70158) {
     return v * v * ((overshoot + 1) * v - overshoot);
@@ -2812,6 +2844,14 @@ void main (void)
   function Out(v, overshoot = 1.70158) {
     return --v * v * ((overshoot + 1) * v + overshoot) + 1;
   }
+
+  // ../phaser-genesis/src/math/easing/bounce/index.ts
+  var bounce_exports = {};
+  __export(bounce_exports, {
+    In: () => In2,
+    InOut: () => InOut2,
+    Out: () => Out2
+  });
 
   // ../phaser-genesis/src/math/easing/bounce/In.ts
   function In2(v) {
@@ -2865,6 +2905,14 @@ void main (void)
     }
   }
 
+  // ../phaser-genesis/src/math/easing/circular/index.ts
+  var circular_exports = {};
+  __export(circular_exports, {
+    In: () => In3,
+    InOut: () => InOut3,
+    Out: () => Out3
+  });
+
   // ../phaser-genesis/src/math/easing/circular/In.ts
   function In3(v) {
     return 1 - Math.sqrt(1 - v * v);
@@ -2884,6 +2932,14 @@ void main (void)
     return Math.sqrt(1 - --v * v);
   }
 
+  // ../phaser-genesis/src/math/easing/cubic/index.ts
+  var cubic_exports = {};
+  __export(cubic_exports, {
+    In: () => In4,
+    InOut: () => InOut4,
+    Out: () => Out4
+  });
+
   // ../phaser-genesis/src/math/easing/cubic/In.ts
   function In4(v) {
     return v * v * v;
@@ -2902,6 +2958,14 @@ void main (void)
   function Out4(v) {
     return --v * v * v + 1;
   }
+
+  // ../phaser-genesis/src/math/easing/elastic/index.ts
+  var elastic_exports = {};
+  __export(elastic_exports, {
+    In: () => In5,
+    InOut: () => InOut5,
+    Out: () => Out5
+  });
 
   // ../phaser-genesis/src/math/easing/elastic/In.ts
   function In5(v, amplitude = 0.1, period = 0.1) {
@@ -2958,6 +3022,14 @@ void main (void)
     }
   }
 
+  // ../phaser-genesis/src/math/easing/expo/index.ts
+  var expo_exports = {};
+  __export(expo_exports, {
+    In: () => In6,
+    InOut: () => InOut6,
+    Out: () => Out6
+  });
+
   // ../phaser-genesis/src/math/easing/expo/In.ts
   function In6(v) {
     return Math.pow(2, 10 * (v - 1)) - 1e-3;
@@ -2983,6 +3055,20 @@ void main (void)
     return 1 - Math.pow(2, -10 * v);
   }
 
+  // ../phaser-genesis/src/math/easing/GetEase.ts
+  var GetEase_exports = {};
+  __export(GetEase_exports, {
+    GetEase: () => GetEase
+  });
+
+  // ../phaser-genesis/src/math/easing/quadratic/index.ts
+  var quadratic_exports = {};
+  __export(quadratic_exports, {
+    In: () => In7,
+    InOut: () => InOut7,
+    Out: () => Out7
+  });
+
   // ../phaser-genesis/src/math/easing/quadratic/In.ts
   function In7(v) {
     return v * v;
@@ -3001,6 +3087,14 @@ void main (void)
   function Out7(v) {
     return v * (2 - v);
   }
+
+  // ../phaser-genesis/src/math/easing/quartic/index.ts
+  var quartic_exports = {};
+  __export(quartic_exports, {
+    In: () => In8,
+    InOut: () => InOut8,
+    Out: () => Out8
+  });
 
   // ../phaser-genesis/src/math/easing/quartic/In.ts
   function In8(v) {
@@ -3021,6 +3115,14 @@ void main (void)
     return -(--v * v * v * v - 1);
   }
 
+  // ../phaser-genesis/src/math/easing/quintic/index.ts
+  var quintic_exports = {};
+  __export(quintic_exports, {
+    In: () => In9,
+    InOut: () => InOut9,
+    Out: () => Out9
+  });
+
   // ../phaser-genesis/src/math/easing/quintic/In.ts
   function In9(v) {
     return v * v * v * v * v;
@@ -3039,6 +3141,14 @@ void main (void)
   function Out9(v) {
     return (v = v - 1) * v * v * v * v + 1;
   }
+
+  // ../phaser-genesis/src/math/easing/sine/index.ts
+  var sine_exports = {};
+  __export(sine_exports, {
+    In: () => In10,
+    InOut: () => InOut10,
+    Out: () => Out10
+  });
 
   // ../phaser-genesis/src/math/easing/sine/In.ts
   function In10(v) {
@@ -3074,11 +3184,19 @@ void main (void)
   }
 
   // ../phaser-genesis/src/math/easing/Linear.ts
+  var Linear_exports = {};
+  __export(Linear_exports, {
+    Linear: () => Linear
+  });
   function Linear(v) {
     return v;
   }
 
   // ../phaser-genesis/src/math/easing/Stepped.ts
+  var Stepped_exports = {};
+  __export(Stepped_exports, {
+    Stepped: () => Stepped
+  });
   function Stepped(v, steps = 1) {
     if (v <= 0) {
       return 0;
@@ -3139,6 +3257,15 @@ void main (void)
     ["back.inout", InOut],
     ["bounce.inout", InOut2]
   ]);
+  function GetEase(name) {
+    name = name.toLowerCase();
+    name = name.replace("ease", "");
+    if (EaseMap.has(name)) {
+      return EaseMap.get(name);
+    } else {
+      return Linear;
+    }
+  }
 
   // ../phaser-genesis/src/math/mat2d/Matrix2D.ts
   var Matrix2D = class {
@@ -3268,6 +3395,11 @@ void main (void)
   // ../phaser-genesis/src/math/vec3/Vec3Unproject.ts
   var matrix = new Matrix4();
   var screenSource = new Vec3();
+
+  // ../phaser-genesis/src/math/vec2/Vec2Clone.ts
+  function Vec2Clone(source) {
+    return new Vec2(source.x, source.y);
+  }
 
   // ../phaser-genesis/src/math/FromPercent.ts
   function FromPercent(percent, min, max) {
@@ -3817,19 +3949,39 @@ void main (void)
       return this;
     }
     image(texture, x, y, alpha = 1, scaleX = 1, scaleY = 1) {
-      DrawImage(this.renderPass, texture, x, y, this.alpha * alpha, scaleX, scaleY);
+      DrawImage(this.renderPass, texture, x, y, alpha, scaleX, scaleY);
       return this;
     }
     imagePart(texture, x0, y0, x1, y1, dx, dy, dw, dh, alpha = 1) {
-      DrawImagePart(this.renderPass, texture, x0, y0, x1, y1, dx, dy, dw, dh, this.alpha * alpha);
+      DrawImagePart(this.renderPass, texture, x0, y0, x1, y1, dx, dy, dw, dh, alpha);
       return this;
     }
     frame(texture, frame2, x, y, alpha = 1, scaleX = 1, scaleY = 1) {
-      DrawFrame(this.renderPass, texture, frame2, x, y, this.alpha * alpha, scaleX, scaleY);
+      DrawFrame(this.renderPass, texture, frame2, x, y, alpha, scaleX, scaleY);
       return this;
     }
     quad(texture, frame2, x0, y0, x1, y1, x2, y2, x3, y3, alpha = 1) {
-      DrawQuad(this.renderPass, texture, frame2, x0, y0, x1, y1, x2, y2, x3, y3, this.alpha * alpha);
+      DrawQuad(this.renderPass, texture, frame2, x0, y0, x1, y1, x2, y2, x3, y3, alpha);
+      return this;
+    }
+    tiles(texture, tileWidth, tileHeight, mapData, mapWidth, x = 0, y = 0) {
+      let tx = 0;
+      let ty = 0;
+      let i = 0;
+      const renderPass = this.renderPass;
+      const alpha = this.alpha;
+      mapData.forEach((tile) => {
+        if (tile !== -1) {
+          DrawFrame(renderPass, texture, tile, Math.floor(x + tx), Math.floor(y + ty), alpha);
+        }
+        i++;
+        tx += tileWidth;
+        if (i === mapWidth) {
+          tx = 0;
+          ty += tileHeight;
+          i = 0;
+        }
+      });
       return this;
     }
     render() {
@@ -4874,12 +5026,9 @@ void main (void)
     ConfigStore.set(CONFIG_DEFAULTS.WORLD_SIZE, size);
   }
 
-  // ../phaser-genesis/src/display/AddChildren.ts
-  function AddChildren(parent, ...children) {
-    children.forEach((child) => {
-      AddChildAt(parent, child);
-    });
-    return children;
+  // ../phaser-genesis/src/display/AddChild.ts
+  function AddChild(parent, child) {
+    return AddChildAt(parent, child);
   }
 
   // ../phaser-genesis/src/display/RemoveChildren.ts
@@ -4888,6 +5037,281 @@ void main (void)
       RemoveChild(parent, child);
     });
     return children;
+  }
+
+  // ../phaser-genesis/src/events/EventEmitter.ts
+  var EventEmitter = class {
+    constructor() {
+      __publicField(this, "events");
+      this.events = new Map();
+    }
+  };
+
+  // ../phaser-genesis/src/events/EventInstance.ts
+  var EventInstance = class {
+    constructor(callback, context, once = false) {
+      __publicField(this, "callback");
+      __publicField(this, "context");
+      __publicField(this, "once");
+      this.callback = callback;
+      this.context = context;
+      this.once = once;
+    }
+  };
+
+  // ../phaser-genesis/src/events/Off.ts
+  function Off(emitter, event, callback, context, once) {
+    const events = emitter.events;
+    const listeners = events.get(event);
+    if (!callback) {
+      events.delete(event);
+    } else if (callback instanceof EventInstance) {
+      listeners.delete(callback);
+    } else {
+      const hasContext = !context;
+      const hasOnce = once !== void 0;
+      for (const listener of listeners) {
+        if (listener.callback === callback && (hasContext && listener.context === context) && (hasOnce && listener.once === once)) {
+          listeners.delete(listener);
+        }
+      }
+    }
+    if (listeners.size === 0) {
+      events.delete(event);
+    }
+    return emitter;
+  }
+
+  // ../phaser-genesis/src/events/On.ts
+  function On(emitter, event, callback, context = emitter, once = false) {
+    if (typeof callback !== "function") {
+      throw new TypeError("Listener not a function");
+    }
+    const listener = new EventInstance(callback, context, once);
+    const listeners = emitter.events.get(event);
+    if (!listeners) {
+      emitter.events.set(event, new Set([listener]));
+    } else {
+      listeners.add(listener);
+    }
+    return listener;
+  }
+
+  // ../phaser-genesis/src/events/Once.ts
+  function Once(emitter, event, callback, context = emitter) {
+    return On(emitter, event, callback, context, true);
+  }
+
+  // ../phaser-genesis/src/motion/tween/TweenProperty.ts
+  var TweenProperty = class {
+    constructor(name, end) {
+      __publicField(this, "name");
+      __publicField(this, "start");
+      __publicField(this, "end");
+      __publicField(this, "modifier");
+      this.name = name;
+      if (typeof end === "string") {
+        this.modifier = end.substr(0, 1);
+        this.end = parseFloat(end.substring(1));
+      } else {
+        this.end = end;
+      }
+    }
+    getEnd(start) {
+      const modifier = this.modifier;
+      const end = this.end;
+      if (modifier === "+") {
+        return start + end;
+      } else if (modifier === "-") {
+        return start - end;
+      } else {
+        return end;
+      }
+    }
+    to(target) {
+      const current = target[this.name];
+      const end = this.getEnd(current);
+      this.start = current;
+      this.end = end;
+    }
+    from(target) {
+      const current = target[this.name];
+      const end = this.getEnd(current);
+      this.start = end;
+      this.end = current;
+      target[this.name] = end;
+    }
+    update(target, v) {
+      target[this.name] = this.start + (this.end - this.start) * v;
+    }
+  };
+
+  // ../phaser-genesis/src/gameobjects/events/UpdateEvent.ts
+  var UpdateEvent = "update";
+
+  // ../phaser-genesis/src/motion/tween/nano/NanoTween.ts
+  var NanoTween = class {
+    constructor(target, emitter, autoStart = true) {
+      __publicField(this, "target");
+      __publicField(this, "state", { running: false, repeat: false, hold: false, delay: false, yoyo: false, yoyoing: false, autoStart: true, reversed: false });
+      __publicField(this, "init", { duration: 0, repeat: 0, repeatDelay: 0, hold: 0, delay: 0 });
+      __publicField(this, "counters", { repeat: 0, delay: 0, progress: 0, elapsed: 0 });
+      __publicField(this, "ease", Linear);
+      __publicField(this, "listener");
+      __publicField(this, "emitter");
+      __publicField(this, "properties", []);
+      if (!emitter) {
+        emitter = GameInstance.get();
+      }
+      this.target = target;
+      this.state.autoStart = autoStart;
+      this.emitter = emitter;
+    }
+    to(duration, properties = null) {
+      return this.add(duration, properties, false);
+    }
+    from(duration, properties = null) {
+      return this.add(duration, properties, true);
+    }
+    add(duration, props, reversed) {
+      const state = this.state;
+      const init = this.init;
+      if (state.running) {
+        return this;
+      }
+      const properties = this.properties;
+      for (const [name, value] of Object.entries(props)) {
+        properties.push(new TweenProperty(name, value));
+      }
+      init.duration = duration;
+      state.reversed = reversed;
+      if (state.autoStart) {
+        this.start();
+      }
+      return this;
+    }
+    start() {
+      const state = this.state;
+      if (state.running) {
+        return this;
+      }
+      const target = this.target;
+      const properties = this.properties;
+      properties.forEach((property) => {
+        if (state.reversed) {
+          property.from(target);
+        } else {
+          property.to(target);
+        }
+      });
+      state.running = true;
+      this.listener = On(this.emitter, UpdateEvent, (delta) => this.update(delta));
+      return this;
+    }
+    restart() {
+      const state = this.state;
+      const init = this.init;
+      const counters = this.counters;
+      if (!state) {
+        throw "Cannot restart destroyed tween";
+      }
+      counters.delay = init.delay;
+      counters.elapsed = 0;
+      counters.progress = 0;
+      counters.repeat = init.repeat;
+      state.yoyoing = false;
+      state.running = true;
+      return this;
+    }
+    update(delta) {
+      const state = this.state;
+      const init = this.init;
+      const counters = this.counters;
+      if (!state.running) {
+        return false;
+      }
+      if (counters.delay > 0) {
+        counters.delay -= delta;
+        if (counters.delay <= 0) {
+          counters.elapsed = Math.abs(counters.delay) - delta;
+          counters.delay = 0;
+        } else {
+          return false;
+        }
+      }
+      counters.elapsed += delta;
+      const progress = Math.min(counters.elapsed / init.duration, 1);
+      counters.progress = progress;
+      const v = state.yoyoing ? this.ease(1 - progress) : this.ease(progress);
+      const target = this.target;
+      const properties = this.properties;
+      properties.forEach((property) => {
+        property.update(target, v);
+      });
+      if (progress < 1) {
+        return false;
+      }
+      const diff2 = counters.elapsed - init.duration;
+      if (state.yoyo && !state.yoyoing) {
+        counters.elapsed = diff2;
+        counters.delay = init.hold - diff2;
+        state.yoyoing = true;
+        return false;
+      }
+      if (counters.repeat > 0) {
+        counters.repeat--;
+        counters.elapsed = diff2;
+        counters.delay = init.repeatDelay - diff2;
+        state.yoyoing = false;
+        return false;
+      }
+      this.destroy();
+      return true;
+    }
+    delay(duration) {
+      const delay = duration;
+      this.init.delay = delay;
+      this.counters.delay = delay;
+      return this;
+    }
+    hold(duration) {
+      this.init.hold = duration;
+      return this;
+    }
+    yoyo(value = true) {
+      this.state.yoyo = value;
+      return this;
+    }
+    repeat(repeatCount = 1, delay = 0) {
+      const init = this.init;
+      if (repeatCount === -1) {
+        repeatCount = Number.MAX_SAFE_INTEGER;
+      }
+      this.state.repeat = repeatCount > 0;
+      this.counters.repeat = repeatCount;
+      init.repeat = repeatCount;
+      init.repeatDelay = delay;
+      return this;
+    }
+    easing(f) {
+      this.ease = f;
+      return this;
+    }
+    destroy() {
+      Off(this.emitter, UpdateEvent, this.listener);
+      this.properties.length = 0;
+      this.target = null;
+      this.ease = null;
+      this.emitter = null;
+      this.state = null;
+      this.init = null;
+      this.counters = null;
+    }
+  };
+
+  // ../phaser-genesis/src/motion/tween/nano/AddTween.ts
+  function AddTween(target, emitter = null, autoStart = true) {
+    return new NanoTween(target, emitter, autoStart);
   }
 
   // ../phaser-genesis/src/dom/AddToDOM.ts
@@ -4918,46 +5342,6 @@ void main (void)
       document.addEventListener("DOMContentLoaded", check, true);
       window.addEventListener("load", check, true);
     }
-  }
-
-  // ../phaser-genesis/src/events/EventEmitter.ts
-  var EventEmitter = class {
-    constructor() {
-      __publicField(this, "events");
-      this.events = new Map();
-    }
-  };
-
-  // ../phaser-genesis/src/events/EventInstance.ts
-  var EventInstance = class {
-    constructor(callback, context, once = false) {
-      __publicField(this, "callback");
-      __publicField(this, "context");
-      __publicField(this, "once");
-      this.callback = callback;
-      this.context = context;
-      this.once = once;
-    }
-  };
-
-  // ../phaser-genesis/src/events/On.ts
-  function On(emitter, event, callback, context = emitter, once = false) {
-    if (typeof callback !== "function") {
-      throw new TypeError("Listener not a function");
-    }
-    const listener = new EventInstance(callback, context, once);
-    const listeners = emitter.events.get(event);
-    if (!listeners) {
-      emitter.events.set(event, new Set([listener]));
-    } else {
-      listeners.add(listener);
-    }
-    return listener;
-  }
-
-  // ../phaser-genesis/src/events/Once.ts
-  function Once(emitter, event, callback, context = emitter) {
-    return On(emitter, event, callback, context, true);
   }
 
   // ../phaser-genesis/src/config/banner/GetBanner.ts
@@ -5638,7 +6022,7 @@ void main (void)
     }
   };
 
-  // examples/src/gameobjects/directdraw/layered drawing.ts
+  // examples/src/gameobjects/directdraw/trail.ts
   var Demo = class extends Scene {
     constructor() {
       super();
@@ -5646,43 +6030,31 @@ void main (void)
     }
     create() {
       return __async(this, null, function* () {
-        yield ImageFile("logo", "assets/logo.png").load();
-        yield ImageFile("brain", "assets/brain.png").load();
+        yield ImageFile("flash", "assets/muzzleflash2.png").load();
         const world3 = new StaticWorld(this);
-        const logo = GetTexture("logo");
-        const brain = GetTexture("brain");
+        const flash = GetTexture("flash");
         const dd = new DirectDraw();
-        const distance = 300;
-        const speed = 6;
-        const max = 400;
-        const xx = [];
-        const yy = [];
-        const zz = [];
-        for (var i = 0; i < max; i++) {
-          xx[i] = Math.floor(Math.random() * 800) - 400;
-          yy[i] = Math.floor(Math.random() * 600) - 300;
-          zz[i] = Math.floor(Math.random() * 1700) - 100;
-        }
+        const trail = [];
+        const position = new Vec2(60, 0);
+        AddTween(position).to(3200, { x: 550 }).yoyo(true).repeat(-1).easing(easing_exports.Back.InOut);
+        AddTween(position).to(2e3, { y: 450 }).yoyo(true).repeat(-1).easing(easing_exports.Sine.InOut);
         dd.render = () => {
-          dd.rect(100, 100, 600, 400, 0);
-          dd.box(100, 100, 600, 400, 1, 16777215);
-          for (let i2 = 0; i2 < max; i2++) {
-            const perspective = distance / (distance - zz[i2]);
-            const x = 400 + xx[i2] * perspective;
-            const y = 300 + yy[i2] * perspective;
-            zz[i2] += speed;
-            if (zz[i2] > 300) {
-              zz[i2] -= 600;
-            }
-            dd.plot(x, y);
+          trail.push(Vec2Clone(position));
+          let alpha = 0;
+          const alphaInc = 1 / trail.length;
+          trail.forEach((pos) => {
+            dd.image(flash, pos.x, pos.y, alpha);
+            alpha += alphaInc;
+          });
+          if (trail.length > 128) {
+            trail.shift();
           }
-          dd.image(logo, 400 - logo.width / 2, 300 - logo.height / 2);
         };
-        AddChildren(world3, dd);
+        AddChild(world3, dd);
       });
     }
   };
-  new Game(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(2960685), Scenes(Demo));
+  new Game(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(526344), Scenes(Demo));
 })();
 /**
  * @author       Niklas von Hertzen (https://github.com/niklasvh/base64-arraybuffer)
@@ -5695,4 +6067,4 @@ void main (void)
  * @copyright    2020 Photon Storm Ltd.
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
  */
-//# sourceMappingURL=layered drawing.js.map
+//# sourceMappingURL=trail.js.map
