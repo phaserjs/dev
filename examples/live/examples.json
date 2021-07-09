@@ -319,6 +319,13 @@
               "type": "file"
             },
             {
+              "path": "examples/live/gameobjects/directdraw/plot.js",
+              "name": "plot.js",
+              "size": 171634,
+              "extension": ".js",
+              "type": "file"
+            },
+            {
               "path": "examples/live/gameobjects/directdraw/tiles.js",
               "name": "tiles.js",
               "size": 178782,
@@ -328,12 +335,12 @@
             {
               "path": "examples/live/gameobjects/directdraw/trail.js",
               "name": "trail.js",
-              "size": 175298,
+              "size": 185778,
               "extension": ".js",
               "type": "file"
             }
           ],
-          "size": 865241,
+          "size": 1047355,
           "type": "directory"
         },
         {
@@ -517,7 +524,7 @@
           "type": "directory"
         }
       ],
-      "size": 4043981,
+      "size": 4226095,
       "type": "directory"
     },
     {
@@ -637,6 +644,6 @@
       "type": "directory"
     }
   ],
-  "size": 10434324,
+  "size": 10616438,
   "type": "directory"
 }
