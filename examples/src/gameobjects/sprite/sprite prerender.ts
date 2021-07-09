@@ -7,7 +7,6 @@ import { Easing } from '../../../../../phaser-genesis/src/math';
 import { Game } from '../../../../../phaser-genesis/src/Game';
 import { GetTexture } from '../../../../../phaser-genesis/src/textures';
 import { ImageFile } from '../../../../../phaser-genesis/src/loader/files/ImageFile';
-import { Loader } from '../../../../../phaser-genesis/src/loader/Loader';
 import { Scene } from '../../../../../phaser-genesis/src/scenes/Scene';
 import { Sprite } from '../../../../../phaser-genesis/src/gameobjects/';
 import { StaticWorld } from '../../../../../phaser-genesis/src/world/StaticWorld';
