@@ -23,6 +23,26 @@
     __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
     return value;
   };
+  var __async = (__this, __arguments, generator) => {
+    return new Promise((resolve, reject) => {
+      var fulfilled = (value) => {
+        try {
+          step(generator.next(value));
+        } catch (e) {
+          reject(e);
+        }
+      };
+      var rejected = (value) => {
+        try {
+          step(generator.throw(value));
+        } catch (e) {
+          reject(e);
+        }
+      };
+      var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
+      step((generator = generator.apply(__this, __arguments)).next());
+    });
+  };
 
   // ../phaser-genesis/src/config/const.ts
   var CONFIG_DEFAULTS = {
@@ -1936,16 +1956,16 @@ void main (void)
     ColorComponent.alpha[id] = 1;
   }
 
-  // ../phaser-genesis/src/components/vertices/AddQuadVertex.ts
-  function AddQuadVertex(id, width = 0, height = 0, flipY = true) {
-    addComponent(GameObjectWorld, QuadVertexComponent, id);
-  }
-
   // ../phaser-genesis/src/components/vertices/QuadVertexComponent.ts
   var QuadVertex = defineComponent({
     values: [Types.f32, 54]
   });
   var QuadVertexComponent = QuadVertex;
+
+  // ../phaser-genesis/src/components/vertices/AddQuadVertex.ts
+  function AddQuadVertex(id, width = 0, height = 0, flipY = true) {
+    addComponent(GameObjectWorld, QuadVertexComponent, id);
+  }
 
   // ../phaser-genesis/src/components/vertices/SetQuadPosition.ts
   function SetQuadPosition(id, x0, y0, x1, y1, x2, y2, x3, y3) {
@@ -3156,6 +3176,11 @@ void main (void)
   var matrix = new Matrix4();
   var screenSource = new Vec3();
 
+  // ../phaser-genesis/src/math/Between.ts
+  function Between(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min);
+  }
+
   // ../phaser-genesis/src/renderer/webgl1/renderpass/Begin.ts
   function Begin(renderPass, camera2D) {
     renderPass.current2DCamera = camera2D;
@@ -4347,6 +4372,64 @@ void main (void)
     }
   };
 
+  // ../phaser-genesis/src/textures/parsers/SpriteSheetParser.ts
+  function SpriteSheetParser(texture, x, y, width, height, frameConfig) {
+    const {
+      frameWidth = null,
+      endFrame = -1,
+      margin = 0,
+      spacingX = 0,
+      spacingY = 0
+    } = frameConfig;
+    let {
+      frameHeight = null,
+      startFrame = 0
+    } = frameConfig;
+    if (!frameHeight) {
+      frameHeight = frameWidth;
+    }
+    if (frameWidth === null) {
+      throw new Error("SpriteSheetParser: Invalid frameWidth");
+    }
+    const row = Math.floor((width - margin + spacingX) / (frameWidth + spacingX));
+    const column = Math.floor((height - margin + spacingY) / (frameHeight + spacingY));
+    let total = row * column;
+    if (total === 0) {
+      console.warn("SpriteSheetParser: Frame config will result in zero frames");
+    }
+    if (startFrame > total || startFrame < -total) {
+      startFrame = 0;
+    }
+    if (startFrame < 0) {
+      startFrame = total + startFrame;
+    }
+    if (endFrame !== -1) {
+      total = startFrame + (endFrame + 1);
+    }
+    let fx = margin;
+    let fy = margin;
+    let ax = 0;
+    let ay = 0;
+    for (let i = 0; i < total; i++) {
+      ax = 0;
+      ay = 0;
+      const w = fx + frameWidth;
+      const h = fy + frameHeight;
+      if (w > width) {
+        ax = w - width;
+      }
+      if (h > height) {
+        ay = h - height;
+      }
+      texture.addFrame(i, x + fx, y + fy, frameWidth - ax, frameHeight - ay);
+      fx += frameWidth + spacingX;
+      if (fx + frameWidth > width) {
+        fx = margin;
+        fy += frameHeight + spacingY;
+      }
+    }
+  }
+
   // ../phaser-genesis/src/textures/WhiteTexture.ts
   var instance3;
   var WhiteTexture = {
@@ -5290,129 +5373,38 @@ void main (void)
     return file;
   }
 
-  // ../phaser-genesis/src/loader/Loader.ts
-  var Loader = class extends EventEmitter {
-    constructor() {
-      super();
-      __publicField(this, "baseURL", "");
-      __publicField(this, "path", "");
-      __publicField(this, "crossOrigin", "anonymous");
-      __publicField(this, "maxParallelDownloads", -1);
-      __publicField(this, "isLoading", false);
-      __publicField(this, "progress");
-      __publicField(this, "queue");
-      __publicField(this, "inflight");
-      __publicField(this, "completed");
-      __publicField(this, "onComplete");
-      __publicField(this, "onError");
-      this.reset();
-    }
-    reset() {
-      this.isLoading = false;
-      this.queue = new Set();
-      this.inflight = new Set();
-      this.completed = new Set();
-      this.progress = 0;
-    }
-    add(...file) {
-      file.forEach((entity) => {
-        entity.loader = this;
-        this.queue.add(entity);
-      });
-      return this;
-    }
-    start() {
-      if (this.isLoading) {
-        return null;
+  // ../phaser-genesis/src/cache/Cache.ts
+  var caches = new Map();
+
+  // ../phaser-genesis/src/loader/files/SpriteSheetFile.ts
+  function SpriteSheetFile(key, url, frameConfig, glConfig) {
+    const file = new File(key, url);
+    file.load = () => {
+      file.url = GetURL(file.key, file.url, ".png", file.loader);
+      if (file.loader) {
+        file.crossOrigin = file.loader.crossOrigin;
       }
       return new Promise((resolve, reject) => {
-        this.completed.clear();
-        this.progress = 0;
-        if (this.queue.size > 0) {
-          this.isLoading = true;
-          this.onComplete = resolve;
-          this.onError = reject;
-          Emit(this, "start");
-          this.nextFile();
+        const textureManager = TextureManagerInstance.get();
+        if (textureManager.has(file.key)) {
+          resolve(file);
         } else {
-          this.progress = 1;
-          Emit(this, "complete");
-          resolve(this);
+          ImageTagLoader(file).then((file2) => {
+            const texture = textureManager.add(file2.key, file2.data, glConfig);
+            if (texture) {
+              SpriteSheetParser(texture, 0, 0, texture.width, texture.height, frameConfig);
+              resolve(file2);
+            } else {
+              reject(file2);
+            }
+          }).catch((file2) => {
+            reject(file2);
+          });
         }
       });
-    }
-    nextFile() {
-      let limit = this.queue.size;
-      if (this.maxParallelDownloads !== -1) {
-        limit = Math.min(limit, this.maxParallelDownloads) - this.inflight.size;
-      }
-      if (limit) {
-        const iterator = this.queue.values();
-        while (limit > 0) {
-          const file = iterator.next().value;
-          this.inflight.add(file);
-          this.queue.delete(file);
-          file.load().then((file2) => this.fileComplete(file2)).catch((file2) => this.fileError(file2));
-          limit--;
-        }
-      } else if (this.inflight.size === 0) {
-        this.stop();
-      }
-    }
-    stop() {
-      if (!this.isLoading) {
-        return;
-      }
-      this.isLoading = false;
-      Emit(this, "complete", this.completed);
-      this.onComplete();
-      this.completed.clear();
-    }
-    updateProgress(file) {
-      this.inflight.delete(file);
-      this.completed.add(file);
-      const totalCompleted = this.completed.size;
-      const totalQueued = this.queue.size + this.inflight.size;
-      if (totalCompleted > 0) {
-        this.progress = totalCompleted / (totalCompleted + totalQueued);
-      }
-      Emit(this, "progress", this.progress, totalCompleted, totalQueued);
-      this.nextFile();
-    }
-    fileComplete(file) {
-      Emit(this, "filecomplete", file);
-      this.updateProgress(file);
-    }
-    fileError(file) {
-      Emit(this, "fileerror", file);
-      this.updateProgress(file);
-    }
-    totalFilesToLoad() {
-      return this.queue.size + this.inflight.size;
-    }
-    setBaseURL(url = "") {
-      if (url !== "" && url.substr(-1) !== "/") {
-        url = url.concat("/");
-      }
-      this.baseURL = url;
-      return this;
-    }
-    setPath(path = "") {
-      if (path !== "" && path.substr(-1) !== "/") {
-        path = path.concat("/");
-      }
-      this.path = path;
-      return this;
-    }
-    setCORS(crossOrigin) {
-      this.crossOrigin = crossOrigin;
-      return this;
-    }
-    setMaxParallelDownloads(max) {
-      this.maxParallelDownloads = max;
-      return this;
-    }
-  };
+    };
+    return file;
+  }
 
   // ../phaser-genesis/src/world/events/WorldAfterUpdateEvent.ts
   var WorldAfterUpdateEvent = "afterupdate";
@@ -5679,16 +5671,35 @@ void main (void)
     }
   };
 
-  // examples/src/gameobjects/sprite/create sprite.ts
+  // examples/src/gameobjects/sprite/lots of sprites.ts
   var Demo = class extends Scene {
     constructor() {
       super();
-      const loader = new Loader();
-      loader.add(ImageFile("rocket", "assets/rocket.png"));
-      loader.start().then(() => {
+      this.create();
+    }
+    create() {
+      return __async(this, null, function* () {
+        yield ImageFile("sky", "assets/sky5.png").load();
+        yield SpriteSheetFile("witches", "assets/witches-95x80x1.png", { frameWidth: 95, frameHeight: 80, spacingX: 1, spacingY: 1 }).load();
         const world2 = new StaticWorld(this);
-        const rocket = new Sprite(400, 300, "rocket");
-        AddChild(world2, rocket);
+        AddChild(world2, new Sprite(400, 300, "sky"));
+        const witches = [];
+        for (let i = 0; i < 256; i++) {
+          const x = Between(-200, 1e3);
+          const y = Between(0, 600);
+          const f = Between(0, 2);
+          const witch = new Sprite(x, y, "witches", f * 3);
+          witches.push(witch);
+          AddChild(world2, witch);
+        }
+        On(world2, "update", () => {
+          witches.forEach((witch) => {
+            witch.x += Number(witch.frame.key) + 2;
+            if (witch.x > 1e3) {
+              witch.x = -200;
+            }
+          });
+        });
       });
     }
   };
@@ -5705,4 +5716,4 @@ void main (void)
  * @copyright    2020 Photon Storm Ltd.
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
  */
-//# sourceMappingURL=create sprite.js.map
+//# sourceMappingURL=lots of sprites.js.map
