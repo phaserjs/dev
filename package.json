@@ -26,7 +26,7 @@
     "chalk": "^4.1.1",
     "directory-tree": "^2.2.9",
     "esbuild": "^0.12.15",
-    "filesize": "^6.4.0",
+    "filesize": "^7.0.0",
     "fs-extra": "^10.0.0",
     "gradient-string": "^1.2.0",
     "gzip-size": "^6.0.0",
