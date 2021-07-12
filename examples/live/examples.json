@@ -290,6 +290,21 @@
       "type": "directory"
     },
     {
+      "path": "examples/live/effects",
+      "name": "effects",
+      "children": [
+        {
+          "path": "examples/live/effects/sprite colormatrix.js",
+          "name": "sprite colormatrix.js",
+          "size": 170287,
+          "extension": ".js",
+          "type": "file"
+        }
+      ],
+      "size": 170287,
+      "type": "directory"
+    },
+    {
       "path": "examples/live/gameobjects",
       "name": "gameobjects",
       "children": [
@@ -500,12 +515,12 @@
             {
               "path": "examples/live/gameobjects/sprite/sprite prerender.js",
               "name": "sprite prerender.js",
-              "size": 169186,
+              "size": 182116,
               "extension": ".js",
               "type": "file"
             }
           ],
-          "size": 1940085,
+          "size": 1953015,
           "type": "directory"
         },
         {
@@ -538,7 +553,7 @@
           "type": "directory"
         }
       ],
-      "size": 4739714,
+      "size": 4752644,
       "type": "directory"
     },
     {
@@ -658,6 +673,6 @@
       "type": "directory"
     }
   ],
-  "size": 11231683,
+  "size": 11414900,
   "type": "directory"
 }
