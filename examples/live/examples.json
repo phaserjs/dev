@@ -296,12 +296,12 @@
         {
           "path": "examples/live/effects/sprite colormatrix.js",
           "name": "sprite colormatrix.js",
-          "size": 170287,
+          "size": 177809,
           "extension": ".js",
           "type": "file"
         }
       ],
-      "size": 170287,
+      "size": 177809,
       "type": "directory"
     },
     {
@@ -673,6 +673,6 @@
       "type": "directory"
     }
   ],
-  "size": 11414900,
+  "size": 11422422,
   "type": "directory"
 }
