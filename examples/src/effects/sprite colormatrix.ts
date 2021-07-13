@@ -51,8 +51,8 @@ class Demo extends Scene
         // Effects.Predator(cream, 0.5);
         // Effects.Saturate(cream, 1.8);
         // Effects.Sepia(cream);
-        Effects.ShiftToBGR(cream);
-        // Effects.Technicolor(cream);
+        // Effects.ShiftToBGR(cream);
+        Effects.Technicolor(cream);
         // Effects.Tint(cream, 0x00ff00);
         // Effects.VintagePinhole(cream);
 
@@ -71,7 +71,6 @@ class Demo extends Scene
         AddChild(world, bg);
         AddChild(world, cream);
 
-        //  Should the children inherit the parent Color Matrix?
         for (let i = 0; i < 32; i++)
         {
             const x = Between(-300, 300);
