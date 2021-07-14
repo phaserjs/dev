@@ -7,7 +7,7 @@ import { Stats } from './renderstats/stats.js';
 import { Vertices } from './renderstats/vertices.js';
 import { WorldTransforms } from './renderstats/worldTransforms.js';
 
-window.linkGame = (game) => {
+window.linkGame = (game, panel) => {
 
     FPS(game);
     MS(game);
@@ -16,6 +16,6 @@ window.linkGame = (game) => {
     MSGauge(game);
     GameObjects(game);
     Vertices(game);
-    Stats(game);
+    Stats(game, panel);
 
 }

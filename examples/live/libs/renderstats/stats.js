@@ -1,4 +1,4 @@
-export function Stats (game)
+export function Stats (game, showPanel)
 {
     const renderStats = game.renderStats;
 
@@ -14,8 +14,7 @@ export function Stats (game)
     const metricsPanel = document.getElementById('metrics');
     const analyticsPanel = document.getElementById('analytics');
     const gameObjectsTable = document.getElementById('goTable');
-    const transformPaneContainer = document.getElementById('transformPaneContainer');
-    const spritePaneContainer = document.getElementById('spritePaneContainer');
+    const spriteEditorContainer = document.getElementById('spriteEditorContainer');
 
     let metricsVisible = true;
 
@@ -300,4 +299,12 @@ export function Stats (game)
 
     }, 2000);
 
+    if (Number(showPanel) === 2)
+    {
+        updateTable();
+
+        metricsPanel.style.display = 'none';
+        analyticsPanel.style.display = 'flex';
+        metricsVisible = false;
+    }
 }

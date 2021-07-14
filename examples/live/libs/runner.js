@@ -103,7 +103,7 @@ const onExamplePlayPause = (win, iframe, item) =>
     }
 }
 
-const onExampleStats = (item, demoID) =>
+const onExampleStats = (item, demoID, panel = 1) =>
 {
     const onStatsIFrameLoaded = (id) => {
 
@@ -115,7 +115,7 @@ const onExampleStats = (item, demoID) =>
 
         if (game)
         {
-            statsIFrame.linkGame(game);
+            statsIFrame.linkGame(game, panel);
         }
 
     };
@@ -262,7 +262,7 @@ window.onload = () => {
             if (autoShowStats)
             {
                 setTimeout(() => {
-                    onExampleStats(autoRunExample, 1);
+                    onExampleStats(autoRunExample, 1, autoShowStats);
                 }, 1000);
             }
         }
