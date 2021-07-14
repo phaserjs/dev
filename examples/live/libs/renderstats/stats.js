@@ -19,8 +19,7 @@ export function Stats (game)
 
     let metricsVisible = true;
 
-    let pane1;
-    let pane2;
+    let pane;
 
     pauseButton.onclick = () => {
 
@@ -96,47 +95,47 @@ export function Stats (game)
 
     const createSpriteEditor = (target) => {
 
-        if (pane1)
+        if (pane)
         {
-            pane1.dispose();
+            pane.dispose();
         }
 
-        if (pane2)
-        {
-            pane2.dispose();
-        }
-
-        pane1 = new Tweakpane.Pane({
+        pane = new Tweakpane.Pane({
             title: target.toString(),
-            container: transformPaneContainer
+            container: spriteEditorContainer
+        });
+        
+        pane.registerPlugin(TweakpaneEssentialsPlugin);
+
+        const tab = pane.addTab({
+            pages: [
+                { title: 'Transform' },
+                { title: 'Texture' },
+                { title: 'Color' },
+                { title: 'ColorMatrix' }
+            ]
         });
 
-        const transformFolder = pane1.addFolder({ title: 'Transform' });
+        const transformTab = tab.pages[0];
+        const textureTab = tab.pages[1];
+        const colorTab = tab.pages[2];
+        const colorMatrixTab = tab.pages[3];
 
         const step01 = { step: 0.1 };
 
-        transformFolder.addInput(target, 'position');
-        transformFolder.addInput(target, 'rotation', step01);
-        transformFolder.addInput(target, 'scale', { x: step01, y: step01 });
-        transformFolder.addInput(target, 'skew', { x: step01, y: step01 });
-        transformFolder.addInput(target, 'origin', { min: 0, max: 1, step: 0.1 });
+        transformTab.addInput(target, 'position');
+        transformTab.addInput(target, 'rotation', step01);
+        transformTab.addInput(target, 'scale', { x: step01, y: step01 });
+        transformTab.addInput(target, 'skew', { x: step01, y: step01 });
+        transformTab.addInput(target, 'origin', { min: 0, max: 1, step: 0.1 });
 
-        const extentsFolder = pane1.addFolder({ title: 'Extents' });
+        const extentsFolder = transformTab.addFolder({ title: 'Extents' });
 
         extentsFolder.addInput(target.size, 'width', { format: (v) => v.toFixed(0) });
         extentsFolder.addInput(target.size, 'height', { format: (v) => v.toFixed(0) });
 
-        //  Pane 2 - Texture & Tint
-
-        pane2 = new Tweakpane.Pane({
-            title: target.toString(),
-            container: spritePaneContainer
-        });
-
         if (target.texture)
         {
-            const textureFolder = pane2.addFolder({ title: 'Texture' });
-
             let frameOptions = {};
 
             for (let frame of target.texture.frames.keys())
@@ -144,7 +143,7 @@ export function Stats (game)
                 frameOptions[frame] = frame;
             }
 
-            const textureInput = textureFolder.addInput(target.texture, 'key', { label: 'texture' }).on('change', event => {
+            const textureInput = textureTab.addInput(target.texture, 'key', { label: 'texture' }).on('change', event => {
 
                 target.setTexture(event.value);
 
@@ -157,11 +156,11 @@ export function Stats (game)
 
             });
 
-            let frameInput = textureFolder.addInput(target.frame, 'key', { label: 'frame', options: frameOptions }).on('change', event => {
+            let frameInput = textureTab.addInput(target.frame, 'key', { label: 'frame', options: frameOptions }).on('change', event => {
 
                 target.setFrame(event.value);
 
-                pane1.refresh();
+                pane.refresh();
 
             });
 
@@ -178,22 +177,115 @@ export function Stats (game)
 
                 frameInput.dispose();
 
-                frameInput = textureFolder.addInput(target.frame, 'key', { label: 'frame', options: frameOptions }).on('change', event => {
+                frameInput = textureTab.addInput(target.frame, 'key', { label: 'frame', options: frameOptions }).on('change', event => {
 
                     target.setFrame(event.value);
 
-                    pane1.refresh();
+                    pane.refresh();
     
                 });
     
             });
         }
 
-        const displayFolder = pane2.addFolder({ title: 'Display' });
+        //  Colors
 
-        displayFolder.addInput(target, 'visible');
-        displayFolder.addInput(target, 'tint', { view: 'color', picker: 'inline' });
-        displayFolder.addInput(target, 'alpha', { min: 0, max: 1, step: 0.1 });
+        const spriteRGB = {
+            tint: {
+                get r () { return target.color.red; },
+                get g () { return target.color.green; },
+                get b () { return target.color.blue; },
+                set r (value) { target.color.red = value; },
+                set g (value) { target.color.green = value; },
+                set b (value) { target.color.blue = value; }
+            }
+        };
+
+        colorTab.addInput(target, 'visible');
+        colorTab.addInput(spriteRGB, 'tint', { view: 'color', picker: 'inline', expanded: true });
+        colorTab.addInput(target, 'alpha', { min: 0, max: 1, step: 0.1 });
+
+        //  Color Matrix
+
+        const cm = target.color.colorMatrix;
+        const coffset = target.color.colorOffset;
+
+        colorMatrixTab.addInput(target.color, 'colorMatrixEnabled');
+        colorMatrixTab.addInput(target.color, 'willColorChildren');
+
+        const grid = colorMatrixTab.addBlade({
+            view: 'buttongrid',
+            size: [ 5, 4 ],
+            cells: (x, y) => ({
+                title: [
+                    ['R', 'G', 'B', 'A', 'Offset'],
+                    ['R', 'G', 'B', 'A', 'Offset'],
+                    ['R', 'G', 'B', 'A', 'Offset'],
+                    ['R', 'G', 'B', 'A', 'Offset']
+                ][y][x],
+            }),
+            label: 'colorMatrix',
+        });
+        
+        const sliderRGBA = colorMatrixTab.addBlade({
+            view: 'slider',
+            label: 'RGBA Value',
+            min: -1,
+            max: 1,
+            value: 0,
+            hidden: true
+        });
+
+        const sliderOffset = colorMatrixTab.addBlade({
+            view: 'slider',
+            label: 'Offset Value',
+            min: -100,
+            max: 100,
+            value: 0,
+            hidden: true
+        });
+
+        const resetButton = colorMatrixTab.addButton({
+            title: 'Reset',
+            label: ''
+        });
+
+        resetButton.on('click', () => {
+            target.color.colorMatrix = [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ];
+            target.color.colorOffset = [ 0, 0, 0, 0 ];
+        });
+
+        let colorMatrixIndex = 0;
+
+        grid.on('click', ev =>
+        {
+            const [ col, row ] = ev.index.values();
+
+            if (col === 4)
+            {
+                colorMatrixIndex = row;
+                sliderOffset.value = coffset[row];
+                sliderOffset.hidden = false;
+                sliderRGBA.hidden = true;
+            }
+            else
+            {
+                colorMatrixIndex = (row * 4) + col;
+                sliderRGBA.value = cm[colorMatrixIndex];
+                sliderOffset.hidden = true;
+                sliderRGBA.hidden = false;
+            }
+        });
+
+        sliderRGBA.on('change', ev =>
+        {
+            cm[colorMatrixIndex] = ev.value;
+        });
+
+        sliderOffset.on('change', ev =>
+        {
+            coffset[colorMatrixIndex] = ev.value;
+        });
 
     };
 
