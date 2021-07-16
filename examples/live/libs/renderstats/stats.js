@@ -108,6 +108,7 @@ export function Stats (game, showPanel)
 
         const tab = pane.addTab({
             pages: [
+                { title: 'Hierarchy' },
                 { title: 'Transform' },
                 { title: 'Texture' },
                 { title: 'Color' },
@@ -115,10 +116,24 @@ export function Stats (game, showPanel)
             ]
         });
 
-        const transformTab = tab.pages[0];
-        const textureTab = tab.pages[1];
-        const colorTab = tab.pages[2];
-        const colorMatrixTab = tab.pages[3];
+        const hierarchyTab = tab.pages[0];
+        const transformTab = tab.pages[1];
+        const textureTab = tab.pages[2];
+        const colorTab = tab.pages[3];
+        const colorMatrixTab = tab.pages[4];
+
+        const slowUpdate = { interval: 5000,  format: v => v.toFixed(0) };
+
+        const familyData = target.getDisplayData();
+
+        familyData.childIDs = familyData.children.join('\n');
+
+        hierarchyTab.addMonitor(familyData, 'id', slowUpdate);
+        hierarchyTab.addMonitor(familyData, 'parent', slowUpdate);
+        hierarchyTab.addMonitor(familyData, 'world', slowUpdate);
+        hierarchyTab.addMonitor(familyData, 'worldDepth', slowUpdate);
+        hierarchyTab.addMonitor(familyData, 'numChildren', slowUpdate);
+        hierarchyTab.addMonitor(familyData, 'childIDs', { multiline: true, lineCount: 10 });
 
         const step01 = { step: 0.1 };
 

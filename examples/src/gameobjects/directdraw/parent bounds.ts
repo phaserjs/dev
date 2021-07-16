@@ -1,6 +1,6 @@
 import { AddChild, AddChildren } from '../../../../../phaser-genesis/src/display';
 import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../../phaser-genesis/src/config';
-import { Container, DirectDraw, Sprite } from '../../../../../phaser-genesis/src/gameobjects';
+import { Container, DirectDraw, GameObjectTree, Sprite } from '../../../../../phaser-genesis/src/gameobjects';
 
 import { Between } from '../../../../../phaser-genesis/src/math';
 import { Game } from '../../../../../phaser-genesis/src/Game';
@@ -23,6 +23,8 @@ class Demo extends Scene
 
         const world = new StaticWorld(this);
 
+        AddChild(world, new Sprite(64, 64, 'mushroom'));
+
         const parent = new Container(400, 300);
 
         parent.name = 'Parent';
@@ -39,12 +41,18 @@ class Demo extends Scene
 
         dd.render = () =>
         {
-            const bounds = parent.getBounds();
+            // const bounds = parent.getBounds();
 
-            dd.box(bounds.x, bounds.y, bounds.width, bounds.height, 1, 0xffff00);
+            dd.box(30, 30, 64, 64, 1, 0xff00ff);
+
+            // dd.box(bounds.x, bounds.y, bounds.width, bounds.height, 1, 0xffff00);
         };
 
         AddChildren(world, parent, dd);
+
+        console.log(parent.getDisplayData());
+
+        // console.log(world.id, '>', GameObjectTree.get(world.id));
     }
 }
 
