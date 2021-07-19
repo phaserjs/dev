@@ -72,7 +72,13 @@ export function Stats (game, showPanel)
         const a = document.createElement('a');
 
         a.className = 'list-group-item list-group-item-action';
-        a.innerText = sprite.toString();
+
+        const data = sprite.getDisplayData();
+
+        const t = '-'.repeat(data.worldDepth) + ' ' + sprite.toString();
+
+        a.innerText = t;
+
         a.onclick = () => createSpriteEditor(sprite);
 
         return a;
