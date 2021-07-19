@@ -20,23 +20,58 @@ class Demo extends Scene
     async create ()
     {
         await ImageFile('mushroom', 'assets/mushroom-32x32.png').load();
+        await ImageFile('lemming', 'assets/lemming.png').load();
+        await ImageFile('garfield', 'assets/orange-cat1.png').load();
+        await ImageFile('clown', 'assets/clown.png').load();
 
         const world = new StaticWorld(this);
 
         AddChild(world, new Sprite(64, 64, 'mushroom'));
 
-        const parent = new Container(400, 300);
+        const parent = new Container(200, 300);
 
-        parent.name = 'Parent';
+        parent.name = 'Lemming Container';
 
-        for (let i = 0; i < 32; i++)
+        for (let i = 0; i < 4; i++)
         {
-            const x = Between(-200, 200);
-            const y = Between(-200, 200);
+            const x = Between(-100, 100);
+            const y = Between(-100, 100);
 
-            AddChild(parent, new Sprite(x, y, 'mushroom'));
+            AddChild(parent, new Sprite(x, y, 'lemming'));
         }
 
+        const parent2 = new Container(400, 300);
+
+        parent2.name = 'Cat Container';
+
+        for (let i = 0; i < 4; i++)
+        {
+            const x = Between(-100, 100);
+            const y = Between(-100, 100);
+
+            AddChild(parent2, new Sprite(x, y, 'garfield'));
+        }
+
+        AddChildren(world, parent, parent2);
+
+        const parent3 = new Container(600, 300);
+
+        parent3.name = 'Deep Container';
+
+        const parent4 = new Container(0, 0);
+
+        parent4.name = 'Deep 1';
+
+        AddChild(parent3, parent4);
+
+        AddChild(parent3, new Sprite(0, 0, 'mushroom'));
+
+        AddChild(parent4, new Sprite(50, 50, 'clown'));
+
+        AddChildren(world, parent3);
+
+
+        /*
         const dd = new DirectDraw();
 
         dd.render = () =>
@@ -51,6 +86,7 @@ class Demo extends Scene
         AddChildren(world, parent, dd);
 
         console.log(parent.getDisplayData());
+        */
 
         // console.log(world.id, '>', GameObjectTree.get(world.id));
     }
