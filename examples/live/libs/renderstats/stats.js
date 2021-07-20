@@ -135,6 +135,7 @@ export function Stats (game, showPanel)
         familyData.childIDs = familyData.children.join('\n');
 
         hierarchyTab.addMonitor(familyData, 'id', slowUpdate);
+        hierarchyTab.addMonitor(familyData, 'index', slowUpdate);
         hierarchyTab.addMonitor(familyData, 'parent', slowUpdate);
         hierarchyTab.addMonitor(familyData, 'world', slowUpdate);
         hierarchyTab.addMonitor(familyData, 'worldDepth', slowUpdate);

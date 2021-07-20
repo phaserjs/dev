@@ -1070,11 +1070,15 @@
       const x3 = right * a + y * c + tx;
       const y3 = right * b + y * d + ty;
       SetQuadPosition(id, x0, y0, x1, y1, x2, y2, x3, y3);
+      const bx = Math.min(x0, x1, x2, x3);
+      const by = Math.min(y0, y1, y2, y3);
+      const br = Math.max(x0, x1, x2, x3);
+      const bb = Math.max(y0, y1, y2, y3);
       const bounds = BoundsComponent.global[id];
-      bounds[0] = Math.min(x0, x1, x2, x3);
-      bounds[1] = Math.min(y0, y1, y2, y3);
-      bounds[2] = Math.max(x0, x1, x2, x3);
-      bounds[3] = Math.max(y0, y1, y2, y3);
+      bounds[0] = bx;
+      bounds[1] = by;
+      bounds[2] = br;
+      bounds[3] = bb;
     }
     return world2;
   });
@@ -1084,7 +1088,7 @@
     if (total > 0) {
       updateVertexPositionSystem(world2);
     }
-    return total;
+    return entities;
   };
 
   // ../phaser-genesis/src/components/vertices/SetQuadColor.ts
@@ -1194,6 +1198,42 @@
     const y3 = right * b + y * d + ty;
     return { x0, y0, x1, y1, x2, y2, x3, y3 };
   }
+
+  // ../phaser-genesis/src/math/vec2/Vec2FromArray.ts
+  function Vec2FromArray(dst, src = [], index = 0) {
+    return dst.set(src[index], src[index + 1]);
+  }
+
+  // ../phaser-genesis/src/math/vec2/Vec2ToArray.ts
+  function Vec2ToArray(v, dst = [], index = 0) {
+    dst[index] = v.x;
+    dst[index + 1] = v.y;
+    return dst;
+  }
+
+  // ../phaser-genesis/src/math/vec2/Vec2.ts
+  var Vec2 = class {
+    constructor(x = 0, y = 0) {
+      __publicField(this, "x");
+      __publicField(this, "y");
+      this.set(x, y);
+    }
+    set(x = 0, y = 0) {
+      this.x = x;
+      this.y = y;
+      return this;
+    }
+    toArray(dst = [], index = 0) {
+      return Vec2ToArray(this, dst, index);
+    }
+    fromArray(src, index = 0) {
+      Vec2FromArray(this, src, index);
+      return this;
+    }
+    toString() {
+      return `{ x=${this.x}, y=${this.y} }`;
+    }
+  };
 
   // ../phaser-genesis/src/components/transform/InvalidateLocalMatrix2DComponent.ts
   function InvalidateLocalMatrix2DComponent(id) {
@@ -1606,6 +1646,52 @@
 
   // ../phaser-genesis/src/renderer/webgl1/draw/BatchQuad.ts
   var buffer = GetQuadBuffer();
+  function BatchQuad(F32, offset, textureIndex, x1, y1, x2, y2, x3, y3, x4, y4, r, g, b, a) {
+    buffer[0] = x1;
+    buffer[1] = y1;
+    buffer[4] = textureIndex;
+    buffer[5] = r;
+    buffer[6] = g;
+    buffer[7] = b;
+    buffer[8] = a;
+    buffer[9] = x2;
+    buffer[10] = y2;
+    buffer[13] = textureIndex;
+    buffer[14] = r;
+    buffer[15] = g;
+    buffer[16] = b;
+    buffer[17] = a;
+    buffer[18] = x3;
+    buffer[19] = y3;
+    buffer[22] = textureIndex;
+    buffer[23] = r;
+    buffer[24] = g;
+    buffer[25] = b;
+    buffer[26] = a;
+    buffer[27] = x1;
+    buffer[28] = y1;
+    buffer[31] = textureIndex;
+    buffer[32] = r;
+    buffer[33] = g;
+    buffer[34] = b;
+    buffer[35] = a;
+    buffer[36] = x3;
+    buffer[37] = y3;
+    buffer[40] = textureIndex;
+    buffer[41] = r;
+    buffer[42] = g;
+    buffer[43] = b;
+    buffer[44] = a;
+    buffer[45] = x4;
+    buffer[46] = y4;
+    buffer[49] = textureIndex;
+    buffer[50] = r;
+    buffer[51] = g;
+    buffer[52] = b;
+    buffer[53] = a;
+    F32.set(buffer, offset);
+    return offset + 54;
+  }
 
   // ../phaser-genesis/src/renderer/webgl1/GL.ts
   var gl;
@@ -1682,6 +1768,64 @@
 
   // ../phaser-genesis/src/renderer/webgl1/draw/BatchTexturedQuad.ts
   var buffer2 = GetQuadBuffer();
+  function BatchTexturedQuad(F32, offset, textureIndex, x1, y1, x2, y2, x3, y3, x4, y4, u0, v0, u1, v1, r, g, b, a) {
+    buffer2[0] = x1;
+    buffer2[1] = y1;
+    buffer2[2] = u0;
+    buffer2[3] = v0;
+    buffer2[4] = textureIndex;
+    buffer2[5] = r;
+    buffer2[6] = g;
+    buffer2[7] = b;
+    buffer2[8] = a;
+    buffer2[9] = x2;
+    buffer2[10] = y2;
+    buffer2[11] = u0;
+    buffer2[12] = v1;
+    buffer2[13] = textureIndex;
+    buffer2[14] = r;
+    buffer2[15] = g;
+    buffer2[16] = b;
+    buffer2[17] = a;
+    buffer2[18] = x3;
+    buffer2[19] = y3;
+    buffer2[20] = u1;
+    buffer2[21] = v1;
+    buffer2[22] = textureIndex;
+    buffer2[23] = r;
+    buffer2[24] = g;
+    buffer2[25] = b;
+    buffer2[26] = a;
+    buffer2[27] = x1;
+    buffer2[28] = y1;
+    buffer2[29] = u0;
+    buffer2[30] = v0;
+    buffer2[31] = textureIndex;
+    buffer2[32] = r;
+    buffer2[33] = g;
+    buffer2[34] = b;
+    buffer2[35] = a;
+    buffer2[36] = x3;
+    buffer2[37] = y3;
+    buffer2[38] = u1;
+    buffer2[39] = v1;
+    buffer2[40] = textureIndex;
+    buffer2[41] = r;
+    buffer2[42] = g;
+    buffer2[43] = b;
+    buffer2[44] = a;
+    buffer2[45] = x4;
+    buffer2[46] = y4;
+    buffer2[47] = u1;
+    buffer2[48] = v0;
+    buffer2[49] = textureIndex;
+    buffer2[50] = r;
+    buffer2[51] = g;
+    buffer2[52] = b;
+    buffer2[53] = a;
+    F32.set(buffer2, offset);
+    return offset + 54;
+  }
 
   // ../phaser-genesis/src/components/vertices/SetQuadTextureIndex.ts
   function SetQuadTextureIndex(id, textureIndex) {
@@ -1739,6 +1883,51 @@
 
   // ../phaser-genesis/src/renderer/webgl1/draw/BatchTriangle.ts
   var buffer3 = GetTriBuffer();
+  function BatchTriangle(F32, offset, textureIndex, x1, y1, x2, y2, x3, y3, r, g, b, a) {
+    buffer3[0] = x1;
+    buffer3[1] = y1;
+    buffer3[4] = textureIndex;
+    buffer3[5] = r;
+    buffer3[6] = g;
+    buffer3[7] = b;
+    buffer3[8] = a;
+    buffer3[9] = x2;
+    buffer3[10] = y2;
+    buffer3[13] = textureIndex;
+    buffer3[14] = r;
+    buffer3[15] = g;
+    buffer3[16] = b;
+    buffer3[17] = a;
+    buffer3[18] = x3;
+    buffer3[19] = y3;
+    buffer3[22] = textureIndex;
+    buffer3[23] = r;
+    buffer3[24] = g;
+    buffer3[25] = b;
+    buffer3[26] = a;
+    F32.set(buffer3, offset);
+    return offset + 27;
+  }
+
+  // ../phaser-genesis/src/renderer/webgl1/draw/DrawFrame.ts
+  function DrawFrame(renderPass, texture, frame2, x, y, alpha = 1, scaleX = 1, scaleY = 1) {
+    const { F32, offset } = GetVertexBufferEntry(renderPass, 2);
+    frame2 = texture.getFrame(frame2);
+    const textureIndex = renderPass.textures.set(texture);
+    const displayWidth = frame2.width * scaleX;
+    const displayHeight = frame2.height * scaleY;
+    BatchTexturedQuad(F32, offset, textureIndex, x, y, x, y + displayHeight, x + displayWidth, y + displayHeight, x + displayWidth, y, frame2.u0, frame2.v0, frame2.u1, frame2.v1, 1, 1, 1, alpha);
+  }
+
+  // ../phaser-genesis/src/renderer/webgl1/draw/DrawImage.ts
+  function DrawImage(renderPass, texture, x, y, alpha = 1, scaleX = 1, scaleY = 1) {
+    const { F32, offset } = GetVertexBufferEntry(renderPass, 2);
+    const frame2 = texture.firstFrame;
+    const textureIndex = renderPass.textures.set(texture);
+    const displayWidth = frame2.width * scaleX;
+    const displayHeight = frame2.height * scaleY;
+    BatchTexturedQuad(F32, offset, textureIndex, x, y, x, y + displayHeight, x + displayWidth, y + displayHeight, x + displayWidth, y, frame2.u0, frame2.v0, frame2.u1, frame2.v1, 1, 1, 1, alpha);
+  }
 
   // ../phaser-genesis/src/math/const.ts
   var MATH_CONST = {
@@ -2130,6 +2319,20 @@
     }
   };
 
+  // ../phaser-genesis/src/math/mat2d/Mat2dAppend.ts
+  function Mat2dAppend(mat1, mat2, out = new Matrix2D()) {
+    const { a: a1, b: b1, c: c1, d: d1, tx: tx1, ty: ty1 } = mat1;
+    const { a: a2, b: b2, c: c2, d: d2, tx: tx2, ty: ty2 } = mat2;
+    return out.set(a2 * a1 + b2 * c1, a2 * b1 + b2 * d1, c2 * a1 + d2 * c1, c2 * b1 + d2 * d1, tx2 * a1 + ty2 * c1 + tx1, tx2 * b1 + ty2 * d1 + ty1);
+  }
+
+  // ../phaser-genesis/src/math/mat2d/Mat2dGlobalToLocal.ts
+  function Mat2dGlobalToLocal(mat, x, y, out = new Vec2()) {
+    const { a, b, c, d, tx, ty } = mat;
+    const id = 1 / (a * d + c * -b);
+    return out.set(d * id * x + -c * id * y + (ty * c - tx * d) * id, a * id * y + -b * id * x + (-ty * a + tx * b) * id);
+  }
+
   // ../phaser-genesis/src/utils/base64/Base64ToArrayBuffer.ts
   var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
   var lookup = new Uint8Array(256);
@@ -2258,6 +2461,11 @@
     return (width & width - 1) === 0 && (height & height - 1) === 0;
   }
 
+  // ../phaser-genesis/src/math/Clamp.ts
+  function Clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+  }
+
   // ../phaser-genesis/src/math/vec3/Vec3Backward.ts
   function Vec3Backward() {
     return new Vec3(0, 0, -1);
@@ -2310,9 +2518,44 @@
   var matrix = new Matrix4();
   var screenSource = new Vec3();
 
-  // ../phaser-genesis/src/math/Between.ts
-  function Between(min, max) {
-    return Math.floor(Math.random() * (max - min + 1) + min);
+  // ../phaser-genesis/src/math/FromPercent.ts
+  function FromPercent(percent, min, max) {
+    percent = Clamp(percent, 0, 1);
+    return (max - min) * percent;
+  }
+
+  // ../phaser-genesis/src/renderer/webgl1/draw/DrawImagePart.ts
+  function DrawImagePart(renderPass, texture, x0, y0, x1, y1, dx, dy, dw, dh, alpha = 1) {
+    const { F32, offset } = GetVertexBufferEntry(renderPass, 2);
+    const frame2 = texture.firstFrame;
+    const textureIndex = renderPass.textures.set(texture);
+    const frameWidth = frame2.width;
+    const frameHeight = frame2.height;
+    x0 = Clamp(x0, 0, frameWidth);
+    x1 = Clamp(x1, x0, frameWidth);
+    y0 = Clamp(y0, 0, frameHeight);
+    y1 = Clamp(y1, y0, frameHeight);
+    const uRange = frame2.u1 - frame2.u0;
+    const vRange = frame2.v1 - frame2.v0;
+    const u0 = frame2.u0 + uRange * (x0 / frameWidth);
+    const v0 = frame2.v0 + vRange * (y0 / frameHeight);
+    const u1 = frame2.u0 + uRange * (x1 / frameWidth);
+    const v1 = frame2.v0 + vRange * (y1 / frameHeight);
+    if (dw === void 0 || dw === null) {
+      dw = x1 - x0;
+    }
+    if (dh === void 0 || dh === null) {
+      dh = y1 - y0;
+    }
+    BatchTexturedQuad(F32, offset, textureIndex, dx, dy, dx, dy + dh, dx + dw, dy + dh, dx + dw, dy, u0, v0, u1, v1, 1, 1, 1, alpha);
+  }
+
+  // ../phaser-genesis/src/renderer/webgl1/draw/DrawQuad.ts
+  function DrawQuad(renderPass, texture, frame2, x0, y0, x1, y1, x2, y2, x3, y3, alpha = 1) {
+    const { F32, offset } = GetVertexBufferEntry(renderPass, 2);
+    frame2 = texture.getFrame(frame2);
+    const textureIndex = renderPass.textures.set(texture);
+    BatchTexturedQuad(F32, offset, textureIndex, x0, y0, x1, y1, x2, y2, x3, y3, frame2.u0, frame2.v0, frame2.u1, frame2.v1, 1, 1, 1, alpha);
   }
 
   // ../phaser-genesis/src/renderer/webgl1/renderpass/Begin.ts
@@ -4188,8 +4431,268 @@ void main (void)
     }
   };
 
+  // ../phaser-genesis/src/geom/circle/GetCircleCircumference.ts
+  function GetCircleCircumference(circle2) {
+    return 2 * (Math.PI * circle2.radius);
+  }
+
+  // ../phaser-genesis/src/geom/circle/GetCircleCircumferencePoint.ts
+  function GetCircleCircumferencePoint(circle2, angle, out = new Vec2()) {
+    return out.set(circle2.x + circle2.radius * Math.cos(angle), circle2.y + circle2.radius * Math.sin(angle));
+  }
+
+  // ../phaser-genesis/src/geom/circle/GetCirclePointsBetween.ts
+  function GetCirclePointsBetween(circle2, startAngle, endAngle, step, anticlockwise = false, includeCenter = false, quantity = 0, out = []) {
+    if (!quantity) {
+      quantity = GetCircleCircumference(circle2) / step;
+    }
+    for (let i = 0; i < quantity; i++) {
+      const angle = FromPercent(i / quantity, 0, MATH_CONST.PI2);
+      if (angle >= startAngle && angle <= endAngle) {
+        out.push(GetCircleCircumferencePoint(circle2, angle));
+      }
+    }
+    if (anticlockwise) {
+      out = out.reverse();
+    }
+    if (includeCenter) {
+      out.push(new Vec2(circle2.x, circle2.y));
+    }
+    return out;
+  }
+
+  // ../phaser-genesis/src/geom/PolyPartition.ts
+  function Area(a, b, c) {
+    return (b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y);
+  }
+  function IsConvex(p1, p2, p3) {
+    return Area(p1, p2, p3) < 0;
+  }
+  function Equals(a, b) {
+    return a.x === b.x && a.y === b.y;
+  }
+  function IsClockwise(polygon) {
+    let sum = 0;
+    for (let i = 0, len = polygon.length; i < len; ++i) {
+      const p1 = polygon[i];
+      const p2 = polygon[(i + 1) % len];
+      sum += (p2.x - p1.x) * (p2.y + p1.y);
+    }
+    return sum > 0;
+  }
+  function UpdateVertex(vertex, vertices) {
+    if (!vertex.shouldUpdate) {
+      return;
+    }
+    vertex.shouldUpdate = false;
+    const v1 = vertex.prev.point;
+    const v2 = vertex.point;
+    const v3 = vertex.next.point;
+    vertex.isConvex = IsConvex(v1, v2, v3);
+    let v1x = v1.x - v2.x;
+    let v1y = v1.y - v2.y;
+    const v1Len = Math.sqrt(v1x * v1x + v1y * v1y);
+    v1x /= v1Len;
+    v1y /= v1Len;
+    let v3x = v3.x - v2.x;
+    let v3y = v3.y - v2.y;
+    const v3Len = Math.sqrt(v3x * v3x + v3y * v3y);
+    v3x /= v3Len;
+    v3y /= v3Len;
+    vertex.angleCos = v1x * v3x + v1y * v3y;
+    if (vertex.isConvex) {
+      vertex.isEar = true;
+      for (let i = 0, len = vertices.length; i < len; ++i) {
+        const curr = vertices[i];
+        if (!curr.isActive || curr === vertex) {
+          continue;
+        }
+        if (Equals(v1, curr.point) || Equals(v2, curr.point) || Equals(v3, curr.point)) {
+          continue;
+        }
+        const areaA = Area(v1, curr.point, v2);
+        const areaB = Area(v2, curr.point, v3);
+        const areaC = Area(v3, curr.point, v1);
+        if (areaA > 0 && areaB > 0 && areaC > 0) {
+          vertex.isEar = false;
+          break;
+        }
+        if (areaA === 0 && areaB >= 0 && areaC >= 0) {
+          if (Area(v1, curr.prev.point, v2) > 0 || Area(v1, curr.next.point, v2) > 0) {
+            vertex.isEar = false;
+            break;
+          }
+        }
+        if (areaB === 0 && areaA >= 0 && areaC >= 0) {
+          if (Area(v2, curr.prev.point, v3) > 0 || Area(v2, curr.next.point, v3) > 0) {
+            vertex.isEar = false;
+            break;
+          }
+        }
+        if (areaC === 0 && areaA >= 0 && areaB >= 0) {
+          if (Area(v3, curr.prev.point, v1) > 0 || Area(v3, curr.next.point, v1) > 0) {
+            vertex.isEar = false;
+            break;
+          }
+        }
+      }
+    } else {
+      vertex.isEar = false;
+    }
+  }
+  function RemoveCollinearOrDuplicate(start) {
+    for (let curr = start, end = start; ; ) {
+      if (Equals(curr.point, curr.next.point) || Area(curr.prev.point, curr.point, curr.next.point) === 0) {
+        curr.prev.next = curr.next;
+        curr.next.prev = curr.prev;
+        curr.prev.shouldUpdate = true;
+        curr.next.shouldUpdate = true;
+        if (curr === curr.next) {
+          break;
+        }
+        end = curr.prev;
+        curr = curr.next;
+        continue;
+      }
+      curr = curr.next;
+      if (curr === end) {
+        break;
+      }
+    }
+  }
+  function Triangulate(polygon, doNotCheckOrdering = false) {
+    if (!doNotCheckOrdering) {
+      if (IsClockwise(polygon)) {
+        throw new Error("Polygon should be counterclockwise");
+      }
+    }
+    if (polygon.length < 4) {
+      return [polygon];
+    }
+    const len = polygon.length;
+    const vertices = [];
+    const triangles = [];
+    for (let i = 0; i < len; ++i) {
+      vertices.push({
+        isActive: true,
+        isConvex: false,
+        isEar: false,
+        point: polygon[i],
+        angleCos: 0,
+        shouldUpdate: true,
+        index: i
+      });
+    }
+    for (let i = 0; i < len; ++i) {
+      const vertex = vertices[i];
+      vertex.prev = vertices[(i + len - 1) % len];
+      vertex.next = vertices[(i + 1) % len];
+    }
+    vertices.forEach((vertex) => UpdateVertex(vertex, vertices));
+    for (let i = 0; i < len - 3; ++i) {
+      let ear = null;
+      for (let j = 0; j < len; ++j) {
+        const vertex = vertices[j];
+        if (!vertex.isActive || !vertex.isEar) {
+          continue;
+        }
+        if (!ear) {
+          ear = vertex;
+        } else if (vertex.angleCos > ear.angleCos) {
+          ear = vertex;
+        }
+      }
+      if (!ear) {
+        for (let i2 = 0; i2 < len; ++i2) {
+          const vertex = vertices[i2];
+          if (vertex.isActive) {
+            const p1 = vertex.prev.point;
+            const p2 = vertex.point;
+            const p3 = vertex.next.point;
+            if (Math.abs(Area(p1, p2, p3)) > 1e-5) {
+              throw new Error("Failed to find ear. There may be self-intersection in the polygon.");
+            }
+          }
+        }
+        break;
+      }
+      triangles.push([ear.prev.point, ear.point, ear.next.point]);
+      ear.isActive = false;
+      ear.prev.next = ear.next;
+      ear.next.prev = ear.prev;
+      ear.prev.shouldUpdate = true;
+      ear.next.shouldUpdate = true;
+      RemoveCollinearOrDuplicate(ear.next);
+      if (i === len - 4) {
+        break;
+      }
+      for (let i2 = 0; i2 < len; ++i2) {
+        UpdateVertex(vertices[i2], vertices);
+      }
+    }
+    for (let i = 0; i < len; ++i) {
+      const vertex = vertices[i];
+      if (vertex.isActive) {
+        vertex.prev.isActive = false;
+        vertex.next.isActive = false;
+        const p1 = vertex.prev.point;
+        const p2 = vertex.point;
+        const p3 = vertex.next.point;
+        if (Math.abs(Area(p1, p2, p3)) > 1e-5) {
+          triangles.push([p1, p2, p3]);
+        }
+      }
+    }
+    return triangles;
+  }
+
   // ../phaser-genesis/src/renderer/webgl1/draw/FillArc.ts
   var circle = new Circle();
+  function FillArc(renderPass, x, y, radius, startAngle, endAngle, steps, anticlockwise, includeCenter, red, green, blue, alpha) {
+    circle.set(x, y, radius);
+    const points = GetCirclePointsBetween(circle, startAngle, endAngle, steps, anticlockwise, includeCenter);
+    const tris = Triangulate(points);
+    if (!tris.length) {
+      return;
+    }
+    const { F32, offset } = GetVertexBufferEntry(renderPass, tris.length);
+    const textureIndex = renderPass.textures.setWhite();
+    let idx = offset;
+    tris.forEach((tri) => {
+      idx = BatchTriangle(F32, idx, textureIndex, tri[0].x, tri[0].y, tri[1].x, tri[1].y, tri[2].x, tri[2].y, red, green, blue, alpha);
+    });
+  }
+
+  // ../phaser-genesis/src/renderer/webgl1/draw/FillLine.ts
+  function FillLine(renderPass, x1, y1, x2, y2, width, red, green, blue, alpha) {
+    const { F32, offset } = GetVertexBufferEntry(renderPass, 2);
+    const textureIndex = renderPass.textures.setWhite();
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const len = Math.sqrt(dx * dx + dy * dy);
+    width *= 0.5;
+    const al0 = width * (y2 - y1) / len;
+    const al1 = width * (x1 - x2) / len;
+    const bl0 = width * (y2 - y1) / len;
+    const bl1 = width * (x1 - x2) / len;
+    BatchQuad(F32, offset, textureIndex, Math.floor(x1 + al0), Math.floor(y1 + al1), Math.floor(x1 - al0), Math.floor(y1 - al1), Math.floor(x2 - bl0), Math.floor(y2 - bl1), Math.floor(x2 + bl0), Math.floor(y2 + bl1), red, green, blue, alpha);
+  }
+
+  // ../phaser-genesis/src/renderer/webgl1/draw/FillRect.ts
+  function FillRect(renderPass, x, y, width, height, red, green, blue, alpha) {
+    const { F32, offset } = GetVertexBufferEntry(renderPass, 2);
+    const textureIndex = renderPass.textures.setWhite();
+    x = Math.round(x);
+    y = Math.round(y);
+    BatchQuad(F32, offset, textureIndex, x, y, x, y + height, x + width, y + height, x + width, y, red, green, blue, alpha);
+  }
+
+  // ../phaser-genesis/src/renderer/webgl1/draw/FillTriangle.ts
+  function FillTriangle(renderPass, x1, y1, x2, y2, x3, y3, red, green, blue, alpha) {
+    const { F32, offset } = GetVertexBufferEntry(renderPass, 1);
+    const textureIndex = renderPass.textures.setWhite();
+    BatchTriangle(F32, offset, textureIndex, x1, y1, x2, y2, x3, y3, red, green, blue, alpha);
+  }
 
   // ../phaser-genesis/src/config/defaultorigin/SetDefaultOrigin.ts
   function SetDefaultOrigin(x = 0.5, y = x) {
@@ -4654,6 +5157,120 @@ void main (void)
     }
   };
 
+  // ../phaser-genesis/src/renderer/webgl1/draw/DrawTiles.ts
+  function DrawTiles(renderPass, texture, tileWidth, tileHeight, mapData, mapWidth, x = 0, y = 0, alpha = 1) {
+    let tx = 0;
+    let ty = 0;
+    let i = 0;
+    mapData.forEach((tile) => {
+      if (tile !== -1) {
+        DrawFrame(renderPass, texture, tile, Math.floor(x + tx), Math.floor(y + ty), alpha);
+      }
+      i++;
+      tx += tileWidth;
+      if (i === mapWidth) {
+        tx = 0;
+        ty += tileHeight;
+        i = 0;
+      }
+    });
+  }
+
+  // ../phaser-genesis/src/gameobjects/directdraw/DirectDraw.ts
+  var DirectDraw = class extends GameObject {
+    constructor() {
+      super();
+      __publicField(this, "type", "DirectDraw");
+      __publicField(this, "red", 1);
+      __publicField(this, "green", 1);
+      __publicField(this, "blue", 1);
+      __publicField(this, "alpha", 1);
+      __publicField(this, "smoothness", 8);
+      __publicField(this, "renderPass");
+      __publicField(this, "_color");
+    }
+    set color(value) {
+      if (value !== void 0 && value !== this._color) {
+        this.red = (value >> 16 & 255) / 255;
+        this.green = (value >> 8 & 255) / 255;
+        this.blue = (value & 255) / 255;
+        this._color = value;
+      }
+    }
+    setRGB(red, green, blue, alpha = 1) {
+      this.red = red / 255;
+      this.green = green / 255;
+      this.blue = blue / 255;
+      this.alpha = alpha;
+      return this;
+    }
+    arc(x, y, radius, startAngle = 0, endAngle = 6.283185307179586, anticlockwise = false, includeCenter = false, color) {
+      this.color = color;
+      FillArc(this.renderPass, x, y, radius, startAngle, endAngle, this.smoothness, anticlockwise, includeCenter, this.red, this.green, this.blue, this.alpha);
+      return this;
+    }
+    circle(x, y, radius, color) {
+      this.color = color;
+      FillArc(this.renderPass, x, y, radius, 0, Math.PI * 2, this.smoothness, false, false, this.red, this.green, this.blue, this.alpha);
+      return this;
+    }
+    plot(x, y, color) {
+      this.color = color;
+      FillRect(this.renderPass, x, y, 1, 1, this.red, this.green, this.blue, this.alpha);
+      return this;
+    }
+    box(x, y, width, height, thickness = 1, color) {
+      this.color = color;
+      const tw = thickness * 0.5;
+      this.line(x, y + tw, x + width, y + tw, thickness);
+      this.line(x, y + height - tw, x + width, y + height - tw, thickness);
+      this.line(x + tw, y + thickness, x + tw, y + height - thickness, thickness);
+      this.line(x + width - tw, y + thickness, x + width - tw, y + height - thickness, thickness);
+      return this;
+    }
+    rect(x, y, width, height, color) {
+      this.color = color;
+      FillRect(this.renderPass, x, y, width, height, this.red, this.green, this.blue, this.alpha);
+      return this;
+    }
+    triangle(x1, y1, x2, y2, x3, y3, color) {
+      this.color = color;
+      FillTriangle(this.renderPass, x1, y1, x2, y2, x3, y3, this.red, this.green, this.blue, this.alpha);
+      return this;
+    }
+    line(x1, y1, x2, y2, width, color) {
+      this.color = color;
+      FillLine(this.renderPass, x1, y1, x2, y2, width, this.red, this.green, this.blue, this.alpha);
+      return this;
+    }
+    image(texture, x, y, alpha = 1, scaleX = 1, scaleY = 1) {
+      DrawImage(this.renderPass, texture, x, y, alpha, scaleX, scaleY);
+      return this;
+    }
+    imagePart(texture, x0, y0, x1, y1, dx, dy, dw, dh, alpha = 1) {
+      DrawImagePart(this.renderPass, texture, x0, y0, x1, y1, dx, dy, dw, dh, alpha);
+      return this;
+    }
+    frame(texture, frame2, x, y, alpha = 1, scaleX = 1, scaleY = 1) {
+      DrawFrame(this.renderPass, texture, frame2, x, y, alpha, scaleX, scaleY);
+      return this;
+    }
+    quad(texture, frame2, x0, y0, x1, y1, x2, y2, x3, y3, alpha = 1) {
+      DrawQuad(this.renderPass, texture, frame2, x0, y0, x1, y1, x2, y2, x3, y3, alpha);
+      return this;
+    }
+    tiles(texture, tileWidth, tileHeight, mapData, mapWidth, x = 0, y = 0) {
+      DrawTiles(this.renderPass, texture, tileWidth, tileHeight, mapData, mapWidth, x, y, this.alpha);
+      return this;
+    }
+    render() {
+    }
+    renderGL(renderPass) {
+      this.renderPass = renderPass;
+      this.render();
+    }
+  };
+
   // ../phaser-genesis/src/components/hierarchy/DepthFirstSearchFromParentID.ts
   function DepthFirstSearchFromParentID(parentID) {
     const stack = [parentID];
@@ -4706,6 +5323,12 @@ void main (void)
       currentParent = GetParentID(currentParent);
     }
     return results;
+  }
+
+  // ../phaser-genesis/src/components/hierarchy/GetSiblingIDs.ts
+  function GetSiblingIDs(childID) {
+    const parentID = GetParentID(childID);
+    return GameObjectTree.get(parentID);
   }
 
   // ../phaser-genesis/src/components/hierarchy/GetWorldID.ts
@@ -4841,12 +5464,18 @@ void main (void)
     return AddChildAt(parent, child);
   }
 
-  // ../phaser-genesis/src/display/AddChildren.ts
-  function AddChildren(parent, ...children) {
-    children.forEach((child) => {
-      AddChildAt(parent, child);
-    });
-    return children;
+  // ../phaser-genesis/src/display/BringChildToTop.ts
+  function BringChildToTop(child) {
+    const childID = child.id;
+    const currentIndex = GetChildIndex(child);
+    const children = GetSiblingIDs(childID);
+    if (currentIndex !== -1 && currentIndex < children.length) {
+      children.splice(currentIndex, 1);
+      children.push(childID);
+      UpdateIndexes(childID);
+      SetDirtyWorldDisplayList(childID);
+    }
+    return child;
   }
 
   // ../phaser-genesis/src/display/RemoveChildren.ts
@@ -5589,8 +6218,154 @@ void main (void)
     return file;
   }
 
-  // ../phaser-genesis/src/cache/Cache.ts
-  var caches = new Map();
+  // ../phaser-genesis/src/input/mouse/Mouse.ts
+  var Mouse = class extends EventEmitter {
+    constructor(target) {
+      super();
+      __publicField(this, "primaryDown", false);
+      __publicField(this, "auxDown", false);
+      __publicField(this, "secondaryDown", false);
+      __publicField(this, "blockContextMenu", true);
+      __publicField(this, "localPoint");
+      __publicField(this, "hitPoint");
+      __publicField(this, "target");
+      __publicField(this, "resolution", 1);
+      __publicField(this, "mousedownHandler");
+      __publicField(this, "mouseupHandler");
+      __publicField(this, "mousemoveHandler");
+      __publicField(this, "mousewheelHandler");
+      __publicField(this, "contextmenuHandler");
+      __publicField(this, "blurHandler");
+      __publicField(this, "transPoint");
+      this.mousedownHandler = (event) => this.onMouseDown(event);
+      this.mouseupHandler = (event) => this.onMouseUp(event);
+      this.mousemoveHandler = (event) => this.onMouseMove(event);
+      this.mousewheelHandler = (event) => this.onMouseWheel(event);
+      this.contextmenuHandler = (event) => this.onContextMenuEvent(event);
+      this.blurHandler = () => this.onBlur();
+      this.localPoint = new Vec2();
+      this.hitPoint = new Vec2();
+      this.transPoint = new Vec2();
+      if (!target) {
+        target = GameInstance.get().renderer.canvas;
+      }
+      target.addEventListener("mousedown", this.mousedownHandler);
+      target.addEventListener("mouseup", this.mouseupHandler);
+      target.addEventListener("wheel", this.mousewheelHandler, { passive: false });
+      target.addEventListener("contextmenu", this.contextmenuHandler);
+      window.addEventListener("mouseup", this.mouseupHandler);
+      window.addEventListener("mousemove", this.mousemoveHandler);
+      window.addEventListener("blur", this.blurHandler);
+      this.target = target;
+    }
+    onBlur() {
+    }
+    onMouseDown(event) {
+      this.positionToPoint(event);
+      this.primaryDown = event.button === 0;
+      this.auxDown = event.button === 1;
+      this.secondaryDown = event.button === 2;
+      Emit(this, "pointerdown", this.localPoint.x, this.localPoint.y, event.button, event);
+    }
+    onMouseUp(event) {
+      this.positionToPoint(event);
+      this.primaryDown = !(event.button === 0);
+      this.auxDown = !(event.button === 1);
+      this.secondaryDown = !(event.button === 2);
+      Emit(this, "pointerup", this.localPoint.x, this.localPoint.y, event.button, event);
+    }
+    onMouseMove(event) {
+      this.positionToPoint(event);
+      Emit(this, "pointermove", this.localPoint.x, this.localPoint.y, event);
+    }
+    onMouseWheel(event) {
+      Emit(this, "wheel", event.deltaX, event.deltaY, event.deltaZ, event);
+    }
+    onContextMenuEvent(event) {
+      if (this.blockContextMenu) {
+        event.preventDefault();
+      }
+      Emit(this, "contextmenu", event);
+    }
+    positionToPoint(event) {
+      return this.localPoint.set(event.offsetX, event.offsetY);
+    }
+    getInteractiveChildren(parent, results) {
+      const children = parent.children;
+      for (let i = 0; i < children.length; i++) {
+        const child = children[i];
+        if (!child.visible || !child.input.enabled) {
+          continue;
+        }
+        results.push(child);
+        if (child.input.enabledChildren && child.numChildren) {
+          this.getInteractiveChildren(child, results);
+        }
+      }
+    }
+    checkHitArea(entity, px, py) {
+      if (entity.input.hitArea) {
+        if (entity.input.hitArea.contains(px, py)) {
+          return true;
+        }
+      } else {
+        return entity.transformExtent.contains(px, py);
+      }
+      return false;
+    }
+    hitTest(...entities3) {
+      const localX = this.localPoint.x;
+      const localY = this.localPoint.y;
+      const point = this.transPoint;
+      for (let i = 0; i < entities3.length; i++) {
+        const entity = entities3[i];
+        if (!entity.world) {
+          continue;
+        }
+        const mat = Mat2dAppend(entity.world.camera.worldTransform, entity.worldTransform);
+        Mat2dGlobalToLocal(mat, localX, localY, point);
+        if (this.checkHitArea(entity, point.x, point.y)) {
+          this.hitPoint.set(point.x, point.y);
+          return true;
+        }
+      }
+      return false;
+    }
+    hitTestChildren(parent, topOnly = true) {
+      const output = [];
+      if (!parent.visible) {
+        return output;
+      }
+      const candidates = [];
+      const parentInput = parent.input;
+      if (parentInput && parentInput.enabled) {
+        candidates.push(parent);
+      }
+      if (parentInput.enabledChildren && parent.numChildren) {
+        this.getInteractiveChildren(parent, candidates);
+      }
+      for (let i = candidates.length - 1; i >= 0; i--) {
+        const entity = candidates[i];
+        if (this.hitTest(entity)) {
+          output.push(entity);
+          if (topOnly) {
+            break;
+          }
+        }
+      }
+      return output;
+    }
+    shutdown() {
+      const target = this.target;
+      target.removeEventListener("mousedown", this.mousedownHandler);
+      target.removeEventListener("mouseup", this.mouseupHandler);
+      target.removeEventListener("wheel", this.mousewheelHandler);
+      target.removeEventListener("contextmenu", this.contextmenuHandler);
+      window.removeEventListener("mouseup", this.mouseupHandler);
+      window.removeEventListener("mousemove", this.mousemoveHandler);
+      window.removeEventListener("blur", this.blurHandler);
+    }
+  };
 
   // ../phaser-genesis/src/world/events/WorldAfterUpdateEvent.ts
   var WorldAfterUpdateEvent = "afterupdate";
@@ -5622,12 +6397,6 @@ void main (void)
   // ../phaser-genesis/src/world/AddRenderDataComponent.ts
   function AddRenderDataComponent(id) {
     addComponent(GameObjectWorld, RenderDataComponent, id);
-  }
-
-  // ../phaser-genesis/src/world/CalculateWorldBounds.ts
-  var processList = new Set();
-  function CalculateWorldBounds(world2, query) {
-    return 1;
   }
 
   // ../phaser-genesis/src/config/worldsize/GetWorldSize.ts
@@ -5734,31 +6503,61 @@ void main (void)
       __publicField(this, "minY");
       __publicField(this, "maxX");
       __publicField(this, "maxY");
+      __publicField(this, "cellSize");
+      __publicField(this, "width");
+      __publicField(this, "height");
       __publicField(this, "cells");
-      __publicField(this, "factor");
+      __publicField(this, "debug");
       this.minX = minX;
       this.minY = minY;
       this.maxX = maxX;
       this.maxY = maxY;
+      this.cellSize = cellSize;
       const width = Math.floor((maxX - minX) / cellSize);
       const height = Math.floor((maxY - minY) / cellSize);
+      this.width = width;
+      this.height = height;
+      console.log("grid size", this.width, this.height);
       this.cells = [];
-      this.factor = 1 / cellSize;
-      let i = 0;
+      this.debug = [];
       for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
-          console.log(`Cell ${i} : ${x} x ${y}`);
           this.cells.push(new Set());
-          i++;
+          this.debug.push({ x: x * cellSize, y: y * cellSize, width: cellSize, height: cellSize });
         }
       }
       console.log("hash", this.cells);
     }
-    getKey(i1, i2) {
-      return `${i1}.${i2}`;
+    clear() {
+      this.cells.forEach((cell) => cell.clear());
     }
-    getIndex(x, y, size) {
-      return x * this.factor + y * this.factor * size;
+    insert(id) {
+      const cells = this.cells;
+      const bounds = BoundsComponent.global[id];
+      const topLeft = this.getIndex(bounds[0], bounds[1]);
+      const bottomRight = this.getIndex(bounds[2], bounds[3]);
+      if (topLeft === bottomRight) {
+        console.log("easyout", topLeft);
+        cells[topLeft].add(id);
+        return;
+      }
+      const topRight = this.getIndex(bounds[2], bounds[1]);
+      const bottomLeft = this.getIndex(bounds[0], bounds[3]);
+      const width = topRight - topLeft;
+      const height = (bottomLeft - topLeft) / this.height;
+      console.log("w/h", width, height, "tl", topLeft, "tr", topRight, "bl", bottomLeft, "br", bottomRight);
+      let offset = 0;
+      for (let i = 0; i < width * height; i++) {
+        const index = i + offset;
+        console.log("adding to index", index, "offset", offset);
+        offset++;
+        if (i % width === 0) {
+          offset += this.height - width;
+        }
+      }
+    }
+    getIndex(x, y) {
+      return Math.floor(x / this.cellSize) + Math.floor(y / this.cellSize) * this.width;
     }
   };
 
@@ -5795,7 +6594,7 @@ void main (void)
       SetWorldID(id, id);
       WorldList.get(scene).push(this);
       this.color = new Color2(id);
-      this.spatialGrid = new SpatialHashGrid(-1e3, -1e3, 1e3, 1e3, 500);
+      this.spatialGrid = new SpatialHashGrid(0, 0, 800, 600, 200);
       Once(scene, SceneDestroyEvent, () => this.destroy());
     }
     beforeUpdate(delta, time) {
@@ -5845,8 +6644,11 @@ void main (void)
         RebuildWorldTransforms(this, id, false);
         isDirty = true;
       }
-      const dirtyWorldTotal = UpdateVertexPositionSystem(GameObjectWorld, this.vertexPositionQuery);
-      const dirtyBoundsTotal = CalculateWorldBounds(GameObjectWorld, this.dirtyBoundsQuery);
+      const updatedEntities = UpdateVertexPositionSystem(GameObjectWorld, this.vertexPositionQuery);
+      const dirtyWorldTotal = updatedEntities.length;
+      updatedEntities.forEach((entity) => {
+        this.spatialGrid.insert(entity);
+      });
       if (dirtyDisplayList) {
         this.listLength = 0;
         RebuildWorldList(this, id, 0);
@@ -5918,7 +6720,7 @@ void main (void)
     }
   };
 
-  // examples/src/gameobjects/directdraw/parent bounds.ts
+  // examples/src/display/spatial grid.ts
   var Demo = class extends Scene {
     constructor() {
       super();
@@ -5926,39 +6728,27 @@ void main (void)
     }
     create() {
       return __async(this, null, function* () {
-        yield ImageFile("mushroom", "assets/mushroom-32x32.png").load();
-        yield ImageFile("lemming", "assets/lemming.png").load();
-        yield ImageFile("garfield", "assets/orange-cat1.png").load();
-        yield ImageFile("clown", "assets/clown.png").load();
+        yield ImageFile("box", "assets/box-item-boxed.png").load();
         const world2 = new StaticWorld(this);
-        AddChild(world2, new Sprite(64, 64, "mushroom"));
-        const parent = new Container(200, 300);
-        parent.name = "Lemming Container";
-        for (let i = 0; i < 4; i++) {
-          const x = Between(-100, 100);
-          const y = Between(-100, 100);
-          AddChild(parent, new Sprite(x, y, "lemming"));
-        }
-        const parent2 = new Container(400, 300);
-        parent2.name = "Cat Container";
-        for (let i = 0; i < 4; i++) {
-          const x = Between(-100, 100);
-          const y = Between(-100, 100);
-          AddChild(parent2, new Sprite(x, y, "garfield"));
-        }
-        AddChildren(world2, parent, parent2);
-        const parent3 = new Container(600, 300);
-        parent3.name = "Deep Container";
-        const parent4 = new Container(0, 0);
-        parent4.name = "Deep 1";
-        AddChild(parent3, parent4);
-        AddChild(parent3, new Sprite(0, 0, "mushroom"));
-        AddChild(parent4, new Sprite(50, 50, "clown"));
-        AddChildren(world2, parent3);
+        const mouse = new Mouse();
+        const grid = world2.spatialGrid;
+        const dd = new DirectDraw();
+        dd.render = () => {
+          grid.debug.forEach((cell) => {
+            dd.box(cell.x, cell.y, cell.width, cell.height, 1, 65280);
+          });
+        };
+        AddChild(world2, dd);
+        On(mouse, "pointerdown", (x, y, button) => {
+          const sprite = new Sprite(x, y, "box");
+          AddChild(world2, sprite);
+          console.log(grid);
+          BringChildToTop(dd);
+        });
       });
     }
   };
-  new Game(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(2960685), Scenes(Demo));
+  new Game(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(657930), Scenes(Demo));
 })();
 /**
  * @author       Niklas von Hertzen (https://github.com/niklasvh/base64-arraybuffer)
@@ -5971,4 +6761,4 @@ void main (void)
  * @copyright    2020 Photon Storm Ltd.
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
  */
-//# sourceMappingURL=parent bounds.js.map
+//# sourceMappingURL=spatial grid.js.map
