@@ -4,6 +4,7 @@ import { DirectDraw, Sprite } from '../../../../phaser-genesis/src/gameobjects';
 
 import { Game } from '../../../../phaser-genesis/src/Game';
 import { ImageFile } from '../../../../phaser-genesis/src/loader/files/ImageFile';
+import { Keyboard } from '../../../../phaser-genesis/src/input/keyboard';
 import { Mouse } from '../../../../phaser-genesis/src/input/mouse/Mouse';
 import { On } from '../../../../phaser-genesis/src/events';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
@@ -21,6 +22,8 @@ class Demo extends Scene
     async create ()
     {
         await ImageFile('box', 'assets/box-item-boxed.png').load();
+        await ImageFile('rocket', 'assets/rocket.png').load();
+        await ImageFile('pacman', 'assets/pacman_by_oz_28x28.png').load();
 
         const world = new StaticWorld(this);
 
@@ -40,15 +43,37 @@ class Demo extends Scene
 
         AddChild(world, dd);
 
-        On(mouse, 'pointerdown', (x: number, y: number, button: number) => {
+        let frame = 'pacman';
 
-            const sprite = new Sprite(x, y, 'box');
+        const keyboard = new Keyboard();
+
+        On(keyboard, 'keydown', (event: KeyboardEvent) => {
+
+            if (event.key === 'b')
+            {
+                frame = 'box';
+            }
+            else if (event.key === 'r')
+            {
+                frame = 'rocket';
+            }
+            else if (event.key === 'p')
+            {
+                frame = 'pacman';
+            }
+    
+        });
+
+        On(mouse, 'pointerdown', (x: number, y: number) => {
+
+            const sprite = new Sprite(x, y, frame);
+
+            if (frame === 'pacman')
+            {
+                sprite.setRotation(Math.PI / 2);
+            }
 
             AddChild(world, sprite);
-
-            // grid.insert(sprite.id);
-
-            console.log(grid);
 
             BringChildToTop(dd);
         });

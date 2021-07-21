@@ -6218,6 +6218,85 @@ void main (void)
     return file;
   }
 
+  // ../phaser-genesis/src/input/keyboard/Keyboard.ts
+  var Keyboard = class extends EventEmitter {
+    constructor() {
+      super();
+      __publicField(this, "keys");
+      __publicField(this, "keydownHandler");
+      __publicField(this, "keyupHandler");
+      __publicField(this, "blurHandler");
+      __publicField(this, "keyConversion", {
+        Up: "ArrowUp",
+        Down: "ArrowDown",
+        Left: "ArrowLeft",
+        Right: "ArrowRight",
+        Spacebar: " ",
+        Win: "Meta",
+        Scroll: "ScrollLock",
+        Del: "Delete",
+        Apps: "ContextMenu",
+        Esc: "Escape",
+        Add: "+",
+        Subtract: "-",
+        Multiply: "*",
+        Decimal: ".",
+        Divide: "/"
+      });
+      this.keydownHandler = (event) => this.onKeyDown(event);
+      this.keyupHandler = (event) => this.onKeyUp(event);
+      this.blurHandler = () => this.onBlur();
+      window.addEventListener("keydown", this.keydownHandler);
+      window.addEventListener("keyup", this.keyupHandler);
+      window.addEventListener("blur", this.blurHandler);
+      this.keys = new Map();
+    }
+    addKeys(...keys) {
+      keys.forEach((key) => {
+        this.keys.set(key.getValue(), key);
+      });
+    }
+    clearKeys() {
+      this.keys.clear();
+    }
+    onBlur() {
+      this.keys.forEach((key) => {
+        key.reset();
+      });
+    }
+    getKeyValue(key) {
+      if (this.keyConversion.hasOwnProperty(key)) {
+        return this.keyConversion[key];
+      } else {
+        return key;
+      }
+    }
+    onKeyDown(event) {
+      const value = this.getKeyValue(event.key);
+      if (this.keys.has(value)) {
+        const key = this.keys.get(value);
+        key.down(event);
+      }
+      Emit(this, "keydown-" + value, event);
+      Emit(this, "keydown", event);
+    }
+    onKeyUp(event) {
+      const value = this.getKeyValue(event.key);
+      if (this.keys.has(value)) {
+        const key = this.keys.get(value);
+        key.up(event);
+      }
+      Emit(this, "keyup-" + value, event);
+      Emit(this, "keyup", event);
+    }
+    destroy() {
+      window.removeEventListener("keydown", this.keydownHandler);
+      window.removeEventListener("keyup", this.keyupHandler);
+      window.removeEventListener("blur", this.blurHandler);
+      Emit(this, "destroy");
+    }
+  };
+
   // ../phaser-genesis/src/input/mouse/Mouse.ts
   var Mouse = class extends EventEmitter {
     constructor(target) {
@@ -6537,27 +6616,40 @@ void main (void)
       const topLeft = this.getIndex(bounds[0], bounds[1]);
       const bottomRight = this.getIndex(bounds[2], bounds[3]);
       if (topLeft === bottomRight) {
-        console.log("easyout", topLeft);
         cells[topLeft].add(id);
         return;
       }
       const topRight = this.getIndex(bounds[2], bounds[1]);
       const bottomLeft = this.getIndex(bounds[0], bounds[3]);
-      const width = topRight - topLeft;
-      const height = (bottomLeft - topLeft) / this.height;
-      console.log("w/h", width, height, "tl", topLeft, "tr", topRight, "bl", bottomLeft, "br", bottomRight);
-      let offset = 0;
+      const width = topRight - topLeft + 1;
+      const height = Math.max(1, Math.ceil((bottomLeft - topLeft) / this.height));
+      const startX = Math.floor(bounds[0] / this.cellSize);
+      const startY = Math.floor(bounds[1] / this.cellSize);
+      let gridX = startX;
+      let gridY = startY;
+      let placed = 0;
       for (let i = 0; i < width * height; i++) {
-        const index = i + offset;
-        console.log("adding to index", index, "offset", offset);
-        offset++;
-        if (i % width === 0) {
-          offset += this.height - width;
+        const index = gridX + gridY * this.width;
+        console.log("adding to index", index);
+        cells[index].add(id);
+        gridX++;
+        placed++;
+        if (placed === width) {
+          gridX = startX;
+          gridY++;
+          placed = 0;
         }
       }
     }
     getIndex(x, y) {
       return Math.floor(x / this.cellSize) + Math.floor(y / this.cellSize) * this.width;
+    }
+    getBounds(x, y, right, bottom) {
+      const topLeft = this.getIndex(x, y);
+      const topRight = this.getIndex(right, y);
+      const bottomLeft = this.getIndex(x, bottom);
+      const bottomRight = this.getIndex(right, bottom);
+      return [topLeft, topRight, bottomLeft, bottomRight];
     }
   };
 
@@ -6729,6 +6821,8 @@ void main (void)
     create() {
       return __async(this, null, function* () {
         yield ImageFile("box", "assets/box-item-boxed.png").load();
+        yield ImageFile("rocket", "assets/rocket.png").load();
+        yield ImageFile("pacman", "assets/pacman_by_oz_28x28.png").load();
         const world2 = new StaticWorld(this);
         const mouse = new Mouse();
         const grid = world2.spatialGrid;
@@ -6739,10 +6833,23 @@ void main (void)
           });
         };
         AddChild(world2, dd);
-        On(mouse, "pointerdown", (x, y, button) => {
-          const sprite = new Sprite(x, y, "box");
+        let frame2 = "pacman";
+        const keyboard = new Keyboard();
+        On(keyboard, "keydown", (event) => {
+          if (event.key === "b") {
+            frame2 = "box";
+          } else if (event.key === "r") {
+            frame2 = "rocket";
+          } else if (event.key === "p") {
+            frame2 = "pacman";
+          }
+        });
+        On(mouse, "pointerdown", (x, y) => {
+          const sprite = new Sprite(x, y, frame2);
+          if (frame2 === "pacman") {
+            sprite.setRotation(Math.PI / 2);
+          }
           AddChild(world2, sprite);
-          console.log(grid);
           BringChildToTop(dd);
         });
       });
