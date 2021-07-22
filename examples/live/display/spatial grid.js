@@ -794,11 +794,6 @@
     return Boolean(DirtyComponent.child[id]);
   }
 
-  // ../phaser-genesis/src/components/dirty/HasDirtyChildCache.ts
-  function HasDirtyChildCache(id) {
-    return Boolean(DirtyComponent.childCache[id]);
-  }
-
   // ../phaser-genesis/src/components/dirty/HasDirtyDisplayList.ts
   function HasDirtyDisplayList(id) {
     return Boolean(DirtyComponent.displayList[id]);
@@ -5299,6 +5294,11 @@ void main (void)
     return out;
   }
 
+  // ../phaser-genesis/src/components/hierarchy/GetIndex.ts
+  function GetIndex(id) {
+    return HierarchyComponent.index[id];
+  }
+
   // ../phaser-genesis/src/components/hierarchy/GetNumChildren.ts
   function GetNumChildren(id) {
     return HierarchyComponent.numChildren[id];
@@ -5356,11 +5356,6 @@ void main (void)
   function SetParentID(childID, parentID) {
     HierarchyComponent.parentID[childID] = parentID;
     UpdateNumChildren(parentID);
-  }
-
-  // ../phaser-genesis/src/components/hierarchy/SetWorldDepth.ts
-  function SetWorldDepth(id, worldDepth) {
-    HierarchyComponent.worldDepth[id] = worldDepth;
   }
 
   // ../phaser-genesis/src/components/hierarchy/SetWorldID.ts
@@ -6483,62 +6478,6 @@ void main (void)
     return ConfigStore.get(CONFIG_DEFAULTS.WORLD_SIZE);
   }
 
-  // ../phaser-genesis/src/world/AddToRenderList.ts
-  function AddToRenderList(world2, id, renderType) {
-    if (renderType === 0 && !world2.checkWorldEntity(id)) {
-      return false;
-    }
-    let len = world2.listLength;
-    const list = world2.renderList;
-    list[len] = id;
-    list[len + 1] = renderType;
-    world2.listLength += 2;
-    len += 2;
-    if (len === list.length) {
-      const newList = new Uint32Array(len + GetWorldSize() * 4);
-      newList.set(list, 0);
-      world2.renderList = newList;
-    }
-    return true;
-  }
-
-  // ../phaser-genesis/src/world/RebuildWorldList.ts
-  function RebuildWorldList(world2, parent, worldDepth) {
-    if (WillRender(parent)) {
-      let entityAdded = true;
-      if (world2.id !== parent) {
-        entityAdded = AddToRenderList(world2, parent, 0);
-      }
-      if (!entityAdded) {
-        return;
-      }
-      const children = GameObjectTree.get(parent);
-      for (let i = 0; i < children.length; i++) {
-        const nodeID = children[i];
-        if (WillRender(nodeID)) {
-          if (GetNumChildren(nodeID) > 0 && WillRenderChildren(nodeID)) {
-            if (!WillCacheChildren(nodeID) || HasDirtyChildCache(nodeID)) {
-              SetWorldDepth(nodeID, worldDepth);
-              RebuildWorldList(world2, nodeID, worldDepth + 1);
-            } else if (AddToRenderList(world2, nodeID, 0)) {
-              SetWorldDepth(nodeID, worldDepth);
-              AddToRenderList(world2, nodeID, 1);
-            }
-          } else if (!WillCacheChildren(nodeID) && AddToRenderList(world2, nodeID, 0)) {
-            SetWorldDepth(nodeID, worldDepth);
-            AddToRenderList(world2, nodeID, 1);
-          }
-        }
-      }
-      if (children.length === 0) {
-        SetWorldDepth(parent, worldDepth);
-      }
-      if (world2.id !== parent) {
-        AddToRenderList(world2, parent, 1);
-      }
-    }
-  }
-
   // ../phaser-genesis/src/world/RebuildWorldTransforms.ts
   function RebuildWorldTransforms(world2, parent, forceUpdate) {
     if (WillRender(parent)) {
@@ -6614,15 +6553,52 @@ void main (void)
     getKey(x, y) {
       return `${this.getX(x)} ${this.getY(y)}`;
     }
+    getGridKey(x, y) {
+      return `${x} ${y}`;
+    }
     add(gridX, gridY, id) {
       const cells = this.cells;
-      const key = this.getKey(gridX, gridY);
+      const key = this.getGridKey(gridX, gridY);
       if (!cells.has(key)) {
         cells.set(key, new Set([id]));
       } else {
         cells.get(key).add(id);
       }
       return key;
+    }
+    near(id) {
+      return [];
+    }
+    intersects(left, top, right, bottom) {
+      const topLeftX = this.getX(left);
+      const topLeftY = this.getY(top);
+      const bottomRightX = this.getX(right);
+      const bottomRightY = this.getY(bottom);
+      const cells = this.cells;
+      if (topLeftX === bottomRightX && topLeftY === bottomRightY) {
+        const key = this.getGridKey(topLeftX, topLeftY);
+        return [...cells.get(key)];
+      }
+      const topRightX = bottomRightX;
+      const bottomLeftY = bottomRightY;
+      const width = topRightX - topLeftX + 1;
+      const height = Math.max(1, Math.ceil((bottomLeftY - topLeftY) / this.height));
+      let gridX = topLeftX;
+      let gridY = topLeftY;
+      let placed = 0;
+      const results = [];
+      for (let i = 0; i < width * height; i++) {
+        const key = this.getGridKey(gridX, gridY);
+        results.concat(...cells.get(key));
+        gridX++;
+        placed++;
+        if (placed === width) {
+          gridX = topLeftX;
+          gridY++;
+          placed = 0;
+        }
+      }
+      return results;
     }
     insert(id) {
       const [left, top, right, bottom] = BoundsComponent.global[id];
@@ -6631,32 +6607,22 @@ void main (void)
       const bottomRightX = this.getX(right);
       const bottomRightY = this.getY(bottom);
       if (topLeftX === bottomRightX && topLeftY === bottomRightY) {
-        console.log("ltrb", left, top, right, bottom);
-        console.log("topleft", topLeftX, topLeftY, "bottomright", bottomRightX, bottomRightY);
-        const key = this.add(topLeftX, topLeftY, id);
-        console.log("Single cell", key);
+        this.add(topLeftX, topLeftY, id);
         return;
       }
       const topRightX = bottomRightX;
-      const topRightY = topLeftY;
-      const bottomLeftX = topLeftX;
       const bottomLeftY = bottomRightY;
       const width = topRightX - topLeftX + 1;
       const height = Math.max(1, Math.ceil((bottomLeftY - topLeftY) / this.height));
-      console.log("width", width, "height", height);
-      console.log("topleft", topLeftX, topLeftY, "topright", topRightX, topRightY, "bottomleft", bottomLeftX, bottomLeftY, "bottomright", bottomRightX, bottomRightY);
-      const startX = Math.floor(left / this.cellWidth);
-      const startY = Math.floor(top / this.cellHeight);
-      let gridX = startX;
-      let gridY = startY;
+      let gridX = topLeftX;
+      let gridY = topLeftY;
       let placed = 0;
       for (let i = 0; i < width * height; i++) {
-        const key = this.add(gridX, gridY, id);
-        console.log("adding to index", key);
+        this.add(gridX, gridY, id);
         gridX++;
         placed++;
         if (placed === width) {
-          gridX = startX;
+          gridX = topLeftX;
           gridY++;
           placed = 0;
         }
@@ -6676,6 +6642,7 @@ void main (void)
       __publicField(this, "is3D", false);
       __publicField(this, "runRender", false);
       __publicField(this, "color");
+      __publicField(this, "renderList2");
       __publicField(this, "renderList");
       __publicField(this, "listLength", 0);
       __publicField(this, "spatialGrid");
@@ -6690,6 +6657,7 @@ void main (void)
       this.dirtyLocalQuery = defineQuery([tag, Changed(Transform2DComponent)]);
       this.vertexPositionQuery = defineQuery([tag, Changed(WorldMatrix2DComponent), Changed(Extent2DComponent)]);
       this.renderList = new Uint32Array(GetWorldSize() * 4);
+      this.renderList2 = [];
       const id = this.id;
       AddRenderDataComponent(id);
       SetWorldID(id, id);
@@ -6750,16 +6718,16 @@ void main (void)
       updatedEntities.forEach((entity) => {
         this.spatialGrid.insert(entity);
       });
-      if (dirtyDisplayList) {
-        this.listLength = 0;
-        RebuildWorldList(this, id, 0);
-        ClearDirtyDisplayList(id);
-        isDirty = true;
-        this.totalChildren = this.totalChildrenQuery(GameObjectWorld).length;
-      }
+      this.renderList2 = this.spatialGrid.intersects(0, 0, 800, 600);
+      this.renderList2.sort((a, b) => this.sortHandler(a, b));
+      this.listLength = this.renderList2.length;
+      ClearDirtyDisplayList(id);
       this.runRender = this.listLength > 0;
       sceneManager.updateWorldStats(this.totalChildren, this.listLength / 4, Number(dirtyDisplayList), dirtyWorldTotal);
       return isDirty;
+    }
+    sortHandler(a, b) {
+      return GetIndex(a) - GetIndex(b);
     }
     getTotalChildren() {
       if (HasDirtyDisplayList(this.id)) {
