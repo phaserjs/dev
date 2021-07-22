@@ -6577,61 +6577,82 @@ void main (void)
 
   // ../phaser-genesis/src/math/spatialgrid/SpatialHashGrid.ts
   var SpatialHashGrid = class {
-    constructor(minX, minY, maxX, maxY, cellSize) {
-      __publicField(this, "minX");
-      __publicField(this, "minY");
-      __publicField(this, "maxX");
-      __publicField(this, "maxY");
-      __publicField(this, "cellSize");
+    constructor(minX, minY, maxX, maxY, cellWidth, cellHeight) {
+      __publicField(this, "cellWidth");
+      __publicField(this, "cellHeight");
       __publicField(this, "width");
       __publicField(this, "height");
       __publicField(this, "cells");
       __publicField(this, "debug");
-      this.minX = minX;
-      this.minY = minY;
-      this.maxX = maxX;
-      this.maxY = maxY;
-      this.cellSize = cellSize;
-      const width = Math.floor((maxX - minX) / cellSize);
-      const height = Math.floor((maxY - minY) / cellSize);
+      cellWidth = Math.abs(cellWidth);
+      cellHeight = Math.abs(cellHeight);
+      const width = Math.floor((maxX - minX) / cellWidth);
+      const height = Math.floor((maxY - minY) / cellHeight);
       this.width = width;
       this.height = height;
-      console.log("grid size", this.width, this.height);
-      this.cells = [];
+      this.cellWidth = cellWidth;
+      this.cellHeight = cellHeight;
+      this.cells = new Map();
       this.debug = [];
-      for (let y = 0; y < height; y++) {
-        for (let x = 0; x < width; x++) {
-          this.cells.push(new Set());
-          this.debug.push({ x: x * cellSize, y: y * cellSize, width: cellSize, height: cellSize });
+      for (let y = minY; y < maxX; y += cellHeight) {
+        for (let x = minX; x < maxX; x += cellWidth) {
+          this.cells.set(this.getKey(x, y), new Set());
+          this.debug.push({ x, y, width: cellWidth, height: cellHeight });
         }
       }
-      console.log("hash", this.cells);
+      console.log("grid", this);
     }
     clear() {
       this.cells.forEach((cell) => cell.clear());
     }
-    insert(id) {
+    getX(x) {
+      return Math.floor(x / this.cellWidth);
+    }
+    getY(y) {
+      return Math.floor(y / this.cellHeight) * this.width;
+    }
+    getKey(x, y) {
+      return `${this.getX(x)} ${this.getY(y)}`;
+    }
+    add(gridX, gridY, id) {
       const cells = this.cells;
-      const bounds = BoundsComponent.global[id];
-      const topLeft = this.getIndex(bounds[0], bounds[1]);
-      const bottomRight = this.getIndex(bounds[2], bounds[3]);
-      if (topLeft === bottomRight) {
-        cells[topLeft].add(id);
+      const key = this.getKey(gridX, gridY);
+      if (!cells.has(key)) {
+        cells.set(key, new Set([id]));
+      } else {
+        cells.get(key).add(id);
+      }
+      return key;
+    }
+    insert(id) {
+      const [left, top, right, bottom] = BoundsComponent.global[id];
+      const topLeftX = this.getX(left);
+      const topLeftY = this.getY(top);
+      const bottomRightX = this.getX(right);
+      const bottomRightY = this.getY(bottom);
+      if (topLeftX === bottomRightX && topLeftY === bottomRightY) {
+        console.log("ltrb", left, top, right, bottom);
+        console.log("topleft", topLeftX, topLeftY, "bottomright", bottomRightX, bottomRightY);
+        const key = this.add(topLeftX, topLeftY, id);
+        console.log("Single cell", key);
         return;
       }
-      const topRight = this.getIndex(bounds[2], bounds[1]);
-      const bottomLeft = this.getIndex(bounds[0], bounds[3]);
-      const width = topRight - topLeft + 1;
-      const height = Math.max(1, Math.ceil((bottomLeft - topLeft) / this.height));
-      const startX = Math.floor(bounds[0] / this.cellSize);
-      const startY = Math.floor(bounds[1] / this.cellSize);
+      const topRightX = bottomRightX;
+      const topRightY = topLeftY;
+      const bottomLeftX = topLeftX;
+      const bottomLeftY = bottomRightY;
+      const width = topRightX - topLeftX + 1;
+      const height = Math.max(1, Math.ceil((bottomLeftY - topLeftY) / this.height));
+      console.log("width", width, "height", height);
+      console.log("topleft", topLeftX, topLeftY, "topright", topRightX, topRightY, "bottomleft", bottomLeftX, bottomLeftY, "bottomright", bottomRightX, bottomRightY);
+      const startX = Math.floor(left / this.cellWidth);
+      const startY = Math.floor(top / this.cellHeight);
       let gridX = startX;
       let gridY = startY;
       let placed = 0;
       for (let i = 0; i < width * height; i++) {
-        const index = gridX + gridY * this.width;
-        console.log("adding to index", index);
-        cells[index].add(id);
+        const key = this.add(gridX, gridY, id);
+        console.log("adding to index", key);
         gridX++;
         placed++;
         if (placed === width) {
@@ -6640,16 +6661,6 @@ void main (void)
           placed = 0;
         }
       }
-    }
-    getIndex(x, y) {
-      return Math.floor(x / this.cellSize) + Math.floor(y / this.cellSize) * this.width;
-    }
-    getBounds(x, y, right, bottom) {
-      const topLeft = this.getIndex(x, y);
-      const topRight = this.getIndex(right, y);
-      const bottomLeft = this.getIndex(x, bottom);
-      const bottomRight = this.getIndex(right, bottom);
-      return [topLeft, topRight, bottomLeft, bottomRight];
     }
   };
 
@@ -6672,21 +6683,19 @@ void main (void)
       __publicField(this, "totalChildrenQuery");
       __publicField(this, "dirtyLocalQuery");
       __publicField(this, "vertexPositionQuery");
-      __publicField(this, "dirtyBoundsQuery");
       this.scene = scene;
       this.sceneManager = SceneManagerInstance.get();
       const tag = this.tag;
       this.totalChildrenQuery = defineQuery([tag]);
       this.dirtyLocalQuery = defineQuery([tag, Changed(Transform2DComponent)]);
       this.vertexPositionQuery = defineQuery([tag, Changed(WorldMatrix2DComponent), Changed(Extent2DComponent)]);
-      this.dirtyBoundsQuery = defineQuery([tag, Changed(BoundsComponent)]);
       this.renderList = new Uint32Array(GetWorldSize() * 4);
       const id = this.id;
       AddRenderDataComponent(id);
       SetWorldID(id, id);
       WorldList.get(scene).push(this);
       this.color = new Color2(id);
-      this.spatialGrid = new SpatialHashGrid(0, 0, 800, 600, 200);
+      this.spatialGrid = new SpatialHashGrid(-1600, -1200, 1600, 1200, 400, 400);
       Once(scene, SceneDestroyEvent, () => this.destroy());
     }
     beforeUpdate(delta, time) {

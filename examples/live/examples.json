@@ -281,7 +281,7 @@
         {
           "path": "examples/live/display/spatial grid.js",
           "name": "spatial grid.js",
-          "size": 210260,
+          "size": 210325,
           "extension": ".js",
           "type": "file"
         },
@@ -293,7 +293,7 @@
           "type": "file"
         }
       ],
-      "size": 1974682,
+      "size": 1974747,
       "type": "directory"
     },
     {
@@ -750,6 +750,6 @@
       "type": "directory"
     }
   ],
-  "size": 13241973,
+  "size": 13242038,
   "type": "directory"
 }
