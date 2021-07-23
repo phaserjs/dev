@@ -116,7 +116,9 @@ const buildResults = esbuild.buildSync({
     target: 'es6',
     sourcemap: true,
     minify: false,
-    bundle: true
+    bundle: true,
+    logLevel: 'silent',
+    legalComments: 'none'
 });
 
 if (buildResults.errors.length > 0)
