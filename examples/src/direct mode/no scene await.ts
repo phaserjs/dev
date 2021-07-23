@@ -30,3 +30,5 @@ class MyGame
 
     }
 }
+
+new MyGame();

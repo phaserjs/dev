@@ -201,6 +201,13 @@
           "type": "file"
         },
         {
+          "path": "examples/live/direct mode/no scene await.js",
+          "name": "no scene await.js",
+          "size": 136350,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
           "path": "examples/live/direct mode/no scene.js",
           "name": "no scene.js",
           "size": 132758,
@@ -208,7 +215,7 @@
           "type": "file"
         }
       ],
-      "size": 1682904,
+      "size": 1819254,
       "type": "directory"
     },
     {
@@ -686,6 +693,28 @@
       "type": "directory"
     },
     {
+      "path": "examples/live/test",
+      "name": "test",
+      "children": [
+        {
+          "path": "examples/live/test/audio time.js",
+          "name": "audio time.js",
+          "size": 502,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/test/image.js",
+          "name": "image.js",
+          "size": 120104,
+          "extension": ".js",
+          "type": "file"
+        }
+      ],
+      "size": 120606,
+      "type": "directory"
+    },
+    {
       "path": "examples/live/textures",
       "name": "textures",
       "children": [
@@ -757,6 +786,6 @@
       "type": "directory"
     }
   ],
-  "size": 13653971,
+  "size": 13910927,
   "type": "directory"
 }
