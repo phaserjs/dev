@@ -113,10 +113,11 @@ if (!fs.existsSync(pathTS))
 const buildResults = esbuild.buildSync({
     entryPoints: [ pathTS ],
     outfile: pathJS,
-    target: 'es6',
+    target: 'esnext',
     sourcemap: true,
     minify: false,
     bundle: true,
+    metafile: true,
     logLevel: 'silent',
     legalComments: 'none'
 });
@@ -130,12 +131,15 @@ if (buildResults.errors.length > 0)
 else
 {
     logTime(chalk`✔ {whiteBright ${srcJS}}`);
+
+    //  Write the metafile
+    fs.writeFileSync('meta.json', JSON.stringify(buildResults.metafile, null, 2));
 }
 
 const minResults = esbuild.buildSync({
     entryPoints: [ pathTS ],
     outfile: (createMin) ? pathMinJS : pathTempMinJS,
-    target: 'es6',
+    target: 'esnext',
     sourcemap: false,
     minify: true,
     bundle: true
