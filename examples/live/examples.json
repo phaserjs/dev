@@ -697,9 +697,9 @@
       "name": "test",
       "children": [
         {
-          "path": "examples/live/test/audio time.js",
-          "name": "audio time.js",
-          "size": 502,
+          "path": "examples/live/test/bundle.js",
+          "name": "bundle.js",
+          "size": 101891,
           "extension": ".js",
           "type": "file"
         },
@@ -709,9 +709,16 @@
           "size": 120104,
           "extension": ".js",
           "type": "file"
+        },
+        {
+          "path": "examples/live/test/mat4.js",
+          "name": "mat4.js",
+          "size": 18900,
+          "extension": ".js",
+          "type": "file"
         }
       ],
-      "size": 120606,
+      "size": 240895,
       "type": "directory"
     },
     {
@@ -786,6 +793,6 @@
       "type": "directory"
     }
   ],
-  "size": 13910927,
+  "size": 14031216,
   "type": "directory"
 }
