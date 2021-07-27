@@ -704,6 +704,27 @@
           "type": "file"
         },
         {
+          "path": "examples/live/test/gamedraw.js",
+          "name": "gamedraw.js",
+          "size": 136244,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/test/gamerect.js",
+          "name": "gamerect.js",
+          "size": 100782,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/test/gamesprite.js",
+          "name": "gamesprite.js",
+          "size": 138819,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
           "path": "examples/live/test/image.js",
           "name": "image.js",
           "size": 120104,
@@ -716,9 +737,16 @@
           "size": 18900,
           "extension": ".js",
           "type": "file"
+        },
+        {
+          "path": "examples/live/test/renderdraw.js",
+          "name": "renderdraw.js",
+          "size": 85482,
+          "extension": ".js",
+          "type": "file"
         }
       ],
-      "size": 240895,
+      "size": 702222,
       "type": "directory"
     },
     {
@@ -793,6 +821,6 @@
       "type": "directory"
     }
   ],
-  "size": 14031216,
+  "size": 14492543,
   "type": "directory"
 }
