@@ -1,13 +1,34 @@
 import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../phaser-genesis/src/config';
 
 import { AddChild } from '../../../../phaser-genesis/src/display';
+import { Between } from '../../../../phaser-genesis/src/math';
 import { Game } from '../../../../phaser-genesis/src/Game';
 import { ImageFile } from '../../../../phaser-genesis/src/loader/files/ImageFile';
-import { Mouse } from '../../../../phaser-genesis/src/input/mouse/Mouse';
-import { On } from '../../../../phaser-genesis/src/events';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
 import { Sprite } from '../../../../phaser-genesis/src/gameobjects';
 import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
+
+class Carrot extends Sprite
+{
+    speed: number;
+
+    constructor (x: number, y: number)
+    {
+        super(x, y, 'carrot');
+
+        this.speed = Between(0, 1);
+    }
+
+    update (): void
+    {
+        this.x -= this.speed;
+
+        if (this.x < -100)
+        {
+            this.x = 900;
+        }
+    }
+}
 
 class Demo extends Scene
 {
@@ -20,21 +41,17 @@ class Demo extends Scene
 
     async create ()
     {
-        await ImageFile('frog', 'assets/frog.png');
+        await ImageFile('carrot', 'assets/carrot.png');
 
         const world = new StaticWorld(this);
 
-        const sprite = new Sprite(400, 300, 'frog');
+        for (let i = 0; i < 4096; i++)
+        {
+            const x = Between(0, 800);
+            const y = Between(0, 600);
 
-        AddChild(world, sprite);
-
-        const mouse = new Mouse();
-
-        On(mouse, 'pointerdown', (x: number, y: number, button: number) => {
-
-            AddChild(world, new Sprite(x, y, 'frog'));
-
-        });
+            AddChild(world, new Carrot(x, y));
+        }
     }
 }
 

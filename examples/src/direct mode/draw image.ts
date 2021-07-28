@@ -21,7 +21,7 @@ class Demo extends Scene
 
     async create ()
     {
-        await ImageFile('gundam', 'assets/gundam-ex-maxi-on-half.jpg').load();
+        await ImageFile('gundam', 'assets/gundam-ex-maxi-on-half.jpg');
 
         const texture = GetTexture('gundam');
 

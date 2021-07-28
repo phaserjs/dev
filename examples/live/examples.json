@@ -225,7 +225,7 @@
         {
           "path": "examples/live/display/add child on click.js",
           "name": "add child on click.js",
-          "size": 163342,
+          "size": 169516,
           "extension": ".js",
           "type": "file"
         },
@@ -239,7 +239,7 @@
         {
           "path": "examples/live/display/add child.js",
           "name": "add child.js",
-          "size": 155887,
+          "size": 162298,
           "extension": ".js",
           "type": "file"
         },
@@ -286,6 +286,20 @@
           "type": "file"
         },
         {
+          "path": "examples/live/display/mass child test.js",
+          "name": "mass child test.js",
+          "size": 161347,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/display/mass draw test.js",
+          "name": "mass draw test.js",
+          "size": 149489,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
           "path": "examples/live/display/overlap bounds.js",
           "name": "overlap bounds.js",
           "size": 122951,
@@ -307,7 +321,7 @@
           "type": "file"
         }
       ],
-      "size": 1996904,
+      "size": 2320325,
       "type": "directory"
     },
     {
@@ -741,12 +755,12 @@
         {
           "path": "examples/live/test/renderdraw.js",
           "name": "renderdraw.js",
-          "size": 85482,
+          "size": 90663,
           "extension": ".js",
           "type": "file"
         }
       ],
-      "size": 702222,
+      "size": 707403,
       "type": "directory"
     },
     {
@@ -821,6 +835,6 @@
       "type": "directory"
     }
   ],
-  "size": 14492543,
+  "size": 14821145,
   "type": "directory"
 }

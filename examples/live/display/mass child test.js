@@ -4158,6 +4158,11 @@ void main (void)
     }
   };
 
+  // ../phaser-genesis/src/math/Between.ts
+  function Between(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min);
+  }
+
   // ../phaser-genesis/src/config/banner/AddBanner.ts
   function AddBanner() {
     const { title, version, url, color, background } = ConfigStore.get(CONFIG_DEFAULTS.BANNER);
@@ -4389,29 +4394,10 @@ void main (void)
       for (const scene of this.scenes.values()) {
         const worlds2 = WorldList.get(scene);
         for (const world2 of worlds2) {
-          if (world2.runRender) {
-            world2.renderGL(renderPass);
-          }
-          world2.postRenderGL(renderPass);
+          world2.renderGL(renderPass);
         }
       }
-    }
-    getRenderList() {
-      let output = [];
-      for (const scene of this.scenes.values()) {
-        const worlds2 = WorldList.get(scene);
-        for (const world2 of worlds2) {
-          output = output.concat(world2.getRenderList());
-        }
-      }
-      return output;
-    }
-    updateWorldStats(numGameObjects, numRendered, numDisplayLists, numWorldTransforms) {
-      const id = this.id;
-      RenderStatsComponent.numGameObjects[id] += numGameObjects;
-      RenderStatsComponent.numGameObjectsRendered[id] += numRendered;
-      RenderStatsComponent.numDirtyWorldLists[id] += numDisplayLists;
-      RenderStatsComponent.numDirtyWorldTransforms[id] += numWorldTransforms;
+      this.flush = false;
     }
   };
 
@@ -4679,13 +4665,12 @@ void main (void)
           Emit(this, "update", delta, time);
         }
         if (this.willRender) {
-          renderer.begin(sceneManager.flush);
           sceneManager.preRender();
+          renderer.begin(sceneManager.flush);
           sceneManager.render(renderer.renderPass);
           this.render(renderer.renderPass, delta, time);
           Emit(this, "render", renderer.renderPass, delta, time);
           renderer.end();
-          sceneManager.flush = false;
         }
       }
       UpdateDelta(id, time);
@@ -4819,165 +4804,6 @@ void main (void)
     return Boolean(PermissionsComponent.visibleChildren[id]) && Boolean(PermissionsComponent.willRenderChildren[id]);
   }
 
-  // ../phaser-genesis/src/components/transform/UpdateLocalTransform2DSystem.ts
-  var entities;
-  var updateLocalTransformSystem = defineSystem((world2) => {
-    let prevParent = 0;
-    for (let i = 0; i < entities.length; i++) {
-      const id = entities[i];
-      const x = Transform2DComponent.x[id];
-      const y = Transform2DComponent.y[id];
-      const rotation = Transform2DComponent.rotation[id];
-      const scaleX = Transform2DComponent.scaleX[id];
-      const scaleY = Transform2DComponent.scaleY[id];
-      const skewX = Transform2DComponent.skewX[id];
-      const skewY = Transform2DComponent.skewY[id];
-      LocalMatrix2DComponent.a[id] = Math.cos(rotation + skewY) * scaleX;
-      LocalMatrix2DComponent.b[id] = Math.sin(rotation + skewY) * scaleX;
-      LocalMatrix2DComponent.c[id] = -Math.sin(rotation - skewX) * scaleY;
-      LocalMatrix2DComponent.d[id] = Math.cos(rotation - skewX) * scaleY;
-      LocalMatrix2DComponent.tx[id] = x;
-      LocalMatrix2DComponent.ty[id] = y;
-      SetDirtyTransform(id);
-      if (GetParentID(id) !== prevParent) {
-        SetDirtyParents(id);
-        prevParent = GetParentID(id);
-      }
-    }
-    return world2;
-  });
-  var UpdateLocalTransform2DSystem = (world2, query) => {
-    entities = query(world2);
-    const total = entities.length;
-    if (total > 0) {
-      SetDirtyChild(world2.id);
-      updateLocalTransformSystem(world2);
-    }
-    return total;
-  };
-
-  // ../phaser-genesis/src/components/vertices/SetQuadPosition.ts
-  function SetQuadPosition(id, x0, y0, x1, y1, x2, y2, x3, y3) {
-    const data = QuadVertexComponent.values[id];
-    data[0] = x0;
-    data[1] = y0;
-    data[9] = x1;
-    data[10] = y1;
-    data[18] = x2;
-    data[19] = y2;
-    data[27] = x0;
-    data[28] = y0;
-    data[36] = x2;
-    data[37] = y2;
-    data[45] = x3;
-    data[46] = y3;
-  }
-
-  // ../phaser-genesis/src/components/transform/CopyLocalToWorld.ts
-  function CopyLocalToWorld(source, target) {
-    WorldMatrix2DComponent.a[target] = LocalMatrix2DComponent.a[source];
-    WorldMatrix2DComponent.b[target] = LocalMatrix2DComponent.b[source];
-    WorldMatrix2DComponent.c[target] = LocalMatrix2DComponent.c[source];
-    WorldMatrix2DComponent.d[target] = LocalMatrix2DComponent.d[source];
-    WorldMatrix2DComponent.tx[target] = LocalMatrix2DComponent.tx[source];
-    WorldMatrix2DComponent.ty[target] = LocalMatrix2DComponent.ty[source];
-  }
-
-  // ../phaser-genesis/src/components/transform/CopyWorldToWorld.ts
-  function CopyWorldToWorld(source, target) {
-    WorldMatrix2DComponent.a[target] = WorldMatrix2DComponent.a[source];
-    WorldMatrix2DComponent.b[target] = WorldMatrix2DComponent.b[source];
-    WorldMatrix2DComponent.c[target] = WorldMatrix2DComponent.c[source];
-    WorldMatrix2DComponent.d[target] = WorldMatrix2DComponent.d[source];
-    WorldMatrix2DComponent.tx[target] = WorldMatrix2DComponent.tx[source];
-    WorldMatrix2DComponent.ty[target] = WorldMatrix2DComponent.ty[source];
-  }
-
-  // ../phaser-genesis/src/components/transform/MultiplyLocalWithWorld.ts
-  function MultiplyLocalWithWorld(parentID, id) {
-    const pa = WorldMatrix2DComponent.a[parentID];
-    const pb = WorldMatrix2DComponent.b[parentID];
-    const pc = WorldMatrix2DComponent.c[parentID];
-    const pd = WorldMatrix2DComponent.d[parentID];
-    const ptx = WorldMatrix2DComponent.tx[parentID];
-    const pty = WorldMatrix2DComponent.ty[parentID];
-    const a = LocalMatrix2DComponent.a[id];
-    const b = LocalMatrix2DComponent.b[id];
-    const c = LocalMatrix2DComponent.c[id];
-    const d = LocalMatrix2DComponent.d[id];
-    const tx = LocalMatrix2DComponent.tx[id];
-    const ty = LocalMatrix2DComponent.ty[id];
-    WorldMatrix2DComponent.a[id] = a * pa + b * pc;
-    WorldMatrix2DComponent.b[id] = a * pb + b * pd;
-    WorldMatrix2DComponent.c[id] = c * pa + d * pc;
-    WorldMatrix2DComponent.d[id] = c * pb + d * pd;
-    WorldMatrix2DComponent.tx[id] = tx * pa + ty * pc + ptx;
-    WorldMatrix2DComponent.ty[id] = tx * pb + ty * pd + pty;
-  }
-
-  // ../phaser-genesis/src/components/permissions/WillTransformChildren.ts
-  function WillTransformChildren(id) {
-    return Boolean(PermissionsComponent.willTransformChildren[id]);
-  }
-
-  // ../phaser-genesis/src/components/transform/UpdateWorldTransform.ts
-  function UpdateWorldTransform(id) {
-    const parentID = GetParentID(id);
-    if (!hasComponent(GameObjectWorld, Transform2DComponent, parentID)) {
-      CopyLocalToWorld(id, id);
-    } else if (!WillTransformChildren(id)) {
-      CopyWorldToWorld(parentID, id);
-    } else {
-      MultiplyLocalWithWorld(parentID, id);
-    }
-    ClearDirtyTransform(id);
-  }
-
-  // ../phaser-genesis/src/components/vertices/UpdateVertexPositionSystem.ts
-  var entities2;
-  var updateVertexPositionSystem = defineSystem((world2) => {
-    for (let i = 0; i < entities2.length; i++) {
-      const id = entities2[i];
-      const a = WorldMatrix2DComponent.a[id];
-      const b = WorldMatrix2DComponent.b[id];
-      const c = WorldMatrix2DComponent.c[id];
-      const d = WorldMatrix2DComponent.d[id];
-      const tx = WorldMatrix2DComponent.tx[id];
-      const ty = WorldMatrix2DComponent.ty[id];
-      const x = Extent2DComponent.x[id];
-      const y = Extent2DComponent.y[id];
-      const right = Extent2DComponent.right[id];
-      const bottom = Extent2DComponent.bottom[id];
-      const x0 = x * a + y * c + tx;
-      const y0 = x * b + y * d + ty;
-      const x1 = x * a + bottom * c + tx;
-      const y1 = x * b + bottom * d + ty;
-      const x2 = right * a + bottom * c + tx;
-      const y2 = right * b + bottom * d + ty;
-      const x3 = right * a + y * c + tx;
-      const y3 = right * b + y * d + ty;
-      SetQuadPosition(id, x0, y0, x1, y1, x2, y2, x3, y3);
-      const bx = Math.min(x0, x1, x2, x3);
-      const by = Math.min(y0, y1, y2, y3);
-      const br = Math.max(x0, x1, x2, x3);
-      const bb = Math.max(y0, y1, y2, y3);
-      const bounds = BoundsComponent.global[id];
-      bounds[0] = bx;
-      bounds[1] = by;
-      bounds[2] = br;
-      bounds[3] = bb;
-    }
-    return world2;
-  });
-  var UpdateVertexPositionSystem = (world2, query) => {
-    entities2 = query(world2);
-    const total = entities2.length;
-    if (total > 0) {
-      updateVertexPositionSystem(world2);
-    }
-    return entities2;
-  };
-
   // ../phaser-genesis/src/world/events/WorldAfterUpdateEvent.ts
   var WorldAfterUpdateEvent = "afterupdate";
 
@@ -4999,7 +4825,9 @@ void main (void)
   // ../phaser-genesis/src/world/RenderDataComponent.ts
   var RenderData = defineComponent({
     gameFrame: Types.ui32,
-    dirtyFrame: Types.ui32,
+    dirtyLocal: Types.ui32,
+    dirtyVertices: Types.ui32,
+    numChildren: Types.ui32,
     numRendered: Types.ui32,
     numRenderable: Types.ui32
   });
@@ -5072,6 +4900,66 @@ void main (void)
     }
   }
 
+  // ../phaser-genesis/src/components/transform/CopyLocalToWorld.ts
+  function CopyLocalToWorld(source, target) {
+    WorldMatrix2DComponent.a[target] = LocalMatrix2DComponent.a[source];
+    WorldMatrix2DComponent.b[target] = LocalMatrix2DComponent.b[source];
+    WorldMatrix2DComponent.c[target] = LocalMatrix2DComponent.c[source];
+    WorldMatrix2DComponent.d[target] = LocalMatrix2DComponent.d[source];
+    WorldMatrix2DComponent.tx[target] = LocalMatrix2DComponent.tx[source];
+    WorldMatrix2DComponent.ty[target] = LocalMatrix2DComponent.ty[source];
+  }
+
+  // ../phaser-genesis/src/components/transform/CopyWorldToWorld.ts
+  function CopyWorldToWorld(source, target) {
+    WorldMatrix2DComponent.a[target] = WorldMatrix2DComponent.a[source];
+    WorldMatrix2DComponent.b[target] = WorldMatrix2DComponent.b[source];
+    WorldMatrix2DComponent.c[target] = WorldMatrix2DComponent.c[source];
+    WorldMatrix2DComponent.d[target] = WorldMatrix2DComponent.d[source];
+    WorldMatrix2DComponent.tx[target] = WorldMatrix2DComponent.tx[source];
+    WorldMatrix2DComponent.ty[target] = WorldMatrix2DComponent.ty[source];
+  }
+
+  // ../phaser-genesis/src/components/transform/MultiplyLocalWithWorld.ts
+  function MultiplyLocalWithWorld(parentID, id) {
+    const pa = WorldMatrix2DComponent.a[parentID];
+    const pb = WorldMatrix2DComponent.b[parentID];
+    const pc = WorldMatrix2DComponent.c[parentID];
+    const pd = WorldMatrix2DComponent.d[parentID];
+    const ptx = WorldMatrix2DComponent.tx[parentID];
+    const pty = WorldMatrix2DComponent.ty[parentID];
+    const a = LocalMatrix2DComponent.a[id];
+    const b = LocalMatrix2DComponent.b[id];
+    const c = LocalMatrix2DComponent.c[id];
+    const d = LocalMatrix2DComponent.d[id];
+    const tx = LocalMatrix2DComponent.tx[id];
+    const ty = LocalMatrix2DComponent.ty[id];
+    WorldMatrix2DComponent.a[id] = a * pa + b * pc;
+    WorldMatrix2DComponent.b[id] = a * pb + b * pd;
+    WorldMatrix2DComponent.c[id] = c * pa + d * pc;
+    WorldMatrix2DComponent.d[id] = c * pb + d * pd;
+    WorldMatrix2DComponent.tx[id] = tx * pa + ty * pc + ptx;
+    WorldMatrix2DComponent.ty[id] = tx * pb + ty * pd + pty;
+  }
+
+  // ../phaser-genesis/src/components/permissions/WillTransformChildren.ts
+  function WillTransformChildren(id) {
+    return Boolean(PermissionsComponent.willTransformChildren[id]);
+  }
+
+  // ../phaser-genesis/src/components/transform/UpdateWorldTransform.ts
+  function UpdateWorldTransform(id) {
+    const parentID = GetParentID(id);
+    if (!hasComponent(GameObjectWorld, Transform2DComponent, parentID)) {
+      CopyLocalToWorld(id, id);
+    } else if (!WillTransformChildren(id)) {
+      CopyWorldToWorld(parentID, id);
+    } else {
+      MultiplyLocalWithWorld(parentID, id);
+    }
+    ClearDirtyTransform(id);
+  }
+
   // ../phaser-genesis/src/world/RebuildWorldTransforms.ts
   function RebuildWorldTransforms(world2, parent, forceUpdate) {
     if (WillRender(parent)) {
@@ -5100,13 +4988,75 @@ void main (void)
   // ../phaser-genesis/src/world/ResetWorldRenderData.ts
   function ResetWorldRenderData(id, gameFrame) {
     RenderDataComponent.gameFrame[id] = gameFrame;
-    RenderDataComponent.dirtyFrame[id] = 0;
+    RenderDataComponent.dirtyLocal[id] = 0;
+    RenderDataComponent.dirtyVertices[id] = 0;
     RenderDataComponent.numRendered[id] = 0;
-    RenderDataComponent.numRenderable[id] = 0;
   }
 
   // ../phaser-genesis/src/scenes/events/SceneDestroyEvent.ts
   var SceneDestroyEvent = "destroy";
+
+  // ../phaser-genesis/src/components/vertices/SetQuadPosition.ts
+  function SetQuadPosition(id, x0, y0, x1, y1, x2, y2, x3, y3) {
+    const data = QuadVertexComponent.values[id];
+    data[0] = x0;
+    data[1] = y0;
+    data[9] = x1;
+    data[10] = y1;
+    data[18] = x2;
+    data[19] = y2;
+    data[27] = x0;
+    data[28] = y0;
+    data[36] = x2;
+    data[37] = y2;
+    data[45] = x3;
+    data[46] = y3;
+  }
+
+  // ../phaser-genesis/src/components/vertices/UpdateVertexPositionSystem.ts
+  var entities;
+  var updateVertexPositionSystem = defineSystem((world2) => {
+    for (let i = 0; i < entities.length; i++) {
+      const id = entities[i];
+      const a = WorldMatrix2DComponent.a[id];
+      const b = WorldMatrix2DComponent.b[id];
+      const c = WorldMatrix2DComponent.c[id];
+      const d = WorldMatrix2DComponent.d[id];
+      const tx = WorldMatrix2DComponent.tx[id];
+      const ty = WorldMatrix2DComponent.ty[id];
+      const x = Extent2DComponent.x[id];
+      const y = Extent2DComponent.y[id];
+      const right = Extent2DComponent.right[id];
+      const bottom = Extent2DComponent.bottom[id];
+      const x0 = x * a + y * c + tx;
+      const y0 = x * b + y * d + ty;
+      const x1 = x * a + bottom * c + tx;
+      const y1 = x * b + bottom * d + ty;
+      const x2 = right * a + bottom * c + tx;
+      const y2 = right * b + bottom * d + ty;
+      const x3 = right * a + y * c + tx;
+      const y3 = right * b + y * d + ty;
+      SetQuadPosition(id, x0, y0, x1, y1, x2, y2, x3, y3);
+      const bx = Math.min(x0, x1, x2, x3);
+      const by = Math.min(y0, y1, y2, y3);
+      const br = Math.max(x0, x1, x2, x3);
+      const bb = Math.max(y0, y1, y2, y3);
+      const bounds = BoundsComponent.global[id];
+      bounds[0] = bx;
+      bounds[1] = by;
+      bounds[2] = br;
+      bounds[3] = bb;
+    }
+    return world2;
+  });
+  var UpdateVertexPositionSystem = (id, world2, query) => {
+    entities = query(world2);
+    const total = entities.length;
+    if (total > 0) {
+      updateVertexPositionSystem(world2);
+    }
+    RenderDataComponent.dirtyVertices[id] = total;
+  };
 
   // ../phaser-genesis/src/world/BaseWorld.ts
   var BaseWorld = class extends GameObject {
@@ -5115,32 +5065,33 @@ void main (void)
       __publicField(this, "type", "BaseWorld");
       __publicField(this, "tag", defineComponent());
       __publicField(this, "scene");
-      __publicField(this, "sceneManager");
       __publicField(this, "camera");
-      __publicField(this, "forceRefresh", false);
       __publicField(this, "is3D", false);
-      __publicField(this, "runRender", false);
       __publicField(this, "color");
       __publicField(this, "renderList");
       __publicField(this, "listLength", 0);
-      __publicField(this, "spatialGrid");
       __publicField(this, "totalChildren", 0);
       __publicField(this, "totalChildrenQuery");
       __publicField(this, "dirtyLocalQuery");
       __publicField(this, "vertexPositionQuery");
-      this.scene = scene;
-      this.sceneManager = SceneManagerInstance.get();
-      const tag = this.tag;
-      this.totalChildrenQuery = defineQuery([tag]);
-      this.dirtyLocalQuery = defineQuery([tag, Changed(Transform2DComponent)]);
-      this.vertexPositionQuery = defineQuery([tag, Changed(WorldMatrix2DComponent), Changed(Extent2DComponent)]);
-      this.renderList = new Uint32Array(GetWorldSize() * 4);
       const id = this.id;
+      const tag = this.tag;
+      this.scene = scene;
+      this.totalChildrenQuery = defineQuery([tag]);
+      this.dirtyLocalQuery = defineQuery([tag, Transform2DComponent]);
+      this.vertexPositionQuery = defineQuery([tag, WorldMatrix2DComponent, Extent2DComponent]);
+      this.renderList = new Uint32Array(GetWorldSize() * 4);
       AddRenderDataComponent(id);
       SetWorldID(id, id);
       WorldList.get(scene).push(this);
       this.color = new Color2(id);
       Once(scene, SceneDestroyEvent, () => this.destroy());
+    }
+    getNumChildren() {
+      if (HasDirtyDisplayList(this.id)) {
+        this.totalChildren = this.totalChildrenQuery(GameObjectWorld).length;
+      }
+      return this.totalChildren;
     }
     beforeUpdate(delta, time) {
       Emit(this, WorldBeforeUpdateEvent, delta, time, this);
@@ -5155,34 +5106,27 @@ void main (void)
     afterUpdate(delta, time) {
       Emit(this, WorldAfterUpdateEvent, delta, time, this);
     }
-    checkWorldEntity(id) {
-      return true;
-    }
     preRender(gameFrame) {
       const id = this.id;
+      ResetWorldRenderData(id, gameFrame);
       ClearDirtyChild(id);
-      const dirtyLocalTotal = UpdateLocalTransform2DSystem(GameObjectWorld, this.dirtyLocalQuery);
+      UpdateLocalTransform2DSystem(id, GameObjectWorld, this.dirtyLocalQuery);
       const dirtyDisplayList = HasDirtyDisplayList(id);
       let isDirty = false;
       if (dirtyDisplayList || HasDirtyChild(id)) {
         RebuildWorldTransforms(this, id, false);
         isDirty = true;
       }
-      const updatedEntities = UpdateVertexPositionSystem(GameObjectWorld, this.vertexPositionQuery);
+      UpdateVertexPositionSystem(id, GameObjectWorld, this.vertexPositionQuery);
       if (dirtyDisplayList) {
         this.listLength = 0;
         RebuildWorldList(this, id, 0);
+        RenderDataComponent.numChildren[id] = this.getNumChildren();
+        RenderDataComponent.numRenderable[id] = this.listLength / 4;
         ClearDirtyDisplayList(id);
         isDirty = true;
       }
-      this.runRender = this.listLength > 0;
       return isDirty;
-    }
-    getTotalChildren() {
-      if (HasDirtyDisplayList(this.id)) {
-        this.totalChildren = this.totalChildrenQuery(GameObjectWorld).length;
-      }
-      return this.totalChildren;
     }
     renderGL(renderPass) {
       SetColor(renderPass, this.color);
@@ -5200,33 +5144,12 @@ void main (void)
           entry.renderGL(renderPass);
         }
       }
-    }
-    postRenderGL(renderPass) {
       PopColor(renderPass, this.color);
-      if (!this.runRender) {
-        Begin(renderPass, this.camera);
-      }
       Emit(this, WorldPostRenderEvent, renderPass, this);
-    }
-    getRenderList() {
-      const list = this.renderList;
-      const output = [];
-      for (let i = 0; i < this.listLength; i += 2) {
-        const eid = list[i];
-        const type = list[i + 1];
-        if (type === 0) {
-          output.push(GameObjectCache.get(eid));
-        }
-      }
-      return output;
     }
     shutdown() {
       RemoveChildren(this);
       Emit(this, WorldShutdownEvent, this);
-      ResetWorldRenderData(this.id, 0);
-      if (this.camera) {
-        this.camera.reset();
-      }
     }
     destroy(reparentChildren) {
       super.destroy(reparentChildren);
@@ -5251,7 +5174,57 @@ void main (void)
     }
   };
 
-  // examples/src/display/add child.ts
+  // ../phaser-genesis/src/components/transform/UpdateLocalTransform2DSystem.ts
+  var entities2;
+  var updateLocalTransformSystem = defineSystem((world2) => {
+    let prevParent = 0;
+    for (let i = 0; i < entities2.length; i++) {
+      const id = entities2[i];
+      const x = Transform2DComponent.x[id];
+      const y = Transform2DComponent.y[id];
+      const rotation = Transform2DComponent.rotation[id];
+      const scaleX = Transform2DComponent.scaleX[id];
+      const scaleY = Transform2DComponent.scaleY[id];
+      const skewX = Transform2DComponent.skewX[id];
+      const skewY = Transform2DComponent.skewY[id];
+      LocalMatrix2DComponent.a[id] = Math.cos(rotation + skewY) * scaleX;
+      LocalMatrix2DComponent.b[id] = Math.sin(rotation + skewY) * scaleX;
+      LocalMatrix2DComponent.c[id] = -Math.sin(rotation - skewX) * scaleY;
+      LocalMatrix2DComponent.d[id] = Math.cos(rotation - skewX) * scaleY;
+      LocalMatrix2DComponent.tx[id] = x;
+      LocalMatrix2DComponent.ty[id] = y;
+      SetDirtyTransform(id);
+      if (GetParentID(id) !== prevParent) {
+        SetDirtyParents(id);
+        prevParent = GetParentID(id);
+      }
+    }
+    return world2;
+  });
+  var UpdateLocalTransform2DSystem = (id, world2, query) => {
+    entities2 = query(world2);
+    const total = entities2.length;
+    if (total > 0) {
+      SetDirtyChild(world2.id);
+      updateLocalTransformSystem(world2);
+    }
+    RenderDataComponent.dirtyLocal[id] = total;
+  };
+
+  // examples/src/display/mass child test.ts
+  var Carrot = class extends Sprite {
+    constructor(x, y) {
+      super(x, y, "carrot");
+      __publicField(this, "speed");
+      this.speed = Between(0, 1);
+    }
+    update() {
+      this.x -= this.speed;
+      if (this.x < -100) {
+        this.x = 900;
+      }
+    }
+  };
   var Demo = class extends Scene {
     constructor() {
       super();
@@ -5259,11 +5232,13 @@ void main (void)
     }
     create() {
       return __async(this, null, function* () {
-        yield ImageFile("gundam", "assets/gundam-ex-maxi-on-half.jpg");
+        yield ImageFile("carrot", "assets/carrot.png");
         const world2 = new StaticWorld(this);
-        const gundam = new Sprite(400, 300, "gundam");
-        AddChild(world2, gundam);
-        console.log(world2);
+        for (let i = 0; i < 4096; i++) {
+          const x = Between(0, 800);
+          const y = Between(0, 600);
+          AddChild(world2, new Carrot(x, y));
+        }
       });
     }
   };
@@ -5274,4 +5249,4 @@ void main (void)
  * @copyright    2020 Photon Storm Ltd.
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
  */
-//# sourceMappingURL=add child.js.map
+//# sourceMappingURL=mass child test.js.map

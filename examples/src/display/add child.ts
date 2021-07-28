@@ -18,13 +18,15 @@ class Demo extends Scene
 
     async create ()
     {
-        await ImageFile('gundam', 'assets/gundam-ex-maxi-on-half.jpg').load();
+        await ImageFile('gundam', 'assets/gundam-ex-maxi-on-half.jpg');
 
         const world = new StaticWorld(this);
 
         const gundam = new Sprite(400, 300, 'gundam');
 
         AddChild(world, gundam);
+
+        console.log(world);
     }
 }
 
