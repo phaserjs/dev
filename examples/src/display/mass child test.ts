@@ -1,4 +1,4 @@
-import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../phaser-genesis/src/config';
+import { BackgroundColor, BatchSize, GlobalVar, Parent, Scenes, WebGL } from '../../../../phaser-genesis/src/config';
 
 import { AddChild } from '../../../../phaser-genesis/src/display';
 import { Between } from '../../../../phaser-genesis/src/math';
@@ -16,16 +16,17 @@ class Carrot extends Sprite
     {
         super(x, y, 'carrot');
 
-        this.speed = Between(0, 1);
+        // this.speed = Between(0, 1);
+        this.speed = Between(1, 8);
     }
 
     update (): void
     {
         this.x -= this.speed;
 
-        if (this.x < -100)
+        if (this.x < -200)
         {
-            this.x = 900;
+            this.x = 1000;
         }
     }
 }
@@ -41,17 +42,35 @@ class Demo extends Scene
 
     async create ()
     {
-        await ImageFile('carrot', 'assets/carrot.png');
+        await ImageFile('carrot', 'assets/2x2.png');
 
         const world = new StaticWorld(this);
 
-        for (let i = 0; i < 4096; i++)
-        {
-            const x = Between(0, 800);
-            const y = Between(0, 600);
+        let total = 0;
+        // const max = 95000;
+        // const max = 25000;
+        const max = 2000;
 
-            AddChild(world, new Carrot(x, y));
-        }
+        setInterval(() => {
+
+            if (total === max)
+            {
+                return;
+            }
+
+            for (let i = 0; i < 5000; i++)
+            {
+                const x = Between(-200, 1000);
+                const y = Between(0, 600);
+    
+                AddChild(world, new Carrot(x, y));
+
+                total++;
+            }
+
+            console.log(`${total} sprites`);
+
+        }, 500);
     }
 }
 

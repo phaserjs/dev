@@ -1,4 +1,4 @@
-import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../phaser-genesis/src/config';
+import { BackgroundColor, BatchSize, GlobalVar, Parent, Scenes, WebGL } from '../../../../phaser-genesis/src/config';
 
 import { AddChild } from '../../../../phaser-genesis/src/display';
 import { Between } from '../../../../phaser-genesis/src/math';
@@ -23,16 +23,16 @@ class Carrot
     {
         this.x = x;
         this.y = y;
-        this.speed = Between(1, 4);
+        this.speed = Between(1, 8);
     }
 
     update (): void
     {
         this.x -= this.speed;
 
-        if (this.x < -100)
+        if (this.x < -200)
         {
-            this.x = 900;
+            this.x = 1000;
         }
     }
 }
@@ -48,7 +48,7 @@ class Demo extends Scene
 
     async create ()
     {
-        await ImageFile('carrot', 'assets/carrot.png');
+        await ImageFile('carrot', 'assets/1x1.png');
 
         const world = new StaticWorld(this);
 
@@ -56,9 +56,9 @@ class Demo extends Scene
 
         const texture = GetTexture('carrot');
 
-        for (let i = 0; i < 4096; i++)
+        for (let i = 0; i < 100000; i++)
         {
-            const x = Between(0, 800);
+            const x = Between(-200, 1000);
             const y = Between(0, 600);
 
             sprites.push(new Carrot(x, y));
@@ -79,6 +79,7 @@ class Demo extends Scene
 
 new Game(
     WebGL(),
+    BatchSize(50000),
     Parent('gameParent'),
     GlobalVar('Phaser4'),
     BackgroundColor(0x0a0a0a),

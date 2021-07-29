@@ -89,6 +89,13 @@
     ConfigStore.set(CONFIG_DEFAULTS.BATCH_SIZE, size);
   }
 
+  // ../phaser-genesis/src/config/batchsize/BatchSize.ts
+  function BatchSize(size) {
+    return () => {
+      SetBatchSize(size);
+    };
+  }
+
   // ../phaser-genesis/src/renderer/BindingQueue.ts
   var queue = [];
   var BindingQueue = {
@@ -4804,12 +4811,12 @@ void main (void)
       __publicField(this, "speed");
       this.x = x;
       this.y = y;
-      this.speed = Between(1, 4);
+      this.speed = Between(1, 8);
     }
     update() {
       this.x -= this.speed;
-      if (this.x < -100) {
-        this.x = 900;
+      if (this.x < -200) {
+        this.x = 1e3;
       }
     }
   };
@@ -4820,12 +4827,12 @@ void main (void)
     }
     create() {
       return __async(this, null, function* () {
-        yield ImageFile("carrot", "assets/carrot.png");
+        yield ImageFile("carrot", "assets/1x1.png");
         const world2 = new StaticWorld(this);
         const sprites = [];
         const texture = GetTexture("carrot");
-        for (let i = 0; i < 4096; i++) {
-          const x = Between(0, 800);
+        for (let i = 0; i < 1e5; i++) {
+          const x = Between(-200, 1e3);
           const y = Between(0, 600);
           sprites.push(new Carrot(x, y));
         }
@@ -4838,7 +4845,7 @@ void main (void)
       });
     }
   };
-  new Game(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(657930), Scenes(Demo));
+  new Game(WebGL(), BatchSize(5e4), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(657930), Scenes(Demo));
 })();
 /**
  * @author       Richard Davey <rich@photonstorm.com>
