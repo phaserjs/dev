@@ -288,7 +288,7 @@
         {
           "path": "examples/live/display/mass child test.js",
           "name": "mass child test.js",
-          "size": 157702,
+          "size": 157399,
           "extension": ".js",
           "type": "file"
         },
@@ -321,7 +321,7 @@
           "type": "file"
         }
       ],
-      "size": 2303253,
+      "size": 2302950,
       "type": "directory"
     },
     {
@@ -835,6 +835,6 @@
       "type": "directory"
     }
   ],
-  "size": 14579714,
+  "size": 14579411,
   "type": "directory"
 }

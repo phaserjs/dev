@@ -305,6 +305,8 @@
   var $storeCursor = Symbol("storeCursor");
   var $subarrayCursors = Symbol("subarrayCursors");
   var $subarray = Symbol("subarray");
+  var $subarrayFrom = Symbol("subarrayFrom");
+  var $subarrayTo = Symbol("subarrayTo");
   var $parentArray = Symbol("subStore");
   var $tagStore = Symbol("tagStore");
   var $queryShadow = Symbol("queryShadow");
@@ -318,6 +320,18 @@
     newTa.set(ta, 0);
     return newTa;
   };
+  var createShadow = (store, key) => {
+    if (!ArrayBuffer.isView(store)) {
+      const shadow = store[$parentArray].slice(0).fill(0);
+      for (const k in store[key]) {
+        const from = store[key][k][$subarrayFrom];
+        const to = store[key][k][$subarrayTo];
+        store[key][k] = shadow.subarray(from, to);
+      }
+    } else {
+      store[key] = store.slice(0).fill(0);
+    }
+  };
   var resizeSubarray = (metadata, store, size) => {
     const cursors = metadata[$subarrayCursors];
     const type = store[$storeType];
@@ -328,8 +342,8 @@
     const array = new TYPES[type](summedLength * size);
     array.set(metadata[$storeSubarrays][type]);
     metadata[$storeSubarrays][type] = array;
-    metadata[$storeSubarrays][type][$queryShadow] = array.slice(0);
-    metadata[$storeSubarrays][type][$serializeShadow] = array.slice(0);
+    createShadow(metadata[$storeSubarrays][type], $queryShadow);
+    createShadow(metadata[$storeSubarrays][type], $serializeShadow);
     array[$indexType] = TYPES_NAMES[indexType];
     array[$indexBytes] = TYPES[indexType].BYTES_PER_ELEMENT;
     const start = cursors[type];
@@ -338,8 +352,8 @@
       const from = cursors[type] + eid * length;
       const to = from + length;
       store[eid] = metadata[$storeSubarrays][type].subarray(from, to);
-      store[eid].from = from;
-      store[eid].to = to;
+      store[eid][$subarrayFrom] = from;
+      store[eid][$subarrayTo] = to;
       store[eid][$queryShadow] = metadata[$storeSubarrays][type][$queryShadow].subarray(from, to);
       store[eid][$serializeShadow] = metadata[$storeSubarrays][type][$serializeShadow].subarray(from, to);
       store[eid][$subarray] = true;
@@ -406,8 +420,8 @@
       const summedLength = Array(arrayCount).fill(0).reduce((a, p) => a + length, 0);
       const array = new TYPES[type](summedLength * size);
       metadata[$storeSubarrays][type] = array;
-      metadata[$storeSubarrays][type][$queryShadow] = array.slice(0);
-      metadata[$storeSubarrays][type][$serializeShadow] = array.slice(0);
+      createShadow(metadata[$storeSubarrays][type], $queryShadow);
+      createShadow(metadata[$storeSubarrays][type], $serializeShadow);
       array[$indexType] = TYPES_NAMES[indexType];
       array[$indexBytes] = TYPES[indexType].BYTES_PER_ELEMENT;
     }
@@ -417,8 +431,8 @@
       const from = cursors[type] + eid * length;
       const to = from + length;
       store[eid] = metadata[$storeSubarrays][type].subarray(from, to);
-      store[eid].from = from;
-      store[eid].to = to;
+      store[eid][$subarrayFrom] = from;
+      store[eid][$subarrayTo] = to;
       store[eid][$queryShadow] = metadata[$storeSubarrays][type][$queryShadow].subarray(from, to);
       store[eid][$serializeShadow] = metadata[$storeSubarrays][type][$serializeShadow].subarray(from, to);
       store[eid][$subarray] = true;
@@ -429,10 +443,6 @@
     cursors[type] = end;
     store[$parentArray] = metadata[$storeSubarrays][type].subarray(start, end);
     return store;
-  };
-  var createShadows = (store) => {
-    store[$queryShadow] = store.slice(0);
-    store[$serializeShadow] = store.slice(0);
   };
   var isArrayType = (x) => Array.isArray(x) && typeof x[0] === "string" && typeof x[1] === "number";
   var createStore = (schema, size) => {
@@ -476,7 +486,8 @@
       const recursiveTransform = (a, k) => {
         if (typeof a[k] === "string") {
           a[k] = createTypeStore(a[k], size);
-          createShadows(a[k]);
+          createShadow(a[k], $queryShadow);
+          createShadow(a[k], $serializeShadow);
           a[k][$storeBase] = () => stores[$store];
           metadata[$storeFlattened].push(a[k]);
         } else if (isArrayType(a[k])) {
@@ -494,16 +505,42 @@
       return stores[$store];
     }
   };
+  var SparseSet = () => {
+    const dense = [];
+    const sparse = [];
+    const has = (val) => dense[sparse[val]] === val;
+    const add = (val) => {
+      if (has(val))
+        return;
+      sparse[val] = dense.push(val) - 1;
+    };
+    const remove = (val) => {
+      if (!has(val))
+        return;
+      const index = sparse[val];
+      const swapped = dense.pop();
+      if (swapped !== val) {
+        dense[index] = swapped;
+        sparse[swapped] = index;
+      }
+    };
+    return {
+      add,
+      remove,
+      has,
+      sparse,
+      dense
+    };
+  };
   var resized = false;
   var setSerializationResized = (v) => {
     resized = v;
   };
   var newEntities = new Map();
   var $entityMasks = Symbol("entityMasks");
-  var $entityEnabled = Symbol("entityEnabled");
+  var $entityComponents = Symbol("entityMasks");
+  var $entitySparseSet = Symbol("entitySparseSet");
   var $entityArray = Symbol("entityArray");
-  var $entityIndices = Symbol("entityIndices");
-  var NONE$1 = __pow(2, 32) - 1;
   var defaultSize = 1e5;
   var globalEntityCursor = 0;
   var globalSize = defaultSize;
@@ -514,10 +551,8 @@
   var getEntityCursor = () => globalEntityCursor;
   var eidToWorld = new Map();
   var addEntity = (world2) => {
-    const enabled = world2[$entityEnabled];
     const eid = removed.length > 0 ? removed.shift() : globalEntityCursor++;
-    enabled[eid] = 1;
-    world2[$entityIndices][eid] = world2[$entityArray].push(eid) - 1;
+    world2[$entitySparseSet].add(eid);
     eidToWorld.set(eid, world2);
     if (globalEntityCursor >= resizeThreshold()) {
       const size = globalSize;
@@ -529,103 +564,135 @@
       setSerializationResized(true);
       console.info(`\u{1F47E} bitECS - resizing all worlds from ${size} to ${size + amount}`);
     }
+    world2[$notQueries].forEach((q) => {
+      const match = queryCheckEntity(world2, q, eid);
+      if (match)
+        queryAddEntity(q, eid);
+    });
+    world2[$entityComponents].set(eid, new Set());
     return eid;
   };
-  function Changed(c) {
-    return function QueryChanged() {
-      return c;
-    };
-  }
+  var removeEntity = (world2, eid) => {
+    if (!world2[$entitySparseSet].has(eid))
+      return;
+    world2[$queries].forEach((q) => {
+      queryRemoveEntity(world2, q, eid);
+    });
+    removed.push(eid);
+    world2[$entitySparseSet].remove(eid);
+    world2[$entityComponents].delete(eid);
+    for (let i = 0; i < world2[$entityMasks].length; i++)
+      world2[$entityMasks][i][eid] = 0;
+  };
   var $queries = Symbol("queries");
+  var $notQueries = Symbol("notQueries");
   var $queryMap = Symbol("queryMap");
   var $dirtyQueries = Symbol("$dirtyQueries");
   var $queryComponents = Symbol("queryComponents");
-  var NONE = __pow(2, 32) - 1;
   var registerQuery = (world2, query) => {
-    let components2 = [];
-    let notComponents = [];
-    let changedComponents = [];
+    const components2 = [];
+    const notComponents = [];
+    const changedComponents = [];
     query[$queryComponents].forEach((c) => {
       if (typeof c === "function") {
+        const comp = c();
+        if (!world2[$componentMap].has(comp))
+          registerComponent(world2, comp);
         if (c.name === "QueryNot") {
-          notComponents.push(c());
+          notComponents.push(comp);
         }
         if (c.name === "QueryChanged") {
-          changedComponents.push(c());
-          components2.push(c());
+          changedComponents.push(comp);
+          components2.push(comp);
         }
       } else {
+        if (!world2[$componentMap].has(c))
+          registerComponent(world2, c);
         components2.push(c);
       }
     });
     const mapComponents = (c) => world2[$componentMap].get(c);
-    const size = components2.concat(notComponents).reduce((a, c) => c[$storeSize] > a ? c[$storeSize] : a, 0);
-    const entities3 = [];
+    const allComponents = components2.concat(notComponents).map(mapComponents);
+    const sparseSet = SparseSet();
+    const archetypes = [];
     const changed = [];
-    const indices = new Uint32Array(size).fill(NONE);
-    const enabled = new Uint8Array(size);
-    const generations = components2.concat(notComponents).map((c) => {
-      if (!world2[$componentMap].has(c))
-        registerComponent(world2, c);
-      return c;
-    }).map(mapComponents).map((c) => c.generationId).reduce((a, v) => {
+    const toRemove = [];
+    const entered = [];
+    const exited = [];
+    const generations = allComponents.map((c) => c.generationId).reduce((a, v) => {
       if (a.includes(v))
         return a;
       a.push(v);
       return a;
     }, []);
-    const reduceBitmasks = (a, c) => {
+    const reduceBitflags = (a, c) => {
       if (!a[c.generationId])
         a[c.generationId] = 0;
       a[c.generationId] |= c.bitflag;
       return a;
     };
-    const masks = components2.map(mapComponents).reduce(reduceBitmasks, {});
+    const masks = components2.map(mapComponents).reduce(reduceBitflags, {});
     const notMasks = notComponents.map(mapComponents).reduce((a, c) => {
       if (!a[c.generationId]) {
         a[c.generationId] = 0;
-        a[c.generationId] |= c.bitflag;
       }
+      a[c.generationId] |= c.bitflag;
       return a;
     }, {});
+    const hasMasks = allComponents.reduce(reduceBitflags, {});
     const flatProps = components2.filter((c) => !c[$tagStore]).map((c) => Object.getOwnPropertySymbols(c).includes($storeFlattened) ? c[$storeFlattened] : [c]).reduce((a, v) => a.concat(v), []);
-    const toRemove = [];
-    const entered = [];
-    const exited = [];
-    world2[$queryMap].set(query, {
-      entities: entities3,
+    const shadows = flatProps.map((prop) => {
+      const $ = Symbol();
+      createShadow(prop, $);
+      return prop[$];
+    }, []);
+    const q = Object.assign(sparseSet, {
+      archetypes,
       changed,
-      enabled,
       components: components2,
       notComponents,
       changedComponents,
       masks,
       notMasks,
+      hasMasks,
       generations,
-      indices,
       flatProps,
       toRemove,
       entered,
-      exited
+      exited,
+      shadows
     });
-    world2[$queries].add(query);
+    world2[$queryMap].set(query, q);
+    world2[$queries].add(q);
+    components2.map(mapComponents).forEach((c) => {
+      c.queries.add(q);
+    });
+    notComponents.map(mapComponents).forEach((c) => {
+      c.notQueries.add(q);
+    });
+    if (notComponents.length)
+      world2[$notQueries].add(q);
     for (let eid = 0; eid < getEntityCursor(); eid++) {
-      if (!world2[$entityEnabled][eid])
+      if (!world2[$entitySparseSet].has(eid))
         continue;
-      if (queryCheckEntity(world2, query, eid)) {
-        queryAddEntity(world2, query, eid);
+      if (queryCheckEntity(world2, q, eid)) {
+        queryAddEntity(q, eid);
       }
     }
   };
   var diff = (q, clearDiff) => {
     if (clearDiff)
       q.changed.length = 0;
-    const flat = q.flatProps;
-    for (let i = 0; i < q.entities.length; i++) {
-      const eid = q.entities[i];
+    const {
+      flatProps,
+      shadows
+    } = q;
+    for (let i = 0; i < q.dense.length; i++) {
+      const eid = q.dense[i];
       let dirty = false;
-      for (let pid = 0; pid < flat.length; pid++) {
-        const prop = flat[pid];
+      for (let pid = 0; pid < flatProps.length; pid++) {
+        const prop = flatProps[pid];
+        const shadow = shadows[pid];
         if (ArrayBuffer.isView(prop[eid])) {
           for (let i2 = 0; i2 < prop[eid].length; i2++) {
             if (prop[eid][i2] !== prop[eid][$queryShadow][i2]) {
@@ -634,9 +701,9 @@
             }
           }
         } else {
-          if (prop[eid] !== prop[$queryShadow][eid]) {
+          if (prop[eid] !== shadow[eid]) {
             dirty = true;
-            prop[$queryShadow][eid] = prop[eid];
+            shadow[eid] = prop[eid];
           }
         }
       }
@@ -653,20 +720,20 @@
       if (!world2[$queryMap].has(query))
         registerQuery(world2, query);
       const q = world2[$queryMap].get(query);
-      queryCommitRemovals(world2, q);
+      queryCommitRemovals(q);
       if (q.changedComponents.length)
         return diff(q, clearDiff);
-      return q.entities;
+      return q.dense;
     };
     query[$queryComponents] = components2;
     return query;
   };
-  var queryCheckEntity = (world2, query, eid) => {
+  var queryCheckEntity = (world2, q, eid) => {
     const {
       masks,
       notMasks,
       generations
-    } = world2[$queryMap].get(query);
+    } = q;
     for (let i = 0; i < generations.length; i++) {
       const generationId = generations[i];
       const qMask = masks[generationId];
@@ -681,51 +748,24 @@
     }
     return true;
   };
-  var queryCheckComponent = (world2, query, component) => {
-    const {
-      generationId,
-      bitflag
-    } = world2[$componentMap].get(component);
-    const {
-      masks
-    } = world2[$queryMap].get(query);
-    const mask = masks[generationId];
-    return (mask & bitflag) === bitflag;
-  };
-  var queryAddEntity = (world2, query, eid) => {
-    const q = world2[$queryMap].get(query);
-    if (q.enabled[eid])
+  var queryAddEntity = (q, eid) => {
+    if (q.has(eid))
       return;
-    q.enabled[eid] = true;
-    q.entities.push(eid);
-    q.indices[eid] = q.entities.length - 1;
+    q.add(eid);
     q.entered.push(eid);
   };
-  var queryCommitRemovals = (world2, q) => {
+  var queryCommitRemovals = (q) => {
     while (q.toRemove.length) {
-      const eid = q.toRemove.pop();
-      const index = q.indices[eid];
-      if (index === NONE)
-        continue;
-      const swapped = q.entities.pop();
-      if (swapped !== eid) {
-        q.entities[index] = swapped;
-        q.indices[swapped] = index;
-      }
-      q.indices[eid] = NONE;
+      q.remove(q.toRemove.pop());
     }
-    world2[$dirtyQueries].delete(q);
   };
   var commitRemovals = (world2) => {
-    world2[$dirtyQueries].forEach((q) => {
-      queryCommitRemovals(world2, q);
-    });
+    world2[$dirtyQueries].forEach(queryCommitRemovals);
+    world2[$dirtyQueries].clear();
   };
-  var queryRemoveEntity = (world2, query, eid) => {
-    const q = world2[$queryMap].get(query);
-    if (!q.enabled[eid])
+  var queryRemoveEntity = (world2, q, eid) => {
+    if (!q.has(eid))
       return;
-    q.enabled[eid] = false;
     q.toRemove.push(eid);
     world2[$dirtyQueries].add(q);
     q.exited.push(eid);
@@ -749,10 +789,23 @@
     }
   };
   var registerComponent = (world2, component) => {
+    if (!component)
+      throw new Error(`\u{1F47E} bitECS - cannot register component as it is null or undefined.`);
+    const queries = new Set();
+    const notQueries = new Set();
+    world2[$queries].forEach((q) => {
+      if (q.components.includes(component)) {
+        queries.add(q);
+      } else if (q.notComponents.includes(component)) {
+        notQueries.add(q);
+      }
+    });
     world2[$componentMap].set(component, {
       generationId: world2[$entityMasks].length - 1,
       bitflag: world2[$bitflag],
-      store: component
+      store: component,
+      queries,
+      notQueries
     });
     if (component[$storeSize] < world2[$size]) {
       resizeStore(component, world2[$size]);
@@ -780,18 +833,25 @@
       registerComponent(world2, component);
     if (hasComponent(world2, component, eid))
       return;
+    const c = world2[$componentMap].get(component);
     const {
       generationId,
-      bitflag
-    } = world2[$componentMap].get(component);
-    world2[$entityMasks][generationId][eid] |= bitflag;
-    world2[$queries].forEach((query) => {
-      if (!queryCheckComponent(world2, query, component))
-        return;
-      const match = queryCheckEntity(world2, query, eid);
+      bitflag,
+      queries,
+      notQueries
+    } = c;
+    notQueries.forEach((q) => {
+      const match = queryCheckEntity(world2, q, eid);
       if (match)
-        queryAddEntity(world2, query, eid);
+        queryRemoveEntity(world2, q, eid);
     });
+    world2[$entityMasks][generationId][eid] |= bitflag;
+    queries.forEach((q) => {
+      const match = queryCheckEntity(world2, q, eid);
+      if (match)
+        queryAddEntity(q, eid);
+    });
+    world2[$entityComponents].get(eid).add(component);
     if (reset)
       resetStoreFor(component, eid);
   };
@@ -801,36 +861,39 @@
       world2 = eidToWorld.get(eid);
       reset = eid || reset;
     }
+    const c = world2[$componentMap].get(component);
     const {
       generationId,
-      bitflag
-    } = world2[$componentMap].get(component);
+      bitflag,
+      queries,
+      notQueries
+    } = c;
     if (!(world2[$entityMasks][generationId][eid] & bitflag))
       return;
-    world2[$queries].forEach((query) => {
-      if (!queryCheckComponent(world2, query, component))
-        return;
-      const match = queryCheckEntity(world2, query, eid);
+    queries.forEach((q) => {
+      const match = queryCheckEntity(world2, q, eid);
       if (match)
-        queryRemoveEntity(world2, query, eid);
+        queryRemoveEntity(world2, q, eid);
     });
     world2[$entityMasks][generationId][eid] &= ~bitflag;
+    notQueries.forEach((q) => {
+      const match = queryCheckEntity(world2, q, eid);
+      if (match)
+        queryAddEntity(q, eid);
+    });
+    world2[$entityComponents].get(eid).delete(component);
     if (reset)
       resetStoreFor(component, eid);
   };
   var $size = Symbol("size");
   var $resizeThreshold = Symbol("resizeThreshold");
   var $bitflag = Symbol("bitflag");
+  var $archetypes = Symbol("archetypes");
+  var $localEntities = Symbol("localEntities");
   var worlds = [];
   var resizeWorlds = (size) => {
     worlds.forEach((world2) => {
       world2[$size] = size;
-      world2[$queryMap].forEach((q) => {
-        q.indices = resize(q.indices, size);
-        q.enabled = resize(q.enabled, size);
-      });
-      world2[$entityEnabled] = resize(world2[$entityEnabled], size);
-      world2[$entityIndices] = resize(world2[$entityIndices], size);
       for (let i = 0; i < world2[$entityMasks].length; i++) {
         const masks = world2[$entityMasks][i];
         world2[$entityMasks][i] = resize(masks, size);
@@ -840,18 +903,27 @@
   };
   var createWorld = () => {
     const world2 = {};
+    resetWorld(world2);
+    worlds.push(world2);
+    return world2;
+  };
+  var resetWorld = (world2) => {
     const size = getGlobalSize();
     world2[$size] = size;
-    world2[$entityEnabled] = new Uint8Array(size);
+    if (world2[$entityArray])
+      world2[$entityArray].forEach((eid) => removeEntity(world2, eid));
     world2[$entityMasks] = [new Uint32Array(size)];
-    world2[$entityArray] = [];
-    world2[$entityIndices] = new Uint32Array(size);
+    world2[$entityComponents] = new Map();
+    world2[$archetypes] = [];
+    world2[$entitySparseSet] = SparseSet();
+    world2[$entityArray] = world2[$entitySparseSet].dense;
     world2[$bitflag] = 1;
     world2[$componentMap] = new Map();
     world2[$queryMap] = new Map();
     world2[$queries] = new Set();
+    world2[$notQueries] = new Set();
     world2[$dirtyQueries] = new Set();
-    worlds.push(world2);
+    world2[$localEntities] = new Map();
     return world2;
   };
   var defineSystem = (fn1, fn2) => {
@@ -4564,19 +4636,6 @@ void main (void)
     });
   }
 
-  // ../phaser-genesis/src/components/bounds/BoundsIntersects.ts
-  function BoundsIntersects(id, x, y, right, bottom) {
-    if (!hasComponent(GameObjectWorld, BoundsComponent, id)) {
-      return true;
-    }
-    const global = BoundsComponent.global[id];
-    const bx = global[0];
-    const by = global[1];
-    const br = global[2];
-    const bb = global[3];
-    return !(right < bx || bottom < by || x > br || y > bb);
-  }
-
   // ../phaser-genesis/src/components/dirty/ClearDirtyChild.ts
   function ClearDirtyChild(id) {
     DirtyComponent.child[id] = 0;
@@ -4668,13 +4727,6 @@ void main (void)
     addComponent(GameObjectWorld, RenderDataComponent, id);
   }
 
-  // ../phaser-genesis/src/renderer/webgl1/renderpass/Begin.ts
-  function Begin(renderPass, camera2D) {
-    renderPass.current2DCamera = camera2D;
-    renderPass.cameraMatrix = camera2D.matrix;
-    renderPass.shader.bindDefault();
-  }
-
   // ../phaser-genesis/src/config/worldsize/GetWorldSize.ts
   function GetWorldSize() {
     return ConfigStore.get(CONFIG_DEFAULTS.WORLD_SIZE);
@@ -4684,6 +4736,14 @@ void main (void)
   function AddToRenderList(world2, id, renderType) {
     let len = world2.listLength;
     const list = world2.renderList;
+    if (len > 0) {
+      const prevEntity = list[len - 1];
+      const prevType = list[len];
+      if (prevEntity === id && prevType === 0 && renderType === 1) {
+        list[len - 1] = 2;
+        return;
+      }
+    }
     list[len] = id;
     list[len + 1] = renderType;
     world2.listLength += 2;
@@ -4693,6 +4753,79 @@ void main (void)
       newList.set(list, 0);
       world2.renderList = newList;
     }
+  }
+
+  // ../phaser-genesis/src/scenes/events/SceneDestroyEvent.ts
+  var SceneDestroyEvent = "destroy";
+
+  // ../phaser-genesis/src/world/BaseWorld.ts
+  var BaseWorld = class extends GameObject {
+    constructor(scene) {
+      super();
+      __publicField(this, "type", "BaseWorld");
+      __publicField(this, "tag", defineComponent());
+      __publicField(this, "scene");
+      __publicField(this, "camera");
+      __publicField(this, "is3D", false);
+      __publicField(this, "color");
+      __publicField(this, "renderList");
+      __publicField(this, "listLength", 0);
+      __publicField(this, "totalChildren", 0);
+      __publicField(this, "totalChildrenQuery");
+      const id = this.id;
+      const tag = this.tag;
+      this.scene = scene;
+      this.totalChildrenQuery = defineQuery([tag]);
+      this.renderList = new Uint32Array(GetWorldSize() * 4);
+      AddRenderDataComponent(id);
+      SetWorldID(id, id);
+      WorldList.get(scene).push(this);
+      this.color = new Color2(id);
+      Once(scene, SceneDestroyEvent, () => this.destroy());
+    }
+    getNumChildren() {
+      if (HasDirtyDisplayList(this.id)) {
+        this.totalChildren = this.totalChildrenQuery(GameObjectWorld).length;
+      }
+      return this.totalChildren;
+    }
+    beforeUpdate(delta, time) {
+      Emit(this, WorldBeforeUpdateEvent, delta, time, this);
+    }
+    update(delta, time) {
+      if (!WillUpdate(this.id)) {
+        return;
+      }
+      Emit(this, WorldUpdateEvent, delta, time, this);
+      super.update(delta, time);
+    }
+    afterUpdate(delta, time) {
+      Emit(this, WorldAfterUpdateEvent, delta, time, this);
+    }
+    preRender(gameFrame) {
+      return true;
+    }
+    renderGL(renderPass) {
+    }
+    shutdown() {
+      RemoveChildren(this);
+      Emit(this, WorldShutdownEvent, this);
+    }
+    destroy(reparentChildren) {
+      super.destroy(reparentChildren);
+      this.shutdown();
+      if (this.camera) {
+        this.camera.destroy();
+      }
+      this.camera = null;
+    }
+  };
+
+  // ../phaser-genesis/src/renderer/webgl1/renderpass/Begin.ts
+  function Begin(renderPass, camera2D) {
+    renderPass.current2DCamera = camera2D;
+    renderPass.cameraMatrix = camera2D.matrix;
+    renderPass.shader.bindDefault();
   }
 
   // ../phaser-genesis/src/world/RebuildWorldList.ts
@@ -4804,9 +4937,6 @@ void main (void)
     RenderDataComponent.numRendered[id] = 0;
   }
 
-  // ../phaser-genesis/src/scenes/events/SceneDestroyEvent.ts
-  var SceneDestroyEvent = "destroy";
-
   // ../phaser-genesis/src/components/vertices/SetQuadPosition.ts
   function SetQuadPosition(id, x0, y0, x1, y1, x2, y2, x3, y3) {
     const data = QuadVertexComponent.values[id];
@@ -4864,51 +4994,15 @@ void main (void)
     RenderDataComponent.dirtyVertices[id] = total;
   };
 
-  // ../phaser-genesis/src/world/BaseWorld.ts
-  var BaseWorld = class extends GameObject {
+  // ../phaser-genesis/src/world/StaticWorld.ts
+  var StaticWorld = class extends BaseWorld {
     constructor(scene) {
-      super();
-      __publicField(this, "type", "BaseWorld");
-      __publicField(this, "tag", defineComponent());
-      __publicField(this, "scene");
-      __publicField(this, "camera");
-      __publicField(this, "is3D", false);
-      __publicField(this, "color");
-      __publicField(this, "renderList");
-      __publicField(this, "listLength", 0);
-      __publicField(this, "totalChildren", 0);
-      __publicField(this, "totalChildrenQuery");
+      super(scene);
+      __publicField(this, "type", "StaticWorld");
       __publicField(this, "transformQuery");
-      const id = this.id;
       const tag = this.tag;
-      this.scene = scene;
-      this.totalChildrenQuery = defineQuery([tag]);
-      this.transformQuery = defineQuery([tag, Changed(Transform2DComponent)]);
-      this.renderList = new Uint32Array(GetWorldSize() * 4);
-      AddRenderDataComponent(id);
-      SetWorldID(id, id);
-      WorldList.get(scene).push(this);
-      this.color = new Color2(id);
-      Once(scene, SceneDestroyEvent, () => this.destroy());
-    }
-    getNumChildren() {
-      if (HasDirtyDisplayList(this.id)) {
-        this.totalChildren = this.totalChildrenQuery(GameObjectWorld).length;
-      }
-      return this.totalChildren;
-    }
-    beforeUpdate(delta, time) {
-      Emit(this, WorldBeforeUpdateEvent, delta, time, this);
-    }
-    update(delta, time) {
-      if (!WillUpdate(this.id)) {
-        return;
-      }
-      Emit(this, WorldUpdateEvent, delta, time, this);
-      super.update(delta, time);
-    }
-    afterUpdate(delta, time) {
-      Emit(this, WorldAfterUpdateEvent, delta, time, this);
+      this.transformQuery = defineQuery([tag, Transform2DComponent]);
+      this.camera = new StaticCamera(800, 600);
     }
     preRender(gameFrame) {
       const id = this.id;
@@ -4946,7 +5040,10 @@ void main (void)
         const eid = list[i];
         const type = list[i + 1];
         const entry = GameObjectCache.get(eid);
-        if (type === 1) {
+        if (type === 2) {
+          entry.renderGL(renderPass);
+          entry.postRenderGL(renderPass);
+        } else if (type === 1) {
           entry.postRenderGL(renderPass);
         } else {
           entry.renderGL(renderPass);
@@ -4964,31 +5061,6 @@ void main (void)
         rebuiltWorld: RenderDataComponent.rebuiltWorld[id]
       };
       Emit(this, WorldPostRenderEvent, renderPass, this);
-    }
-    shutdown() {
-      RemoveChildren(this);
-      Emit(this, WorldShutdownEvent, this);
-    }
-    destroy(reparentChildren) {
-      super.destroy(reparentChildren);
-      this.shutdown();
-      if (this.camera) {
-        this.camera.destroy();
-      }
-      this.camera = null;
-    }
-  };
-
-  // ../phaser-genesis/src/world/StaticWorld.ts
-  var StaticWorld = class extends BaseWorld {
-    constructor(scene) {
-      super(scene);
-      __publicField(this, "type", "StaticWorld");
-      this.camera = new StaticCamera(800, 600);
-    }
-    checkWorldEntity(id) {
-      const cameraBounds = this.camera.bounds;
-      return BoundsIntersects(id, cameraBounds.x, cameraBounds.y, cameraBounds.right, cameraBounds.bottom);
     }
   };
 
@@ -5054,7 +5126,7 @@ void main (void)
         yield ImageFile("carrot", "assets/2x2.png");
         const world2 = new StaticWorld(this);
         let total = 0;
-        const max = 2e3;
+        const max = 5e3;
         setInterval(() => {
           if (total === max) {
             return;
@@ -5066,7 +5138,7 @@ void main (void)
             total++;
           }
           console.log(`${total} sprites`);
-        }, 500);
+        }, 1e3);
       });
     }
   };

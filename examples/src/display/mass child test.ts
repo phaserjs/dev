@@ -49,7 +49,7 @@ class Demo extends Scene
         let total = 0;
         // const max = 95000;
         // const max = 25000;
-        const max = 2000;
+        const max = 5000;
 
         setInterval(() => {
 
@@ -70,7 +70,7 @@ class Demo extends Scene
 
             console.log(`${total} sprites`);
 
-        }, 500);
+        }, 1000);
     }
 }
 
