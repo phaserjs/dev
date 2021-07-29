@@ -92,7 +92,7 @@ term.hideCursor();
 esbuild.build({
     entryPoints: [ pathTS ],
     outfile: pathJS,
-    target: 'es6',
+    target: 'esnext',
     sourcemap: true,
     minify: false,
     bundle: true,
