@@ -1782,8 +1782,8 @@ void main (void)
   // ../phaser-genesis/src/renderer/webgl1/shaders/CreateUniforms.ts
   function CreateUniforms(program) {
     const uniforms = new Map();
-    const total3 = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
-    for (let i = 0; i < total3; i++) {
+    const total = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
+    for (let i = 0; i < total; i++) {
       const uniform = gl.getActiveUniform(program, i);
       let name = uniform.name;
       if (name.startsWith("gl_") || name.startsWith("webgl_")) {
@@ -2933,266 +2933,6 @@ void main (void)
     ConfigStore.set(CONFIG_DEFAULTS.WORLD_SIZE, size);
   }
 
-  // ../phaser-genesis/src/math/Clamp.ts
-  function Clamp(value, min, max) {
-    return Math.max(min, Math.min(max, value));
-  }
-
-  // ../phaser-genesis/src/events/Emit.ts
-  function Emit(emitter, event, ...args) {
-    if (emitter.events.size === 0 || !emitter.events.has(event)) {
-      return false;
-    }
-    const listeners = emitter.events.get(event);
-    const handlers = [...listeners];
-    for (const ee of handlers) {
-      ee.callback.apply(ee.context, args);
-      if (ee.once) {
-        listeners.delete(ee);
-      }
-    }
-    if (listeners.size === 0) {
-      emitter.events.delete(event);
-    }
-    return true;
-  }
-
-  // ../phaser-genesis/src/input/keyboard/Key.ts
-  var Key = class {
-    value;
-    events;
-    capture = true;
-    isDown = false;
-    enabled = true;
-    repeatRate = 0;
-    canRepeat = true;
-    timeDown = 0;
-    timeUpdated = 0;
-    timeUp = 0;
-    shiftKey;
-    ctrlKey;
-    altKey;
-    downCallback;
-    upCallback;
-    constructor(value) {
-      this.value = value;
-      this.events = new Map();
-    }
-    getValue() {
-      return this.value;
-    }
-    down(event) {
-      if (!this.enabled) {
-        return;
-      }
-      if (this.capture) {
-        event.preventDefault();
-      }
-      this.shiftKey = event.shiftKey;
-      this.ctrlKey = event.ctrlKey;
-      this.altKey = event.altKey;
-      if (this.isDown && this.canRepeat) {
-        this.timeUpdated = event.timeStamp;
-        const delay = this.timeUpdated - this.timeDown;
-        if (delay >= this.repeatRate) {
-          Emit(this, "keydown", this);
-          if (this.downCallback) {
-            this.downCallback(this);
-          }
-        }
-      } else {
-        this.isDown = true;
-        this.timeDown = event.timeStamp;
-        this.timeUpdated = event.timeStamp;
-        Emit(this, "keydown", this);
-        if (this.downCallback) {
-          this.downCallback(this);
-        }
-      }
-    }
-    up(event) {
-      if (!this.enabled) {
-        return;
-      }
-      if (this.capture) {
-        event.preventDefault();
-      }
-      this.shiftKey = event.shiftKey;
-      this.ctrlKey = event.ctrlKey;
-      this.altKey = event.altKey;
-      if (this.isDown) {
-        this.isDown = false;
-        this.timeUp = event.timeStamp;
-        this.timeUpdated = event.timeStamp;
-        Emit(this, "keyup", this);
-        if (this.upCallback) {
-          this.upCallback(this);
-        }
-      }
-    }
-    reset() {
-      this.isDown = false;
-      this.timeUpdated = this.timeDown;
-      this.timeUp = this.timeDown;
-    }
-    destroy() {
-      this.downCallback = null;
-      this.upCallback = null;
-      this.events.clear();
-    }
-  };
-
-  // ../phaser-genesis/src/input/keyboard/keys/DownKey.ts
-  var DownKey = class extends Key {
-    constructor() {
-      super("ArrowDown");
-    }
-  };
-
-  // ../phaser-genesis/src/input/keyboard/keys/LeftKey.ts
-  var LeftKey = class extends Key {
-    constructor() {
-      super("ArrowLeft");
-    }
-  };
-
-  // ../phaser-genesis/src/input/keyboard/keys/RightKey.ts
-  var RightKey = class extends Key {
-    constructor() {
-      super("ArrowRight");
-    }
-  };
-
-  // ../phaser-genesis/src/input/keyboard/keys/UpKey.ts
-  var UpKey = class extends Key {
-    constructor() {
-      super("ArrowUp");
-    }
-  };
-
-  // ../phaser-genesis/src/textures/parsers/AtlasParser.ts
-  function AtlasParser(texture, data) {
-    let frames;
-    if (Array.isArray(data.textures)) {
-      frames = data.textures[0].frames;
-    } else if (Array.isArray(data.frames)) {
-      frames = data.frames;
-    } else if (data.hasOwnProperty("frames")) {
-      frames = [];
-      for (const [filename, frame2] of Object.entries(data.frames)) {
-        frame2["filename"] = filename;
-        frames.push(frame2);
-      }
-    } else {
-      console.warn("Invalid Texture Atlas JSON");
-    }
-    if (frames) {
-      let newFrame;
-      for (let i = 0; i < frames.length; i++) {
-        const src = frames[i];
-        newFrame = texture.addFrame(src.filename, src.frame.x, src.frame.y, src.frame.w, src.frame.h);
-        if (src.trimmed) {
-          newFrame.setTrim(src.sourceSize.w, src.sourceSize.h, src.spriteSourceSize.x, src.spriteSourceSize.y, src.spriteSourceSize.w, src.spriteSourceSize.h);
-        } else {
-          newFrame.setSourceSize(src.sourceSize.w, src.sourceSize.h);
-        }
-        if (src.rotated) {
-        }
-        if (src.anchor) {
-          newFrame.setPivot(src.anchor.x, src.anchor.y);
-        }
-      }
-    }
-  }
-
-  // ../phaser-genesis/src/textures/CreateCanvas.ts
-  function CreateCanvas(width, height) {
-    const canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
-    return canvas.getContext("2d");
-  }
-
-  // ../phaser-genesis/src/textures/TextureManagerInstance.ts
-  var instance4;
-  var TextureManagerInstance = {
-    get: () => {
-      return instance4;
-    },
-    set: (manager) => {
-      if (instance4) {
-        throw new Error("Cannot instantiate TextureManager more than once");
-      }
-      instance4 = manager;
-    }
-  };
-
-  // ../phaser-genesis/src/textures/TextureManager.ts
-  var TextureManager = class {
-    textures;
-    constructor() {
-      TextureManagerInstance.set(this);
-      this.textures = new Map();
-      this.createDefaultTextures();
-    }
-    createDefaultTextures() {
-      this.add("__BLANK", new Texture(CreateCanvas(2, 2).canvas));
-      const missing = CreateCanvas(32, 32);
-      missing.strokeStyle = "#0f0";
-      missing.moveTo(0, 0);
-      missing.lineTo(32, 32);
-      missing.stroke();
-      missing.strokeRect(0.5, 0.5, 31, 31);
-      this.add("__MISSING", new Texture(missing.canvas));
-      const white = CreateCanvas(2, 2);
-      white.fillStyle = "#fff";
-      white.fillRect(0, 0, 2, 2);
-      const whiteTexture = this.add("__WHITE", new Texture(white.canvas));
-      WhiteTexture.set(whiteTexture);
-    }
-    get(key) {
-      const textures = this.textures;
-      if (textures.has(key)) {
-        return textures.get(key);
-      } else {
-        return textures.get("__MISSING");
-      }
-    }
-    has(key) {
-      return this.textures.has(key);
-    }
-    add(key, source, glConfig) {
-      let texture;
-      if (!this.textures.has(key)) {
-        if (source instanceof Texture) {
-          texture = source;
-        } else {
-          texture = new Texture(source, 0, 0, glConfig);
-        }
-        texture.key = key;
-        this.textures.set(key, texture);
-      }
-      return texture;
-    }
-    update(key, source, glConfig) {
-      const texture = this.textures.get(key);
-      if (texture) {
-        texture.update(source, glConfig);
-      }
-      return texture;
-    }
-  };
-
-  // ../phaser-genesis/src/textures/CreateTextureManager.ts
-  function CreateTextureManager() {
-    new TextureManager();
-  }
-
-  // ../phaser-genesis/src/textures/GetTexture.ts
-  function GetTexture(key) {
-    return TextureManagerInstance.get().get(key);
-  }
-
   // ../phaser-genesis/src/gameobjects/GameObjectTree.ts
   var GameObjectTree = new Map();
 
@@ -3538,6 +3278,25 @@ void main (void)
   // ../phaser-genesis/src/gameobjects/events/DestroyEvent.ts
   var DestroyEvent = "destroy";
 
+  // ../phaser-genesis/src/events/Emit.ts
+  function Emit(emitter, event, ...args) {
+    if (emitter.events.size === 0 || !emitter.events.has(event)) {
+      return false;
+    }
+    const listeners = emitter.events.get(event);
+    const handlers = [...listeners];
+    for (const ee of handlers) {
+      ee.callback.apply(ee.context, args);
+      if (ee.once) {
+        listeners.delete(ee);
+      }
+    }
+    if (listeners.size === 0) {
+      emitter.events.delete(event);
+    }
+    return true;
+  }
+
   // ../phaser-genesis/src/components/hierarchy/GetNumChildren.ts
   function GetNumChildren(id) {
     return HierarchyComponent.numChildren[id];
@@ -3749,31 +3508,6 @@ void main (void)
     }
   }
 
-  // ../phaser-genesis/src/GameInstance.ts
-  var instance5;
-  var frame = 0;
-  var elapsed = 0;
-  var GameInstance = {
-    get: () => {
-      return instance5;
-    },
-    set: (game) => {
-      instance5 = game;
-    },
-    getFrame: () => {
-      return frame;
-    },
-    setFrame: (current) => {
-      frame = current;
-    },
-    getElapsed: () => {
-      return elapsed;
-    },
-    setElapsed: (current) => {
-      elapsed = current;
-    }
-  };
-
   // ../phaser-genesis/src/components/transform/Position.ts
   var Position = class {
     id;
@@ -3789,14 +3523,12 @@ void main (void)
     }
     set x(value) {
       Transform2DComponent.x[this.id] = value;
-      Transform2DComponent.dirty[this.id] = GameInstance.getFrame();
     }
     get x() {
       return Transform2DComponent.x[this.id];
     }
     set y(value) {
       Transform2DComponent.y[this.id] = value;
-      Transform2DComponent.dirty[this.id] = GameInstance.getFrame();
     }
     get y() {
       return Transform2DComponent.y[this.id];
@@ -3992,15 +3724,6 @@ void main (void)
     }
   };
 
-  // ../phaser-genesis/src/utils/array/GetRandom.ts
-  function GetRandom(array, startIndex = 0, length) {
-    if (!length) {
-      length = array.length;
-    }
-    const randomIndex = startIndex + Math.floor(Math.random() * length);
-    return array[randomIndex];
-  }
-
   // ../phaser-genesis/src/display/RemoveChildren.ts
   function RemoveChildren(parent, ...children) {
     children.forEach((child) => {
@@ -4070,6 +3793,25 @@ void main (void)
       frame2.copyToVertices(child.id);
     });
     return children;
+  }
+
+  // ../phaser-genesis/src/textures/TextureManagerInstance.ts
+  var instance4;
+  var TextureManagerInstance = {
+    get: () => {
+      return instance4;
+    },
+    set: (manager) => {
+      if (instance4) {
+        throw new Error("Cannot instantiate TextureManager more than once");
+      }
+      instance4 = manager;
+    }
+  };
+
+  // ../phaser-genesis/src/textures/GetTexture.ts
+  function GetTexture(key) {
+    return TextureManagerInstance.get().get(key);
   }
 
   // ../phaser-genesis/src/gameobjects/sprite/SetTexture.ts
@@ -4149,136 +3891,6 @@ void main (void)
       this.hasTexture = false;
     }
   };
-
-  // ../phaser-genesis/src/loader/CreateFile.ts
-  function CreateFile(key, url, skipCache = false) {
-    return {
-      key,
-      url,
-      skipCache
-    };
-  }
-
-  // ../phaser-genesis/src/loader/GetURL.ts
-  function GetURL(key, url, extension) {
-    if (!url) {
-      url = `${key}.${extension}`;
-    }
-    if (/^(?:blob:|data:|http:\/\/|https:\/\/|\/\/)/.exec(url)) {
-      return url;
-    } else {
-      return url;
-    }
-  }
-
-  // ../phaser-genesis/src/loader/RequestFile.ts
-  async function RequestFile(file, preload, onload, fileData) {
-    if (!preload(file)) {
-      return Promise.reject(file);
-    }
-    try {
-      const request = new Request(file.url, fileData?.requestInit);
-      file.response = await fetch(request);
-      if (file.response.ok && await onload(file)) {
-        return Promise.resolve(file);
-      } else {
-        return Promise.reject(file);
-      }
-    } catch (error) {
-      file.error = error;
-      return Promise.reject(file);
-    }
-  }
-
-  // ../phaser-genesis/src/loader/files/ImageFile.ts
-  async function ImageFile(key, url, fileData = {}) {
-    const file = CreateFile(key, GetURL(key, url, "png"), fileData?.skipCache);
-    const textureManager = TextureManagerInstance.get();
-    const preload = () => {
-      return textureManager && (!textureManager.has(key) || !textureManager.get(key).locked);
-    };
-    const onload = async (file2) => {
-      const blob = await file2.response.blob();
-      let image;
-      if (window && "createImageBitmap" in window && !fileData?.getImage) {
-        image = await createImageBitmap(blob);
-      } else {
-        image = await new Promise((resolve, reject) => {
-          const url2 = URL.createObjectURL(blob);
-          const img = new Image();
-          img.onload = () => {
-            URL.revokeObjectURL(url2);
-            resolve(img);
-          };
-          img.onerror = () => {
-            reject();
-          };
-          img.src = url2;
-          if (img.complete && img.width && img.height) {
-            img.onload = null;
-            img.onerror = null;
-            resolve(img);
-          }
-        });
-      }
-      if (!image) {
-        return false;
-      }
-      if (fileData.skipCache) {
-        file2.data = image;
-      } else if (textureManager.has(key)) {
-        file2.data = textureManager.update(key, image, fileData?.glConfig);
-      } else {
-        file2.data = textureManager.add(key, image, fileData?.glConfig);
-      }
-      return true;
-    };
-    return RequestFile(file, preload, onload, fileData);
-  }
-
-  // ../phaser-genesis/src/cache/Cache.ts
-  var caches = new Map();
-  var Cache = {
-    get: (type) => {
-      if (!caches.has(type)) {
-        caches.set(type, new Map());
-      }
-      return caches.get(type);
-    },
-    getEntry: (cache, entry) => {
-      if (caches.has(cache)) {
-        return caches.get(cache).get(entry);
-      }
-    }
-  };
-
-  // ../phaser-genesis/src/loader/files/JSONFile.ts
-  async function JSONFile(key, url, fileData = {}) {
-    const file = CreateFile(key, GetURL(key, url, "json"), fileData.skipCache);
-    const cache = Cache.get("JSON");
-    const preload = (file2) => {
-      return cache && (!cache.has(key) || !file2.skipCache);
-    };
-    const onload = async (file2) => {
-      file2.data = await file2.response.json();
-      if (!file2.skipCache) {
-        cache.set(key, file2.data);
-      }
-      return true;
-    };
-    return RequestFile(file, preload, onload, fileData);
-  }
-
-  // ../phaser-genesis/src/loader/files/AtlasFile.ts
-  async function AtlasFile(key, textureURL, atlasURL, fileData = {}) {
-    try {
-      await ImageFile(key, textureURL, Object.assign({}, fileData, { skipCache: false }));
-      const json = await JSONFile(key, atlasURL, Object.assign({}, fileData, { skipCache: true }));
-      AtlasParser(GetTexture(key), json.data);
-    } catch (error) {
-      return Promise.reject();
-    }
-  }
 
   // ../phaser-genesis/src/world/events/WorldAfterUpdateEvent.ts
   var WorldAfterUpdateEvent = "afterupdate";
@@ -4497,14 +4109,9 @@ void main (void)
 
   // ../phaser-genesis/src/components/transform/Transform2DSystem.ts
   var entities;
-  var total = 0;
   var system = defineSystem((world2) => {
-    const gameFrame = GameInstance.getFrame();
     for (let i = 0; i < entities.length; i++) {
       const id = entities[i];
-      if (gameFrame > Transform2DComponent.dirty[id]) {
-        continue;
-      }
       const x = Transform2DComponent.x[id];
       const y = Transform2DComponent.y[id];
       const rotation = Transform2DComponent.rotation[id];
@@ -4520,14 +4127,13 @@ void main (void)
       local[4] = x;
       local[5] = y;
       Transform2DComponent.world[id].set(local);
-      total++;
     }
     return world2;
   });
   var Transform2DSystem = (id, world2, query) => {
-    total = 0;
     entities = query(world2);
-    if (entities.length > 0) {
+    const total = entities.length;
+    if (total > 0) {
       system(world2);
     }
     RenderDataComponent.dirtyLocal[id] = total;
@@ -4553,14 +4159,9 @@ void main (void)
 
   // ../phaser-genesis/src/components/vertices/UpdateVertexPositionSystem.ts
   var entities2;
-  var total2 = 0;
   var updateVertexPositionSystem = defineSystem((world2) => {
-    const gameFrame = GameInstance.getFrame();
     for (let i = 0; i < entities2.length; i++) {
       const id = entities2[i];
-      if (gameFrame > Transform2DComponent.dirty[id]) {
-        continue;
-      }
       const [a, b, c, d, tx, ty] = Transform2DComponent.world[id];
       const x = Extent2DComponent.x[id];
       const y = Extent2DComponent.y[id];
@@ -4584,17 +4185,16 @@ void main (void)
       bounds[1] = by;
       bounds[2] = br;
       bounds[3] = bb;
-      total2++;
     }
     return world2;
   });
   var UpdateVertexPositionSystem = (id, world2, query) => {
-    total2 = 0;
     entities2 = query(world2);
-    if (entities2.length > 0) {
+    const total = entities2.length;
+    if (total > 0) {
       updateVertexPositionSystem(world2);
     }
-    RenderDataComponent.dirtyVertices[id] = total2;
+    RenderDataComponent.dirtyVertices[id] = total;
   };
 
   // ../phaser-genesis/src/camera/WorldCamera.ts
@@ -4737,6 +4337,100 @@ void main (void)
         rebuiltWorld: RenderDataComponent.rebuiltWorld[id]
       };
       Emit(this, WorldPostRenderEvent, renderPass, this);
+    }
+  };
+
+  // ../phaser-genesis/src/textures/CreateCanvas.ts
+  function CreateCanvas(width, height) {
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    return canvas.getContext("2d");
+  }
+
+  // ../phaser-genesis/src/textures/TextureManager.ts
+  var TextureManager = class {
+    textures;
+    constructor() {
+      TextureManagerInstance.set(this);
+      this.textures = new Map();
+      this.createDefaultTextures();
+    }
+    createDefaultTextures() {
+      this.add("__BLANK", new Texture(CreateCanvas(2, 2).canvas));
+      const missing = CreateCanvas(32, 32);
+      missing.strokeStyle = "#0f0";
+      missing.moveTo(0, 0);
+      missing.lineTo(32, 32);
+      missing.stroke();
+      missing.strokeRect(0.5, 0.5, 31, 31);
+      this.add("__MISSING", new Texture(missing.canvas));
+      const white = CreateCanvas(2, 2);
+      white.fillStyle = "#fff";
+      white.fillRect(0, 0, 2, 2);
+      const whiteTexture = this.add("__WHITE", new Texture(white.canvas));
+      WhiteTexture.set(whiteTexture);
+    }
+    get(key) {
+      const textures = this.textures;
+      if (textures.has(key)) {
+        return textures.get(key);
+      } else {
+        return textures.get("__MISSING");
+      }
+    }
+    has(key) {
+      return this.textures.has(key);
+    }
+    add(key, source, glConfig) {
+      let texture;
+      if (!this.textures.has(key)) {
+        if (source instanceof Texture) {
+          texture = source;
+        } else {
+          texture = new Texture(source, 0, 0, glConfig);
+        }
+        texture.key = key;
+        this.textures.set(key, texture);
+      }
+      return texture;
+    }
+    update(key, source, glConfig) {
+      const texture = this.textures.get(key);
+      if (texture) {
+        texture.update(source, glConfig);
+      }
+      return texture;
+    }
+  };
+
+  // ../phaser-genesis/src/textures/CreateTextureManager.ts
+  function CreateTextureManager() {
+    new TextureManager();
+  }
+
+  // ../phaser-genesis/src/GameInstance.ts
+  var instance5;
+  var frame = 0;
+  var elapsed = 0;
+  var GameInstance = {
+    get: () => {
+      return instance5;
+    },
+    set: (game) => {
+      instance5 = game;
+    },
+    getFrame: () => {
+      return frame;
+    },
+    setFrame: (current) => {
+      frame = current;
+    },
+    getElapsed: () => {
+      return elapsed;
+    },
+    setElapsed: (current) => {
+      elapsed = current;
     }
   };
 
@@ -5050,7 +4744,6 @@ void main (void)
     TimeComponent.elapsed[id] += delta;
     TimeComponent.delta[id] = delta;
     TimeComponent.frame[id]++;
-    GameInstance.setFrame(TimeComponent.frame[id]);
   }
 
   // ../phaser-genesis/src/components/timer/UpdateTime.ts
@@ -5130,156 +4823,83 @@ void main (void)
     }
   };
 
-  // ../phaser-genesis/src/input/keyboard/Keyboard.ts
-  var Keyboard = class extends EventEmitter {
-    keys;
-    keydownHandler;
-    keyupHandler;
-    blurHandler;
-    keyConversion = {
-      Up: "ArrowUp",
-      Down: "ArrowDown",
-      Left: "ArrowLeft",
-      Right: "ArrowRight",
-      Spacebar: " ",
-      Win: "Meta",
-      Scroll: "ScrollLock",
-      Del: "Delete",
-      Apps: "ContextMenu",
-      Esc: "Escape",
-      Add: "+",
-      Subtract: "-",
-      Multiply: "*",
-      Decimal: ".",
-      Divide: "/"
+  // ../phaser-genesis/src/loader/CreateFile.ts
+  function CreateFile(key, url) {
+    return {
+      key,
+      url,
+      skipCache: false
     };
-    constructor() {
-      super();
-      this.keydownHandler = (event) => this.onKeyDown(event);
-      this.keyupHandler = (event) => this.onKeyUp(event);
-      this.blurHandler = () => this.onBlur();
-      window.addEventListener("keydown", this.keydownHandler);
-      window.addEventListener("keyup", this.keyupHandler);
-      window.addEventListener("blur", this.blurHandler);
-      this.keys = new Map();
-    }
-    addKeys(...keys) {
-      keys.forEach((key) => {
-        this.keys.set(key.getValue(), key);
-      });
-    }
-    clearKeys() {
-      this.keys.clear();
-    }
-    onBlur() {
-      this.keys.forEach((key) => {
-        key.reset();
-      });
-    }
-    getKeyValue(key) {
-      if (this.keyConversion.hasOwnProperty(key)) {
-        return this.keyConversion[key];
-      } else {
-        return key;
-      }
-    }
-    onKeyDown(event) {
-      const value = this.getKeyValue(event.key);
-      if (this.keys.has(value)) {
-        const key = this.keys.get(value);
-        key.down(event);
-      }
-      Emit(this, "keydown-" + value, event);
-      Emit(this, "keydown", event);
-    }
-    onKeyUp(event) {
-      const value = this.getKeyValue(event.key);
-      if (this.keys.has(value)) {
-        const key = this.keys.get(value);
-        key.up(event);
-      }
-      Emit(this, "keyup-" + value, event);
-      Emit(this, "keyup", event);
-    }
-    destroy() {
-      window.removeEventListener("keydown", this.keydownHandler);
-      window.removeEventListener("keyup", this.keyupHandler);
-      window.removeEventListener("blur", this.blurHandler);
-      Emit(this, "destroy");
-    }
-  };
+  }
 
-  // examples/src/camera/flat world camera.ts
+  // ../phaser-genesis/src/loader/GetURL.ts
+  function GetURL(key, url, extension) {
+    if (!url) {
+      url = `${key}.${extension}`;
+    }
+    if (/^(?:blob:|data:|http:\/\/|https:\/\/|\/\/)/.exec(url)) {
+      return url;
+    } else {
+      return url;
+    }
+  }
+
+  // ../phaser-genesis/src/loader/RequestFile.ts
+  async function RequestFile(file, preload, onload, requestInit) {
+    if (!preload(file)) {
+      return Promise.reject(file);
+    }
+    try {
+      const request = new Request(file.url, Object.assign({}, requestInit));
+      file.response = await fetch(request);
+      if (file.response.ok && await onload(file)) {
+        return Promise.resolve(file);
+      } else {
+        return Promise.reject(file);
+      }
+    } catch (error) {
+      file.error = error;
+      return Promise.reject(file);
+    }
+  }
+
+  // ../phaser-genesis/src/loader/files/ImageFile.ts
+  async function ImageFile(key, url, requestInit, glConfig) {
+    const file = CreateFile(key, GetURL(key, url, "png"));
+    const textureManager = TextureManagerInstance.get();
+    const preload = () => {
+      return textureManager && (!textureManager.has(key) || !textureManager.get(key).locked);
+    };
+    const onload = async (file2) => {
+      const blob = await file2.response.blob();
+      const image = await createImageBitmap(blob);
+      if (textureManager.has(key)) {
+        file2.data = textureManager.update(key, image, glConfig);
+      } else {
+        file2.data = textureManager.add(key, image, glConfig);
+      }
+      return true;
+    };
+    return RequestFile(file, preload, onload, requestInit);
+  }
+
+  // examples/src/loader/image.ts
   var Demo = class extends Scene {
-    leftKey;
-    rightKey;
-    upKey;
-    downKey;
-    world;
-    camera;
-    texture;
-    cameraSpeed = 16;
     constructor() {
       super();
-      const keyboard = new Keyboard();
-      this.leftKey = new LeftKey();
-      this.rightKey = new RightKey();
-      this.upKey = new UpKey();
-      this.downKey = new DownKey();
-      keyboard.addKeys(this.leftKey, this.rightKey, this.upKey, this.downKey);
       this.create();
     }
     async create() {
-      await AtlasFile("items", "assets/land.png", "assets/land.json");
-      await ImageFile("grass", "assets/textures/grass-plain.png");
-      this.world = new FlatWorld(this);
-      this.camera = this.world.camera;
-      this.texture = GetTexture("items");
-      this.createGrass();
-      this.createLandscape();
-      this.camera.setPosition(-16384, -16384);
-      window["camera"] = this.world.camera;
-    }
-    createGrass() {
-      for (let y = 0; y < 64; y++) {
-        for (let x = 0; x < 64; x++) {
-          AddChild(this.world, new Sprite(x * 512, y * 512, "grass").setOrigin(0, 0));
-        }
-      }
-    }
-    createLandscape() {
-      const frames = Array.from(this.texture.frames.keys());
-      frames.shift();
-      for (let y = 0; y < 251; y++) {
-        for (let x = 0; x < 251; x++) {
-          const frame2 = GetRandom(frames);
-          AddChild(this.world, new Sprite(256 + x * 128, 512 + y * 128, "items", frame2).setOrigin(0.5, 1));
-        }
-      }
-    }
-    update() {
-      if (!this.camera) {
-        return;
-      }
-      if (this.leftKey.isDown) {
-        this.camera.x += this.cameraSpeed;
-      } else if (this.rightKey.isDown) {
-        this.camera.x -= this.cameraSpeed;
-      }
-      if (this.upKey.isDown) {
-        this.camera.y += this.cameraSpeed;
-      } else if (this.downKey.isDown) {
-        this.camera.y -= this.cameraSpeed;
-      }
-      this.camera.x = Clamp(this.camera.x, -31968, 0);
-      this.camera.y = Clamp(this.camera.y, -32168, 0);
+      await ImageFile("beat", "assets/beat.png");
+      const world2 = new FlatWorld(this);
+      AddChild(world2, new Sprite(400, 300, "beat"));
     }
   };
-  new Game(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(657930), Scenes(Demo));
+  new Game(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(8924461), Scenes(Demo));
 })();
 /**
  * @author       Richard Davey <rich@photonstorm.com>
  * @copyright    2020 Photon Storm Ltd.
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
  */
-//# sourceMappingURL=flat world camera.js.map
+//# sourceMappingURL=image.js.map

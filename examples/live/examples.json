@@ -67,12 +67,12 @@
         {
           "path": "examples/live/camera/flat world camera.js",
           "name": "flat world camera.js",
-          "size": 143937,
+          "size": 152805,
           "extension": ".js",
           "type": "file"
         }
       ],
-      "size": 284292,
+      "size": 293160,
       "type": "directory"
     },
     {
@@ -715,9 +715,58 @@
           "size": 135579,
           "extension": ".js",
           "type": "file"
+        },
+        {
+          "path": "examples/live/loader/atlas.js",
+          "name": "atlas.js",
+          "size": 146747,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/loader/csv.js",
+          "name": "csv.js",
+          "size": 147925,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/loader/image.js",
+          "name": "image.js",
+          "size": 143729,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/loader/imageblob.js",
+          "name": "imageblob.js",
+          "size": 102670,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/loader/imageobject.js",
+          "name": "imageobject.js",
+          "size": 103110,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/loader/json.js",
+          "name": "json.js",
+          "size": 102454,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/loader/spritesheet.js",
+          "name": "spritesheet.js",
+          "size": 146913,
+          "extension": ".js",
+          "type": "file"
         }
       ],
-      "size": 135579,
+      "size": 1029127,
       "type": "directory"
     },
     {
@@ -849,6 +898,6 @@
       "type": "directory"
     }
   ],
-  "size": 15113630,
+  "size": 16016046,
   "type": "directory"
 }

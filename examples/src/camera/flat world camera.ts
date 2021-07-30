@@ -1,43 +1,18 @@
 import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../phaser-genesis/src/config';
-import { Between, FloatBetween } from '../../../../phaser-genesis/src/math';
+import { Between, Clamp, FloatBetween } from '../../../../phaser-genesis/src/math';
 import { DownKey, LeftKey, RightKey, UpKey } from '../../../../phaser-genesis/src/input/keyboard/keys';
-import { FlatWorld, SortWorldList } from '../../../../phaser-genesis/src/world';
+import { GetTexture, Texture } from '../../../../phaser-genesis/src/textures';
 
 import { AddChild } from '../../../../phaser-genesis/src/display';
+import { AtlasFile } from '../../../../phaser-genesis/src/loader/files';
+import { FlatWorld } from '../../../../phaser-genesis/src/world';
 import { Game } from '../../../../phaser-genesis/src/Game';
+import { GetRandom } from '../../../../phaser-genesis/src/utils/array/GetRandom';
 import { ImageFile } from '../../../../phaser-genesis/src/loader/files/ImageFile';
 import { Keyboard } from '../../../../phaser-genesis/src/input/keyboard';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
 import { Sprite } from '../../../../phaser-genesis/src/gameobjects';
 import { WorldCamera } from '../../../../phaser-genesis/src/camera/WorldCamera';
-
-/*
-class Slider extends Sprite
-{
-    speed: number;
-
-    constructor (x: number, y: number, texture: string)
-    {
-        super(x, y, texture);
-
-        const s = FloatBetween(1, 8);
-
-        this.setScale(1 / s);
-
-        this.speed = 8 - s;
-    }
-
-    update (): void
-    {
-        this.y += this.speed;
-
-        if (this.y > 800)
-        {
-            this.y = -300;
-        }
-    }
-}
-*/
 
 class Demo extends Scene
 {
@@ -46,7 +21,12 @@ class Demo extends Scene
     upKey: RightKey;
     downKey: RightKey;
 
+    world: FlatWorld;
     camera: WorldCamera;
+
+    texture: Texture;
+
+    cameraSpeed: number = 16;
 
     constructor ()
     {
@@ -66,42 +46,82 @@ class Demo extends Scene
 
     async create ()
     {
-        await ImageFile('glove', 'assets/boxing-glove.png');
+        await AtlasFile('items', 'assets/land.png', 'assets/land.json');
+        await ImageFile('grass', 'assets/textures/grass-plain.png');
 
-        const world = new FlatWorld(this);
+        this.world = new FlatWorld(this);
 
-        this.camera = world.camera;
+        this.camera = this.world.camera;
 
-        for (let i = 0; i < 4096; i++)
+        this.texture = GetTexture('items');
+
+        this.createGrass();
+        this.createLandscape();
+
+        this.camera.setPosition(-16384, -16384);
+
+        window['camera'] = this.world.camera;
+    }
+
+    createGrass ()
+    {
+        //  Grass texture is 512 x 512
+        //  World is 64 x 64 tiles = 32,768 x 32,768
+
+        for (let y = 0; y < 64; y++)
         {
-            const x = Between(-4000, 4000);
-            const y = Between(-4000, 4000);
-
-            AddChild(world, new Sprite(x, y, 'glove'));
+            for (let x = 0; x < 64; x++)
+            {
+                AddChild(this.world, new Sprite(x * 512, y * 512, 'grass').setOrigin(0, 0));
+            }
         }
+    }
 
-        window['camera'] = world.camera;
+    createLandscape ()
+    {
+        const frames = Array.from(this.texture.frames.keys());
+
+        //  Remove __BASE texture
+        frames.shift();
+
+        for (let y = 0; y < 251; y++)
+        {
+            for (let x = 0; x < 251; x++)
+            {
+                const frame = GetRandom(frames);
+
+                AddChild(this.world, new Sprite(256 + (x * 128), 512 + (y * 128), 'items', frame).setOrigin(0.5, 1));
+            }
+        }
     }
 
     update (): void
     {
+        if (!this.camera)
+        {
+            return;
+        }
+
         if (this.leftKey.isDown)
         {
-            this.camera.x -= 4;
+            this.camera.x += this.cameraSpeed;
         }
         else if (this.rightKey.isDown)
         {
-            this.camera.x += 4;
+            this.camera.x -= this.cameraSpeed;
         }
 
         if (this.upKey.isDown)
         {
-            this.camera.y -= 4;
+            this.camera.y += this.cameraSpeed;
         }
         else if (this.downKey.isDown)
         {
-            this.camera.y += 4;
+            this.camera.y -= this.cameraSpeed;
         }
+
+        this.camera.x = Clamp(this.camera.x, -31968, 0);
+        this.camera.y = Clamp(this.camera.y, -32168, 0);
     }
 }
 
