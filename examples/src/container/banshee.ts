@@ -51,10 +51,6 @@ class Demo extends Scene
         AddTween(arm2).to(300, { x: 60, rotation: -0.20 }).yoyo(true).repeat(-1).easing(Easing.Sine.InOut);
         AddTween(hand2).to(300, { rotation: 0.30 }).yoyo(true).repeat(-1).easing(Easing.Sine.InOut);
         AddTween(hand1).to(300, { rotation: -0.20 }).yoyo(true).repeat(-1).easing(Easing.Sine.InOut);
-
-        window['head'] = head;
-        window['arm'] = arm2;
-        window['hand'] = hand1;
     }
 }
 

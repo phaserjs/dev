@@ -4,7 +4,6 @@ import { SetFillStyle, Text } from '../../../../../phaser-genesis/src/gameobject
 import { AddChildren } from '../../../../../phaser-genesis/src/display';
 import { Game } from '../../../../../phaser-genesis/src/Game';
 import { ImageFile } from '../../../../../phaser-genesis/src/loader/files/ImageFile';
-import { Loader } from '../../../../../phaser-genesis/src/loader/Loader';
 import { Scene } from '../../../../../phaser-genesis/src/scenes/Scene';
 import { StaticWorld } from '../../../../../phaser-genesis/src/world/StaticWorld';
 import { TextureManagerInstance } from '../../../../../phaser-genesis/src/textures/TextureManagerInstance';
@@ -15,15 +14,13 @@ class Demo extends Scene
     {
         super();
 
-        const loader = new Loader();
-
-        loader.add(ImageFile('8x8', 'assets/8x8.png'));
-
-        loader.start().then(() => this.create());
+        this.create();
     }
 
-    create ()
+    async create ()
     {
+        await ImageFile('8x8', 'assets/8x8.png');
+
         const world = new StaticWorld(this);
 
         const text1 = new Text(400, 100, 'Phaser 4 Text', '48px Arial Black');

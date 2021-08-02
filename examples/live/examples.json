@@ -111,7 +111,7 @@
         {
           "path": "examples/live/container/banshee.js",
           "name": "banshee.js",
-          "size": 150499,
+          "size": 170456,
           "extension": ".js",
           "type": "file"
         },
@@ -130,7 +130,7 @@
           "type": "file"
         }
       ],
-      "size": 667564,
+      "size": 687521,
       "type": "directory"
     },
     {
@@ -527,33 +527,33 @@
             {
               "path": "examples/live/gameobjects/rectangle/1024 rectangles.js",
               "name": "1024 rectangles.js",
-              "size": 113721,
+              "size": 145198,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/rectangle/create rectangle.js",
               "name": "create rectangle.js",
-              "size": 155740,
+              "size": 143845,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/rectangle/random rectangles.js",
               "name": "random rectangles.js",
-              "size": 113524,
+              "size": 145011,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/rectangle/transforming rectangles.js",
               "name": "transforming rectangles.js",
-              "size": 177312,
+              "size": 162855,
               "extension": ".js",
               "type": "file"
             }
           ],
-          "size": 560297,
+          "size": 596909,
           "type": "directory"
         },
         {
@@ -656,30 +656,30 @@
             {
               "path": "examples/live/gameobjects/text/create text.js",
               "name": "create text.js",
-              "size": 109397,
+              "size": 151770,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/text/fill style.js",
               "name": "fill style.js",
-              "size": 116680,
+              "size": 155703,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/text/text stroke.js",
               "name": "text stroke.js",
-              "size": 109799,
+              "size": 152208,
               "extension": ".js",
               "type": "file"
             }
           ],
-          "size": 335876,
+          "size": 459681,
           "type": "directory"
         }
       ],
-      "size": 5135028,
+      "size": 5295445,
       "type": "directory"
     },
     {
@@ -905,6 +905,6 @@
       "type": "directory"
     }
   ],
-  "size": 16168178,
+  "size": 16348552,
   "type": "directory"
 }
