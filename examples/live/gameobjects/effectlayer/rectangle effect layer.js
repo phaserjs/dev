@@ -4497,7 +4497,7 @@ void main (void)
         ClearDirtyChildCache(id);
         SetDirtyParents(id);
       }
-      BatchTexturedQuad(this.texture, id, renderPass);
+      DrawTexturedQuad(renderPass, this.texture);
     }
   };
 
@@ -4519,7 +4519,8 @@ void main (void)
       Flush(renderPass);
       renderPass.framebuffer.pop();
       if (shaders.length === 0) {
-        BatchTexturedQuadBuffer(texture, id, renderPass);
+        renderPass.textures.clear();
+        DrawTexturedQuad(renderPass, texture);
       } else {
         renderPass.textures.clear();
         let prevTexture = texture;
@@ -5267,14 +5268,17 @@ void main() {
       const stars = new FXShader({ fragmentShader: starsFragmentShader });
       const world2 = new StaticWorld(this);
       const layer = new EffectLayer();
+      const layer2 = new RenderLayer();
       stars.timeScale = 1e-3;
-      const rect = new Rectangle2(400, 300, 512, 512);
+      const rect = new Rectangle2(400, 300, 512, 512, 16711680);
+      rect.rotation = 0.4;
+      rect.skew.set(2, 1);
       On(world2, "update", () => {
         rect.rotation += 0.01;
       });
       window["bob"] = rect;
-      AddChildren(layer, rect);
-      AddChildren(world2, layer);
+      AddChildren(layer2, rect);
+      AddChildren(world2, layer2);
     }
   };
   new Game(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(2960685), Scenes(Demo));

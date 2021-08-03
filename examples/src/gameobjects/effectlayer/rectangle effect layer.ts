@@ -1,5 +1,5 @@
 import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../../phaser-genesis/src/config';
-import { EffectLayer, Rectangle } from '../../../../../phaser-genesis/src/gameobjects';
+import { EffectLayer, Rectangle, RenderLayer } from '../../../../../phaser-genesis/src/gameobjects';
 
 import { AddChildren } from '../../../../../phaser-genesis/src/display';
 import { FXShader } from '../../../../../phaser-genesis/src/renderer/webgl1/shaders/FXShader';
@@ -433,8 +433,6 @@ void main( void ) {
 	gl_FragColor = vec4(tcolor.rgb * color, tcolor.a);
 }`;
 
-
-
 class Demo extends Scene
 {
     constructor ()
@@ -451,6 +449,7 @@ class Demo extends Scene
         const world = new StaticWorld(this);
 
         const layer = new EffectLayer();
+        const layer2 = new RenderLayer();
 
         // dots.timeScale = 0.001;
         stars.timeScale = 0.001;
@@ -463,19 +462,29 @@ class Demo extends Scene
         // layer.shaders.push(dots);
         // layer.shaders.push(stars);
 
-        const rect = new Rectangle(400, 300, 512, 512);
+        const rect = new Rectangle(400, 300, 512, 512, 0xff0000);
+
+        rect.rotation = 0.4;
+        rect.skew.set(2, 1);
 
         On(world, 'update', () => {
 
             rect.rotation += 0.01;
+            // rect.x += 1;
 
         });
 
         window['bob'] = rect;
 
-        AddChildren(layer, rect);
+        // AddChildren(world, rect);
 
-        AddChildren(world, layer);
+        AddChildren(layer2, rect);
+
+        // AddChildren(layer, rect);
+
+        // AddChildren(world, layer);
+
+        AddChildren(world, layer2);
     }
 }
 
