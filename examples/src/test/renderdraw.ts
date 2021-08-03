@@ -35,6 +35,7 @@ class MiniPhaser
         renderer.begin(true);
 
         FillRect(renderer.renderPass, 100, 100, 400, 300, 255, 255, 0, 1);
+        // FillRect(renderer.renderPass, 200, 200, 400, 300, 255, 0, 255, 0.5);
 
         renderer.end();
 

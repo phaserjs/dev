@@ -3020,4 +3020,4 @@ void main (void)
  * @copyright    2020 Photon Storm Ltd.
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
  */
-//# sourceMappingURL=renderdraw.js.map
+//# sourceMappingURL=renderdraw.ts.map
