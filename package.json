@@ -27,6 +27,7 @@
     "chalk": "^4.1.2",
     "directory-tree": "^2.2.9",
     "esbuild": "^0.12.17",
+    "esbuild-plugin-ifdef": "^1.0.1",
     "filesize": "^7.0.0",
     "fs-extra": "^10.0.0",
     "gradient-string": "^1.2.0",

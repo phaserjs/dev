@@ -7,7 +7,18 @@ import fs from 'fs-extra';
 import gradient from 'gradient-string';
 import gzip from 'gzip-size';
 import { hideBin } from 'yargs/helpers';
+import ifdef from 'esbuild-plugin-ifdef';
 import yargs from 'yargs';
+
+const define = {
+    'process.env.RENDER_STATS': true,
+    'process.env.GET_DISPLAY_DATA': true
+};
+
+const productionDefine = {
+    'process.env.RENDER_STATS': false,
+    'process.env.GET_DISPLAY_DATA': false
+};
 
 const argv = yargs(hideBin(process.argv)).argv
 
@@ -110,13 +121,15 @@ if (!fs.existsSync(pathTS))
     process.exit(1);
 }
 
-const buildResults = esbuild.buildSync({
+const buildResults = await esbuild.build({
     entryPoints: [ pathTS ],
     outfile: pathJS,
     target: 'esnext',
     sourcemap: true,
     minify: false,
     bundle: true,
+    define: productionDefine,
+    plugins: [ ifdef(productionDefine, '/Users/rich/Documents/GitHub/') ],
     metafile: true,
     logLevel: 'silent',
     legalComments: 'none'
@@ -136,13 +149,15 @@ else
     fs.writeFileSync('meta.json', JSON.stringify(buildResults.metafile, null, 2));
 }
 
-const minResults = esbuild.buildSync({
+const minResults = await esbuild.build({
     entryPoints: [ pathTS ],
     outfile: (createMin) ? pathMinJS : pathTempMinJS,
     target: 'esnext',
     sourcemap: false,
     minify: true,
-    bundle: true
+    bundle: true,
+    define: productionDefine,
+    plugins: [ ifdef(productionDefine, '/Users/rich/Documents/GitHub/') ],
 });
 
 if (minResults.errors.length > 0)
