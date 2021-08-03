@@ -128,8 +128,8 @@ const buildResults = await esbuild.build({
     sourcemap: true,
     minify: false,
     bundle: true,
-    define: productionDefine,
-    plugins: [ ifdef(productionDefine, '/Users/rich/Documents/GitHub/') ],
+    // define: productionDefine,
+    // plugins: [ ifdef(productionDefine, '/Users/rich/Documents/GitHub/') ],
     metafile: true,
     logLevel: 'silent',
     legalComments: 'none'
@@ -156,8 +156,8 @@ const minResults = await esbuild.build({
     sourcemap: false,
     minify: true,
     bundle: true,
-    define: productionDefine,
-    plugins: [ ifdef(productionDefine, '/Users/rich/Documents/GitHub/') ],
+    // define: productionDefine,
+    // plugins: [ ifdef(productionDefine, '/Users/rich/Documents/GitHub/') ],
 });
 
 if (minResults.errors.length > 0)

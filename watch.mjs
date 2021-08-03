@@ -90,10 +90,13 @@ const spinner = await new terminalKit.AnimatedText({
 
 // term.hideCursor();
 
-const define = {
-    'process.env.RENDER_STATS': true,
-    'process.env.GET_DISPLAY_DATA': true,
-};
+// const define = {
+//     'process.env.RENDER_STATS': true,
+//     'process.env.GET_DISPLAY_DATA': true,
+// };
+
+// define,
+// plugins: [ ifdef(define) ],
 
 esbuild.build({
     entryPoints: [ pathTS ],
@@ -102,8 +105,6 @@ esbuild.build({
     sourcemap: true,
     minify: false,
     bundle: true,
-    define,
-    plugins: [ ifdef(define) ],
     watch: {
         onRebuild(error, result)
         {
