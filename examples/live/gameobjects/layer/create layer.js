@@ -1009,11 +1009,6 @@
   });
   var DirtyComponent = Dirty;
 
-  // ../phaser-genesis/src/components/dirty/SetDirtyChild.ts
-  function SetDirtyChild(id) {
-    DirtyComponent.child[id] = 1;
-  }
-
   // ../phaser-genesis/src/components/dirty/SetDirtyChildCache.ts
   function SetDirtyChildCache(id) {
     DirtyComponent.childCache[id] = 1;
@@ -1043,20 +1038,12 @@
     return Boolean(PermissionsComponent.willCacheChildren[id]);
   }
 
-  // ../phaser-genesis/src/components/permissions/WillTransformChildren.ts
-  function WillTransformChildren(id) {
-    return Boolean(PermissionsComponent.willTransformChildren[id]);
-  }
-
   // ../phaser-genesis/src/components/dirty/SetDirtyParents.ts
   function SetDirtyParents(childID) {
     const parents = GetParents(childID);
     parents.forEach((id) => {
-      SetDirtyChild(id);
-      if (WillTransformChildren(id)) {
-        SetDirtyTransform(id);
-      }
       if (WillCacheChildren(id)) {
+        SetDirtyTransform(id);
         SetDirtyChildCache(id);
       }
     });
@@ -2735,6 +2722,7 @@ void main (void)
     textures;
     colorMatrix;
     quadShader;
+    quadBuffer;
     quadCamera;
     current2DCamera;
     constructor(renderer) {
@@ -2759,7 +2747,6 @@ void main (void)
     }
     reset() {
       const gl2 = this.renderer.gl;
-      this.quadShader = new QuadShader();
       this.quadCamera = new StaticCamera(this.renderer.width, this.renderer.height);
       this.textures.setDefault();
       this.framebuffer.setDefault();
@@ -2942,11 +2929,6 @@ void main (void)
     DirtyComponent.child[id] = 0;
   }
 
-  // ../phaser-genesis/src/components/dirty/ClearDirtyChildCache.ts
-  function ClearDirtyChildCache(id) {
-    DirtyComponent.childCache[id] = 0;
-  }
-
   // ../phaser-genesis/src/components/dirty/ClearDirtyDisplayList.ts
   function ClearDirtyDisplayList(id) {
     DirtyComponent.displayList[id] = 0;
@@ -2975,6 +2957,11 @@ void main (void)
   // ../phaser-genesis/src/components/dirty/HasDirtyTransform.ts
   function HasDirtyTransform(id) {
     return Boolean(DirtyComponent.transform[id]);
+  }
+
+  // ../phaser-genesis/src/components/dirty/SetDirtyChild.ts
+  function SetDirtyChild(id) {
+    DirtyComponent.child[id] = 1;
   }
 
   // ../phaser-genesis/src/components/dirty/SetDirtyDisplayList.ts
@@ -3120,14 +3107,6 @@ void main (void)
     PermissionsComponent.willColorChildren[id] = 1;
   }
 
-  // ../phaser-genesis/src/components/permissions/SetWillCacheChildren.ts
-  function SetWillCacheChildren(value, ...children) {
-    children.forEach((child) => {
-      PermissionsComponent.willCacheChildren[child.id] = Number(value);
-    });
-    return children;
-  }
-
   // ../phaser-genesis/src/components/permissions/WillRender.ts
   function WillRender(id) {
     return Boolean(PermissionsComponent.visible[id]) && Boolean(PermissionsComponent.willRender[id]);
@@ -3176,6 +3155,42 @@ void main (void)
     Transform2DComponent.local[id].set([1, 0, 0, 1, x, y]);
     Transform2DComponent.world[id].set([1, 0, 0, 1, x, y]);
   }
+
+  // ../phaser-genesis/src/math/vec2/Vec2FromArray.ts
+  function Vec2FromArray(dst, src = [], index = 0) {
+    return dst.set(src[index], src[index + 1]);
+  }
+
+  // ../phaser-genesis/src/math/vec2/Vec2ToArray.ts
+  function Vec2ToArray(v, dst = [], index = 0) {
+    dst[index] = v.x;
+    dst[index + 1] = v.y;
+    return dst;
+  }
+
+  // ../phaser-genesis/src/math/vec2/Vec2.ts
+  var Vec2 = class {
+    x;
+    y;
+    constructor(x = 0, y = 0) {
+      this.set(x, y);
+    }
+    set(x = 0, y = 0) {
+      this.x = x;
+      this.y = y;
+      return this;
+    }
+    toArray(dst = [], index = 0) {
+      return Vec2ToArray(this, dst, index);
+    }
+    fromArray(src, index = 0) {
+      Vec2FromArray(this, src, index);
+      return this;
+    }
+    toString() {
+      return `{ x=${this.x}, y=${this.y} }`;
+    }
+  };
 
   // ../phaser-genesis/src/components/transform/UpdateExtent.ts
   function UpdateExtent(id, width, height) {
@@ -3388,6 +3403,11 @@ void main (void)
     world2[4] = tx * pa + ty * pc + ptx;
     world2[5] = tx * pb + ty * pd + pty;
     SetDirtyTransform(childID);
+  }
+
+  // ../phaser-genesis/src/components/permissions/WillTransformChildren.ts
+  function WillTransformChildren(id) {
+    return Boolean(PermissionsComponent.willTransformChildren[id]);
   }
 
   // ../phaser-genesis/src/components/transform/UpdateWorldTransform.ts
@@ -4205,6 +4225,38 @@ void main (void)
     }
   };
 
+  // ../phaser-genesis/src/math/mat2d/Matrix2D.ts
+  var Matrix2D = class {
+    a;
+    b;
+    c;
+    d;
+    tx;
+    ty;
+    constructor(a = 1, b = 0, c = 0, d = 1, tx = 0, ty = 0) {
+      this.set(a, b, c, d, tx, ty);
+    }
+    set(a = 1, b = 0, c = 0, d = 1, tx = 0, ty = 0) {
+      this.a = a;
+      this.b = b;
+      this.c = c;
+      this.d = d;
+      this.tx = tx;
+      this.ty = ty;
+      return this;
+    }
+    identity() {
+      return this.set();
+    }
+    toArray() {
+      const { a, b, c, d, tx, ty } = this;
+      return [a, b, c, d, tx, ty];
+    }
+    fromArray(src) {
+      return this.set(src[0], src[1], src[2], src[3], src[4], src[5]);
+    }
+  };
+
   // ../phaser-genesis/src/components/vertices/AddQuadVertex.ts
   function AddQuadVertex(id, width = 0, height = 0, flipY = true) {
     addComponent(GameObjectWorld, QuadVertexComponent, id);
@@ -4350,6 +4402,25 @@ void main (void)
     }
   };
 
+  // ../phaser-genesis/src/gameobjects/sprite/SetFrame.ts
+  function SetFrame(texture, key, ...children) {
+    const frame2 = texture.getFrame(key);
+    const pivot = frame2.pivot;
+    children.forEach((child) => {
+      if (!child || frame2 === child.frame) {
+        return;
+      }
+      child.frame = frame2;
+      child.hasTexture = true;
+      if (pivot) {
+        child.origin.set(pivot.x, pivot.y);
+      }
+      frame2.copyToExtent(child);
+      frame2.copyToVertices(child.id);
+    });
+    return children;
+  }
+
   // ../phaser-genesis/src/textures/TextureManagerInstance.ts
   var instance5;
   var TextureManagerInstance = {
@@ -4364,87 +4435,88 @@ void main (void)
     }
   };
 
-  // ../phaser-genesis/src/renderer/webgl1/draw/BatchTexturedQuad.ts
-  function BatchTexturedQuad(F32, offset, textureIndex, x1, y1, x2, y2, x3, y3, x4, y4, u0, v0, u1, v1, r, g, b, a) {
-    F32.set([
-      x1,
-      y1,
-      u0,
-      v0,
-      textureIndex,
-      r,
-      g,
-      b,
-      a,
-      x2,
-      y2,
-      u0,
-      v1,
-      textureIndex,
-      r,
-      g,
-      b,
-      a,
-      x3,
-      y3,
-      u1,
-      v1,
-      textureIndex,
-      r,
-      g,
-      b,
-      a,
-      x1,
-      y1,
-      u0,
-      v0,
-      textureIndex,
-      r,
-      g,
-      b,
-      a,
-      x3,
-      y3,
-      u1,
-      v1,
-      textureIndex,
-      r,
-      g,
-      b,
-      a,
-      x4,
-      y4,
-      u1,
-      v0,
-      textureIndex,
-      r,
-      g,
-      b,
-      a
-    ], offset);
-    return offset + 54;
+  // ../phaser-genesis/src/textures/GetTexture.ts
+  function GetTexture(key) {
+    return TextureManagerInstance.get().get(key);
   }
 
-  // ../phaser-genesis/src/renderer/webgl1/draw/BatchSingleQuad.ts
-  function BatchSingleQuad(renderPass, x, y, width, height, u0, v0, u1, v1, textureIndex = 0) {
-    const { F32, offset } = GetVertexBufferEntry(renderPass, 2);
-    BatchTexturedQuad(F32, offset, textureIndex, x, y, x, y + height, x + width, y + height, x + width, y, u0, v0, u1, v1, 1, 1, 1, 1);
-  }
-
-  // ../phaser-genesis/src/renderer/webgl1/draw/DrawTexturedQuad.ts
-  function DrawTexturedQuad(renderPass, texture, shader) {
-    if (!shader) {
-      shader = renderPass.quadShader;
+  // ../phaser-genesis/src/gameobjects/sprite/SetTexture.ts
+  function SetTexture(key, frame2, ...children) {
+    if (!key) {
+      children.forEach((child) => {
+        child.texture = null;
+        child.frame = null;
+        child.hasTexture = false;
+      });
+    } else {
+      let texture;
+      if (key instanceof Frame) {
+        frame2 = key;
+        texture = key.texture;
+      } else if (key instanceof Texture) {
+        texture = key;
+      } else {
+        texture = GetTexture(key);
+      }
+      if (!texture) {
+        console.warn(`Invalid Texture key: ${key}`);
+      } else {
+        children.forEach((child) => {
+          child.texture = texture;
+        });
+        SetFrame(texture, frame2, ...children);
+      }
     }
-    const { u0, v0, u1, v1 } = texture.firstFrame;
-    Flush(renderPass);
-    renderPass.textures.bind(texture, 0);
-    renderPass.shader.set(shader, 0);
-    BatchSingleQuad(renderPass, 0, 0, texture.width, texture.height, u0, v0, u1, v1, 0);
-    Flush(renderPass);
-    renderPass.shader.pop();
-    renderPass.textures.unbind();
+    return children;
   }
+
+  // ../phaser-genesis/src/gameobjects/sprite/Sprite.ts
+  var Sprite = class extends Container {
+    type = "Sprite";
+    texture;
+    frame;
+    hasTexture = false;
+    constructor(x, y, texture = "__BLANK", frame2) {
+      super(x, y);
+      AddQuadVertex(this.id);
+      this.setTexture(texture, frame2);
+    }
+    setTexture(key, frame2) {
+      SetTexture(key, frame2, this);
+      return this;
+    }
+    setFrame(key) {
+      SetFrame(this.texture, key, this);
+      return this;
+    }
+    isRenderable() {
+      return this.visible && this.hasTexture && WillRender(this.id) && this.alpha > 0;
+    }
+    renderGL(renderPass) {
+      const color = this.color;
+      if (this.shader) {
+        Flush(renderPass);
+        renderPass.shader.set(this.shader, 0);
+      }
+      if (color.colorMatrixEnabled) {
+        renderPass.colorMatrix.set(color);
+      }
+      this.preRenderGL(renderPass);
+      BatchTexturedQuadBuffer(this.texture, this.id, renderPass);
+      if (color.colorMatrixEnabled && !color.willColorChildren) {
+        Flush(renderPass);
+        renderPass.colorMatrix.pop();
+      }
+    }
+    renderCanvas(renderer) {
+    }
+    destroy(reparentChildren) {
+      super.destroy(reparentChildren);
+      this.texture = null;
+      this.frame = null;
+      this.hasTexture = false;
+    }
+  };
 
   // ../phaser-genesis/src/components/permissions/SetWillTransformChildren.ts
   function SetWillTransformChildren(value, ...children) {
@@ -4459,77 +4531,6 @@ void main (void)
     constructor() {
       super();
       SetWillTransformChildren(false, this);
-    }
-  };
-
-  // ../phaser-genesis/src/gameobjects/renderlayer/RenderLayer.ts
-  var RenderLayer = class extends Layer {
-    type = "RenderLayer";
-    texture;
-    framebuffer;
-    constructor() {
-      super();
-      SetWillCacheChildren(true, this);
-      const width = GetWidth();
-      const height = GetHeight();
-      const resolution = GetResolution();
-      const id = this.id;
-      const texture = new Texture(null, width * resolution, height * resolution);
-      texture.key = this.type + id.toString();
-      const binding = new GLTextureBinding(texture, {
-        createFramebuffer: true,
-        flipY: true
-      });
-      AddQuadVertex(id, width, height, true);
-      this.texture = texture;
-      this.framebuffer = binding.framebuffer;
-    }
-    renderGL(renderPass) {
-      const id = this.id;
-      Flush(renderPass);
-      renderPass.framebuffer.set(this.framebuffer, true);
-    }
-    postRenderGL(renderPass) {
-      const id = this.id;
-      if (!WillCacheChildren(id) || HasDirtyChildCache(id)) {
-        Flush(renderPass);
-        renderPass.framebuffer.pop();
-        ClearDirtyChildCache(id);
-        SetDirtyParents(id);
-      }
-      BatchTexturedQuad(this.texture, id, renderPass);
-    }
-  };
-
-  // ../phaser-genesis/src/gameobjects/effectlayer/EffectLayer.ts
-  var EffectLayer = class extends RenderLayer {
-    type = "EffectLayer";
-    filterArea;
-    shaders = [];
-    constructor(...shaders) {
-      super();
-      if (Array.isArray(shaders)) {
-        this.shaders = shaders;
-      }
-    }
-    postRenderGL(renderPass) {
-      const id = this.id;
-      const shaders = this.shaders;
-      const texture = this.texture;
-      Flush(renderPass);
-      renderPass.framebuffer.pop();
-      if (shaders.length === 0) {
-        BatchTexturedQuadBuffer(texture, id, renderPass);
-      } else {
-        renderPass.textures.clear();
-        let prevTexture = texture;
-        for (let i = 0; i < shaders.length; i++) {
-          const shader = shaders[i];
-          DrawTexturedQuad(renderPass, prevTexture, shader);
-          prevTexture = shader.texture;
-        }
-        DrawTexturedQuad(renderPass, prevTexture);
-      }
     }
   };
 
@@ -4602,94 +4603,29 @@ void main (void)
     new TextureManager();
   }
 
-  // ../phaser-genesis/src/gameobjects/rectangle/Rectangle.ts
-  var Rectangle2 = class extends Container {
-    type = "Rectangle";
-    texture;
-    frame;
-    constructor(x, y, width = 64, height = 64, color = 16777215) {
-      super(x, y);
-      const id = this.id;
-      AddQuadVertex(id);
-      this.texture = WhiteTexture.get();
-      this.frame = this.texture.getFrame();
-      this.frame.copyToExtent(this);
-      this.frame.copyToVertices(id);
-      this.size.set(width, height);
-      this.color.tint = color;
-    }
-    isRenderable() {
-      return this.visible && WillRender(this.id) && this.alpha > 0;
-    }
-    renderGL(renderPass) {
-      const color = this.color;
-      if (this.shader) {
-        Flush(renderPass);
-        renderPass.shader.set(this.shader, 0);
-      }
-      if (color.colorMatrixEnabled) {
-        renderPass.colorMatrix.set(color);
-      }
-      this.preRenderGL(renderPass);
-      BatchTexturedQuadBuffer(this.texture, this.id, renderPass);
-      if (color.colorMatrixEnabled && !color.willColorChildren) {
-        Flush(renderPass);
-        renderPass.colorMatrix.pop();
-      }
-    }
-    renderCanvas(renderer) {
-    }
-    destroy(reparentChildren) {
-      super.destroy(reparentChildren);
-      this.texture = null;
-      this.frame = null;
-    }
-  };
-
-  // ../phaser-genesis/src/display/AddChildren.ts
-  function AddChildren(parent, ...children) {
-    children.forEach((child) => {
-      AddChildAt(parent, child);
-    });
-    return children;
+  // ../phaser-genesis/src/display/AddChild.ts
+  function AddChild(parent, child) {
+    return AddChildAt(parent, child);
   }
 
-  // ../phaser-genesis/src/renderer/webgl1/shaders/FXShader.ts
-  var FXShader = class extends QuadShader {
-    timeVar;
-    resolutionVar;
-    timeScale;
-    constructor(config = {}) {
-      config.attributes = config?.attributes || DefaultQuadAttributes;
-      config.renderToFramebuffer = true;
-      super(config);
-      const {
-        timeUniform = "uTime",
-        resolutionUniform = "uResolution",
-        timeScale = 1
-      } = config;
-      const uniforms = [...this.uniformSetters.keys()];
-      this.timeVar = uniforms.includes(timeUniform) ? timeUniform : "time";
-      this.resolutionVar = uniforms.includes(resolutionUniform) ? resolutionUniform : "resolution";
-      if (!uniforms.includes(this.timeVar)) {
-        this.timeVar = void 0;
-      }
-      if (!uniforms.includes(this.resolutionVar)) {
-        this.resolutionVar = void 0;
-      }
-      this.timeScale = timeScale;
-    }
-    bind(renderPass) {
-      const renderer = renderPass.renderer;
-      if (this.timeVar) {
-        this.uniforms.set(this.timeVar, performance.now() * this.timeScale);
-      }
-      if (this.resolutionVar) {
-        this.uniforms.set(this.resolutionVar, [renderer.width, renderer.height]);
-      }
-      return super.bind(renderPass);
-    }
-  };
+  // ../phaser-genesis/src/math/mat2d/Mat2dAppend.ts
+  function Mat2dAppend(mat1, mat2, out = new Matrix2D()) {
+    const { a: a1, b: b1, c: c1, d: d1, tx: tx1, ty: ty1 } = mat1;
+    const { a: a2, b: b2, c: c2, d: d2, tx: tx2, ty: ty2 } = mat2;
+    return out.set(a2 * a1 + b2 * c1, a2 * b1 + b2 * d1, c2 * a1 + d2 * c1, c2 * b1 + d2 * d1, tx2 * a1 + ty2 * c1 + tx1, tx2 * b1 + ty2 * d1 + ty1);
+  }
+
+  // ../phaser-genesis/src/math/mat2d/Mat2dGlobalToLocal.ts
+  function Mat2dGlobalToLocal(mat, x, y, out = new Vec2()) {
+    const { a, b, c, d, tx, ty } = mat;
+    const id = 1 / (a * d + c * -b);
+    return out.set(d * id * x + -c * id * y + (ty * c - tx * d) * id, a * id * y + -b * id * x + (-ty * a + tx * b) * id);
+  }
+
+  // ../phaser-genesis/src/math/Between.ts
+  function Between(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min);
+  }
 
   // ../phaser-genesis/src/config/banner/AddBanner.ts
   function AddBanner() {
@@ -5081,207 +5017,269 @@ void main (void)
     }
   };
 
-  // examples/src/gameobjects/effectlayer/rectangle effect layer.ts
-  var starsFragmentShader = `
-#ifdef GL_ES
-precision highp float;
-#endif
- 
-uniform float time;
-uniform vec2 resolution;
+  // ../phaser-genesis/src/loader/CreateFile.ts
+  function CreateFile(key, url, skipCache = false) {
+    return {
+      key,
+      url,
+      skipCache
+    };
+  }
 
-varying vec2 vTextureCoord;
-varying float vTextureId;
-varying vec4 vTintColor;
+  // ../phaser-genesis/src/loader/GetURL.ts
+  function GetURL(key, url, extension) {
+    if (!url) {
+      url = `${key}.${extension}`;
+    }
+    if (/^(?:blob:|data:|http:\/\/|https:\/\/|\/\/)/.exec(url)) {
+      return url;
+    } else {
+      return url;
+    }
+  }
 
-uniform sampler2D uTexture;
+  // ../phaser-genesis/src/loader/RequestFile.ts
+  async function RequestFile(file, preload, onload, fileData) {
+    if (!preload(file)) {
+      return Promise.reject(file);
+    }
+    try {
+      const request = new Request(file.url, fileData?.requestInit);
+      file.response = await fetch(request);
+      if (file.response.ok && await onload(file)) {
+        return Promise.resolve(file);
+      } else {
+        return Promise.reject(file);
+      }
+    } catch (error) {
+      file.error = error;
+      return Promise.reject(file);
+    }
+  }
 
-#define mouse vec2(sin(time)/48., cos(time)/48.)
-#define iterations 14
-#define formuparam2 0.79
- 
-#define volsteps 5
-#define stepsize 0.390
- 
-#define zoom 0.900
-#define tile   0.850
-#define speed2  100.0 
-#define brightness 0.003
-#define darkmatter 0.400
-#define distfading 0.560
-#define saturation 0.800
+  // ../phaser-genesis/src/loader/files/ImageFile.ts
+  async function ImageFile(key, url, fileData = {}) {
+    const file = CreateFile(key, GetURL(key, url, "png"), fileData?.skipCache);
+    const textureManager = TextureManagerInstance.get();
+    const preload = () => {
+      return textureManager && (!textureManager.has(key) || !textureManager.get(key).locked);
+    };
+    const onload = async (file2) => {
+      const blob = await file2.response.blob();
+      let image;
+      if (window && "createImageBitmap" in window && !fileData?.getImage) {
+        image = await createImageBitmap(blob);
+      } else {
+        image = await new Promise((resolve, reject) => {
+          const url2 = URL.createObjectURL(blob);
+          const img = new Image();
+          img.onload = () => {
+            URL.revokeObjectURL(url2);
+            resolve(img);
+          };
+          img.onerror = () => {
+            reject();
+          };
+          img.src = url2;
+          if (img.complete && img.width && img.height) {
+            img.onload = null;
+            img.onerror = null;
+            resolve(img);
+          }
+        });
+      }
+      if (!image) {
+        return false;
+      }
+      if (fileData.skipCache) {
+        file2.data = image;
+      } else if (textureManager.has(key)) {
+        file2.data = textureManager.update(key, image, fileData?.glConfig);
+      } else {
+        file2.data = textureManager.add(key, image, fileData?.glConfig);
+      }
+      return true;
+    };
+    return RequestFile(file, preload, onload, fileData);
+  }
 
+  // ../phaser-genesis/src/input/mouse/Mouse.ts
+  var Mouse = class extends EventEmitter {
+    primaryDown = false;
+    auxDown = false;
+    secondaryDown = false;
+    blockContextMenu = true;
+    localPoint;
+    hitPoint;
+    target;
+    resolution = 1;
+    mousedownHandler;
+    mouseupHandler;
+    mousemoveHandler;
+    mousewheelHandler;
+    contextmenuHandler;
+    blurHandler;
+    transPoint;
+    constructor(target) {
+      super();
+      this.mousedownHandler = (event) => this.onMouseDown(event);
+      this.mouseupHandler = (event) => this.onMouseUp(event);
+      this.mousemoveHandler = (event) => this.onMouseMove(event);
+      this.mousewheelHandler = (event) => this.onMouseWheel(event);
+      this.contextmenuHandler = (event) => this.onContextMenuEvent(event);
+      this.blurHandler = () => this.onBlur();
+      this.localPoint = new Vec2();
+      this.hitPoint = new Vec2();
+      this.transPoint = new Vec2();
+      if (!target) {
+        target = RendererInstance.get().canvas;
+      }
+      target.addEventListener("mousedown", this.mousedownHandler);
+      target.addEventListener("mouseup", this.mouseupHandler);
+      target.addEventListener("wheel", this.mousewheelHandler, { passive: false });
+      target.addEventListener("contextmenu", this.contextmenuHandler);
+      window.addEventListener("mouseup", this.mouseupHandler);
+      window.addEventListener("mousemove", this.mousemoveHandler);
+      window.addEventListener("blur", this.blurHandler);
+      this.target = target;
+    }
+    onBlur() {
+    }
+    onMouseDown(event) {
+      this.positionToPoint(event);
+      this.primaryDown = event.button === 0;
+      this.auxDown = event.button === 1;
+      this.secondaryDown = event.button === 2;
+      Emit(this, "pointerdown", this.localPoint.x, this.localPoint.y, event.button, event);
+    }
+    onMouseUp(event) {
+      this.positionToPoint(event);
+      this.primaryDown = !(event.button === 0);
+      this.auxDown = !(event.button === 1);
+      this.secondaryDown = !(event.button === 2);
+      Emit(this, "pointerup", this.localPoint.x, this.localPoint.y, event.button, event);
+    }
+    onMouseMove(event) {
+      this.positionToPoint(event);
+      Emit(this, "pointermove", this.localPoint.x, this.localPoint.y, event);
+    }
+    onMouseWheel(event) {
+      Emit(this, "wheel", event.deltaX, event.deltaY, event.deltaZ, event);
+    }
+    onContextMenuEvent(event) {
+      if (this.blockContextMenu) {
+        event.preventDefault();
+      }
+      Emit(this, "contextmenu", event);
+    }
+    positionToPoint(event) {
+      return this.localPoint.set(event.offsetX, event.offsetY);
+    }
+    getInteractiveChildren(parent, results) {
+      const children = parent.children;
+      for (let i = 0; i < children.length; i++) {
+        const child = children[i];
+        if (!child.visible || !child.input.enabled) {
+          continue;
+        }
+        results.push(child);
+        if (child.input.enabledChildren && child.numChildren) {
+          this.getInteractiveChildren(child, results);
+        }
+      }
+    }
+    checkHitArea(entity, px, py) {
+      if (entity.input.hitArea) {
+        if (entity.input.hitArea.contains(px, py)) {
+          return true;
+        }
+      } else {
+        return entity.transformExtent.contains(px, py);
+      }
+      return false;
+    }
+    hitTest(...entities3) {
+      const localX = this.localPoint.x;
+      const localY = this.localPoint.y;
+      const point = this.transPoint;
+      for (let i = 0; i < entities3.length; i++) {
+        const entity = entities3[i];
+        if (!entity.world) {
+          continue;
+        }
+        const mat = Mat2dAppend(entity.world.camera.worldTransform, entity.worldTransform);
+        Mat2dGlobalToLocal(mat, localX, localY, point);
+        if (this.checkHitArea(entity, point.x, point.y)) {
+          this.hitPoint.set(point.x, point.y);
+          return true;
+        }
+      }
+      return false;
+    }
+    hitTestChildren(parent, topOnly = true) {
+      const output = [];
+      if (!parent.visible) {
+        return output;
+      }
+      const candidates = [];
+      const parentInput = parent.input;
+      if (parentInput && parentInput.enabled) {
+        candidates.push(parent);
+      }
+      if (parentInput.enabledChildren && parent.numChildren) {
+        this.getInteractiveChildren(parent, candidates);
+      }
+      for (let i = candidates.length - 1; i >= 0; i--) {
+        const entity = candidates[i];
+        if (this.hitTest(entity)) {
+          output.push(entity);
+          if (topOnly) {
+            break;
+          }
+        }
+      }
+      return output;
+    }
+    shutdown() {
+      const target = this.target;
+      target.removeEventListener("mousedown", this.mousedownHandler);
+      target.removeEventListener("mouseup", this.mouseupHandler);
+      target.removeEventListener("wheel", this.mousewheelHandler);
+      target.removeEventListener("contextmenu", this.contextmenuHandler);
+      window.removeEventListener("mouseup", this.mouseupHandler);
+      window.removeEventListener("mousemove", this.mousemoveHandler);
+      window.removeEventListener("blur", this.blurHandler);
+    }
+  };
 
-#define transverseSpeed zoom*2.0
-#define cloud 0.11 
-
- 
-float triangle(float x, float a) { 
-	float output2 = 2.0*abs(  2.0*  ( (x/a) - floor( (x/a) + 0.5) ) ) - 1.0;
-	return output2;
-}
- 
-float field(in vec3 p) {	
-	float strength = 7. + .03 * log(1.e-6 + fract(sin(time) * 4373.11));
-	float accum = 0.;
-	float prev = 0.;
-	float tw = 0.;	
-
-	for (int i = 0; i < 6; ++i) {
-		float mag = dot(p, p);
-		p = abs(p) / mag + vec3(-.5, -.8 + 0.1*sin(time*0.7 + 2.0), -1.1+0.3*cos(time*0.3));
-		float w = exp(-float(i) / 7.);
-		accum += w * exp(-strength * pow(abs(mag - prev), 2.3));
-		tw += w;
-		prev = mag;
-	}
-	return max(0., 5. * accum / tw - .7);
-}
-
-
-
-void main() {   
-     	vec2 uv2 = 2. * gl_FragCoord.xy / vec2(512) - 1.;
-	vec2 uvs = uv2 * vec2(512)  / 512.;
-	
-	float time2 = time;               
-        float speed = speed2;
-        speed = .01 * cos(time2*0.02 + 3.1415926/4.0);          
-		
-    	float formuparam = formuparam2;
-	
-    		
-	vec2 uv = uvs;		       
-	
-	float a_xz = 0.9;
-	float a_yz = -.6;
-	float a_xy = 0.9 + time*0.08;	
-	
-	mat2 rot_xz = mat2(cos(a_xz),sin(a_xz),-sin(a_xz),cos(a_xz));	
-	mat2 rot_yz = mat2(cos(a_yz),sin(a_yz),-sin(a_yz),cos(a_yz));		
-	mat2 rot_xy = mat2(cos(a_xy),sin(a_xy),-sin(a_xy),cos(a_xy));
-	
-
-	float v2 =1.0;	
-	vec3 dir=vec3(uv*zoom,1.); 
-	vec3 from=vec3(0.0, 0.0,0.0);                               
-        from.x -= 5.0*(mouse.x-0.5);
-        from.y -= 5.0*(mouse.y-0.5);
-               
-               
-	vec3 forward = vec3(0.,0.,1.);   
-	from.x += transverseSpeed*(1.0)*cos(0.01*time) + 0.001*time;
-	from.y += transverseSpeed*(1.0)*sin(0.01*time) +0.001*time;
-	from.z += 0.003*time;	
-	
-	dir.xy*=rot_xy;
-	forward.xy *= rot_xy;
-	dir.xz*=rot_xz;
-	forward.xz *= rot_xz;	
-	dir.yz*= rot_yz;
-	forward.yz *= rot_yz;
-	
-	from.xy*=-rot_xy;
-	from.xz*=rot_xz;
-	from.yz*= rot_yz;
-	
-	float zooom = (time2-3311.)*speed;
-	from += forward* zooom;
-	float sampleShift = mod( zooom, stepsize );
-	 
-	float zoffset = -sampleShift;
-	sampleShift /= stepsize;
-	
-	
-	float s=0.24;
-	float s3 = s + stepsize/2.0;
-	vec3 v=vec3(0.);
-	float t3 = 0.0;	
-	
-	vec3 backCol2 = vec3(0.);
-	for (int r=0; r<volsteps; r++) {
-		vec3 p2=from+(s+zoffset)*dir;
-		vec3 p3=from+(s3+zoffset)*dir;
-		
-		p2 = abs(vec3(tile)-mod(p2,vec3(tile*2.)));
-		p3 = abs(vec3(tile)-mod(p3,vec3(tile*2.)));		
-		#ifdef cloud
-		t3 = field(p3);
-		#endif
-		
-		float pa,a=pa=0.;
-		for (int i=0; i<iterations; i++) {
-			p2=abs(p2)/dot(p2,p2)-formuparam;
-			
-			float D = abs(length(p2)-pa);
-			a += i > 7 ? min( 12., D) : D;
-			pa=length(p2);
-		}
-		
-		
-		
-		a*=a*a;
-		
-		float s1 = s+zoffset;
-		
-		float fade = pow(distfading,max(0.,float(r)-sampleShift));		
-			
-		v+=fade;
-	       	
-
-		
-		if( r == 0 )
-			fade *= (1. - (sampleShift));
-		
-		if( r == volsteps-1 )
-			fade *= sampleShift;
-		v+=vec3(s1,s1*s1,s1*s1*s1*s1)*a*brightness*fade;
-		
-		backCol2 += mix(.4, 1., v2) * vec3(1.8 * t3 * t3 * t3, 1.4 * t3 * t3, t3) * fade;
-
-		
-		s+=stepsize;
-		s3 += stepsize;		
-	}
-		       
-	v=mix(vec3(length(v)),v,saturation);	
-
-	vec4 forCol2 = vec4(v*.01,1.);	
-	#ifdef cloud
-	backCol2 *= cloud;
-	#endif	
-	backCol2.b *= 1.8;
-	backCol2.r *= 0.05;	
-	
-	backCol2.b = 0.5*mix(backCol2.g, backCol2.b, 0.8);
-	backCol2.g = 0.0;
-	backCol2.bg = mix(backCol2.gb, backCol2.bg, 0.5*(cos(time*0.01) + 1.0));
-
-    vec4 tcolor = texture2D(uTexture, vTextureCoord);
-
-	gl_FragColor = vec4(tcolor.rgb * (forCol2.rgb + backCol2), tcolor.a);
-}`;
+  // examples/src/gameobjects/layer/create layer.ts
   var Demo = class extends Scene {
     constructor() {
       super();
-      const stars = new FXShader({ fragmentShader: starsFragmentShader });
+      this.create();
+    }
+    async create() {
+      await ImageFile("snowflake", "assets/snowflake-pixel.png");
+      await ImageFile("sonic", "assets/sonic.png");
       const world2 = new StaticWorld(this);
-      const layer = new EffectLayer();
-      stars.timeScale = 1e-3;
-      const rect = new Rectangle2(400, 300, 512, 512);
-      On(world2, "update", () => {
-        rect.rotation += 0.01;
+      const layer = new Layer();
+      for (let i = 0; i < 32; i++) {
+        const x = Between(0, 800);
+        const y = Between(0, 600);
+        AddChild(layer, new Sprite(x, y, "snowflake"));
+      }
+      AddChild(world2, layer);
+      for (let i = 0; i < 32; i++) {
+        const x = Between(0, 800);
+        const y = Between(0, 600);
+        AddChild(world2, new Sprite(x, y, "sonic"));
+      }
+      const mouse = new Mouse();
+      On(mouse, "pointerdown", () => {
+        layer.visible = !layer.visible;
       });
-      window["bob"] = rect;
-      AddChildren(layer, rect);
-      AddChildren(world2, layer);
     }
   };
   new Game(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(2960685), Scenes(Demo));
 })();
-/**
- * @author       Richard Davey <rich@photonstorm.com>
- * @copyright    2020 Photon Storm Ltd.
- * @license      {@link https://opensource.org/licenses/MIT|MIT License}
- */
-//# sourceMappingURL=rectangle effect layer.js.map
+//# sourceMappingURL=create layer.js.map

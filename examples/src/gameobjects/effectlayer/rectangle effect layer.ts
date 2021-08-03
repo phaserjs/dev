@@ -4,6 +4,7 @@ import { EffectLayer, Rectangle } from '../../../../../phaser-genesis/src/gameob
 import { AddChildren } from '../../../../../phaser-genesis/src/display';
 import { FXShader } from '../../../../../phaser-genesis/src/renderer/webgl1/shaders/FXShader';
 import { Game } from '../../../../../phaser-genesis/src/Game';
+import { On } from '../../../../../phaser-genesis/src/events';
 import { Scene } from '../../../../../phaser-genesis/src/scenes/Scene';
 import { StaticWorld } from '../../../../../phaser-genesis/src/world/StaticWorld';
 
@@ -443,15 +444,15 @@ class Demo extends Scene
         // const plasma = new FXShader({ fragmentShader: plasmaFragmentShader });
         // const sine = new FXShader({ fragmentShader: sineWaveFragmentShader });
         // const clouds = new FXShader({ fragmentShader: cloudsFragmentShader });
-        const flower = new FXShader({ fragmentShader: flowerFragmentShader });
-        const dots = new FXShader({ fragmentShader: dotsFragmentShader });
+        // const flower = new FXShader({ fragmentShader: flowerFragmentShader });
+        // const dots = new FXShader({ fragmentShader: dotsFragmentShader });
         const stars = new FXShader({ fragmentShader: starsFragmentShader });
 
         const world = new StaticWorld(this);
 
         const layer = new EffectLayer();
 
-        dots.timeScale = 0.001;
+        // dots.timeScale = 0.001;
         stars.timeScale = 0.001;
         // flower.timeScale = 0.001;
 
@@ -460,9 +461,17 @@ class Demo extends Scene
         // layer.shaders.push(sine);
         // layer.shaders.push(clouds);
         // layer.shaders.push(dots);
-        layer.shaders.push(stars);
+        // layer.shaders.push(stars);
 
         const rect = new Rectangle(400, 300, 512, 512);
+
+        On(world, 'update', () => {
+
+            rect.rotation += 0.01;
+
+        });
+
+        window['bob'] = rect;
 
         AddChildren(layer, rect);
 
