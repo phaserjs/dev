@@ -440,32 +440,36 @@ class Demo extends Scene
         super();
 
         // const plasma = new FXShader({ fragmentShader: plasmaFragmentShader });
-        // const sine = new FXShader({ fragmentShader: sineWaveFragmentShader });
+        const sine = new FXShader({ fragmentShader: sineWaveFragmentShader });
         // const clouds = new FXShader({ fragmentShader: cloudsFragmentShader });
-        // const flower = new FXShader({ fragmentShader: flowerFragmentShader });
-        // const dots = new FXShader({ fragmentShader: dotsFragmentShader });
+        const flower = new FXShader({ fragmentShader: flowerFragmentShader });
+        const dots = new FXShader({ fragmentShader: dotsFragmentShader });
         const stars = new FXShader({ fragmentShader: starsFragmentShader });
 
         const world = new StaticWorld(this);
 
         const layer = new EffectLayer();
-        const layer2 = new RenderLayer();
+        // const layer2 = new RenderLayer();
 
-        // dots.timeScale = 0.001;
+        dots.timeScale = 0.001;
         stars.timeScale = 0.001;
-        // flower.timeScale = 0.001;
+        flower.timeScale = 0.001;
 
         // layer.shaders.push(flower);
         // layer.shaders.push(plasma);
-        // layer.shaders.push(sine);
+        layer.shaders.push(stars);
+        layer.shaders.push(sine);
         // layer.shaders.push(clouds);
         // layer.shaders.push(dots);
-        // layer.shaders.push(stars);
 
-        const rect = new Rectangle(400, 300, 512, 512, 0xff0000);
+        const rect = new Rectangle(400, 300, 512, 512, 0xffffff);
+        // const rect2 = new Rectangle(400, 300, 256, 256, 0xffff00);
 
-        rect.rotation = 0.4;
         rect.skew.set(2, 1);
+
+        // setInterval(() => {
+        //     rect.rotation += 0.01;
+        // }, 1000);
 
         On(world, 'update', () => {
 
@@ -474,17 +478,15 @@ class Demo extends Scene
 
         });
 
-        window['bob'] = rect;
-
         // AddChildren(world, rect);
 
-        AddChildren(layer2, rect);
+        // AddChildren(layer2, rect);
 
-        // AddChildren(layer, rect);
+        AddChildren(layer, rect);
 
-        // AddChildren(world, layer);
+        // AddChildren(world, layer2);
 
-        AddChildren(world, layer2);
+        AddChildren(world, layer);
     }
 }
 
