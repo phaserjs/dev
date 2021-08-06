@@ -1,18 +1,18 @@
-import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../phaser-genesis/src/config';
-import { Between, Clamp, FloatBetween } from '../../../../phaser-genesis/src/math';
-import { DownKey, LeftKey, RightKey, UpKey } from '../../../../phaser-genesis/src/input/keyboard/keys';
-import { GetTexture, Texture } from '../../../../phaser-genesis/src/textures';
+import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../../phaser-genesis/src/config';
+import { Between, Clamp, FloatBetween } from '../../../../../phaser-genesis/src/math';
+import { DownKey, LeftKey, RightKey, UpKey } from '../../../../../phaser-genesis/src/input/keyboard/keys';
+import { GetTexture, Texture } from '../../../../../phaser-genesis/src/textures';
 
-import { AddChild } from '../../../../phaser-genesis/src/display';
-import { AtlasFile } from '../../../../phaser-genesis/src/loader/files';
-import { FlatWorld } from '../../../../phaser-genesis/src/world';
-import { Game } from '../../../../phaser-genesis/src/Game';
-import { GetRandom } from '../../../../phaser-genesis/src/utils/array/GetRandom';
-import { ImageFile } from '../../../../phaser-genesis/src/loader/files/ImageFile';
-import { Keyboard } from '../../../../phaser-genesis/src/input/keyboard';
-import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
-import { Sprite } from '../../../../phaser-genesis/src/gameobjects';
-import { WorldCamera } from '../../../../phaser-genesis/src/camera/WorldCamera';
+import { AddChild } from '../../../../../phaser-genesis/src/display';
+import { AtlasFile } from '../../../../../phaser-genesis/src/loader/files';
+import { FlatWorld } from '../../../../../phaser-genesis/src/world';
+import { Game } from '../../../../../phaser-genesis/src/Game';
+import { GetRandom } from '../../../../../phaser-genesis/src/utils/array/GetRandom';
+import { ImageFile } from '../../../../../phaser-genesis/src/loader/files/ImageFile';
+import { Keyboard } from '../../../../../phaser-genesis/src/input/keyboard';
+import { Scene } from '../../../../../phaser-genesis/src/scenes/Scene';
+import { Sprite } from '../../../../../phaser-genesis/src/gameobjects';
+import { WorldCamera } from '../../../../../phaser-genesis/src/camera/WorldCamera';
 
 class Demo extends Scene
 {
@@ -84,9 +84,9 @@ class Demo extends Scene
         //  Remove __BASE texture
         frames.shift();
 
-        for (let y = 0; y < 251; y++)
+        for (let y = 0; y < 512; y++)
         {
-            for (let x = 0; x < 251; x++)
+            for (let x = 0; x < 512; x++)
             {
                 const frame = GetRandom(frames);
 

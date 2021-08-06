@@ -1,5 +1,5 @@
 import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../../phaser-genesis/src/config';
-import { EffectLayer, Rectangle, RenderLayer } from '../../../../../phaser-genesis/src/gameobjects';
+import { EffectLayer, Rectangle, RenderLayer, Sprite } from '../../../../../phaser-genesis/src/gameobjects';
 
 import { AddChildren } from '../../../../../phaser-genesis/src/display';
 import { FXShader } from '../../../../../phaser-genesis/src/renderer/webgl1/shaders/FXShader';
@@ -439,17 +439,17 @@ class Demo extends Scene
     {
         super();
 
-        // const plasma = new FXShader({ fragmentShader: plasmaFragmentShader });
+        const plasma = new FXShader({ fragmentShader: plasmaFragmentShader });
         const sine = new FXShader({ fragmentShader: sineWaveFragmentShader });
-        // const clouds = new FXShader({ fragmentShader: cloudsFragmentShader });
+        const clouds = new FXShader({ fragmentShader: cloudsFragmentShader });
         const flower = new FXShader({ fragmentShader: flowerFragmentShader });
         const dots = new FXShader({ fragmentShader: dotsFragmentShader });
         const stars = new FXShader({ fragmentShader: starsFragmentShader });
 
         const world = new StaticWorld(this);
 
-        const layer = new EffectLayer();
-        // const layer2 = new RenderLayer();
+        // const layer = new EffectLayer();
+        const layer2 = new RenderLayer();
 
         dots.timeScale = 0.001;
         stars.timeScale = 0.001;
@@ -457,36 +457,38 @@ class Demo extends Scene
 
         // layer.shaders.push(flower);
         // layer.shaders.push(plasma);
-        layer.shaders.push(stars);
-        layer.shaders.push(sine);
+        // layer.shaders.push(stars);
+        // layer.shaders.push(sine);
         // layer.shaders.push(clouds);
         // layer.shaders.push(dots);
 
-        const rect = new Rectangle(400, 300, 512, 512, 0xffffff);
-        // const rect2 = new Rectangle(400, 300, 256, 256, 0xffff00);
+        const rect = new Rectangle(400, 300, 512, 512, 0xff00ff);
+        const rect2 = new Rectangle(400, 300, 256, 256, 0xffff00);
 
         rect.skew.set(2, 1);
 
-        // setInterval(() => {
-        //     rect.rotation += 0.01;
-        // }, 1000);
-
         On(world, 'update', () => {
 
-            rect.rotation += 0.01;
-            // rect.x += 1;
+            // rect.rotation += 0.01;
 
         });
 
-        // AddChildren(world, rect);
+        setInterval(() => {
 
-        // AddChildren(layer2, rect);
+            rect.rotation += 0.02;
 
-        AddChildren(layer, rect);
+        }, 1000);
 
-        // AddChildren(world, layer2);
+        AddChildren(layer2, rect, rect2);
 
-        AddChildren(world, layer);
+        AddChildren(world, layer2);
+
+        // const bob = new Sprite(200, 300, layer2.texture).setScale(0.5);
+
+        // AddChildren(world, bob);
+
+        // AddChildren(layer, rect);
+        // AddChildren(world, layer);
     }
 }
 

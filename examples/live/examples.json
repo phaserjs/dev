@@ -512,12 +512,12 @@
             {
               "path": "examples/live/gameobjects/effectlayer/rectangle effect layer.js",
               "name": "rectangle effect layer.js",
-              "size": 154645,
+              "size": 161144,
               "extension": ".js",
               "type": "file"
             }
           ],
-          "size": 659909,
+          "size": 666408,
           "type": "directory"
         },
         {
@@ -694,7 +694,7 @@
           "type": "directory"
         }
       ],
-      "size": 5445086,
+      "size": 5451585,
       "type": "directory"
     },
     {
@@ -796,11 +796,33 @@
       "name": "test",
       "children": [
         {
+          "path": "examples/live/test/bounds.js",
+          "name": "bounds.js",
+          "size": 155333,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
           "path": "examples/live/test/bundle.js",
           "name": "bundle.js",
           "size": 101891,
           "extension": ".js",
           "type": "file"
+        },
+        {
+          "path": "examples/live/test/camera",
+          "name": "camera",
+          "children": [
+            {
+              "path": "examples/live/test/camera/flat world camera.js",
+              "name": "flat world camera.js",
+              "size": 155475,
+              "extension": ".js",
+              "type": "file"
+            }
+          ],
+          "size": 155475,
+          "type": "directory"
         },
         {
           "path": "examples/live/test/gamedraw.js",
@@ -838,6 +860,13 @@
           "type": "file"
         },
         {
+          "path": "examples/live/test/maxrender.js",
+          "name": "maxrender.js",
+          "size": 155241,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
           "path": "examples/live/test/renderdraw.js",
           "name": "renderdraw.js",
           "size": 88661,
@@ -852,7 +881,7 @@
           "type": "file"
         }
       ],
-      "size": 744028,
+      "size": 1210077,
       "type": "directory"
     },
     {
@@ -927,6 +956,6 @@
       "type": "directory"
     }
   ],
-  "size": 16534818,
+  "size": 17007366,
   "type": "directory"
 }
