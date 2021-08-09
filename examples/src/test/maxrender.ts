@@ -1,4 +1,4 @@
-import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../phaser-genesis/src/config';
+import { BackgroundColor, BatchSize, GlobalVar, Parent, Scenes, WebGL } from '../../../../phaser-genesis/src/config';
 import { DownKey, LeftKey, RightKey, UpKey } from '../../../../phaser-genesis/src/input/keyboard/keys';
 
 import { AddChild } from '../../../../phaser-genesis/src/display';
@@ -49,6 +49,10 @@ class Demo extends Scene
         
         this.camera = world.camera;
 
+        // http://192.168.0.100/dev/examples/live/debug.html?f=test/maxrender.js
+
+        /*
+        //  200,000 draws at 50fps solid (with batch of 2048)
         const texture = GetTexture('brain');
 
         On(world, 'worldpostrender', (renderPass) => {
@@ -56,7 +60,7 @@ class Demo extends Scene
             let x = 0;
             let y = 0;
 
-            for (let i = 0; i < 50000; i++)
+            for (let i = 0; i < 200000; i++)
             {
                 DrawImage(renderPass, texture, x, y);
     
@@ -69,11 +73,12 @@ class Demo extends Scene
                 }
             }
         });
+        */
 
-        /*
         let x = 0;
         let y = 0;
 
+        //  100,000 sprites at 50fps solid (with batch of 4096)
         for (let i = 0; i < 100000; i++)
         {
             AddChild(world, new Sprite(x, y, 'brain'));
@@ -86,9 +91,6 @@ class Demo extends Scene
                 y += 2;
             }
         }
-
-        console.log(world);
-        */
     }
 
     update (): void
@@ -120,6 +122,7 @@ class Demo extends Scene
 
 new Game(
     WebGL(),
+    BatchSize(4096),
     Parent('gameParent'),
     GlobalVar('Phaser4'),
     BackgroundColor(0x0a0a0a),
