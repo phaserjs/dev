@@ -21,12 +21,12 @@
   },
   "homepage": "https://github.com/phaserjs/dev#readme",
   "devDependencies": {
-    "@tweakpane/core": "^1.0.5",
+    "@tweakpane/core": "^1.0.6",
     "bitecs": "^0.3.16-3-alpha",
     "boxen": "^5.0.1",
     "chalk": "^4.1.2",
     "directory-tree": "^2.2.9",
-    "esbuild": "^0.12.17",
+    "esbuild": "^0.12.19",
     "esbuild-plugin-ifdef": "^1.0.1",
     "filesize": "^7.0.0",
     "fs-extra": "^10.0.0",
@@ -34,12 +34,12 @@
     "gzip-size": "^6.0.0",
     "tslib": "^2.3.0",
     "typescript": "^4.3.5",
-    "yargs": "^17.0.1"
+    "yargs": "^17.1.0"
   },
   "dependencies": {
     "@phaserjs/phaser": "^0.1.19",
-    "http-server": "^0.12.3",
+    "http-server": "^13.0.0",
     "terminal-kit": "^2.1.6",
-    "tweakpane": "^3.0.4"
+    "tweakpane": "^3.0.5"
   }
 }
