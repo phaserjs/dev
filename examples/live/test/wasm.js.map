@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../src/test/wasm.ts"],
+  "sourcesContent": ["import exampleWasm from '../../../rustwasm/target/wasm32-unknown-unknown/debug/rustwasm.wasm';\r\n\r\nasync function run ()\r\n{\r\n    let { instance } = await WebAssembly.instantiate(exampleWasm);\r\n}\r\n\r\nrun();\r\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;;;;;AAEA,uBACA;AACI,QAAI,EAAE,aAAa,MAAM,YAAY,YAAY;AAAA;AAGrD;",
+  "names": []
+}

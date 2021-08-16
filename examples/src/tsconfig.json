@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
-        "target": "esnext",
+        "module": "esnext",
+        "target": "es2017",
         "moduleResolution": "node",
         "allowSyntheticDefaultImports": true,
         "suppressImplicitAnyIndexErrors": true,

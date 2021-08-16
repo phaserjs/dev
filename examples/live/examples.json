@@ -253,7 +253,7 @@
         {
           "path": "examples/live/display/add child.js",
           "name": "add child.js",
-          "size": 162298,
+          "size": 155785,
           "extension": ".js",
           "type": "file"
         },
@@ -307,6 +307,13 @@
           "type": "file"
         },
         {
+          "path": "examples/live/display/linkedlist.js",
+          "name": "linkedlist.js",
+          "size": 155787,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
           "path": "examples/live/display/mass child test.js",
           "name": "mass child test.js",
           "size": 162551,
@@ -342,7 +349,7 @@
           "type": "file"
         }
       ],
-      "size": 2468873,
+      "size": 2618147,
       "type": "directory"
     },
     {
@@ -848,7 +855,7 @@
         {
           "path": "examples/live/test/image.js",
           "name": "image.js",
-          "size": 120104,
+          "size": 153047,
           "extension": ".js",
           "type": "file"
         },
@@ -862,7 +869,7 @@
         {
           "path": "examples/live/test/maxrender.js",
           "name": "maxrender.js",
-          "size": 155241,
+          "size": 157854,
           "extension": ".js",
           "type": "file"
         },
@@ -879,9 +886,16 @@
           "size": 38627,
           "extension": ".js",
           "type": "file"
+        },
+        {
+          "path": "examples/live/test/wasm.js",
+          "name": "wasm.js",
+          "size": 2030910,
+          "extension": ".js",
+          "type": "file"
         }
       ],
-      "size": 1210077,
+      "size": 3276543,
       "type": "directory"
     },
     {
@@ -956,6 +970,6 @@
       "type": "directory"
     }
   ],
-  "size": 17007366,
+  "size": 19223106,
   "type": "directory"
 }

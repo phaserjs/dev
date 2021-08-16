@@ -4068,14 +4068,13 @@ void main (void)
   function DebugHierarchyComponent(id) {
     const hc = HierarchyComponent;
     console.group(`Entity ID: ${id}`);
-    console.log(`world: ${hc.world[id]}`);
-    console.log(`parent: ${hc.parent[id]}`);
-    console.log(`index: ${hc.index[id]}`);
-    console.log(`next: ${hc.next[id]}`);
-    console.log(`prev: ${hc.prev[id]}`);
-    console.log(`first: ${hc.first[id]}`);
-    console.log(`last: ${hc.last[id]}`);
-    console.log(`numChildren: ${hc.numChildren[id]}`);
+    console.log(`index: ${hc.index[id]} - parent: ${hc.parent[id]} - world: ${hc.world[id]}`);
+    console.log(`> next: ${hc.next[id]}      < prev: ${hc.prev[id]}`);
+    if (hc.numChildren[id] > 0) {
+      console.log(`first: ${hc.first[id]}`);
+      console.log(`last: ${hc.last[id]}`);
+      console.log(`numChildren: ${hc.numChildren[id]}`);
+    }
     console.groupEnd();
   }
 
@@ -4684,6 +4683,42 @@ void main (void)
     return RequestFile(file, preload, onload, fileData);
   }
 
+  // ../phaser-genesis/src/components/hierarchy/GetFirstChildID.ts
+  function GetFirstChildID(id) {
+    return HierarchyComponent.first[id];
+  }
+
+  // ../phaser-genesis/src/components/hierarchy/GetNextSiblingID.ts
+  function GetNextSiblingID(id) {
+    return HierarchyComponent.next[id];
+  }
+
+  // ../phaser-genesis/src/world/IterateWorld.ts
+  function IterateWorld(world2) {
+    const output = [];
+    const worldID = world2.id;
+    let next = GetFirstChildID(worldID);
+    while (next > 0) {
+      output.push(next);
+      if (GetNumChildren(next)) {
+        next = GetFirstChildID(next);
+      } else {
+        const sibling = GetNextSiblingID(next);
+        if (sibling === 0) {
+          const parent = GetParentID(next);
+          if (parent === worldID) {
+            next = 0;
+          } else {
+            next = GetNextSiblingID(parent);
+          }
+        } else {
+          next = sibling;
+        }
+      }
+    }
+    return output;
+  }
+
   // ../phaser-genesis/src/components/bounds/BoundsIntersects.ts
   function BoundsIntersects(id, x, y, right, bottom) {
     if (hasComponent(GameObjectWorld, BoundsComponent, id)) {
@@ -5281,19 +5316,35 @@ void main (void)
     }
   };
 
-  // examples/src/display/add child.ts
+  // examples/src/display/linkedlist.ts
   var Demo = class extends Scene {
     constructor() {
       super();
       this.create();
     }
     async create() {
-      await ImageFile("gundam", "assets/gundam-ex-maxi-on-half.jpg");
+      await ImageFile("carrot", "assets/carrot.png");
       const world2 = new StaticWorld(this);
-      const child = new Sprite(400, 300, "gundam");
-      AddChild(world2, child);
+      const childA = new Sprite(400, 300, "carrot");
+      const childB = new Sprite(400, 300, "carrot");
+      const childC = new Sprite(400, 300, "carrot");
+      const childD = new Sprite(400, 300, "carrot");
+      const childE = new Sprite(400, 300, "carrot");
+      const childF = new Sprite(400, 300, "carrot");
+      AddChild(world2, childA);
+      AddChild(world2, childB);
+      AddChild(world2, childC);
+      AddChild(childA, childD);
+      AddChild(childA, childE);
+      AddChild(childC, childF);
       DebugHierarchyComponent(world2.id);
-      DebugHierarchyComponent(child.id);
+      DebugHierarchyComponent(childA.id);
+      DebugHierarchyComponent(childB.id);
+      DebugHierarchyComponent(childC.id);
+      DebugHierarchyComponent(childD.id);
+      DebugHierarchyComponent(childE.id);
+      DebugHierarchyComponent(childF.id);
+      console.log(IterateWorld(world2));
     }
   };
   new Game(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(657930), Scenes(Demo));
@@ -5303,4 +5354,4 @@ void main (void)
  * @copyright    2020 Photon Storm Ltd.
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
  */
-//# sourceMappingURL=add child.js.map
+//# sourceMappingURL=linkedlist.js.map

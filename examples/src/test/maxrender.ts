@@ -79,7 +79,7 @@ class Demo extends Scene
         let y = 0;
 
         //  100,000 sprites at 50fps solid (with batch of 4096)
-        for (let i = 0; i < 100000; i++)
+        for (let i = 0; i < 50000; i++)
         {
             AddChild(world, new Sprite(x, y, 'brain'));
 
