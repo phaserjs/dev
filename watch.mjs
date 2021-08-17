@@ -4,7 +4,9 @@ import esbuild from 'esbuild';
 import fs from 'fs-extra';
 import { hideBin } from 'yargs/helpers';
 import ifdef from 'esbuild-plugin-ifdef';
+import inlineWorkerPlugin from 'esbuild-plugin-inline-worker';
 import terminalKit from 'terminal-kit';
+import watPlugin from 'esbuild-plugin-wat';
 import yargs from 'yargs';
 
 const term = terminalKit.terminal;
@@ -98,6 +100,8 @@ const spinner = await new terminalKit.AnimatedText({
 // define,
 // plugins: [ ifdef(define) ],
 
+// https://github.com/mitschabaude/esbuild-plugin-inline-worker
+
 esbuild.build({
     entryPoints: [ pathTS ],
     outfile: pathJS,
@@ -105,6 +109,10 @@ esbuild.build({
     sourcemap: true,
     minify: false,
     bundle: true,
+    plugins: [ inlineWorkerPlugin(), watPlugin({
+        loader: 'binary', // what loader esbuild should use to load the .wasm file. Default: 'binary'
+        inlineFunctions: false, // optimize .wasm/.wat files by inlining all functions. Default: false
+      }) ],
     watch: {
         onRebuild(error, result)
         {
