@@ -16,6 +16,7 @@ import { WorldCamera } from '../../../../phaser-genesis/src/camera/WorldCamera';
 
 class Star extends Sprite
 {
+    // i: number;
     speed: number;
 
     constructor ()
@@ -23,10 +24,19 @@ class Star extends Sprite
         super(Between(-8000, 8000), Between(-8000, 8000), 'snow');
 
         this.speed = Between(1, 8);
+
+        // this.i = 0;
     }
 
     update (): void
     {
+        // if (this.i > 10)
+        // {
+        //     return;
+        // }
+
+        // this.i++;
+
         this.position.x -= this.speed;
 
         if (this.position.x < -8000)
@@ -72,7 +82,14 @@ class Demo extends Scene
         
         this.camera = world.camera;
 
-        for (let i = 0; i < 100000; i++)
+        //  PC = 100k @ 50fps
+        //  PC = 80k @ 55fps
+        //  PC = 75k @ 60fps
+
+        // for (let i = 0; i < 100000; i++)
+        // for (let i = 0; i < 80000; i++)
+        // for (let i = 0; i < 75000; i++)
+        for (let i = 0; i < 50000; i++)
         {
             // const star = new Star();
             // const star = new Sprite(400, 300, 'snow');
