@@ -10,6 +10,7 @@ Thumbs.db
 *.suo
 *.sublime-project
 *.sublime-workspace
+rustwasm
 
 # Logs
 logs
