@@ -78,8 +78,9 @@ class Demo extends Scene
         let x = 0;
         let y = 0;
 
-        //  100,000 sprites at 50fps solid (with batch of 4096)
-        for (let i = 0; i < 50000; i++)
+        //  100,000 sprites at 60fps solid (with batch of 4096)
+        // for (let i = 0; i < 100000; i++)
+        for (let i = 0; i < 200000; i++)
         {
             AddChild(world, new Sprite(x, y, 'brain'));
 
@@ -122,7 +123,7 @@ class Demo extends Scene
 
 new Game(
     WebGL(),
-    BatchSize(4096),
+    BatchSize(1024),
     Parent('gameParent'),
     GlobalVar('Phaser4'),
     BackgroundColor(0x0a0a0a),

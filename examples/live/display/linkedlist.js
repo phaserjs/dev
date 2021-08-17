@@ -4064,20 +4064,6 @@ void main (void)
     }
   };
 
-  // ../phaser-genesis/src/components/hierarchy/DebugHierarchyComponent.ts
-  function DebugHierarchyComponent(id) {
-    const hc = HierarchyComponent;
-    console.group(`Entity ID: ${id}`);
-    console.log(`index: ${hc.index[id]} - parent: ${hc.parent[id]} - world: ${hc.world[id]}`);
-    console.log(`> next: ${hc.next[id]}      < prev: ${hc.prev[id]}`);
-    if (hc.numChildren[id] > 0) {
-      console.log(`first: ${hc.first[id]}`);
-      console.log(`last: ${hc.last[id]}`);
-      console.log(`numChildren: ${hc.numChildren[id]}`);
-    }
-    console.groupEnd();
-  }
-
   // ../phaser-genesis/src/config/banner/AddBanner.ts
   function AddBanner() {
     const { title, version, url, color, background } = ConfigStore.get(CONFIG_DEFAULTS.BANNER);
@@ -4683,42 +4669,6 @@ void main (void)
     return RequestFile(file, preload, onload, fileData);
   }
 
-  // ../phaser-genesis/src/components/hierarchy/GetFirstChildID.ts
-  function GetFirstChildID(id) {
-    return HierarchyComponent.first[id];
-  }
-
-  // ../phaser-genesis/src/components/hierarchy/GetNextSiblingID.ts
-  function GetNextSiblingID(id) {
-    return HierarchyComponent.next[id];
-  }
-
-  // ../phaser-genesis/src/world/IterateWorld.ts
-  function IterateWorld(world2) {
-    const output = [];
-    const worldID = world2.id;
-    let next = GetFirstChildID(worldID);
-    while (next > 0) {
-      output.push(next);
-      if (GetNumChildren(next)) {
-        next = GetFirstChildID(next);
-      } else {
-        const sibling = GetNextSiblingID(next);
-        if (sibling === 0) {
-          const parent = GetParentID(next);
-          if (parent === worldID) {
-            next = 0;
-          } else {
-            next = GetNextSiblingID(parent);
-          }
-        } else {
-          next = sibling;
-        }
-      }
-    }
-    return output;
-  }
-
   // ../phaser-genesis/src/components/bounds/BoundsIntersects.ts
   function BoundsIntersects(id, x, y, right, bottom) {
     if (hasComponent(GameObjectWorld, BoundsComponent, id)) {
@@ -5050,77 +5000,44 @@ void main (void)
     SetCamera(renderPass, camera);
   }
 
-  // ../phaser-genesis/src/config/worldsize/GetWorldSize.ts
-  function GetWorldSize() {
-    return ConfigStore.get(CONFIG_DEFAULTS.WORLD_SIZE);
+  // ../phaser-genesis/src/components/hierarchy/GetFirstChildID.ts
+  function GetFirstChildID(id) {
+    return HierarchyComponent.first[id];
   }
 
-  // ../phaser-genesis/src/world/AddToRenderList.ts
-  function AddToRenderList(world2, id, renderType) {
-    let len = world2.listLength;
-    const list = world2.renderList;
-    if (len > 0) {
-      const prevEntity = list[len - 1];
-      const prevType = list[len];
-      if (prevEntity === id && prevType === 0 && renderType === 1) {
-        list[len - 1] = 2;
-        return;
-      }
-    }
-    list[len] = id;
-    list[len + 1] = renderType;
-    world2.listLength += 2;
-    len += 2;
-    if (len === list.length) {
-      const newList = new Uint32Array(len + GetWorldSize() * 4);
-      newList.set(list, 0);
-      world2.renderList = newList;
-    }
+  // ../phaser-genesis/src/components/hierarchy/GetNextSiblingID.ts
+  function GetNextSiblingID(id) {
+    return HierarchyComponent.next[id];
   }
 
-  // ../phaser-genesis/src/world/RebuildWorldList.ts
-  function RebuildWorldList(world2, parent) {
-    if (WillRender(parent)) {
-      if (HasRenderableChildren(parent)) {
-        if (parent !== world2.id) {
-          AddToRenderList(world2, parent, 0);
+  // ../phaser-genesis/src/components/hierarchy/MoveNextRenderable.ts
+  function MoveNextRenderable(id) {
+    const firstChild = GetFirstChildID(id);
+    if (firstChild > 0 && WillRenderChildren(id)) {
+      return firstChild;
+    } else {
+      const sibling = GetNextSiblingID(id);
+      if (sibling === 0) {
+        const parent = GetParentID(id);
+        if (parent === GetWorldID(id)) {
+          return 0;
+        } else {
+          return GetNextSiblingID(parent);
         }
-        const children = GameObjectTree.get(parent);
-        for (let i = 0; i < children.length; i++) {
-          const childID = children[i];
-          if (WillRender(childID)) {
-            RebuildWorldList(world2, childID);
-          }
-        }
-        AddToRenderList(world2, parent, 1);
-      } else if (parent !== world2.id) {
-        AddToRenderList(world2, parent, 2);
+      } else {
+        return sibling;
       }
     }
   }
 
   // ../phaser-genesis/src/world/RebuildWorldTransforms.ts
-  function RebuildWorldTransforms(world2, parent, forceUpdate) {
-    if (WillRender(parent)) {
-      if (!forceUpdate && HasDirtyTransform(parent)) {
-        forceUpdate = true;
+  function RebuildWorldTransforms(world2) {
+    let next = GetFirstChildID(world2.id);
+    while (next > 0) {
+      if (WillRender(next) && HasDirtyTransform(next)) {
+        UpdateWorldTransform(next);
       }
-      if (forceUpdate && hasComponent(GameObjectWorld, Transform2DComponent, parent)) {
-        UpdateWorldTransform(parent);
-      }
-      const children = GameObjectTree.get(parent);
-      for (let i = 0; i < children.length; i++) {
-        const nodeID = children[i];
-        if (WillRender(nodeID)) {
-          if (GetNumChildren(nodeID) > 0) {
-            if (WillRenderChildren(nodeID)) {
-              RebuildWorldTransforms(world2, nodeID, forceUpdate);
-            }
-          } else if (forceUpdate || HasDirtyTransform(nodeID)) {
-            UpdateWorldTransform(nodeID);
-          }
-        }
-      }
+      next = MoveNextRenderable(next);
     }
   }
 
@@ -5223,7 +5140,6 @@ void main (void)
       this.camera = new WorldCamera(renderer.width, renderer.height);
     }
     preRender(gameFrame) {
-      return true;
       const id = this.id;
       ResetWorldRenderData(id, gameFrame);
       RenderDataComponent.rebuiltList[id] = 0;
@@ -5233,21 +5149,30 @@ void main (void)
       RenderDataComponent.dirtyLocal[id] = totalDirty;
       const dirtyDisplayList = HasDirtyDisplayList(id);
       if (dirtyDisplayList || totalDirty > 0) {
-        RebuildWorldTransforms(this, id, false);
+        RebuildWorldTransforms(this);
         RenderDataComponent.rebuiltWorld[id] = 1;
         this.getNumChildren();
-      }
-      UpdateVertexPositionSystem(id, GameObjectWorld, this.transformQuery);
-      if (dirtyDisplayList) {
-        this.listLength = 0;
-        RebuildWorldList(this, id);
-        RenderDataComponent.numChildren[id] = this.getNumChildren();
-        RenderDataComponent.numRenderable[id] = this.listLength / 4;
-        RenderDataComponent.rebuiltList[id] = 1;
         ClearDirtyDisplayList(id);
       }
+      UpdateVertexPositionSystem(id, GameObjectWorld, this.transformQuery);
       UpdateQuadColorSystem(id, GameObjectWorld, this.colorQuery);
       return true;
+    }
+    listRender(renderPass, x, y, right, bottom) {
+      let next = GetFirstChildID(this.id);
+      while (next > 0) {
+        if (WillRender(next)) {
+          const intersects = BoundsIntersects(next, x, y, right, bottom);
+          let gameObject;
+          if (intersects) {
+            gameObject = GameObjectCache.get(next);
+            this.rendered++;
+            gameObject.renderGL(renderPass);
+            gameObject.postRenderGL(renderPass);
+          }
+        }
+        next = MoveNextRenderable(next);
+      }
     }
     runRender(renderPass, entry, x, y, right, bottom) {
       if (WillRender(entry)) {
@@ -5285,21 +5210,7 @@ void main (void)
       Begin(renderPass, camera);
       const [x, y, right, bottom] = camera.getBounds();
       this.rendered = 0;
-      const list = this.renderList;
-      for (let i = 0; i < this.listLength; i += 2) {
-        const eid = list[i];
-        const type = list[i + 1];
-        const entry = GameObjectCache.get(eid);
-        if (type === 1) {
-          entry.postRenderGL(renderPass);
-        } else if (BoundsIntersects(eid, x, y, right, bottom)) {
-          entry.renderGL(renderPass);
-          if (type === 2) {
-            entry.postRenderGL(renderPass);
-          }
-          this.rendered++;
-        }
-      }
+      this.listRender(renderPass, x, y, right, bottom);
       PopColor(renderPass, this.color);
       const id = this.id;
       window["renderStats"] = {
@@ -5324,27 +5235,20 @@ void main (void)
     }
     async create() {
       await ImageFile("carrot", "assets/carrot.png");
+      await ImageFile("clown", "assets/clown.png");
       const world2 = new StaticWorld(this);
-      const childA = new Sprite(400, 300, "carrot");
+      const childA = new Sprite(200, 300, "carrot");
       const childB = new Sprite(400, 300, "carrot");
-      const childC = new Sprite(400, 300, "carrot");
-      const childD = new Sprite(400, 300, "carrot");
-      const childE = new Sprite(400, 300, "carrot");
-      const childF = new Sprite(400, 300, "carrot");
+      const childC = new Sprite(600, 300, "carrot");
+      const childD = new Sprite(0, 50, "clown");
+      const childE = new Sprite(0, 100, "clown");
+      const childF = new Sprite(0, 50, "clown");
       AddChild(world2, childA);
       AddChild(world2, childB);
       AddChild(world2, childC);
       AddChild(childA, childD);
       AddChild(childA, childE);
       AddChild(childC, childF);
-      DebugHierarchyComponent(world2.id);
-      DebugHierarchyComponent(childA.id);
-      DebugHierarchyComponent(childB.id);
-      DebugHierarchyComponent(childC.id);
-      DebugHierarchyComponent(childD.id);
-      DebugHierarchyComponent(childE.id);
-      DebugHierarchyComponent(childF.id);
-      console.log(IterateWorld(world2));
     }
   };
   new Game(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(657930), Scenes(Demo));

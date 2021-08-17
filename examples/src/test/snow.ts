@@ -1,15 +1,40 @@
-import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../phaser-genesis/src/config';
+import { BackgroundColor, BatchSize, GlobalVar, Parent, Scenes, WebGL } from '../../../../phaser-genesis/src/config';
 import { DownKey, LeftKey, RightKey, UpKey } from '../../../../phaser-genesis/src/input/keyboard/keys';
 
 import { AddChild } from '../../../../phaser-genesis/src/display';
 import { Between } from '../../../../phaser-genesis/src/math';
+import { DrawImage } from '../../../../phaser-genesis/src/renderer/webgl1/draw';
 import { Game } from '../../../../phaser-genesis/src/Game';
+import { GetTexture } from '../../../../phaser-genesis/src/textures';
 import { ImageFile } from '../../../../phaser-genesis/src/loader/files/ImageFile';
 import { Keyboard } from '../../../../phaser-genesis/src/input/keyboard';
+import { On } from '../../../../phaser-genesis/src/events';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
 import { Sprite } from '../../../../phaser-genesis/src/gameobjects';
 import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
 import { WorldCamera } from '../../../../phaser-genesis/src/camera/WorldCamera';
+
+class Star extends Sprite
+{
+    speed: number;
+
+    constructor ()
+    {
+        super(Between(-8000, 8000), Between(-8000, 8000), 'snow');
+
+        this.speed = Between(1, 8);
+    }
+
+    update (): void
+    {
+        this.position.x -= this.speed;
+
+        if (this.position.x < -8000)
+        {
+            this.position.x = 8000;
+        }
+    }
+}
 
 class Demo extends Scene
 {
@@ -40,27 +65,27 @@ class Demo extends Scene
 
     async create ()
     {
-        await ImageFile('brain', 'assets/mushroom-32x32.png');
+        // await ImageFile('snow', 'assets/snowflake-pixel.png');
+        await ImageFile('snow', 'assets/cybertank-bullet.png');
 
         const world = new StaticWorld(this);
         
         this.camera = world.camera;
 
-        //  500,000 Sprites at 50fps with update disabled, 45fps with update running
-
-        //  Biggest cost is listRender iterating all half million Sprites
-        //  Need a way to grab only those intersecting with the camera
-
-        for (let i = 0; i < 500000; i++)
+        for (let i = 0; i < 100000; i++)
         {
-            const x = Between(-50000, 50000);
-            const y = Between(-50000, 50000);
+            // const star = new Star();
+            // const star = new Sprite(400, 300, 'snow');
 
-            AddChild(world, new Sprite(x, y, 'brain'));
+            // if (i % 1000 === 0)
+            // {
+            //     console.log(star);
+            // }
+
+            // AddChild(world, star);
+
+            AddChild(world, new Star());
         }
-
-
-        console.log(world);
     }
 
     update (): void
@@ -92,6 +117,7 @@ class Demo extends Scene
 
 new Game(
     WebGL(),
+    BatchSize(4096),
     Parent('gameParent'),
     GlobalVar('Phaser4'),
     BackgroundColor(0x0a0a0a),

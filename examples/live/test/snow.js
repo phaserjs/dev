@@ -46,6 +46,13 @@
     ConfigStore.set(CONFIG_DEFAULTS.BATCH_SIZE, size);
   }
 
+  // ../phaser-genesis/src/config/batchsize/BatchSize.ts
+  function BatchSize(size) {
+    return () => {
+      SetBatchSize(size);
+    };
+  }
+
   // ../phaser-genesis/src/renderer/BindingQueue.ts
   var queue = [];
   var BindingQueue = {
@@ -2185,7 +2192,7 @@ void main (void)
   var BoundsComponent = Bounds;
 
   // ../phaser-genesis/src/GameObjectWorld.ts
-  setDefaultSize(55e4);
+  setDefaultSize(25e4);
   var world = createWorld();
   var GameObjectWorld = world;
 
@@ -4958,6 +4965,11 @@ void main (void)
     return Boolean(PermissionsComponent.willUpdate[id]);
   }
 
+  // ../phaser-genesis/src/components/permissions/WillUpdateChildren.ts
+  function WillUpdateChildren(id) {
+    return Boolean(PermissionsComponent.willUpdateChildren[id]);
+  }
+
   // ../phaser-genesis/src/components/transform/CopyLocalToWorld.ts
   function CopyLocalToWorld(source, target) {
     Transform2DComponent.world[target].set(Transform2DComponent.local[source]);
@@ -5223,6 +5235,26 @@ void main (void)
     }
   }
 
+  // ../phaser-genesis/src/components/hierarchy/MoveNextUpdatable.ts
+  function MoveNextUpdatable(id) {
+    const firstChild = GetFirstChildID(id);
+    if (firstChild > 0 && WillUpdateChildren(id)) {
+      return firstChild;
+    } else {
+      const sibling = GetNextSiblingID(id);
+      if (sibling === 0) {
+        const parent = GetParentID(id);
+        if (parent === GetWorldID(id)) {
+          return 0;
+        } else {
+          return GetNextSiblingID(parent);
+        }
+      } else {
+        return sibling;
+      }
+    }
+  }
+
   // ../phaser-genesis/src/world/RebuildWorldTransforms.ts
   function RebuildWorldTransforms(world2) {
     let next = GetFirstChildID(world2.id);
@@ -5351,6 +5383,17 @@ void main (void)
       UpdateQuadColorSystem(id, GameObjectWorld, this.colorQuery);
       return true;
     }
+    update(delta, time) {
+      this.beforeUpdate(delta, time);
+      let next = GetFirstChildID(this.id);
+      while (next > 0) {
+        if (WillUpdate(next)) {
+          GameObjectCache.get(next).update(delta, time);
+        }
+        next = MoveNextUpdatable(next);
+      }
+      this.afterUpdate(delta, time);
+    }
     listRender(renderPass, x, y, right, bottom) {
       let next = GetFirstChildID(this.id);
       while (next > 0) {
@@ -5420,7 +5463,19 @@ void main (void)
     }
   };
 
-  // examples/src/test/bounds.ts
+  // examples/src/test/snow.ts
+  var Star = class extends Sprite {
+    constructor() {
+      super(Between(-8e3, 8e3), Between(-8e3, 8e3), "snow");
+      this.speed = Between(1, 8);
+    }
+    update() {
+      this.position.x -= this.speed;
+      if (this.position.x < -8e3) {
+        this.position.x = 8e3;
+      }
+    }
+  };
   var Demo = class extends Scene {
     constructor() {
       super();
@@ -5434,15 +5489,12 @@ void main (void)
       this.create();
     }
     async create() {
-      await ImageFile("brain", "assets/mushroom-32x32.png");
+      await ImageFile("snow", "assets/cybertank-bullet.png");
       const world2 = new StaticWorld(this);
       this.camera = world2.camera;
-      for (let i = 0; i < 5e5; i++) {
-        const x = Between(-5e4, 5e4);
-        const y = Between(-5e4, 5e4);
-        AddChild(world2, new Sprite(x, y, "brain"));
+      for (let i = 0; i < 1e5; i++) {
+        AddChild(world2, new Star());
       }
-      console.log(world2);
     }
     update() {
       if (!this.camera) {
@@ -5460,11 +5512,11 @@ void main (void)
       }
     }
   };
-  new Game(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(657930), Scenes(Demo));
+  new Game(WebGL(), BatchSize(4096), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(657930), Scenes(Demo));
 })();
 /**
  * @author       Richard Davey <rich@photonstorm.com>
  * @copyright    2020 Photon Storm Ltd.
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
  */
-//# sourceMappingURL=bounds.js.map
+//# sourceMappingURL=snow.js.map

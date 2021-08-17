@@ -21,16 +21,17 @@ class Demo extends Scene
     async create ()
     {
         await ImageFile('carrot', 'assets/carrot.png');
+        await ImageFile('clown', 'assets/clown.png');
 
         const world = new StaticWorld(this);
 
-        const childA = new Sprite(400, 300, 'carrot');
+        const childA = new Sprite(200, 300, 'carrot');
         const childB = new Sprite(400, 300, 'carrot');
-        const childC = new Sprite(400, 300, 'carrot');
+        const childC = new Sprite(600, 300, 'carrot');
 
-        const childD = new Sprite(400, 300, 'carrot');
-        const childE = new Sprite(400, 300, 'carrot');
-        const childF = new Sprite(400, 300, 'carrot');
+        const childD = new Sprite(0, 50, 'clown');
+        const childE = new Sprite(0, 100, 'clown');
+        const childF = new Sprite(0, 50, 'clown');
 
         AddChild(world, childA);
         AddChild(world, childB);
@@ -40,16 +41,16 @@ class Demo extends Scene
         AddChild(childA, childE);
         AddChild(childC, childF);
 
-        DebugHierarchyComponent(world.id);
+        // DebugHierarchyComponent(world.id);
 
-        DebugHierarchyComponent(childA.id);
-        DebugHierarchyComponent(childB.id);
-        DebugHierarchyComponent(childC.id);
-        DebugHierarchyComponent(childD.id);
-        DebugHierarchyComponent(childE.id);
-        DebugHierarchyComponent(childF.id);
+        // DebugHierarchyComponent(childA.id);
+        // DebugHierarchyComponent(childB.id);
+        // DebugHierarchyComponent(childC.id);
+        // DebugHierarchyComponent(childD.id);
+        // DebugHierarchyComponent(childE.id);
+        // DebugHierarchyComponent(childF.id);
 
-        console.log(IterateWorld(world));
+        // console.log(IterateWorld(world));
     }
 }
 
