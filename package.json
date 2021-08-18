@@ -8,7 +8,9 @@
     "watch": "node watch.mjs",
     "rebuild": "node buildAll.mjs",
     "examples": "node examples.mjs",
-    "serve": "http-server ./examples/live --cors -o -c-1"
+    "serve": "http-server ./examples/live --cors -o -c-1",
+    "cb": "cd rustwasm && cargo build --target wasm32-unknown-unknown --release",
+    "gc": "cd rustwasm && wasm-gc target/wasm32-unknown-unknown/release/rustwasm.wasm"
   },
   "repository": {
     "type": "git",

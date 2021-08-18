@@ -10,7 +10,8 @@ Thumbs.db
 *.suo
 *.sublime-project
 *.sublime-workspace
-rustwasm
+rustwasm/target
+rustwasm/xtarget
 
 # Logs
 logs

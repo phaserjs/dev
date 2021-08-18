@@ -890,19 +890,19 @@
         {
           "path": "examples/live/test/snow.js",
           "name": "snow.js",
-          "size": 163591,
+          "size": 164158,
           "extension": ".js",
           "type": "file"
         },
         {
           "path": "examples/live/test/wasm.js",
           "name": "wasm.js",
-          "size": 2030910,
+          "size": 1871,
           "extension": ".js",
           "type": "file"
         }
       ],
-      "size": 3456450,
+      "size": 1427978,
       "type": "directory"
     },
     {
@@ -977,6 +977,6 @@
       "type": "directory"
     }
   ],
-  "size": 19406654,
+  "size": 17378182,
   "type": "directory"
 }
