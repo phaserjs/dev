@@ -86,10 +86,12 @@ class Demo extends Scene
         //  PC = 80k @ 55fps
         //  PC = 75k @ 60fps
 
+        for (let i = 0; i < 200000; i++)
         // for (let i = 0; i < 100000; i++)
         // for (let i = 0; i < 80000; i++)
         // for (let i = 0; i < 75000; i++)
-        for (let i = 0; i < 50000; i++)
+        // for (let i = 0; i < 50000; i++)
+        // for (let i = 0; i < 100; i++)
         {
             // const star = new Star();
             // const star = new Sprite(400, 300, 'snow');

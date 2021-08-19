@@ -10,7 +10,8 @@
     "examples": "node examples.mjs",
     "serve": "http-server ./examples/live --cors -o -c-1",
     "cb": "cd rustwasm && cargo build --target wasm32-unknown-unknown --release",
-    "gc": "cd rustwasm && wasm-gc target/wasm32-unknown-unknown/release/rustwasm.wasm"
+    "gc": "cd rustwasm && wasm-gc target/wasm32-unknown-unknown/release/rustwasm.wasm",
+    "rb": "cd rustwasm && wasm-pack build --release --target web --out-name phaser4"
   },
   "repository": {
     "type": "git",

@@ -105,7 +105,7 @@
     const res = instance.array_sum(ptr, array.length);
     console.log("Result: " + res);
   }
-  rustwasm_default("/dev/rustwasm/pkg/rustwasm_bg.wasm").then((wasm2) => {
+  rustwasm_default("//wasm.test.local:8890/rustwasm_bg.wasm").then((wasm2) => {
     console.log(wasm2.add(333));
     console.log(wasm2.bob(66));
     arraySum([10, 20, 30, 40, 50], wasm2);

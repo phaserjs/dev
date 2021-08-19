@@ -1,10 +1,5 @@
 /* tslint:disable */
 /* eslint-disable */
 export const memory: WebAssembly.Memory;
-export function memalloc(a: number): number;
-export function my_alloc(a: number): number;
-export function my_dealloc(a: number, b: number): void;
-export function array_merge(a: number, b: number): number;
-export function add(a: number): number;
-export function bob(a: number): number;
-export function array_sum(a: number, b: number): number;
+export function load_matrix(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number): void;
+export function get_quad_pointer(): number;

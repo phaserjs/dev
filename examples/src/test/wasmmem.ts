@@ -1,22 +1,4 @@
-/*
-import load from '../../../rustwasm/pkg/rustwasm_bg.wasm';
-
-load().then(lib =>
-{
-    console.log('wasm alive 20');
-    console.log(lib);
-
-    lib.start();
-
-    // const v = lib.add(99);
-
-    // console.log(v);
-
-});
-*/
-
-//  Windows:
-import init, { add, bob } from '../../../rustwasm/pkg/rustwasm';
+import init from '../../../rustwasm/pkg/rustwasm';
 
 // Copy `data` into the `instance` exported memory buffer.
 function copyMemory (data, instance)
@@ -58,10 +40,6 @@ init('//wasm.test.local:8890/rustwasm_bg.wasm').then(wasm => {
     console.log(wasm.add(333));
     console.log(wasm.bob(66));
 
-    // const v = add(321);
-    // console.log(v);
-    // console.log(bob(55));
-
     arraySum([ 10, 20, 30, 40, 50 ], wasm);
 
     // const array = new Int32Array(wasm.memory.buffer, 0, 5);
@@ -69,39 +47,3 @@ init('//wasm.test.local:8890/rustwasm_bg.wasm').then(wasm => {
     // const result = sumArrayInt32(array.byteOffset, array.length)
 
 });
-
-/*
-import rust from '../../../rustwasm/target/wasm32-unknown-unknown/release/rustwasm.wasm';
-
-rust().then(lib => {
-
-    console.log(lib);
-
-}).catch(console.error);
-*/
-
-/*
-//  Works with wasm-pack build:
-(async () => {
-    let response = await fetch('/dev/rustwasm/pkg/rustwasm_bg.wasm');
-    let bytes = await response.arrayBuffer();
-    let { instance } = await WebAssembly.instantiate(bytes, { });
-
-    console.log('The answer is: ', instance.exports.add(333));
-})();
-*/
-
-/*
-load(imports).then(lib =>
-{
-    console.log('wasm alive 20');
-    console.log(lib);
-
-    // const v = lib.add_array(100);
-
-    const v = lib.add(100, 555);
-
-    console.log(v);
-
-});
-*/

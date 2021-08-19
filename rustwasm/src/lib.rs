@@ -1,146 +1,92 @@
-use wasm_bindgen::prelude::*;
-use js_sys::Array;
-use std::alloc::{alloc, dealloc, Layout};
+const MAX_QUADS: usize = 100000;
+const TRANSFORM_SIZE: usize = 12;
+const QUAD_SIZE: usize = 9;
 
-#[wasm_bindgen]
-pub fn add(x: i32) -> i32 {
-    x + 100
-}
-
-#[wasm_bindgen]
-pub fn bob(x: i32) -> Array {
-    let arr = Array::new_with_length(3);
-    arr.set(0, JsValue::from(x));
-    arr.set(1, JsValue::from(x + 10));
-    arr.set(2, JsValue::from(x + 100));
-
-    return arr;
-}
-
-/// Allocate memory into the module's linear memory
-/// and return the offset to the start of the block.
-#[no_mangle]
-pub fn memalloc(len: usize) -> *mut u8 {
-    // create a new mutable buffer with capacity `len`
-    let mut buf = Vec::with_capacity(len);
-    // take a mutable pointer to the buffer
-    let ptr = buf.as_mut_ptr();
-    // take ownership of the memory block and
-    // ensure that its destructor is not
-    // called when the object goes out of scope
-    // at the end of the function
-    std::mem::forget(buf);
-    // return the pointer so the runtime
-    // can write data at this offset
-    return ptr;
-}
+static mut TRANSFORM_BUFFER: [ f32; MAX_QUADS * TRANSFORM_SIZE ] = [ 0.0; MAX_QUADS * TRANSFORM_SIZE ];
+static mut QUAD_BUFFER: [ f32; MAX_QUADS * QUAD_SIZE ] = [ 0.0; MAX_QUADS * QUAD_SIZE ];
 
 #[no_mangle]
-pub unsafe fn my_alloc(len: usize) -> *mut u8 {
-    let align = std::mem::align_of::<usize>();
-    let layout = Layout::from_size_align_unchecked(len, align);
-    alloc(layout)
-}
-
-#[no_mangle]
-pub unsafe fn my_dealloc(ptr: *mut u8, size: usize) {
-    let align = std::mem::align_of::<usize>();
-    let layout = Layout::from_size_align_unchecked(size, align);
-    dealloc(ptr, layout);
-}
-
-/// Given a pointer to the start of a byte array and
-/// its length, return the sum of its elements.
-#[no_mangle]
-pub unsafe fn array_sum(ptr: *mut u8, len: usize) -> u8 {
-    // create a Vec<u8> from the pointer to the
-    // linear memory and the length
-    let data = Vec::from_raw_parts(ptr, len, len);
-    // actually compute the sum and return it
-    data.iter().sum()
-}
-
-#[no_mangle]
-pub unsafe fn array_merge(ptr: *mut u8, len: usize) -> u8 {
-
-    // create a Vec<u8> from the pointer to the
-    // linear memory and the length
-    let data = Vec::from_raw_parts(ptr, len, len);
-
-    // actually compute the sum and return it
-    data.iter().sum()
-}
-
-
-/*
-#![allow(dead_code)]
-
-use wasm_bindgen::prelude::*;
-
-#[no_mangle]
-#[wasm_bindgen]
-extern "C" {
-    fn alert(s: &str);
-}
-
-#[no_mangle]
-#[wasm_bindgen]
-pub fn greet(name: &str) {
-    alert(&format!("Hello, {}!", name));
-}
-*/
-
-//  entry point?!
-
-/*
-#[wasm_bindgen]
-pub extern "C" fn add_array(x: i32) -> Vec<i32>
+pub fn calc_matrix()
 {
-    use web_sys::console;
+    let mut counter = 0;
+    let mut transform_offset = 0;
+    let mut quad_offset = 0;
 
+    while counter < MAX_QUADS
+    {
+        unsafe {
 
+            let id = TRANSFORM_BUFFER[transform_offset + 0];
+            let tx = TRANSFORM_BUFFER[transform_offset + 1];
+            let ty = TRANSFORM_BUFFER[transform_offset + 2];
+            let rotation = TRANSFORM_BUFFER[transform_offset + 3];
+            let scale_x = TRANSFORM_BUFFER[transform_offset + 4];
+            let scale_y = TRANSFORM_BUFFER[transform_offset + 5];
+            let skew_x = TRANSFORM_BUFFER[transform_offset + 6];
+            let skew_y = TRANSFORM_BUFFER[transform_offset + 7];
+            let x = TRANSFORM_BUFFER[transform_offset + 8];
+            let y = TRANSFORM_BUFFER[transform_offset + 9];
+            let right = TRANSFORM_BUFFER[transform_offset + 10];
+            let bottom = TRANSFORM_BUFFER[transform_offset + 11];
 
-    let mut result: Vec<i32> = Vec::new();
+            let a = f32::cos(rotation + skew_y) * scale_x;
+            let b = f32::sin(rotation + skew_y) * scale_x;
+            let c = -f32::sin(rotation - skew_x) * scale_y;
+            let d = f32::cos(rotation - skew_x) * scale_y;
+        
+            //  top left
+            let x0 = (x * a) + (y * c) + tx;
+            let y0 = (x * b) + (y * d) + ty;
+        
+            //  bottom left
+            let x1 = (x * a) + (bottom * c) + tx;
+            let y1 = (x * b) + (bottom * d) + ty;
+        
+            //  bottom right
+            let x2 = (right * a) + (bottom * c) + tx;
+            let y2 = (right * b) + (bottom * d) + ty;
+        
+            //  top right
+            let x3 = (right * a) + (y * c) + tx;
+            let y3 = (right * b) + (y * d) + ty;
 
-    result.push(x);
-    result.push(x * 2);
+            QUAD_BUFFER[quad_offset + 0] = id;
+            QUAD_BUFFER[quad_offset + 1] = x0;
+            QUAD_BUFFER[quad_offset + 2] = y0;
+            QUAD_BUFFER[quad_offset + 3] = x1;
+            QUAD_BUFFER[quad_offset + 4] = y1;
+            QUAD_BUFFER[quad_offset + 5] = x2;
+            QUAD_BUFFER[quad_offset + 6] = y2;
+            QUAD_BUFFER[quad_offset + 7] = x3;
+            QUAD_BUFFER[quad_offset + 8] = y3;
+        }
 
-    return result;
+        quad_offset += QUAD_SIZE;
+        transform_offset += TRANSFORM_SIZE;
+        counter += 1;
+    }    
 }
-*/
 
-/*
-pub extern "C" fn addOnce (x: i32) -> i32
+#[no_mangle]
+pub fn get_transform_pointer() -> *const f32
 {
-    //  #1 - Direct
-    // x + 1
+    let pointer: *const f32;
 
-    //  #2 - Vectors
-    // let mut fruit: Vec<i32> = Vec::new();
+    unsafe {
+        pointer = TRANSFORM_BUFFER.as_ptr();
+    }
 
-    // fruit.push(200);
-
-    // return x + fruit[0];
-
-    //  #3 - Arrays
-
-    // let numbers: [ i32; 4 ] = [ 100, 200, 300, 400 ];
-
-    // return x + numbers[2];
-
-    return x + getNumber();
+    return pointer;
 }
-*/
 
-/*
-fn get_number() -> i32
+#[no_mangle]
+pub fn get_quad_pointer() -> *const f32
 {
-    let numbers: [ i32; 4 ] = [ 100, 200, 300, 400 ];
+    let pointer: *const f32;
 
-    return numbers[3];
+    unsafe {
+        pointer = QUAD_BUFFER.as_ptr();
+    }
+
+    return pointer;
 }
-*/
-
-//  #1 = 211 bytes
-//  #2 = 19.9 Kb (!)
-//  #3 = 210 bytes
