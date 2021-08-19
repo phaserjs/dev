@@ -1,21 +1,4 @@
 (() => {
-  var __toBinary = /* @__PURE__ */ (() => {
-    var table = new Uint8Array(128);
-    for (var i = 0; i < 64; i++)
-      table[i < 26 ? i + 65 : i < 52 ? i + 71 : i < 62 ? i - 4 : i * 4 - 205] = i;
-    return (base64) => {
-      var n = base64.length, bytes = new Uint8Array((n - (base64[n - 1] == "=") - (base64[n - 2] == "=")) * 3 / 4 | 0);
-      for (var i2 = 0, j = 0; i2 < n; ) {
-        var c0 = table[base64.charCodeAt(i2++)], c1 = table[base64.charCodeAt(i2++)];
-        var c2 = table[base64.charCodeAt(i2++)], c3 = table[base64.charCodeAt(i2++)];
-        bytes[j++] = c0 << 2 | c1 >> 4;
-        bytes[j++] = c1 << 4 | c2 >> 2;
-        bytes[j++] = c2 << 6 | c3;
-      }
-      return bytes;
-    };
-  })();
-
   // ../phaser-genesis/src/config/const.ts
   var CONFIG_DEFAULTS = {
     AUTO: "Auto",
@@ -1754,41 +1737,60 @@ void main (void)
   };
   var Types = TYPES_ENUM;
 
-  // ../phaser-genesis/src/components/transform/Extent2DComponent.ts
-  var Extent2D = defineComponent({
-    x: Types.f32,
-    y: Types.f32,
-    width: Types.f32,
-    height: Types.f32,
-    right: Types.f32,
-    bottom: Types.f32
+  // ../phaser-genesis/src/components/transform/Transform2DComponent.ts
+  var TRANSFORM = {
+    DIRTY: 0,
+    X: 1,
+    Y: 2,
+    ROTATION: 3,
+    SCALE_X: 4,
+    SCALE_Y: 5,
+    SKEW_X: 6,
+    SKEW_Y: 7,
+    AXIS_ALIGNED: 8,
+    FRAME_X1: 9,
+    FRAME_Y1: 10,
+    FRAME_X2: 11,
+    FRAME_Y2: 12,
+    LOCAL_A: 13,
+    LOCAL_B: 14,
+    LOCAL_C: 15,
+    LOCAL_D: 16,
+    LOCAL_TX: 17,
+    LOCAL_TY: 18,
+    BOUNDS_X1: 19,
+    BOUNDS_Y1: 20,
+    BOUNDS_X2: 21,
+    BOUNDS_Y2: 22,
+    ORIGIN_X: 23,
+    ORIGIN_Y: 24,
+    WORLD_A: 25,
+    WORLD_B: 26,
+    WORLD_C: 27,
+    WORLD_D: 28,
+    WORLD_TX: 29,
+    WORLD_TY: 30,
+    FRAME_WIDTH: 31,
+    FRAME_HEIGHT: 32,
+    RESERVED: 33
+  };
+  var Transform2DComponent = defineComponent({
+    data: [Types.f32, 34]
   });
-  var Extent2DComponent = Extent2D;
-
-  // ../phaser-genesis/src/components/dirty/DirtyComponent.ts
-  var Dirty = defineComponent({
-    child: Types.ui8,
-    childCache: Types.ui8,
-    displayList: Types.ui8,
-    transform: Types.ui8,
-    worldTransform: Types.ui8,
-    color: Types.ui8
-  });
-  var DirtyComponent = Dirty;
 
   // ../phaser-genesis/src/components/dirty/SetDirtyTransform.ts
   function SetDirtyTransform(id) {
-    DirtyComponent.transform[id] = 1;
+    Transform2DComponent.data[id][TRANSFORM.DIRTY] = 1;
   }
 
   // ../phaser-genesis/src/components/transform/SetExtent.ts
   function SetExtent(id, x, y, width, height) {
-    Extent2DComponent.x[id] = x;
-    Extent2DComponent.y[id] = y;
-    Extent2DComponent.width[id] = width;
-    Extent2DComponent.height[id] = height;
-    Extent2DComponent.right[id] = x + width;
-    Extent2DComponent.bottom[id] = y + height;
+    Transform2DComponent.data[id][TRANSFORM.FRAME_X1] = x;
+    Transform2DComponent.data[id][TRANSFORM.FRAME_Y1] = y;
+    Transform2DComponent.data[id][TRANSFORM.FRAME_X2] = x + width;
+    Transform2DComponent.data[id][TRANSFORM.FRAME_Y2] = y + height;
+    Transform2DComponent.data[id][TRANSFORM.FRAME_WIDTH] = width;
+    Transform2DComponent.data[id][TRANSFORM.FRAME_HEIGHT] = height;
     SetDirtyTransform(id);
   }
 
@@ -3067,6 +3069,17 @@ void main (void)
     return results;
   }
 
+  // ../phaser-genesis/src/components/dirty/DirtyComponent.ts
+  var Dirty = defineComponent({
+    child: Types.ui8,
+    childCache: Types.ui8,
+    displayList: Types.ui8,
+    transform: Types.ui8,
+    worldTransform: Types.ui8,
+    color: Types.ui8
+  });
+  var DirtyComponent = Dirty;
+
   // ../phaser-genesis/src/components/dirty/SetDirtyChild.ts
   function SetDirtyChild(id) {
     DirtyComponent.child[id] = 1;
@@ -3078,27 +3091,29 @@ void main (void)
   }
 
   // ../phaser-genesis/src/components/permissions/PermissionsComponent.ts
-  var Permissions = defineComponent({
-    visible: Types.ui8,
-    visibleChildren: Types.ui8,
-    willUpdate: Types.ui8,
-    willUpdateChildren: Types.ui8,
-    willRender: Types.ui8,
-    willRenderChildren: Types.ui8,
-    willCacheChildren: Types.ui8,
-    willTransformChildren: Types.ui8,
-    willColorChildren: Types.ui8
+  var PERMISSION = {
+    VISIBLE: 0,
+    VISIBLE_CHILDREN: 1,
+    WILL_UPDATE: 2,
+    WILL_UPDATE_CHILDREN: 3,
+    WILL_RENDER: 4,
+    WILL_RENDER_CHILDREN: 5,
+    WILL_CACHE_CHILDREN: 6,
+    WILL_TRANSFORM_CHILDREN: 7,
+    WILL_COLOR_CHILDREN: 8
+  };
+  var PermissionsComponent = defineComponent({
+    data: [Types.ui8, 9]
   });
-  var PermissionsComponent = Permissions;
 
   // ../phaser-genesis/src/components/permissions/WillCacheChildren.ts
   function WillCacheChildren(id) {
-    return Boolean(PermissionsComponent.willCacheChildren[id]);
+    return Boolean(PermissionsComponent.data[id][PERMISSION.WILL_CACHE_CHILDREN]);
   }
 
   // ../phaser-genesis/src/components/permissions/WillTransformChildren.ts
   function WillTransformChildren(id) {
-    return Boolean(PermissionsComponent.willTransformChildren[id]);
+    return Boolean(PermissionsComponent.data[id][PERMISSION.WILL_TRANSFORM_CHILDREN]);
   }
 
   // ../phaser-genesis/src/components/dirty/SetDirtyParents.ts
@@ -3385,34 +3400,16 @@ void main (void)
     SetDirtyWorldDisplayList(parent.id);
   }
 
-  // ../phaser-genesis/src/components/transform/Transform2DComponent.ts
-  var Transform2DComponent = defineComponent({
-    x: Types.f32,
-    y: Types.f32,
-    rotation: Types.f32,
-    scaleX: Types.f32,
-    scaleY: Types.f32,
-    skewX: Types.f32,
-    skewY: Types.f32,
-    originX: Types.f32,
-    originY: Types.f32,
-    data: [Types.f32, 7],
-    local: [Types.f32, 6],
-    world: [Types.f32, 6]
-  });
-
   // ../phaser-genesis/src/components/transform/AddTransform2DComponent.ts
   function AddTransform2DComponent(id, x = 0, y = 0, originX = 0, originY = 0) {
     addComponent(GameObjectWorld, Transform2DComponent, id);
-    addComponent(GameObjectWorld, Extent2DComponent, id);
-    Transform2DComponent.x[id] = x;
-    Transform2DComponent.y[id] = y;
-    Transform2DComponent.scaleX[id] = 1;
-    Transform2DComponent.scaleY[id] = 1;
-    Transform2DComponent.originX[id] = originX;
-    Transform2DComponent.originY[id] = originY;
-    Transform2DComponent.local[id].set([1, 0, 0, 1, x, y]);
-    Transform2DComponent.world[id].set([1, 0, 0, 1, x, y]);
+    Transform2DComponent.data[id][TRANSFORM.X] = x;
+    Transform2DComponent.data[id][TRANSFORM.Y] = y;
+    Transform2DComponent.data[id][TRANSFORM.SCALE_X] = 1;
+    Transform2DComponent.data[id][TRANSFORM.SCALE_Y] = 1;
+    Transform2DComponent.data[id][TRANSFORM.ORIGIN_X] = originX;
+    Transform2DComponent.data[id][TRANSFORM.ORIGIN_Y] = originY;
+    Transform2DComponent.data[id][TRANSFORM.AXIS_ALIGNED] = 1;
   }
 
   // ../phaser-genesis/src/components/color/ColorComponent.ts
@@ -3471,7 +3468,7 @@ void main (void)
 
   // ../phaser-genesis/src/components/dirty/ClearDirtyTransform.ts
   function ClearDirtyTransform(id) {
-    DirtyComponent.transform[id] = 0;
+    Transform2DComponent.data[id][TRANSFORM.DIRTY] = 0;
   }
 
   // ../phaser-genesis/src/components/dirty/HasDirtyChildCache.ts
@@ -3491,7 +3488,7 @@ void main (void)
 
   // ../phaser-genesis/src/components/dirty/HasDirtyTransform.ts
   function HasDirtyTransform(id) {
-    return Boolean(DirtyComponent.transform[id]);
+    return Boolean(Transform2DComponent.data[id][TRANSFORM.DIRTY]);
   }
 
   // ../phaser-genesis/src/components/color/Color.ts
@@ -3576,15 +3573,7 @@ void main (void)
   // ../phaser-genesis/src/components/permissions/AddPermissionsComponent.ts
   function AddPermissionsComponent(id) {
     addComponent(GameObjectWorld, PermissionsComponent, id);
-    PermissionsComponent.visible[id] = 1;
-    PermissionsComponent.visibleChildren[id] = 1;
-    PermissionsComponent.willUpdate[id] = 1;
-    PermissionsComponent.willUpdateChildren[id] = 1;
-    PermissionsComponent.willRender[id] = 1;
-    PermissionsComponent.willRenderChildren[id] = 1;
-    PermissionsComponent.willCacheChildren[id] = 0;
-    PermissionsComponent.willTransformChildren[id] = 1;
-    PermissionsComponent.willColorChildren[id] = 1;
+    PermissionsComponent.data[id].set([1, 1, 1, 1, 1, 1, 1, 1, 1]);
   }
 
   // ../phaser-genesis/src/gameobjects/events/DestroyEvent.ts
@@ -3597,12 +3586,12 @@ void main (void)
 
   // ../phaser-genesis/src/components/permissions/GetVisible.ts
   function GetVisible(id) {
-    return Boolean(PermissionsComponent.visible[id]);
+    return Boolean(PermissionsComponent.data[id][PERMISSION.VISIBLE]);
   }
 
   // ../phaser-genesis/src/components/permissions/GetVisibleChildren.ts
   function GetVisibleChildren(id) {
-    return Boolean(PermissionsComponent.visibleChildren[id]);
+    return Boolean(PermissionsComponent.data[id][PERMISSION.VISIBLE_CHILDREN]);
   }
 
   // ../phaser-genesis/src/display/SetParent.ts
@@ -3622,21 +3611,21 @@ void main (void)
 
   // ../phaser-genesis/src/components/permissions/SetVisible.ts
   function SetVisible(value, id) {
-    PermissionsComponent.visible[id] = Number(value);
+    PermissionsComponent.data[id][PERMISSION.VISIBLE] = Number(value);
     SetDirtyParents(id);
     SetDirtyDisplayList(GetWorldID(id));
   }
 
   // ../phaser-genesis/src/components/permissions/SetVisibleChildren.ts
   function SetVisibleChildren(value, id) {
-    PermissionsComponent.visibleChildren[id] = Number(value);
+    PermissionsComponent.data[id][PERMISSION.VISIBLE_CHILDREN] = Number(value);
     SetDirtyParents(id);
     SetDirtyDisplayList(GetWorldID(id));
   }
 
   // ../phaser-genesis/src/components/permissions/WillRender.ts
   function WillRender(id) {
-    return Boolean(PermissionsComponent.visible[id]) && Boolean(PermissionsComponent.willRender[id]);
+    return Boolean(PermissionsComponent.data[id][PERMISSION.VISIBLE]) && Boolean(PermissionsComponent.data[id][PERMISSION.WILL_RENDER]);
   }
 
   // ../phaser-genesis/src/gameobjects/GameObject.ts
@@ -3745,21 +3734,20 @@ void main (void)
 
   // ../phaser-genesis/src/components/transform/UpdateExtent.ts
   function UpdateExtent(id, width, height) {
-    const x = -Transform2DComponent.originX[id] * width;
-    const y = -Transform2DComponent.originY[id] * height;
-    Extent2DComponent.x[id] = x;
-    Extent2DComponent.y[id] = y;
-    Extent2DComponent.width[id] = width;
-    Extent2DComponent.height[id] = height;
-    Extent2DComponent.right[id] = x + width;
-    Extent2DComponent.bottom[id] = y + height;
-    const world2 = Transform2DComponent.world[id];
-    world2[6] = x;
-    world2[7] = y;
-    world2[8] = x + width;
-    world2[9] = y + height;
-    world2[10] = width;
-    world2[11] = height;
+    const x = -Transform2DComponent.data[id][TRANSFORM.ORIGIN_X] * width;
+    const y = -Transform2DComponent.data[id][TRANSFORM.ORIGIN_Y] * height;
+    Transform2DComponent.data[id][TRANSFORM.FRAME_X1] = x;
+    Transform2DComponent.data[id][TRANSFORM.FRAME_Y1] = y;
+    Transform2DComponent.data[id][TRANSFORM.FRAME_X2] = x + width;
+    Transform2DComponent.data[id][TRANSFORM.FRAME_Y2] = y + height;
+    Transform2DComponent.data[id][TRANSFORM.FRAME_WIDTH] = width;
+    Transform2DComponent.data[id][TRANSFORM.FRAME_HEIGHT] = height;
+    Transform2DComponent.data[id][TRANSFORM.WORLD_A] = x;
+    Transform2DComponent.data[id][TRANSFORM.WORLD_B] = y;
+    Transform2DComponent.data[id][TRANSFORM.WORLD_C] = x + width;
+    Transform2DComponent.data[id][TRANSFORM.WORLD_D] = y + height;
+    Transform2DComponent.data[id][TRANSFORM.WORLD_TX] = width;
+    Transform2DComponent.data[id][TRANSFORM.WORLD_TY] = height;
     SetDirtyTransform(id);
   }
 
@@ -3773,26 +3761,26 @@ void main (void)
     }
     set(x, y = x) {
       const id = this.id;
-      Transform2DComponent.originX[id] = x;
-      Transform2DComponent.originY[id] = y;
-      UpdateExtent(id, Extent2DComponent.width[id], Extent2DComponent.height[id]);
+      Transform2DComponent.data[id][TRANSFORM.ORIGIN_X] = x;
+      Transform2DComponent.data[id][TRANSFORM.ORIGIN_Y] = y;
+      UpdateExtent(id, Transform2DComponent.data[id][TRANSFORM.FRAME_WIDTH], Transform2DComponent.data[id][TRANSFORM.FRAME_HEIGHT]);
       return this;
     }
     set x(value) {
       const id = this.id;
-      Transform2DComponent.originX[id] = value;
-      UpdateExtent(id, Extent2DComponent.width[id], Extent2DComponent.height[id]);
+      Transform2DComponent.data[id][TRANSFORM.ORIGIN_X] = value;
+      UpdateExtent(id, Transform2DComponent.data[id][TRANSFORM.FRAME_WIDTH], Transform2DComponent.data[id][TRANSFORM.FRAME_HEIGHT]);
     }
     get x() {
-      return Transform2DComponent.originX[this.id];
+      return Transform2DComponent.data[this.id][TRANSFORM.ORIGIN_X];
     }
     set y(value) {
       const id = this.id;
-      Transform2DComponent.originY[id] = value;
-      UpdateExtent(id, Extent2DComponent.width[id], Extent2DComponent.height[id]);
+      Transform2DComponent.data[id][TRANSFORM.ORIGIN_Y] = value;
+      UpdateExtent(id, Transform2DComponent.data[id][TRANSFORM.FRAME_WIDTH], Transform2DComponent.data[id][TRANSFORM.FRAME_HEIGHT]);
     }
     get y() {
-      return Transform2DComponent.originY[this.id];
+      return Transform2DComponent.data[this.id][TRANSFORM.ORIGIN_Y];
     }
   };
 
@@ -3806,10 +3794,11 @@ void main (void)
   // ../phaser-genesis/src/components/transform/Position.ts
   var Position = class {
     id;
+    _x;
+    _y;
     constructor(id, x = 0, y = 0) {
       this.id = id;
-      this.x = x;
-      this.y = y;
+      this.set(x, y);
     }
     set(x, y = x) {
       this.x = x;
@@ -3817,28 +3806,33 @@ void main (void)
       return this;
     }
     set x(value) {
-      Transform2DComponent.data[this.id][0] = value;
-      SetDirtyTransform(this.id);
+      this._x = value;
+      const id = this.id;
+      Transform2DComponent.data[id][TRANSFORM.X] = value;
+      SetDirtyTransform(id);
     }
     get x() {
-      return Transform2DComponent.data[this.id][0];
+      return this._x;
     }
     set y(value) {
-      Transform2DComponent.data[this.id][1] = value;
-      SetDirtyTransform(this.id);
+      this._y = value;
+      const id = this.id;
+      Transform2DComponent.data[id][TRANSFORM.Y] = value;
+      SetDirtyTransform(id);
     }
     get y() {
-      return Transform2DComponent.data[this.id][1];
+      return this._y;
     }
   };
 
   // ../phaser-genesis/src/components/transform/Scale.ts
   var Scale = class {
     id;
+    _x;
+    _y;
     constructor(id, x = 1, y = 1) {
       this.id = id;
-      this.x = x;
-      this.y = y;
+      this.set(x, y);
     }
     set(x, y = x) {
       this.x = x;
@@ -3846,18 +3840,22 @@ void main (void)
       return this;
     }
     set x(value) {
-      Transform2DComponent.data[this.id][3] = value;
-      SetDirtyTransform(this.id);
+      this._x = value;
+      const id = this.id;
+      Transform2DComponent.data[id][TRANSFORM.SCALE_X] = value;
+      SetDirtyTransform(id);
     }
     get x() {
-      return Transform2DComponent.data[this.id][3];
+      return this._x;
     }
     set y(value) {
-      Transform2DComponent.data[this.id][4] = value;
-      SetDirtyTransform(this.id);
+      this._y = value;
+      const id = this.id;
+      Transform2DComponent.data[id][TRANSFORM.SCALE_Y] = value;
+      SetDirtyTransform(id);
     }
     get y() {
-      return Transform2DComponent.data[this.id][4];
+      return this._y;
     }
   };
 
@@ -3884,13 +3882,13 @@ void main (void)
       UpdateExtent(this.id, value, this.height);
     }
     get width() {
-      return Extent2DComponent.width[this.id];
+      return Transform2DComponent.data[this.id][TRANSFORM.FRAME_WIDTH];
     }
     set height(value) {
       UpdateExtent(this.id, this.width, value);
     }
     get height() {
-      return Extent2DComponent.height[this.id];
+      return Transform2DComponent.data[this.id][TRANSFORM.FRAME_HEIGHT];
     }
     set x(value) {
       this.width = value;
@@ -3906,13 +3904,22 @@ void main (void)
     }
   };
 
+  // ../phaser-genesis/src/components/transform/UpdateAxisAligned.ts
+  function UpdateAxisAligned(id) {
+    const rotation = Transform2DComponent.data[id][TRANSFORM.ROTATION];
+    const skewX = Transform2DComponent.data[id][TRANSFORM.SKEW_X];
+    const skewY = Transform2DComponent.data[id][TRANSFORM.SKEW_Y];
+    Transform2DComponent.data[id][TRANSFORM.AXIS_ALIGNED] = Number(rotation === 0 && skewX === 0 && skewY === 0);
+  }
+
   // ../phaser-genesis/src/components/transform/Skew.ts
   var Skew = class {
     id;
+    _x;
+    _y;
     constructor(id, x = 0, y = 0) {
       this.id = id;
-      this.x = x;
-      this.y = y;
+      this.set(x, y);
     }
     set(x, y = x) {
       this.x = x;
@@ -3920,18 +3927,24 @@ void main (void)
       return this;
     }
     set x(value) {
-      Transform2DComponent.data[this.id][5] = value;
-      SetDirtyTransform(this.id);
+      this._x = value;
+      const id = this.id;
+      Transform2DComponent.data[id][TRANSFORM.SKEW_X] = value;
+      UpdateAxisAligned(id);
+      SetDirtyTransform(id);
     }
     get x() {
-      return Transform2DComponent.data[this.id][5];
+      return this._x;
     }
     set y(value) {
-      Transform2DComponent.data[this.id][6] = value;
-      SetDirtyTransform(this.id);
+      this._y = value;
+      const id = this.id;
+      Transform2DComponent.data[id][TRANSFORM.SKEW_Y] = value;
+      UpdateAxisAligned(id);
+      SetDirtyTransform(id);
     }
     get y() {
-      return Transform2DComponent.data[this.id][6];
+      return this._y;
     }
   };
 
@@ -3945,11 +3958,11 @@ void main (void)
     size;
     color;
     shader;
+    _rotation = 0;
     constructor(x = 0, y = 0) {
       super();
       const id = this.id;
       AddTransform2DComponent(id, x, y, GetDefaultOriginX(), GetDefaultOriginY());
-      AddBoundsComponent(id);
       this.position = new Position(id, x, y);
       this.scale = new Scale(id);
       this.skew = new Skew(id);
@@ -3985,11 +3998,14 @@ void main (void)
       return this.position.y;
     }
     set rotation(value) {
-      Transform2DComponent.data[this.id][2] = value;
-      SetDirtyTransform(this.id);
+      this._rotation = value;
+      const id = this.id;
+      Transform2DComponent.data[id][TRANSFORM.ROTATION] = value;
+      UpdateAxisAligned(id);
+      SetDirtyTransform(id);
     }
     get rotation() {
-      return Transform2DComponent.data[this.id][2];
+      return this._rotation;
     }
     get alpha() {
       return this.color.alpha;
@@ -4327,19 +4343,12 @@ void main (void)
   var instance5;
   var frame = 0;
   var elapsed = 0;
-  var phaser4Wasm;
   var GameInstance = {
     get: () => {
       return instance5;
     },
     set: (game) => {
       instance5 = game;
-    },
-    getWasm: () => {
-      return phaser4Wasm;
-    },
-    setWasm: (wasm) => {
-      phaser4Wasm = wasm;
     },
     getFrame: () => {
       return frame;
@@ -4662,7 +4671,7 @@ void main (void)
   function SetConfigDefaults() {
     SetBackgroundColor(0);
     SetBatchSize(2048);
-    SetBanner("Phaser", "4.0.0-wasm", "https://phaser4.io");
+    SetBanner("Phaser", "4.0.0", "https://phaser4.io");
     SetMaxTextures(0);
     SetDefaultOrigin(0.5, 0.5);
     SetSize(800, 600, 1);
@@ -4696,12 +4705,6 @@ void main (void)
     TimeComponent.ms[id] = time - TimeComponent.lastTick[id];
   }
 
-  // wasm-binary:/Users/rich/Documents/GitHub/phaser-genesis/src/phaser4_bg.wasm
-  var phaser4_bg_default = __toBinary("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");
-
-  // wasm-stub:/Users/rich/Documents/GitHub/phaser-genesis/src/phaser4_bg.wasm
-  var phaser4_bg_default2 = () => WebAssembly.instantiate(phaser4_bg_default).then((result) => result.instance.exports);
-
   // ../phaser-genesis/src/Game.ts
   var Game = class extends EventEmitter {
     id = addEntity(GameObjectWorld);
@@ -4728,10 +4731,7 @@ void main (void)
       this.renderStats = GetRenderStatsAsObject();
       this.isBooted = true;
       Emit(this, "boot");
-      phaser4_bg_default2().then((wasm) => {
-        GameInstance.setWasm(wasm);
-        requestAnimationFrame((now) => this.step(now));
-      });
+      requestAnimationFrame((now) => this.step(now));
     }
     pause() {
       this.isPaused = true;
@@ -4943,15 +4943,11 @@ void main (void)
 
   // ../phaser-genesis/src/components/bounds/BoundsIntersects.ts
   function BoundsIntersects(id, x, y, right, bottom) {
-    if (hasComponent(GameObjectWorld, BoundsComponent, id)) {
-      const bounds = BoundsComponent.global[id];
-      const bx = bounds[0];
-      const by = bounds[1];
-      const br = bounds[2];
-      const bb = bounds[3];
-      return !(right < bx || bottom < by || x > br || y > bb);
-    }
-    return true;
+    const bx = Transform2DComponent.data[id][TRANSFORM.BOUNDS_X1];
+    const by = Transform2DComponent.data[id][TRANSFORM.BOUNDS_Y1];
+    const br = Transform2DComponent.data[id][TRANSFORM.BOUNDS_X2];
+    const bb = Transform2DComponent.data[id][TRANSFORM.BOUNDS_Y2];
+    return !(right < bx || bottom < by || x > br || y > bb);
   }
 
   // ../phaser-genesis/src/components/vertices/SetQuadColor.ts
@@ -5015,9 +5011,14 @@ void main (void)
     HierarchyComponent.world[id] = worldID;
   }
 
+  // ../phaser-genesis/src/components/permissions/WillRenderChildren.ts
+  function WillRenderChildren(id) {
+    return GetVisibleChildren(id) && Boolean(PermissionsComponent.data[id][PERMISSION.WILL_RENDER_CHILDREN]);
+  }
+
   // ../phaser-genesis/src/components/permissions/HasRenderableChildren.ts
   function HasRenderableChildren(id) {
-    if (PermissionsComponent.visibleChildren[id] === 0 || PermissionsComponent.willRenderChildren[id] === 0 || GetNumChildren(id) === 0) {
+    if (!WillRenderChildren(id) || GetNumChildren(id) === 0) {
       return false;
     }
     if (!WillCacheChildren(id) || WillCacheChildren(id) && HasDirtyChildCache(id)) {
@@ -5026,57 +5027,9 @@ void main (void)
     return false;
   }
 
-  // ../phaser-genesis/src/components/permissions/WillRenderChildren.ts
-  function WillRenderChildren(id) {
-    return Boolean(PermissionsComponent.visibleChildren[id]) && Boolean(PermissionsComponent.willRenderChildren[id]);
-  }
-
   // ../phaser-genesis/src/components/permissions/WillUpdate.ts
   function WillUpdate(id) {
-    return Boolean(PermissionsComponent.willUpdate[id]);
-  }
-
-  // ../phaser-genesis/src/components/permissions/WillUpdateChildren.ts
-  function WillUpdateChildren(id) {
-    return Boolean(PermissionsComponent.willUpdateChildren[id]);
-  }
-
-  // ../phaser-genesis/src/components/transform/CopyLocalToWorld.ts
-  function CopyLocalToWorld(source, target) {
-    Transform2DComponent.world[target].set(Transform2DComponent.local[source]);
-    SetDirtyWorldTransform(target);
-  }
-
-  // ../phaser-genesis/src/components/transform/CopyWorldToWorld.ts
-  function CopyWorldToWorld(source, target) {
-    Transform2DComponent.world[target].set(Transform2DComponent.world[source]);
-  }
-
-  // ../phaser-genesis/src/components/transform/MultiplyLocalWithWorld.ts
-  function MultiplyLocalWithWorld(parentID, childID) {
-    const world2 = Transform2DComponent.world[childID];
-    const local = Transform2DComponent.local[childID];
-    const [pa, pb, pc, pd, ptx, pty] = Transform2DComponent.world[parentID];
-    const [a, b, c, d, tx, ty] = local;
-    world2[0] = a * pa + b * pc;
-    world2[1] = a * pb + b * pd;
-    world2[2] = c * pa + d * pc;
-    world2[3] = c * pb + d * pd;
-    world2[4] = tx * pa + ty * pc + ptx;
-    world2[5] = tx * pb + ty * pd + pty;
-    SetDirtyWorldTransform(childID);
-  }
-
-  // ../phaser-genesis/src/components/transform/UpdateWorldTransform.ts
-  function UpdateWorldTransform(id) {
-    const parentID = GetParentID(id);
-    if (!hasComponent(GameObjectWorld, Transform2DComponent, parentID)) {
-      CopyLocalToWorld(id, id);
-    } else if (!WillTransformChildren(id)) {
-      CopyWorldToWorld(parentID, id);
-    } else {
-      MultiplyLocalWithWorld(parentID, id);
-    }
+    return Boolean(PermissionsComponent.data[id][PERMISSION.WILL_UPDATE]);
   }
 
   // ../phaser-genesis/src/world/RenderDataComponent.ts
@@ -5100,7 +5053,12 @@ void main (void)
   // ../phaser-genesis/src/components/transform/UpdateLocalTransform.ts
   var entities2;
   var total2 = 0;
+  var baseworld;
   var system2 = defineSystem((world2) => {
+    const cx = baseworld.camera.getBoundsX();
+    const cy = baseworld.camera.getBoundsY();
+    const cright = baseworld.camera.getBoundsRight();
+    const cbottom = baseworld.camera.getBoundsBottom();
     let prevParent = 0;
     for (let i = 0; i < entities2.length; i++) {
       const id = entities2[i];
@@ -5108,38 +5066,36 @@ void main (void)
         continue;
       }
       const isRoot = IsRoot(id);
-      const transform = Transform2DComponent.data[id];
-      const tx = transform[0];
-      const ty = transform[1];
-      const rotation = transform[2];
-      const scaleX = transform[3];
-      const scaleY = transform[4];
-      const skewX = transform[5];
-      const skewY = transform[6];
+      const data = Transform2DComponent.data[id];
+      const tx = data[TRANSFORM.X];
+      const ty = data[TRANSFORM.Y];
+      const rotation = data[TRANSFORM.ROTATION];
+      const scaleX = data[TRANSFORM.SCALE_X];
+      const scaleY = data[TRANSFORM.SCALE_Y];
+      const skewX = data[TRANSFORM.SKEW_X];
+      const skewY = data[TRANSFORM.SKEW_Y];
+      const axisAligned = data[TRANSFORM.AXIS_ALIGNED];
+      const x = data[TRANSFORM.FRAME_X1];
+      const y = data[TRANSFORM.FRAME_Y1];
+      const right = data[TRANSFORM.FRAME_X2];
+      const bottom = data[TRANSFORM.FRAME_Y2];
       let a = scaleX;
       let b = 0;
       let c = 0;
       let d = scaleY;
-      const axisAligned = rotation === 0 && skewX === 0 && skewY === 0;
       if (!axisAligned) {
         a = Math.cos(rotation + skewY) * scaleX;
         b = Math.sin(rotation + skewY) * scaleX;
         c = -Math.sin(rotation - skewX) * scaleY;
         d = Math.cos(rotation - skewX) * scaleY;
       }
-      const local = Transform2DComponent.local[id];
-      local[0] = a;
-      local[1] = b;
-      local[2] = c;
-      local[3] = d;
-      local[4] = tx;
-      local[5] = ty;
+      data[TRANSFORM.LOCAL_A] = a;
+      data[TRANSFORM.LOCAL_B] = b;
+      data[TRANSFORM.LOCAL_C] = c;
+      data[TRANSFORM.LOCAL_D] = d;
+      data[TRANSFORM.LOCAL_TX] = tx;
+      data[TRANSFORM.LOCAL_TY] = ty;
       if (isRoot) {
-        const x = Extent2DComponent.x[id];
-        const y = Extent2DComponent.y[id];
-        const right = Extent2DComponent.right[id];
-        const bottom = Extent2DComponent.bottom[id];
-        const bounds = BoundsComponent.global[id];
         if (axisAligned) {
           const x0 = x * a + tx;
           const y0 = y * d + ty;
@@ -5149,10 +5105,10 @@ void main (void)
           const y2 = bottom * d + ty;
           const x3 = right * a + tx;
           const y3 = y * d + ty;
-          bounds[0] = x0;
-          bounds[1] = y0;
-          bounds[2] = x2;
-          bounds[3] = y2;
+          data[TRANSFORM.BOUNDS_X1] = x0;
+          data[TRANSFORM.BOUNDS_Y1] = y0;
+          data[TRANSFORM.BOUNDS_X2] = x2;
+          data[TRANSFORM.BOUNDS_Y2] = y2;
           SetQuadPosition(id, x0, y0, x1, y1, x2, y2, x3, y3);
         } else {
           const x0 = x * a + y * c + tx;
@@ -5163,11 +5119,14 @@ void main (void)
           const y2 = right * b + bottom * d + ty;
           const x3 = right * a + y * c + tx;
           const y3 = right * b + y * d + ty;
-          bounds[0] = Math.min(x0, x1, x2, x3);
-          bounds[1] = Math.min(y0, y1, y2, y3);
-          bounds[2] = Math.max(x0, x1, x2, x3);
-          bounds[3] = Math.max(y0, y1, y2, y3);
+          data[TRANSFORM.BOUNDS_X1] = Math.min(x0, x1, x2, x3);
+          data[TRANSFORM.BOUNDS_Y1] = Math.min(y0, y1, y2, y3);
+          data[TRANSFORM.BOUNDS_X2] = Math.max(x0, x1, x2, x3);
+          data[TRANSFORM.BOUNDS_Y2] = Math.max(y0, y1, y2, y3);
           SetQuadPosition(id, x0, y0, x1, y1, x2, y2, x3, y3);
+        }
+        if (WillRender(id) && BoundsIntersects(id, cx, cy, cright, cbottom)) {
+          baseworld.list2.push(id);
         }
         ClearDirtyTransform(id);
       } else {
@@ -5181,12 +5140,11 @@ void main (void)
     }
     return world2;
   });
-  var UpdateLocalTransform = (id, world2, query) => {
+  var UpdateLocalTransform = (world2, iworld, query) => {
     total2 = 0;
-    entities2 = query(world2);
-    if (entities2.length > 0) {
-      system2(world2);
-    }
+    entities2 = query(iworld);
+    baseworld = world2;
+    system2(iworld);
     return total2;
   };
 
@@ -5202,17 +5160,16 @@ void main (void)
 
   // ../phaser-genesis/src/components/vertices/SetQuadFromWorld.ts
   function SetQuadFromWorld(id) {
-    const world2 = Transform2DComponent.world[id];
-    const a = world2[0];
-    const b = world2[1];
-    const c = world2[2];
-    const d = world2[3];
-    const tx = world2[4];
-    const ty = world2[5];
-    const x = Extent2DComponent.x[id];
-    const y = Extent2DComponent.y[id];
-    const right = Extent2DComponent.right[id];
-    const bottom = Extent2DComponent.bottom[id];
+    const a = Transform2DComponent.data[id][TRANSFORM.WORLD_A];
+    const b = Transform2DComponent.data[id][TRANSFORM.WORLD_B];
+    const c = Transform2DComponent.data[id][TRANSFORM.WORLD_C];
+    const d = Transform2DComponent.data[id][TRANSFORM.WORLD_D];
+    const tx = Transform2DComponent.data[id][TRANSFORM.WORLD_TX];
+    const ty = Transform2DComponent.data[id][TRANSFORM.WORLD_TY];
+    const x = Transform2DComponent.data[id][TRANSFORM.FRAME_X1];
+    const y = Transform2DComponent.data[id][TRANSFORM.FRAME_Y1];
+    const right = Transform2DComponent.data[id][TRANSFORM.FRAME_X2];
+    const bottom = Transform2DComponent.data[id][TRANSFORM.FRAME_Y2];
     const x0 = x * a + y * c + tx;
     const y0 = x * b + y * d + ty;
     const x1 = x * a + bottom * c + tx;
@@ -5222,11 +5179,10 @@ void main (void)
     const x3 = right * a + y * c + tx;
     const y3 = right * b + y * d + ty;
     SetQuadPosition(id, x0, y0, x1, y1, x2, y2, x3, y3);
-    const bounds = BoundsComponent.global[id];
-    bounds[0] = Math.min(x0, x1, x2, x3);
-    bounds[1] = Math.min(y0, y1, y2, y3);
-    bounds[2] = Math.max(x0, x1, x2, x3);
-    bounds[3] = Math.max(y0, y1, y2, y3);
+    Transform2DComponent.data[id][TRANSFORM.BOUNDS_X1] = Math.min(x0, x1, x2, x3);
+    Transform2DComponent.data[id][TRANSFORM.BOUNDS_Y1] = Math.min(y0, y1, y2, y3);
+    Transform2DComponent.data[id][TRANSFORM.BOUNDS_X2] = Math.max(x0, x1, x2, x3);
+    Transform2DComponent.data[id][TRANSFORM.BOUNDS_Y2] = Math.max(y0, y1, y2, y3);
   }
 
   // ../phaser-genesis/src/components/vertices/UpdateVertexPositionSystem.ts
@@ -5247,9 +5203,7 @@ void main (void)
   var UpdateVertexPositionSystem = (id, world2, query) => {
     total3 = 0;
     entities3 = query(world2);
-    if (entities3.length > 0) {
-      updateVertexPositionSystem(world2);
-    }
+    updateVertexPositionSystem(world2);
     ClearDirtyWorldTransform(id);
     RenderDataComponent.dirtyVertices[id] = total3;
   };
@@ -5360,58 +5314,6 @@ void main (void)
     SetCamera(renderPass, camera);
   }
 
-  // ../phaser-genesis/src/components/hierarchy/MoveNextRenderable.ts
-  function MoveNextRenderable(id) {
-    const firstChild = GetFirstChildID(id);
-    if (firstChild > 0 && WillRenderChildren(id)) {
-      return firstChild;
-    } else {
-      const sibling = GetNextSiblingID(id);
-      if (sibling === 0) {
-        const parent = GetParentID(id);
-        if (parent === GetWorldID(id)) {
-          return 0;
-        } else {
-          return GetNextSiblingID(parent);
-        }
-      } else {
-        return sibling;
-      }
-    }
-  }
-
-  // ../phaser-genesis/src/components/hierarchy/MoveNextUpdatable.ts
-  function MoveNextUpdatable(id) {
-    const firstChild = GetFirstChildID(id);
-    if (firstChild > 0 && WillUpdateChildren(id)) {
-      return firstChild;
-    } else {
-      const sibling = GetNextSiblingID(id);
-      if (sibling === 0) {
-        const parent = GetParentID(id);
-        if (parent === GetWorldID(id)) {
-          return 0;
-        } else {
-          return GetNextSiblingID(parent);
-        }
-      } else {
-        return sibling;
-      }
-    }
-  }
-
-  // ../phaser-genesis/src/world/RebuildWorldTransforms.ts
-  function RebuildWorldTransforms(world2) {
-    let next = GetFirstChildID(world2.id);
-    while (next > 0) {
-      if (HasDirtyTransform(next) && WillRender(next)) {
-        UpdateWorldTransform(next);
-        ClearDirtyTransform(next);
-      }
-      next = MoveNextRenderable(next);
-    }
-  }
-
   // ../phaser-genesis/src/world/ResetWorldRenderData.ts
   function ResetWorldRenderData(id, gameFrame) {
     RenderDataComponent.gameFrame[id] = gameFrame;
@@ -5509,6 +5411,8 @@ void main (void)
     colorQuery;
     transformQuery;
     rendered;
+    list = [];
+    list2 = [];
     constructor(scene) {
       super(scene);
       const tag = this.tag;
@@ -5523,11 +5427,13 @@ void main (void)
       RenderDataComponent.rebuiltList[id] = 0;
       RenderDataComponent.rebuiltWorld[id] = 0;
       ClearDirtyChild(id);
-      const totalDirty = UpdateLocalTransform(id, GameObjectWorld, this.transformQuery);
+      this.list2 = [];
+      this.camera.update();
+      this.camera.isDirty = true;
+      const totalDirty = UpdateLocalTransform(this, GameObjectWorld, this.transformQuery);
       RenderDataComponent.dirtyLocal[id] = totalDirty;
       const dirtyDisplayList = HasDirtyDisplayList(id);
       if (dirtyDisplayList || totalDirty > 0) {
-        RebuildWorldTransforms(this);
         RenderDataComponent.rebuiltWorld[id] = 1;
         this.getNumChildren();
         ClearDirtyDisplayList(id);
@@ -5537,34 +5443,22 @@ void main (void)
       return true;
     }
     update(delta, time) {
-      this.beforeUpdate(delta, time);
-      let next = GetFirstChildID(this.id);
-      while (next > 0) {
-        if (WillUpdate(next)) {
-          GameObjectCache.get(next).update(delta, time);
+      const list = this.list2;
+      for (let i = 0; i < list.length; i++) {
+        const id = list[i];
+        if (WillUpdate(id)) {
+          GameObjectCache.get(id).update(delta, time);
         }
-        next = MoveNextUpdatable(next);
       }
-      this.afterUpdate(delta, time);
     }
     listRender(renderPass, camera) {
-      const x = camera.getBoundsX();
-      const y = camera.getBoundsY();
-      const right = camera.getBoundsRight();
-      const bottom = camera.getBoundsBottom();
-      let next = GetFirstChildID(this.id);
-      while (next > 0) {
-        if (WillRender(next)) {
-          const intersects = BoundsIntersects(next, x, y, right, bottom);
-          let gameObject;
-          if (intersects) {
-            gameObject = GameObjectCache.get(next);
-            this.rendered++;
-            gameObject.renderGL(renderPass);
-            gameObject.postRenderGL(renderPass);
-          }
-        }
-        next = MoveNextRenderable(next);
+      const list = this.list2;
+      for (let i = 0; i < list.length; i++) {
+        const id = list[i];
+        const gameObject = GameObjectCache.get(id);
+        this.rendered++;
+        gameObject.renderGL(renderPass);
+        gameObject.postRenderGL(renderPass);
       }
     }
     runRender(renderPass, entry, x, y, right, bottom) {
@@ -5648,8 +5542,9 @@ void main (void)
       await ImageFile("snow", "assets/cybertank-bullet.png");
       const world2 = new StaticWorld(this);
       this.camera = world2.camera;
-      for (let i = 0; i < 2e5; i++) {
-        AddChild(world2, new Star());
+      for (let i = 0; i < 1e5; i++) {
+        const star = new Star();
+        AddChild(world2, star);
       }
     }
     update() {

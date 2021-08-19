@@ -82,28 +82,26 @@ class Demo extends Scene
         
         this.camera = world.camera;
 
-        //  PC = 100k @ 50fps
+        //  PC = 100k @ 50fps = now @ 60fps with array optimizations!
         //  PC = 80k @ 55fps
         //  PC = 75k @ 60fps
 
-        for (let i = 0; i < 200000; i++)
-        // for (let i = 0; i < 100000; i++)
+        //  200k = 427MB js heap
+        //  100k = 378MB js heap
+
+        // for (let i = 0; i < 200000; i++)
+        for (let i = 0; i < 100000; i++)
         // for (let i = 0; i < 80000; i++)
         // for (let i = 0; i < 75000; i++)
         // for (let i = 0; i < 50000; i++)
         // for (let i = 0; i < 100; i++)
         {
-            // const star = new Star();
-            // const star = new Sprite(400, 300, 'snow');
+            const star = new Star();
 
-            // if (i % 1000 === 0)
-            // {
-            //     console.log(star);
-            // }
+            AddChild(world, star);
 
-            // AddChild(world, star);
-
-            AddChild(world, new Star());
+            // world.list.push(star);
+            // world.list2.push(star.id);
         }
     }
 
