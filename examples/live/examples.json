@@ -869,7 +869,14 @@
         {
           "path": "examples/live/test/maxrender.js",
           "name": "maxrender.js",
-          "size": 164938,
+          "size": 160783,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/test/maxrenderdraw.js",
+          "name": "maxrenderdraw.js",
+          "size": 152928,
           "extension": ".js",
           "type": "file"
         },
@@ -895,9 +902,16 @@
           "type": "file"
         },
         {
+          "path": "examples/live/test/screensnow.js",
+          "name": "screensnow.js",
+          "size": 161612,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
           "path": "examples/live/test/snow.js",
           "name": "snow.js",
-          "size": 167169,
+          "size": 166024,
           "extension": ".js",
           "type": "file"
         },
@@ -930,7 +944,7 @@
           "type": "file"
         }
       ],
-      "size": 1616838,
+      "size": 1926078,
       "type": "directory"
     },
     {
@@ -1005,6 +1019,6 @@
       "type": "directory"
     }
   ],
-  "size": 17567042,
+  "size": 17876282,
   "type": "directory"
 }

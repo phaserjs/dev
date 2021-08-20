@@ -45,8 +45,6 @@ class Demo extends Scene
     async create ()
     {
         await ImageFile('white', 'assets/1x1white.png');
-        // await ImageFile('brain', 'assets/cybertank-bullet.png');
-        // await SpriteSheetFile('balls', 'assets/balls.png', { frameWidth: 17 });
 
         const world = new StaticWorld(this);
         
@@ -54,16 +52,24 @@ class Demo extends Scene
 
         // http://192.168.0.100/dev/examples/live/debug.html?f=test/maxrender.js
 
-        /*
         //  200,000 draws at 50fps solid (with batch of 2048)
-        const texture = GetTexture('brain');
+        const texture = GetTexture('white');
+
+        const params = new URLSearchParams(document.location.search);
+    
+        let total = parseInt(params.get('t'));
+        
+        if (!total || total === 0)
+        {
+            total = 50000;
+        }
 
         On(world, 'worldpostrender', (renderPass) => {
 
             let x = 0;
             let y = 0;
 
-            for (let i = 0; i < 200000; i++)
+            for (let i = 0; i < total; i++)
             {
                 DrawImage(renderPass, texture, x, y);
     
@@ -76,41 +82,6 @@ class Demo extends Scene
                 }
             }
         });
-        */
-
-        let x = 0;
-        let y = 0;
-        let f = 0;
-
-        const params = new URLSearchParams(document.location.search);
-    
-        let total = parseInt(params.get('t'));
-        
-        if (!total || total === 0)
-        {
-            total = 50000;
-        }
-
-        for (let i = 0; i < total; i++)
-        {
-            // AddChild(world, new Sprite(x, y, 'balls', f));
-            AddChild(world, new Sprite(x, y, 'white').setOrigin(0, 0));
-
-            x += 2;
-
-            if (x >= 800)
-            {
-                x = 0;
-                y += 2;
-            }
-
-            f++;
-
-            if (f === 6)
-            {
-                f = 0;
-            }
-        }
     }
 
     update (): void
