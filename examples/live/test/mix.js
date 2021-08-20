@@ -951,8 +951,8 @@ void main (void)
   // ../phaser-genesis/src/renderer/webgl1/shaders/CreateUniforms.ts
   function CreateUniforms(program) {
     const uniforms = new Map();
-    const total4 = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
-    for (let i = 0; i < total4; i++) {
+    const total3 = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
+    for (let i = 0; i < total3; i++) {
       const uniform = gl.getActiveUniform(program, i);
       let name = uniform.name;
       if (name.startsWith("gl_") || name.startsWith("webgl_")) {
@@ -2215,11 +2215,7 @@ void main (void)
   });
 
   // ../phaser-genesis/src/GameObjectWorld.ts
-  if (window["defaultSize"]) {
-    setDefaultSize(parseInt(window["defaultSize"]));
-  } else {
-    setDefaultSize(4e5);
-  }
+  setDefaultSize(25e4);
   var world = createWorld();
   var GameObjectWorld = world;
 
@@ -2856,11 +2852,6 @@ void main (void)
     ConfigStore.set(CONFIG_DEFAULTS.WORLD_SIZE, width * height);
   }
 
-  // ../phaser-genesis/src/math/Clamp.ts
-  function Clamp(value, min, max) {
-    return Math.max(min, Math.min(max, value));
-  }
-
   // ../phaser-genesis/src/math/Between.ts
   function Between(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
@@ -3288,8 +3279,8 @@ void main (void)
   }
 
   // ../phaser-genesis/src/components/hierarchy/SetNumChildren.ts
-  function SetNumChildren(parentID, total4) {
-    HierarchyComponent.numChildren[parentID] = total4;
+  function SetNumChildren(parentID, total3) {
+    HierarchyComponent.numChildren[parentID] = total3;
   }
 
   // ../phaser-genesis/src/components/hierarchy/SetParentID.ts
@@ -4182,15 +4173,6 @@ void main (void)
     }
   };
 
-  // ../phaser-genesis/src/utils/array/GetRandom.ts
-  function GetRandom(array, startIndex = 0, length) {
-    if (!length) {
-      length = array.length;
-    }
-    const randomIndex = startIndex + Math.floor(Math.random() * length);
-    return array[randomIndex];
-  }
-
   // ../phaser-genesis/src/display/RemoveChildAt.ts
   function RemoveChildAt(parent, index) {
     const parentID = parent.id;
@@ -4523,10 +4505,10 @@ void main (void)
   }
 
   // ../phaser-genesis/src/config/globalvar/AddGlobalVar.ts
-  function AddGlobalVar(game2) {
+  function AddGlobalVar(game) {
     const globalVar = ConfigStore.get(CONFIG_DEFAULTS.GLOBAL_VAR);
     if (globalVar && window) {
-      window[globalVar] = game2;
+      window[globalVar] = game;
     }
   }
 
@@ -4602,8 +4584,8 @@ void main (void)
     get: () => {
       return instance5;
     },
-    set: (game2) => {
-      instance5 = game2;
+    set: (game) => {
+      instance5 = game;
     },
     getFrame: () => {
       return frame;
@@ -5347,7 +5329,7 @@ void main (void)
   // ../phaser-genesis/src/components/transform/UpdateLocalTransformList.ts
   function UpdateLocalTransformList(entities3, renderList) {
     let prevParent = 0;
-    let total4 = 0;
+    let total3 = 0;
     for (let i = 0; i < entities3.length; i++) {
       const id = entities3[i];
       if (!HasDirtyTransform(id)) {
@@ -5422,9 +5404,9 @@ void main (void)
           prevParent = parentID;
         }
       }
-      total4++;
+      total3++;
     }
-    return total4;
+    return total3;
   }
 
   // ../phaser-genesis/src/camera/WorldCamera.ts
@@ -5610,7 +5592,7 @@ void main (void)
       window["renderStats"] = {
         gameFrame: RenderDataComponent.gameFrame[id],
         numChildren: this.getNumChildren(),
-        numRendered: this.rendered,
+        numRendererd: this.rendered,
         numRenderable: RenderDataComponent.numRenderable[id],
         dirtyLocal: RenderDataComponent.dirtyLocal[id],
         dirtyVertices: RenderDataComponent.dirtyVertices[id],
@@ -5621,21 +5603,16 @@ void main (void)
     }
   };
 
-  // examples/src/test/snow.ts
-  var Snowflake = class extends Sprite {
+  // examples/src/test/mix.ts
+  var Star = class extends Sprite {
     constructor() {
-      super(Between(0, 32768), Between(0, 32768), "snow");
-      this.speedX = Between(1, 8);
-      this.speedY = Between(1, 8);
+      super(Between(0, 800), Between(0, 600), "snow");
+      this.speed = Between(1, 8);
     }
     update() {
-      this.x -= this.speedX;
-      this.y += this.speedY;
+      this.x -= this.speed;
       if (this.x < 0) {
-        this.x = 32768;
-      }
-      if (this.y > 32768) {
-        this.y = 0;
+        this.x = 800;
       }
     }
   };
@@ -5654,37 +5631,16 @@ void main (void)
     async create() {
       await AtlasFile("items", "assets/land.png", "assets/land.json");
       await ImageFile("grass", "assets/textures/grass-plain.png");
-      await ImageFile("snow", "assets/particle1.png");
+      await ImageFile("snow", "assets/cybertank-bullet.png");
+      const frames = Array.from(GetTexture("items").frames.keys());
+      frames.shift();
       const world2 = new StaticWorld(this);
       this.world = world2;
       this.camera = this.world.camera;
-      this.texture = GetTexture("items");
-      this.createGrass();
-      this.createLandscape();
-      for (let i = 0; i < total3; i++) {
-        const star = new Snowflake();
-        AddChild(world2, star);
-        world2.list.push(star);
-      }
-      this.camera.setPosition(-16384, -16384);
-    }
-    createGrass() {
-      for (let y = 0; y < 64; y++) {
-        for (let x = 0; x < 64; x++) {
-          AddChild(this.world, new Sprite(x * 512, y * 512, "grass").setOrigin(0, 0));
-        }
-      }
-    }
-    createLandscape() {
-      const frames = Array.from(this.texture.frames.keys());
-      frames.shift();
-      const size = 512;
-      for (let y = 0; y < size; y++) {
-        for (let x = 0; x < size; x++) {
-          const frame2 = GetRandom(frames);
-          AddChild(this.world, new Sprite(256 + x * 128, size + y * 128, "items", frame2).setOrigin(0.5, 1));
-        }
-      }
+      const grass = AddChild(world2, new Sprite(400, 300, "grass"));
+      window.grass = grass;
+      const s1 = AddChild(world2, new Star());
+      world2.list.push(s1);
     }
     update() {
       if (!this.camera) {
@@ -5700,38 +5656,13 @@ void main (void)
       } else if (this.downKey.isDown) {
         this.camera.y -= this.cameraSpeed;
       }
-      this.camera.x = Clamp(this.camera.x, -31968, 0);
-      this.camera.y = Clamp(this.camera.y, -32168, 0);
-      const rs = window.renderStats;
-      if (rs) {
-        msg.innerText = `Frame: ${rs.gameFrame} - Game Objects: ${rs.numChildren} - Rendered: ${rs.numRendered} - Updated: ${rs.dirtyLocal}`;
-      }
     }
   };
-  var params = new URLSearchParams(document.location.search);
-  var total3 = parseInt(params.get("t"));
-  if (!total3 || total3 === 0) {
-    total3 = 25e3;
-  }
-  var msg = document.createElement("p");
-  msg.innerHTML = "Warning: This demo requires over 1GB RAM<br />When loaded use cursors to move";
-  msg.style.paddingLeft = "150px";
-  var button = document.createElement("button");
-  button.innerText = "Run Demo";
-  var game;
-  button.onclick = () => {
-    const sprites = 266240 + total3;
-    msg.innerText = `Please wait, generating ${sprites} Sprites`;
-    window.defaultSize = sprites + 1e3;
-    game = new Game(WebGL(), BatchSize(4096), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(657930), Scenes(Demo));
-    document.body.removeChild(button);
-  };
-  document.body.appendChild(msg);
-  document.body.appendChild(button);
+  window.game = new Game(WebGL(), BatchSize(4096), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(657930), Scenes(Demo));
 })();
 /**
  * @author       Richard Davey <rich@photonstorm.com>
  * @copyright    2020 Photon Storm Ltd.
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
  */
-//# sourceMappingURL=snow.js.map
+//# sourceMappingURL=mix.js.map

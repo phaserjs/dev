@@ -1,47 +1,45 @@
 import { BackgroundColor, BatchSize, GlobalVar, Parent, Scenes, WebGL } from '../../../../phaser-genesis/src/config';
+import { Between, Clamp } from '../../../../phaser-genesis/src/math';
 import { DownKey, LeftKey, RightKey, UpKey } from '../../../../phaser-genesis/src/input/keyboard/keys';
+import { GetTexture, Texture } from '../../../../phaser-genesis/src/textures';
 
 import { AddChild } from '../../../../phaser-genesis/src/display';
-import { Between } from '../../../../phaser-genesis/src/math';
-import { DrawImage } from '../../../../phaser-genesis/src/renderer/webgl1/draw';
+import { AtlasFile } from '../../../../phaser-genesis/src/loader/files/AtlasFile';
 import { Game } from '../../../../phaser-genesis/src/Game';
-import { GetTexture } from '../../../../phaser-genesis/src/textures';
+import { GetRandom } from '../../../../phaser-genesis/src/utils/array/GetRandom';
 import { ImageFile } from '../../../../phaser-genesis/src/loader/files/ImageFile';
 import { Keyboard } from '../../../../phaser-genesis/src/input/keyboard';
-import { On } from '../../../../phaser-genesis/src/events';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
 import { Sprite } from '../../../../phaser-genesis/src/gameobjects';
 import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
 import { WorldCamera } from '../../../../phaser-genesis/src/camera/WorldCamera';
 
-class Star extends Sprite
+class Snowflake extends Sprite
 {
-    // i: number;
-    speed: number;
+    speedX: number;
+    speedY: number;
 
     constructor ()
     {
-        super(Between(-8000, 8000), Between(-8000, 8000), 'snow');
+        super(Between(0, 32768), Between(0, 32768), 'snow');
 
-        this.speed = Between(1, 8);
-
-        // this.i = 0;
+        this.speedX = Between(1, 8);
+        this.speedY = Between(1, 8);
     }
 
     update (): void
     {
-        // if (this.i > 10)
-        // {
-        //     return;
-        // }
+        this.x -= this.speedX;
+        this.y += this.speedY;
 
-        // this.i++;
-
-        this.position.x -= this.speed;
-
-        if (this.position.x < -8000)
+        if (this.x < 0)
         {
-            this.position.x = 8000;
+            this.x = 32768;
+        }
+
+        if (this.y > 32768)
+        {
+            this.y = 0;
         }
     }
 }
@@ -54,8 +52,10 @@ class Demo extends Scene
     downKey: RightKey;
 
     camera: WorldCamera;
+    world: StaticWorld;
+    texture: Texture;
 
-    cameraSpeed: number = 8;
+    cameraSpeed: number = 16;
 
     constructor ()
     {
@@ -75,33 +75,71 @@ class Demo extends Scene
 
     async create ()
     {
-        // await ImageFile('snow', 'assets/snowflake-pixel.png');
-        await ImageFile('snow', 'assets/cybertank-bullet.png');
+        await AtlasFile('items', 'assets/land.png', 'assets/land.json');
+        await ImageFile('grass', 'assets/textures/grass-plain.png');
+        await ImageFile('snow', 'assets/particle1.png');
 
         const world = new StaticWorld(this);
         
-        this.camera = world.camera;
+        this.world = world;
 
-        //  PC = 100k @ 50fps = now @ 60fps with array optimizations!
-        //  PC = 80k @ 55fps
-        //  PC = 75k @ 60fps
+        this.camera = this.world.camera;
 
-        //  200k = 427MB js heap
-        //  100k = 378MB js heap
+        this.texture = GetTexture('items');
+
+        this.createGrass();
+        this.createLandscape();
 
         // for (let i = 0; i < 200000; i++)
-        for (let i = 0; i < 100000; i++)
+        // for (let i = 0; i < 100000; i++)
         // for (let i = 0; i < 80000; i++)
         // for (let i = 0; i < 75000; i++)
-        // for (let i = 0; i < 50000; i++)
+        // for (let i = 0; i < 25000; i++)
         // for (let i = 0; i < 100; i++)
+        // for (let i = 0; i < 10; i++)
+        for (let i = 0; i < total; i++)
         {
-            const star = new Star();
+            const star = new Snowflake();
 
             AddChild(world, star);
 
-            // world.list.push(star);
-            // world.list2.push(star.id);
+            world.list.push(star);
+        }
+
+        this.camera.setPosition(-16384, -16384);
+    }
+
+    createGrass ()
+    {
+        //  Grass texture is 512 x 512
+        //  World is 64 x 64 tiles = 32,768 x 32,768
+
+        for (let y = 0; y < 64; y++)
+        {
+            for (let x = 0; x < 64; x++)
+            {
+                AddChild(this.world, new Sprite(x * 512, y * 512, 'grass').setOrigin(0, 0));
+            }
+        }
+    }
+
+    createLandscape ()
+    {
+        const frames = Array.from(this.texture.frames.keys());
+
+        //  Remove __BASE texture
+        frames.shift();
+
+        const size = 512;
+
+        for (let y = 0; y < size; y++)
+        {
+            for (let x = 0; x < size; x++)
+            {
+                const frame = GetRandom(frames);
+
+                AddChild(this.world, new Sprite(256 + (x * 128), size + (y * 128), 'items', frame).setOrigin(0.5, 1));
+            }
         }
     }
 
@@ -129,14 +167,58 @@ class Demo extends Scene
         {
             this.camera.y -= this.cameraSpeed;
         }
+
+        this.camera.x = Clamp(this.camera.x, -31968, 0);
+        this.camera.y = Clamp(this.camera.y, -32168, 0);
+
+        const rs = window.renderStats;
+
+        if (rs)
+        {
+            msg.innerText = `Frame: ${rs.gameFrame} - Game Objects: ${rs.numChildren} - Rendered: ${rs.numRendered} - Updated: ${rs.dirtyLocal}`;
+        }
     }
 }
 
-new Game(
-    WebGL(),
-    BatchSize(4096),
-    Parent('gameParent'),
-    GlobalVar('Phaser4'),
-    BackgroundColor(0x0a0a0a),
-    Scenes(Demo)
-);
+const params = new URLSearchParams(document.location.search);
+    
+let total = parseInt(params.get('t'));
+
+if (!total || total === 0)
+{
+    total = 25000;
+}
+
+const msg = document.createElement('p');
+
+msg.innerHTML = 'Warning: This demo requires over 1GB RAM<br />When loaded use cursors to move';
+msg.style.paddingLeft = '150px';
+
+const button = document.createElement('button');
+button.innerText = 'Run Demo';
+
+let game;
+
+button.onclick = () =>
+{
+    //  266240 - grass + items
+    const sprites = 266240 + total;
+
+    msg.innerText = `Please wait, generating ${sprites} Sprites`;
+
+    window.defaultSize = sprites + 1000;
+
+    game = new Game(
+        WebGL(),
+        BatchSize(4096),
+        Parent('gameParent'),
+        GlobalVar('Phaser4'),
+        BackgroundColor(0x0a0a0a),
+        Scenes(Demo)
+    );
+
+    document.body.removeChild(button);
+}
+
+document.body.appendChild(msg);
+document.body.appendChild(button);

@@ -874,6 +874,13 @@
           "type": "file"
         },
         {
+          "path": "examples/live/test/mix.js",
+          "name": "mix.js",
+          "size": 166036,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
           "path": "examples/live/test/renderdraw.js",
           "name": "renderdraw.js",
           "size": 88661,
@@ -890,7 +897,7 @@
         {
           "path": "examples/live/test/snow.js",
           "name": "snow.js",
-          "size": 162769,
+          "size": 167169,
           "extension": ".js",
           "type": "file"
         },
@@ -923,7 +930,7 @@
           "type": "file"
         }
       ],
-      "size": 1446402,
+      "size": 1616838,
       "type": "directory"
     },
     {
@@ -998,6 +1005,6 @@
       "type": "directory"
     }
   ],
-  "size": 17396606,
+  "size": 17567042,
   "type": "directory"
 }
