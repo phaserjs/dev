@@ -2,6 +2,7 @@ import { BackgroundColor, BatchSize, GlobalVar, Parent, Scenes, WebGL } from '..
 import { Between, Clamp } from '../../../../phaser-genesis/src/math';
 import { DownKey, LeftKey, RightKey, UpKey } from '../../../../phaser-genesis/src/input/keyboard/keys';
 import { GetTexture, Texture } from '../../../../phaser-genesis/src/textures';
+import { Layer, Sprite } from '../../../../phaser-genesis/src/gameobjects';
 
 import { AddChild } from '../../../../phaser-genesis/src/display';
 import { AtlasFile } from '../../../../phaser-genesis/src/loader/files/AtlasFile';
@@ -10,8 +11,9 @@ import { GetRandom } from '../../../../phaser-genesis/src/utils/array/GetRandom'
 import { ImageFile } from '../../../../phaser-genesis/src/loader/files/ImageFile';
 import { Keyboard } from '../../../../phaser-genesis/src/input/keyboard';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
-import { Sprite } from '../../../../phaser-genesis/src/gameobjects';
+import { SetWillUpdateChildren } from '../../../../phaser-genesis/src/components/permissions/SetWillUpdateChildren';
 import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
+import { WillUpdateChildren } from '../../../../phaser-genesis/src/components/permissions/WillUpdateChildren';
 import { WorldCamera } from '../../../../phaser-genesis/src/camera/WorldCamera';
 
 class Snowflake extends Sprite
@@ -102,9 +104,6 @@ class Demo extends Scene
             const flake = new Snowflake();
 
             AddChild(world, flake);
-
-            world.list.push(flake);
-            world.renderList2.push(flake.id);
         }
 
         this.camera.setPosition(-16384, -16384);
@@ -115,15 +114,19 @@ class Demo extends Scene
         //  Grass texture is 512 x 512
         //  World is 64 x 64 tiles = 32,768 x 32,768
 
+        const layer = new Layer();
+
+        SetWillUpdateChildren(layer.id, false);
+
         for (let y = 0; y < 64; y++)
         {
             for (let x = 0; x < 64; x++)
             {
-                const s = AddChild(this.world, new Sprite(x * 512, y * 512, 'grass').setOrigin(0, 0));
-
-                this.world.renderList2.push(s.id);
+                AddChild(layer, new Sprite(x * 512, y * 512, 'grass').setOrigin(0, 0));
             }
         }
+
+        AddChild(this.world, layer);
     }
 
     createLandscape ()
@@ -133,6 +136,10 @@ class Demo extends Scene
         //  Remove __BASE texture
         frames.shift();
 
+        const layer = new Layer();
+
+        SetWillUpdateChildren(layer.id, false);
+
         const size = 512;
 
         for (let y = 0; y < size; y++)
@@ -141,11 +148,11 @@ class Demo extends Scene
             {
                 const frame = GetRandom(frames);
 
-                const s = AddChild(this.world, new Sprite(256 + (x * 128), size + (y * 128), 'items', frame).setOrigin(0.5, 1));
-
-                this.world.renderList2.push(s.id);
+                AddChild(layer, new Sprite(256 + (x * 128), size + (y * 128), 'items', frame).setOrigin(0.5, 1));
             }
         }
+
+        AddChild(this.world, layer);
     }
 
     update (): void
@@ -180,7 +187,7 @@ class Demo extends Scene
 
         if (rs)
         {
-            msg.innerText = `Frame: ${rs.gameFrame} - Game Objects: ${rs.numChildren} - Rendered: ${rs.numRendered} - Updated: ${rs.dirtyLocal}`;
+            msg.innerText = `Frame: ${rs.gameFrame} - Game Objects: ${rs.numChildren} - Rendered: ${rs.rendered} - Updated: ${rs.dirtyLocal}`;
         }
     }
 }

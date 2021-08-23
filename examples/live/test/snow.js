@@ -951,8 +951,8 @@ void main (void)
   // ../phaser-genesis/src/renderer/webgl1/shaders/CreateUniforms.ts
   function CreateUniforms(program) {
     const uniforms = new Map();
-    const total3 = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
-    for (let i = 0; i < total3; i++) {
+    const total2 = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
+    for (let i = 0; i < total2; i++) {
       const uniform = gl.getActiveUniform(program, i);
       let name = uniform.name;
       if (name.startsWith("gl_") || name.startsWith("webgl_")) {
@@ -1716,71 +1716,98 @@ void main (void)
     world2[$localEntities] = new Map();
     return world2;
   };
-  var defineSystem = (fn1, fn2) => {
-    const update = fn2 !== void 0 ? fn2 : fn1;
-    const create = fn2 !== void 0 ? fn1 : void 0;
-    const init = new Set();
-    const system2 = (world2, ...args) => {
-      if (create && !init.has(world2)) {
-        create(world2, ...args);
-        init.add(world2);
-      }
-      update(world2, ...args);
-      commitRemovals(world2);
-      return world2;
-    };
-    Object.defineProperty(system2, "name", {
-      value: (update.name || "AnonymousSystem") + "_internal",
-      configurable: true
-    });
-    return system2;
-  };
   var Types = TYPES_ENUM;
 
   // ../phaser-genesis/src/components/transform/Transform2DComponent.ts
   var TRANSFORM = {
-    DIRTY: 0,
-    X: 1,
-    Y: 2,
-    ROTATION: 3,
-    SCALE_X: 4,
-    SCALE_Y: 5,
-    SKEW_X: 6,
-    SKEW_Y: 7,
-    AXIS_ALIGNED: 8,
-    FRAME_X1: 9,
-    FRAME_Y1: 10,
-    FRAME_X2: 11,
-    FRAME_Y2: 12,
-    LOCAL_A: 13,
-    LOCAL_B: 14,
-    LOCAL_C: 15,
-    LOCAL_D: 16,
-    LOCAL_TX: 17,
-    LOCAL_TY: 18,
-    BOUNDS_X1: 19,
-    BOUNDS_Y1: 20,
-    BOUNDS_X2: 21,
-    BOUNDS_Y2: 22,
-    ORIGIN_X: 23,
-    ORIGIN_Y: 24,
-    WORLD_A: 25,
-    WORLD_B: 26,
-    WORLD_C: 27,
-    WORLD_D: 28,
-    WORLD_TX: 29,
-    WORLD_TY: 30,
-    FRAME_WIDTH: 31,
-    FRAME_HEIGHT: 32,
-    RESERVED: 33
+    IS_ROOT: 0,
+    DIRTY: 1,
+    X: 2,
+    Y: 3,
+    ROTATION: 4,
+    SCALE_X: 5,
+    SCALE_Y: 6,
+    SKEW_X: 7,
+    SKEW_Y: 8,
+    AXIS_ALIGNED: 9,
+    FRAME_X1: 10,
+    FRAME_Y1: 11,
+    FRAME_X2: 12,
+    FRAME_Y2: 13,
+    LOCAL_A: 14,
+    LOCAL_B: 15,
+    LOCAL_C: 16,
+    LOCAL_D: 17,
+    LOCAL_TX: 18,
+    LOCAL_TY: 19,
+    BOUNDS_X1: 20,
+    BOUNDS_Y1: 21,
+    BOUNDS_X2: 22,
+    BOUNDS_Y2: 23,
+    ORIGIN_X: 24,
+    ORIGIN_Y: 25,
+    WORLD_A: 26,
+    WORLD_B: 27,
+    WORLD_C: 28,
+    WORLD_D: 29,
+    WORLD_TX: 30,
+    WORLD_TY: 31,
+    FRAME_WIDTH: 32,
+    FRAME_HEIGHT: 33,
+    DIRTY_WORLD: 34,
+    RESERVED: 35
   };
   var Transform2DComponent = defineComponent({
-    data: [Types.f32, 34]
+    data: [Types.f32, 36]
   });
+
+  // ../phaser-genesis/src/components/hierarchy/HierarchyComponent.ts
+  var HIERARCHY = {
+    WORLD: 0,
+    PARENT: 1,
+    INDEX: 2,
+    NEXT: 3,
+    PREV: 4,
+    FIRST: 5,
+    LAST: 6,
+    NUM_CHILDREN: 7,
+    DEPTH: 8
+  };
+  var HierarchyComponent = defineComponent({
+    data: [Types.ui32, 9]
+  });
+
+  // ../phaser-genesis/src/components/hierarchy/GetWorldID.ts
+  function GetWorldID(id) {
+    return HierarchyComponent.data[id][HIERARCHY.WORLD];
+  }
+
+  // ../phaser-genesis/src/components/dirty/DirtyComponent.ts
+  var DIRTY = {
+    CHILD: 0,
+    CHILD_CACHE: 1,
+    CHILD_TRANSFORM: 2,
+    CHILD_WORLD_TRANSFORM: 3,
+    CHILD_COLOR: 4,
+    DISPLAY_LIST: 5,
+    COLOR: 6
+  };
+  var DirtyComponent = defineComponent({
+    data: [Types.ui8, 7]
+  });
+
+  // ../phaser-genesis/src/components/dirty/SetDirtyChildTransform.ts
+  function SetDirtyChildTransform(id) {
+    DirtyComponent.data[id][DIRTY.CHILD_TRANSFORM] = 1;
+  }
 
   // ../phaser-genesis/src/components/dirty/SetDirtyTransform.ts
   function SetDirtyTransform(id) {
     Transform2DComponent.data[id][TRANSFORM.DIRTY] = 1;
+    const worldID = GetWorldID(id);
+    if (worldID > 0) {
+      SetDirtyChildTransform(worldID);
+    }
   }
 
   // ../phaser-genesis/src/components/transform/SetExtent.ts
@@ -2218,7 +2245,7 @@ void main (void)
   if (window["defaultSize"]) {
     setDefaultSize(parseInt(window["defaultSize"]));
   } else {
-    setDefaultSize(4e5);
+    setDefaultSize(5e5);
   }
   var world = createWorld();
   var GameObjectWorld = world;
@@ -2846,16 +2873,6 @@ void main (void)
     ConfigStore.set(CONFIG_DEFAULTS.WEBGL_CONTEXT, contextAttributes);
   }
 
-  // ../phaser-genesis/src/config/worldsize/SetWorldSize.ts
-  function SetWorldSize(width = 17592186, height = 512) {
-    if (width * height > 9007199254) {
-      throw new Error("Invalid world size");
-    }
-    ConfigStore.set(CONFIG_DEFAULTS.WORLD_WIDTH, width);
-    ConfigStore.set(CONFIG_DEFAULTS.WORLD_HEIGHT, height);
-    ConfigStore.set(CONFIG_DEFAULTS.WORLD_SIZE, width * height);
-  }
-
   // ../phaser-genesis/src/math/Clamp.ts
   function Clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
@@ -3121,78 +3138,39 @@ void main (void)
     return TextureManagerInstance.get().get(key);
   }
 
-  // ../phaser-genesis/src/components/hierarchy/HierarchyComponent.ts
-  var Hierarchy = defineComponent({
-    world: Types.ui32,
-    parent: Types.ui32,
-    index: Types.ui32,
-    next: Types.ui32,
-    prev: Types.ui32,
-    first: Types.ui32,
-    last: Types.ui32,
-    numChildren: Types.ui32,
-    depth: Types.ui32
+  // ../phaser-genesis/src/components/bounds/BoundsIntersects.ts
+  function BoundsIntersects(id, x, y, right, bottom) {
+    const bx = Transform2DComponent.data[id][TRANSFORM.BOUNDS_X1];
+    const by = Transform2DComponent.data[id][TRANSFORM.BOUNDS_Y1];
+    const br = Transform2DComponent.data[id][TRANSFORM.BOUNDS_X2];
+    const bb = Transform2DComponent.data[id][TRANSFORM.BOUNDS_Y2];
+    return !(right < bx || bottom < by || x > br || y > bb);
+  }
+
+  // ../phaser-genesis/src/components/color/ColorComponent.ts
+  var Color = defineComponent({
+    r: Types.ui8c,
+    g: Types.ui8c,
+    b: Types.ui8c,
+    a: Types.f32,
+    colorMatrix: [Types.f32, 16],
+    colorOffset: [Types.f32, 4]
   });
-  var HierarchyComponent = Hierarchy;
+  var ColorComponent = Color;
 
-  // ../phaser-genesis/src/components/hierarchy/ClearHierarchyComponent.ts
-  function ClearHierarchyComponent(id) {
-    HierarchyComponent.world[id] = 0;
-    HierarchyComponent.parent[id] = 0;
-    HierarchyComponent.index[id] = 0;
-    HierarchyComponent.next[id] = 0;
-    HierarchyComponent.prev[id] = 0;
-    HierarchyComponent.first[id] = 0;
-    HierarchyComponent.last[id] = 0;
-    HierarchyComponent.numChildren[id] = 0;
-  }
-
-  // ../phaser-genesis/src/components/hierarchy/GetLastChildID.ts
-  function GetLastChildID(id) {
-    return HierarchyComponent.last[id];
-  }
-
-  // ../phaser-genesis/src/components/hierarchy/GetNumChildren.ts
-  function GetNumChildren(id) {
-    return HierarchyComponent.numChildren[id];
-  }
-
-  // ../phaser-genesis/src/gameobjects/GameObjectCache.ts
-  var GameObjectCache = {
-    local: [],
-    set: function(index, object) {
-      this.local[index] = object;
-    },
-    get: function(index) {
-      return this.local[index];
-    },
-    clear: function() {
-      this.local.length = 0;
-    },
-    remove: function(index) {
-      this.local[index] = null;
-    }
-  };
-
-  // ../phaser-genesis/src/components/hierarchy/GetWorldID.ts
-  function GetWorldID(id) {
-    return HierarchyComponent.world[id];
-  }
-
-  // ../phaser-genesis/src/components/hierarchy/GetWorldFromParentID.ts
-  function GetWorldFromParentID(parentID) {
-    const worldID = GetWorldID(parentID);
-    return GameObjectCache.get(worldID);
+  // ../phaser-genesis/src/components/color/AddColorComponent.ts
+  function AddColorComponent(id) {
+    addComponent(GameObjectWorld, ColorComponent, id);
+    ColorComponent.r[id] = 255;
+    ColorComponent.g[id] = 255;
+    ColorComponent.b[id] = 255;
+    ColorComponent.a[id] = 1;
+    ColorComponent.colorMatrix[id].set(DEFAULT_COLOR_MATRIX);
   }
 
   // ../phaser-genesis/src/components/hierarchy/GetParentID.ts
   function GetParentID(id) {
-    return HierarchyComponent.parent[id];
-  }
-
-  // ../phaser-genesis/src/display/IsValidParent.ts
-  function IsValidParent(parent, child) {
-    return !(child.id === parent.id || parent.id === GetParentID(child.id));
+    return HierarchyComponent.data[id][HIERARCHY.PARENT];
   }
 
   // ../phaser-genesis/src/components/hierarchy/GetParents.ts
@@ -3206,25 +3184,14 @@ void main (void)
     return results;
   }
 
-  // ../phaser-genesis/src/components/dirty/DirtyComponent.ts
-  var Dirty = defineComponent({
-    child: Types.ui8,
-    childCache: Types.ui8,
-    displayList: Types.ui8,
-    transform: Types.ui8,
-    worldTransform: Types.ui8,
-    color: Types.ui8
-  });
-  var DirtyComponent = Dirty;
-
   // ../phaser-genesis/src/components/dirty/SetDirtyChild.ts
   function SetDirtyChild(id) {
-    DirtyComponent.child[id] = 1;
+    DirtyComponent.data[id][DIRTY.CHILD] = 1;
   }
 
   // ../phaser-genesis/src/components/dirty/SetDirtyChildCache.ts
   function SetDirtyChildCache(id) {
-    DirtyComponent.childCache[id] = 1;
+    DirtyComponent.data[id][DIRTY.CHILD_CACHE] = 1;
   }
 
   // ../phaser-genesis/src/components/permissions/PermissionsComponent.ts
@@ -3256,7 +3223,8 @@ void main (void)
   // ../phaser-genesis/src/components/dirty/SetDirtyParents.ts
   function SetDirtyParents(childID) {
     const parents = GetParents(childID);
-    parents.forEach((id) => {
+    for (let i = 0; i < parents.length; i++) {
+      const id = parents[i];
       SetDirtyChild(id);
       if (WillTransformChildren(id)) {
         SetDirtyTransform(id);
@@ -3264,66 +3232,173 @@ void main (void)
       if (WillCacheChildren(id)) {
         SetDirtyChildCache(id);
       }
-    });
+    }
   }
 
-  // ../phaser-genesis/src/components/hierarchy/SetFirstChildID.ts
-  function SetFirstChildID(parentID, childID) {
-    HierarchyComponent.first[parentID] = childID;
+  // ../phaser-genesis/src/components/dirty/ClearDirtyColor.ts
+  function ClearDirtyColor(id) {
+    DirtyComponent.data[id][DIRTY.COLOR] = 0;
   }
 
-  // ../phaser-genesis/src/components/hierarchy/SetIndex.ts
-  function SetIndex(id, index) {
-    HierarchyComponent.index[id] = index;
+  // ../phaser-genesis/src/components/dirty/HasDirtyColor.ts
+  function HasDirtyColor(id) {
+    return Boolean(DirtyComponent.data[id][DIRTY.COLOR]);
   }
 
-  // ../phaser-genesis/src/components/hierarchy/SetLastChildID.ts
-  function SetLastChildID(parentID, childID) {
-    HierarchyComponent.last[parentID] = childID;
+  // ../phaser-genesis/src/components/vertices/SetQuadColor.ts
+  function SetQuadColor(id, red, green, blue, alpha) {
+    const data = QuadVertexComponent.values[id];
+    data[5] = red;
+    data[6] = green;
+    data[7] = blue;
+    data[8] = alpha;
+    data[14] = red;
+    data[15] = green;
+    data[16] = blue;
+    data[17] = alpha;
+    data[23] = red;
+    data[24] = green;
+    data[25] = blue;
+    data[26] = alpha;
+    data[32] = red;
+    data[33] = green;
+    data[34] = blue;
+    data[35] = alpha;
+    data[41] = red;
+    data[42] = green;
+    data[43] = blue;
+    data[44] = alpha;
+    data[50] = red;
+    data[51] = green;
+    data[52] = blue;
+    data[53] = alpha;
   }
 
-  // ../phaser-genesis/src/components/hierarchy/SetNextSiblingID.ts
-  function SetNextSiblingID(parentID, childID) {
-    HierarchyComponent.next[parentID] = childID;
+  // ../phaser-genesis/src/components/color/UpdateQuadColorSystem.ts
+  function UpdateQuadColorSystem(entities) {
+    let total2 = 0;
+    const len = entities.length;
+    for (let i = 0; i < len; i++) {
+      const id = entities[i];
+      if (HasDirtyColor(id)) {
+        const r = ColorComponent.r[id] / 255;
+        const g = ColorComponent.g[id] / 255;
+        const b = ColorComponent.b[id] / 255;
+        const a = ColorComponent.a[id];
+        SetQuadColor(id, r, g, b, a);
+        ClearDirtyColor(id);
+        total2++;
+      }
+    }
+    return total2;
   }
 
-  // ../phaser-genesis/src/components/hierarchy/SetNumChildren.ts
-  function SetNumChildren(parentID, total3) {
-    HierarchyComponent.numChildren[parentID] = total3;
+  // ../phaser-genesis/src/components/dirty/SetDirtyColor.ts
+  function SetDirtyColor(id) {
+    DirtyComponent.data[id][DIRTY.COLOR] = 1;
+    const world2 = GetWorldID(id);
+    if (world2) {
+      DirtyComponent.data[world2][DIRTY.CHILD_COLOR] = 1;
+    }
   }
 
-  // ../phaser-genesis/src/components/hierarchy/SetParentID.ts
-  function SetParentID(childID, parentID) {
-    HierarchyComponent.parent[childID] = parentID;
+  // ../phaser-genesis/src/components/dirty/AddDirtyComponent.ts
+  function AddDirtyComponent(id) {
+    addComponent(GameObjectWorld, DirtyComponent, id);
+    SetDirtyColor(id);
   }
 
-  // ../phaser-genesis/src/components/hierarchy/SetPreviousSiblingID.ts
-  function SetPreviousSiblingID(parentID, childID) {
-    HierarchyComponent.prev[parentID] = childID;
+  // ../phaser-genesis/src/components/dirty/ClearDirtyChild.ts
+  function ClearDirtyChild(id) {
+    DirtyComponent.data[id][DIRTY.CHILD] = 0;
+  }
+
+  // ../phaser-genesis/src/components/dirty/ClearDirtyDisplayList.ts
+  function ClearDirtyDisplayList(id) {
+    DirtyComponent.data[id][DIRTY.DISPLAY_LIST] = 0;
+  }
+
+  // ../phaser-genesis/src/components/dirty/ClearDirtyTransform.ts
+  function ClearDirtyTransform(id) {
+    Transform2DComponent.data[id][TRANSFORM.DIRTY] = 0;
+  }
+
+  // ../phaser-genesis/src/components/dirty/HasDirtyChildCache.ts
+  function HasDirtyChildCache(id) {
+    return Boolean(DirtyComponent.data[id][DIRTY.CHILD_CACHE]);
+  }
+
+  // ../phaser-genesis/src/components/dirty/HasDirtyDisplayList.ts
+  function HasDirtyDisplayList(id) {
+    return Boolean(DirtyComponent.data[id][DIRTY.DISPLAY_LIST]);
+  }
+
+  // ../phaser-genesis/src/components/dirty/HasDirtyTransform.ts
+  function HasDirtyTransform(id) {
+    return Boolean(Transform2DComponent.data[id][TRANSFORM.DIRTY]);
   }
 
   // ../phaser-genesis/src/components/dirty/SetDirtyDisplayList.ts
   function SetDirtyDisplayList(id) {
-    DirtyComponent.displayList[id] = 1;
+    DirtyComponent.data[id][DIRTY.DISPLAY_LIST] = 1;
   }
 
-  // ../phaser-genesis/src/display/ClearWorld.ts
-  function ClearWorld(childID) {
-    const worldID = HierarchyComponent.world[childID];
+  // ../phaser-genesis/src/components/dirty/SetDirtyWorldDisplayList.ts
+  function SetDirtyWorldDisplayList(id) {
+    const worldID = GetWorldID(id);
+    if (worldID > 0) {
+      DirtyComponent.data[worldID][DIRTY.DISPLAY_LIST];
+    }
+  }
+
+  // ../phaser-genesis/src/components/hierarchy/AddHierarchyComponent.ts
+  function AddHierarchyComponent(id) {
+    addComponent(GameObjectWorld, HierarchyComponent, id);
+  }
+
+  // ../phaser-genesis/src/gameobjects/GameObjectCache.ts
+  var GameObjectCache = {
+    local: [],
+    set: function(index, object) {
+      this.local[index] = object;
+    },
+    get: function(index) {
+      return this.local[index];
+    },
+    clear: function() {
+      this.local.length = 0;
+    },
+    remove: function(index) {
+      this.local[index] = null;
+    }
+  };
+
+  // ../phaser-genesis/src/components/hierarchy/UpdateNumChildren.ts
+  function UpdateNumChildren(id) {
+  }
+
+  // ../phaser-genesis/src/components/hierarchy/ClearWorldAndParentID.ts
+  function ClearWorldAndParentID(id) {
+    const worldID = GetWorldID(id);
+    const parentID = GetParentID(id);
     const world2 = GameObjectCache.get(worldID);
-    removeComponent(GameObjectWorld, world2.tag, childID);
-    HierarchyComponent.world[childID] = 0;
-    SetDirtyDisplayList(worldID);
+    HierarchyComponent.data[id][HIERARCHY.WORLD] = 0;
+    HierarchyComponent.data[id][HIERARCHY.PARENT] = 0;
+    if (world2 && hasComponent(GameObjectWorld, world2.tag, id)) {
+      removeComponent(GameObjectWorld, world2.tag, id);
+    }
+    UpdateNumChildren(parentID);
+    SetDirtyParents(id);
   }
 
   // ../phaser-genesis/src/components/hierarchy/GetFirstChildID.ts
   function GetFirstChildID(id) {
-    return HierarchyComponent.first[id];
+    return HierarchyComponent.data[id][HIERARCHY.FIRST];
   }
 
   // ../phaser-genesis/src/components/hierarchy/GetNextSiblingID.ts
   function GetNextSiblingID(id) {
-    return HierarchyComponent.next[id];
+    return HierarchyComponent.data[id][HIERARCHY.NEXT];
   }
 
   // ../phaser-genesis/src/components/hierarchy/MoveNext.ts
@@ -3360,368 +3435,86 @@ void main (void)
     return output;
   }
 
-  // ../phaser-genesis/src/display/SetWorld.ts
-  function SetWorld(world2, ...entries) {
-    const worldID = world2.id;
-    const worldTag = world2.tag;
-    entries.forEach((entry) => {
-      const children = DepthFirstSearchFromParentID(entry.id, false);
-      children.map((id) => {
-        const currentWorldID = HierarchyComponent.world[id];
-        if (currentWorldID > 0 && currentWorldID !== worldID) {
-          ClearWorld(id);
-        }
-        if (currentWorldID !== worldID) {
-          addComponent(GameObjectWorld, worldTag, id);
-          HierarchyComponent.world[id] = worldID;
-        }
-      });
-    });
-    SetDirtyDisplayList(worldID);
-    return entries;
-  }
-
-  // ../phaser-genesis/src/display/AddChild.ts
-  function AddChild(parent, child) {
-    if (IsValidParent(parent, child)) {
-      const childID = child.id;
-      const parentID = parent.id;
-      const numChildren = GetNumChildren(parentID);
-      const world2 = GetWorldFromParentID(parentID);
-      ClearHierarchyComponent(childID);
-      if (numChildren === 0) {
-        SetIndex(childID, 0);
-        SetFirstChildID(parentID, childID);
-      } else {
-        const lastChild = GetLastChildID(parentID);
-        SetNextSiblingID(lastChild, childID);
-        SetPreviousSiblingID(childID, lastChild);
-        SetIndex(childID, numChildren);
-      }
-      SetParentID(childID, parentID);
-      SetDirtyTransform(childID);
-      SetDirtyParents(childID);
-      SetLastChildID(parentID, childID);
-      SetNumChildren(parentID, numChildren + 1);
-      if (world2) {
-        SetWorld(world2, child);
-      }
-    }
-    return child;
-  }
-
-  // ../phaser-genesis/src/display/AddChildAt.ts
-  function AddChildAt(parent, child, index) {
-    if (IsValidParent(parent, child)) {
-      const childID = child.id;
-      const parentID = parent.id;
-      const numChildren = GetNumChildren(parentID);
-      const world2 = GetWorldFromParentID(parentID);
-      ClearHierarchyComponent(childID);
-      if (index === -1) {
-        if (numChildren === 0) {
-          SetIndex(childID, 0);
-          SetFirstChildID(parentID, childID);
-          SetLastChildID(parentID, childID);
-        } else {
-          const lastChild = GetLastChildID(parentID);
-          SetNextSiblingID(lastChild, childID);
-          SetPreviousSiblingID(childID, lastChild);
-          SetIndex(childID, numChildren);
-          SetLastChildID(parentID, childID);
-        }
-        SetParentID(childID, parentID);
-        SetNumChildren(parentID, numChildren + 1);
-        SetDirtyTransform(childID);
-      } else {
-      }
-      SetDirtyParents(childID);
-      if (world2) {
-        SetWorld(world2, child);
-      }
-    }
-    return child;
-  }
-
-  // ../phaser-genesis/src/display/GetChildIndex.ts
-  function GetChildIndex(child) {
-    return HierarchyComponent.index[child.id];
-  }
-
-  // ../phaser-genesis/src/gameobjects/GameObjectTree.ts
-  var GameObjectTree = {
-    local: [],
-    set: function(index, object) {
-      this.local[index] = object;
-    },
-    get: function(index) {
-      return this.local[index];
-    },
-    clear: function() {
-      this.local.length = 0;
-    },
-    remove: function(index) {
-      this.local[index] = null;
-    }
-  };
-
-  // ../phaser-genesis/src/components/dirty/SetDirtyWorldDisplayList.ts
-  function SetDirtyWorldDisplayList(id) {
-    const worldID = HierarchyComponent.world[id];
-    DirtyComponent.displayList[worldID] = 1;
-  }
-
   // ../phaser-genesis/src/components/hierarchy/GetChildrenFromParentID.ts
   function GetChildrenFromParentID(id) {
     const out = [];
-    GameObjectTree.get(id).forEach((childID) => {
-      out.push(GameObjectCache.get(childID));
-    });
+    let next = GetFirstChildID(id);
+    while (next > 0) {
+      out.push(GameObjectCache.get(next));
+      next = GetNextSiblingID(next);
+    }
     return out;
   }
 
-  // ../phaser-genesis/src/components/hierarchy/UpdateNumChildren.ts
-  function UpdateNumChildren(id) {
-    HierarchyComponent.numChildren[id] = GameObjectTree.get(id).length;
+  // ../phaser-genesis/src/components/hierarchy/GetDepth.ts
+  function GetDepth(id) {
+    return HierarchyComponent.data[id][HIERARCHY.DEPTH];
   }
 
-  // ../phaser-genesis/src/components/hierarchy/ClearWorldAndParentID.ts
-  function ClearWorldAndParentID(id) {
-    const worldID = GetWorldID(id);
-    const parentID = GetParentID(id);
-    const world2 = GameObjectCache.get(worldID);
-    HierarchyComponent.world[id] = 0;
-    HierarchyComponent.parent[id] = 0;
-    if (world2 && hasComponent(GameObjectWorld, world2.tag, id)) {
-      removeComponent(GameObjectWorld, world2.tag, id);
+  // ../phaser-genesis/src/components/hierarchy/GetNumChildren.ts
+  function GetNumChildren(id) {
+    return HierarchyComponent.data[id][HIERARCHY.NUM_CHILDREN];
+  }
+
+  // ../phaser-genesis/src/components/hierarchy/GetParentGameObject.ts
+  function GetParentGameObject(id) {
+    return GameObjectCache.get(HierarchyComponent.data[id][HIERARCHY.PARENT]);
+  }
+
+  // ../phaser-genesis/src/components/hierarchy/GetWorldFromParentID.ts
+  function GetWorldFromParentID(parentID) {
+    const worldID = GetWorldID(parentID);
+    return GameObjectCache.get(worldID);
+  }
+
+  // ../phaser-genesis/src/components/hierarchy/SetDepth.ts
+  function SetDepth(id, depth) {
+    HierarchyComponent.data[id][HIERARCHY.DEPTH] = depth;
+  }
+
+  // ../phaser-genesis/src/components/hierarchy/SetIndex.ts
+  function SetIndex(id, index) {
+    HierarchyComponent.data[id][HIERARCHY.INDEX] = index;
+  }
+
+  // ../phaser-genesis/src/components/hierarchy/SetNumChildren.ts
+  function SetNumChildren(parentID, total2) {
+    HierarchyComponent.data[parentID][HIERARCHY.NUM_CHILDREN] = total2;
+  }
+
+  // ../phaser-genesis/src/components/hierarchy/SetParentID.ts
+  function SetParentID(childID, parentID) {
+    HierarchyComponent.data[childID][HIERARCHY.PARENT] = parentID;
+  }
+
+  // ../phaser-genesis/src/components/hierarchy/SetWorldID.ts
+  function SetWorldID(id, worldID) {
+    HierarchyComponent.data[id][HIERARCHY.WORLD] = worldID;
+  }
+
+  // ../phaser-genesis/src/components/hierarchy/GetChildIDsFromParentID.ts
+  function GetChildIDsFromParentID(id) {
+    let next = GetFirstChildID(id);
+    const output = [];
+    while (next > 0) {
+      output.push(next);
+      next = GetNextSiblingID(next);
     }
-    UpdateNumChildren(parentID);
-    SetDirtyParents(id);
+    return output;
   }
 
   // ../phaser-genesis/src/components/hierarchy/UpdateChildIndexes.ts
   function UpdateChildIndexes(parentID) {
-    const children = GameObjectTree.get(parentID);
-    for (let i = 0; i < children.length; i++) {
-      SetIndex(children[i], i);
+    const children2 = GetChildIDsFromParentID(parentID);
+    for (let i = 0; i < children2.length; i++) {
+      SetIndex(children2[i], i);
     }
-  }
-
-  // ../phaser-genesis/src/display/RemoveChildrenBetween.ts
-  function RemoveChildrenBetween(parent, beginIndex = 0, endIndex) {
-    const parentID = parent.id;
-    const children = GameObjectTree.get(parentID);
-    if (endIndex === void 0) {
-      endIndex = children.length;
-    }
-    const range = endIndex - beginIndex;
-    if (range > 0 && range <= endIndex) {
-      const removed2 = children.splice(beginIndex, range);
-      removed2.forEach((childID) => {
-        ClearWorldAndParentID(childID);
-      });
-      UpdateChildIndexes(parentID);
-      return removed2.map((id) => GameObjectCache.get(id));
-    } else {
-      return [];
-    }
-  }
-
-  // ../phaser-genesis/src/display/DestroyChildren.ts
-  function DestroyChildren(parent, beginIndex = 0, endIndex) {
-    const removed2 = RemoveChildrenBetween(parent, beginIndex, endIndex);
-    removed2.forEach((child) => {
-      child.destroy();
-    });
-    UpdateChildIndexes(parent.id);
-    SetDirtyWorldDisplayList(parent.id);
-  }
-
-  // ../phaser-genesis/src/components/transform/AddTransform2DComponent.ts
-  function AddTransform2DComponent(id, x = 0, y = 0, originX = 0, originY = 0) {
-    addComponent(GameObjectWorld, Transform2DComponent, id);
-    Transform2DComponent.data[id][TRANSFORM.DIRTY] = 1;
-    Transform2DComponent.data[id][TRANSFORM.X] = x;
-    Transform2DComponent.data[id][TRANSFORM.Y] = y;
-    Transform2DComponent.data[id][TRANSFORM.SCALE_X] = 1;
-    Transform2DComponent.data[id][TRANSFORM.SCALE_Y] = 1;
-    Transform2DComponent.data[id][TRANSFORM.ORIGIN_X] = originX;
-    Transform2DComponent.data[id][TRANSFORM.ORIGIN_Y] = originY;
-    Transform2DComponent.data[id][TRANSFORM.AXIS_ALIGNED] = 1;
-  }
-
-  // ../phaser-genesis/src/components/color/ColorComponent.ts
-  var Color = defineComponent({
-    r: Types.ui8c,
-    g: Types.ui8c,
-    b: Types.ui8c,
-    a: Types.f32,
-    colorMatrix: [Types.f32, 16],
-    colorOffset: [Types.f32, 4]
-  });
-  var ColorComponent = Color;
-
-  // ../phaser-genesis/src/components/color/AddColorComponent.ts
-  function AddColorComponent(id) {
-    addComponent(GameObjectWorld, ColorComponent, id);
-    ColorComponent.r[id] = 255;
-    ColorComponent.g[id] = 255;
-    ColorComponent.b[id] = 255;
-    ColorComponent.a[id] = 1;
-    ColorComponent.colorMatrix[id].set(DEFAULT_COLOR_MATRIX);
-  }
-
-  // ../phaser-genesis/src/components/dirty/SetDirtyColor.ts
-  function SetDirtyColor(id) {
-    DirtyComponent.color[id] = 1;
-    const world2 = GetWorldID(id);
-    if (world2) {
-      DirtyComponent.color[world2] = 1;
-    }
-  }
-
-  // ../phaser-genesis/src/components/dirty/AddDirtyComponent.ts
-  function AddDirtyComponent(id) {
-    addComponent(GameObjectWorld, DirtyComponent, id);
-    SetDirtyColor(id);
-  }
-
-  // ../phaser-genesis/src/components/dirty/ClearDirtyChild.ts
-  function ClearDirtyChild(id) {
-    DirtyComponent.child[id] = 0;
-  }
-
-  // ../phaser-genesis/src/components/dirty/ClearDirtyColor.ts
-  function ClearDirtyColor(id) {
-    DirtyComponent.color[id] = 0;
-  }
-
-  // ../phaser-genesis/src/components/dirty/ClearDirtyTransform.ts
-  function ClearDirtyTransform(id) {
-    Transform2DComponent.data[id][TRANSFORM.DIRTY] = 0;
-  }
-
-  // ../phaser-genesis/src/components/dirty/HasDirtyChildCache.ts
-  function HasDirtyChildCache(id) {
-    return Boolean(DirtyComponent.childCache[id]);
-  }
-
-  // ../phaser-genesis/src/components/dirty/HasDirtyColor.ts
-  function HasDirtyColor(id) {
-    return Boolean(DirtyComponent.color[id]);
-  }
-
-  // ../phaser-genesis/src/components/dirty/HasDirtyDisplayList.ts
-  function HasDirtyDisplayList(id) {
-    return Boolean(DirtyComponent.displayList[id]);
-  }
-
-  // ../phaser-genesis/src/components/dirty/HasDirtyTransform.ts
-  function HasDirtyTransform(id) {
-    return Boolean(Transform2DComponent.data[id][TRANSFORM.DIRTY]);
-  }
-
-  // ../phaser-genesis/src/components/permissions/SetWillColorChildren.ts
-  function SetWillColorChildren(value, id) {
-    PermissionsComponent.data[id][PERMISSION.WILL_COLOR_CHILDREN] = Number(value);
-  }
-
-  // ../phaser-genesis/src/components/permissions/WillColorChildren.ts
-  function WillColorChildren(id) {
-    return Boolean(PermissionsComponent.data[id][PERMISSION.WILL_COLOR_CHILDREN]);
-  }
-
-  // ../phaser-genesis/src/components/color/Color.ts
-  var Color2 = class {
-    id;
-    colorMatrixEnabled = false;
-    constructor(id, red = 255, green = 255, blue = 255, alpha = 1) {
-      AddColorComponent(id);
-      this.id = id;
-      this.set(red, green, blue, alpha);
-    }
-    set(red, green, blue, alpha) {
-      this.red = red;
-      this.green = green;
-      this.blue = blue;
-      this.alpha = alpha;
-    }
-    set tint(value) {
-      this.red = value >> 16 & 255;
-      this.green = value >> 8 & 255;
-      this.blue = value & 255;
-    }
-    get tint() {
-      return this.red << 16 | this.green << 8 | this.blue;
-    }
-    set willColorChildren(value) {
-      SetWillColorChildren(value, this.id);
-    }
-    get willColorChildren() {
-      return WillColorChildren(this.id);
-    }
-    set colorMatrix(value) {
-      ColorComponent.colorMatrix[this.id].set(value);
-      SetDirtyColor(this.id);
-      this.colorMatrixEnabled = true;
-    }
-    get colorMatrix() {
-      return ColorComponent.colorMatrix[this.id];
-    }
-    set colorOffset(value) {
-      ColorComponent.colorOffset[this.id].set(value);
-      SetDirtyColor(this.id);
-    }
-    get colorOffset() {
-      return ColorComponent.colorOffset[this.id];
-    }
-    set red(value) {
-      ColorComponent.r[this.id] = value;
-      SetDirtyColor(this.id);
-    }
-    get red() {
-      return ColorComponent.r[this.id];
-    }
-    set green(value) {
-      ColorComponent.g[this.id] = value;
-      SetDirtyColor(this.id);
-    }
-    get green() {
-      return ColorComponent.g[this.id];
-    }
-    set blue(value) {
-      ColorComponent.b[this.id] = value;
-      SetDirtyColor(this.id);
-    }
-    get blue() {
-      return ColorComponent.b[this.id];
-    }
-    set alpha(value) {
-      ColorComponent.a[this.id] = value;
-      SetDirtyColor(this.id);
-    }
-    get alpha() {
-      return ColorComponent.a[this.id];
-    }
-  };
-
-  // ../phaser-genesis/src/components/hierarchy/AddHierarchyComponent.ts
-  function AddHierarchyComponent(id) {
-    addComponent(GameObjectWorld, HierarchyComponent, id);
   }
 
   // ../phaser-genesis/src/components/permissions/AddPermissionsComponent.ts
   function AddPermissionsComponent(id) {
     addComponent(GameObjectWorld, PermissionsComponent, id);
     PermissionsComponent.data[id].set([1, 1, 1, 1, 1, 1, 1, 1, 1]);
-  }
-
-  // ../phaser-genesis/src/gameobjects/events/DestroyEvent.ts
-  var DestroyEvent = "destroy";
-
-  // ../phaser-genesis/src/components/hierarchy/GetParentGameObject.ts
-  function GetParentGameObject(id) {
-    return GameObjectCache.get(HierarchyComponent.parent[id]);
   }
 
   // ../phaser-genesis/src/components/permissions/GetVisible.ts
@@ -3734,33 +3527,59 @@ void main (void)
     return Boolean(PermissionsComponent.data[id][PERMISSION.VISIBLE_CHILDREN]);
   }
 
-  // ../phaser-genesis/src/display/SetParent.ts
-  function SetParent2(parent, ...children) {
-    children.forEach((child) => {
-      AddChildAt(parent, child);
-    });
-    return children;
+  // ../phaser-genesis/src/components/permissions/WillRenderChildren.ts
+  function WillRenderChildren(id) {
+    return GetVisibleChildren(id) && Boolean(PermissionsComponent.data[id][PERMISSION.WILL_RENDER_CHILDREN]);
   }
 
-  // ../phaser-genesis/src/display/ReparentChildren.ts
-  function ReparentChildren(parent, newParent, beginIndex = 0, endIndex) {
-    const moved = RemoveChildrenBetween(parent, beginIndex, endIndex);
-    SetParent2(newParent, ...moved);
-    return moved;
+  // ../phaser-genesis/src/components/permissions/HasRenderableChildren.ts
+  function HasRenderableChildren(id) {
+    if (!WillRenderChildren(id) || GetNumChildren(id) === 0) {
+      return false;
+    }
+    if (!WillCacheChildren(id) || WillCacheChildren(id) && HasDirtyChildCache(id)) {
+      return true;
+    }
+    return false;
   }
 
   // ../phaser-genesis/src/components/permissions/SetVisible.ts
-  function SetVisible(value, id) {
+  function SetVisible(id, value) {
     PermissionsComponent.data[id][PERMISSION.VISIBLE] = Number(value);
     SetDirtyParents(id);
     SetDirtyDisplayList(GetWorldID(id));
   }
 
   // ../phaser-genesis/src/components/permissions/SetVisibleChildren.ts
-  function SetVisibleChildren(value, id) {
+  function SetVisibleChildren(id, value) {
     PermissionsComponent.data[id][PERMISSION.VISIBLE_CHILDREN] = Number(value);
     SetDirtyParents(id);
     SetDirtyDisplayList(GetWorldID(id));
+  }
+
+  // ../phaser-genesis/src/components/permissions/SetWillCacheChildren.ts
+  function SetWillCacheChildren(id, value) {
+    PermissionsComponent.data[id][PERMISSION.WILL_CACHE_CHILDREN] = Number(value);
+  }
+
+  // ../phaser-genesis/src/components/permissions/SetWillColorChildren.ts
+  function SetWillColorChildren(id, value) {
+    PermissionsComponent.data[id][PERMISSION.WILL_COLOR_CHILDREN] = Number(value);
+  }
+
+  // ../phaser-genesis/src/components/permissions/SetWillTransformChildren.ts
+  function SetWillTransformChildren(id, value) {
+    PermissionsComponent.data[id][PERMISSION.WILL_TRANSFORM_CHILDREN] = Number(value);
+  }
+
+  // ../phaser-genesis/src/components/permissions/SetWillUpdateChildren.ts
+  function SetWillUpdateChildren(id, value) {
+    PermissionsComponent.data[id][PERMISSION.WILL_UPDATE_CHILDREN] = Number(value);
+  }
+
+  // ../phaser-genesis/src/components/permissions/WillColorChildren.ts
+  function WillColorChildren(id) {
+    return Boolean(PermissionsComponent.data[id][PERMISSION.WILL_COLOR_CHILDREN]);
   }
 
   // ../phaser-genesis/src/components/permissions/WillRender.ts
@@ -3768,126 +3587,47 @@ void main (void)
     return Boolean(PermissionsComponent.data[id][PERMISSION.VISIBLE]) && Boolean(PermissionsComponent.data[id][PERMISSION.WILL_RENDER]);
   }
 
-  // ../phaser-genesis/src/gameobjects/GameObject.ts
-  var GameObject = class {
-    id = addEntity(GameObjectWorld);
-    type = "GameObject";
-    name = "";
-    events;
-    constructor() {
-      const id = this.id;
-      AddHierarchyComponent(id);
-      AddPermissionsComponent(id);
-      AddDirtyComponent(id);
-      GameObjectCache.set(id, this);
-      this.events = new Map();
-    }
-    isRenderable() {
-      return WillRender(this.id);
-    }
-    beforeUpdate(delta, time) {
-    }
-    update(delta, time) {
-    }
-    afterUpdate(delta, time) {
-    }
-    preRenderGL(renderPass) {
-    }
-    renderGL(renderPass) {
-    }
-    renderCanvas(renderer) {
-    }
-    postRenderGL(renderPass) {
-    }
-    postRenderCanvas(renderer) {
-    }
-    set visible(value) {
-      SetVisible(value, this.id);
-    }
-    get visible() {
-      return GetVisible(this.id);
-    }
-    set visibleChildren(value) {
-      SetVisibleChildren(value, this.id);
-    }
-    get visibleChildren() {
-      return GetVisibleChildren(this.id);
-    }
-    set depth(value) {
-      HierarchyComponent.depth[this.id] = value;
-    }
-    get depth() {
-      return HierarchyComponent.depth[this.id];
-    }
-    hasParent(id) {
-      if (id) {
-        return HierarchyComponent.parent[this.id] === id;
-      } else {
-        return HierarchyComponent.parent[this.id] > 0;
-      }
-    }
-    getParent() {
-      return GetParentGameObject(this.id);
-    }
-    getChildren() {
-      return GetChildrenFromParentID(this.id);
-    }
-    getNumChildren() {
-      return GetNumChildren(this.id);
-    }
-    getDisplayData() {
-      const id = this.id;
-      return {
-        id,
-        index: HierarchyComponent.index[id],
-        parent: HierarchyComponent.parent[id],
-        world: HierarchyComponent.world[id],
-        worldDepth: HierarchyComponent.worldDepth[id],
-        numChildren: HierarchyComponent.numChildren[id],
-        children: GameObjectTree.get(id)
-      };
-    }
-    toString() {
-      return `${this.type} id="${this.id}" name="${this.name}"`;
-    }
-    destroy(reparentChildren) {
-      if (reparentChildren) {
-        ReparentChildren(this, reparentChildren);
-      } else {
-        DestroyChildren(this);
-      }
-      Emit(this, DestroyEvent, this);
-      this.events.clear();
-      this.events = null;
-    }
-  };
-
-  // ../phaser-genesis/src/config/defaultorigin/GetDefaultOriginX.ts
-  function GetDefaultOriginX() {
-    return ConfigStore.get(CONFIG_DEFAULTS.DEFAULT_ORIGIN).x;
+  // ../phaser-genesis/src/components/permissions/WillUpdate.ts
+  function WillUpdate(id) {
+    return Boolean(PermissionsComponent.data[id][PERMISSION.WILL_UPDATE]);
   }
 
-  // ../phaser-genesis/src/config/defaultorigin/GetDefaultOriginY.ts
-  function GetDefaultOriginY() {
-    return ConfigStore.get(CONFIG_DEFAULTS.DEFAULT_ORIGIN).y;
+  // ../phaser-genesis/src/components/permissions/WillUpdateChildren.ts
+  function WillUpdateChildren(id) {
+    return Boolean(PermissionsComponent.data[id][PERMISSION.WILL_UPDATE_CHILDREN]);
+  }
+
+  // ../phaser-genesis/src/components/transform/AddTransform2DComponent.ts
+  function AddTransform2DComponent(id, x = 0, y = 0, originX = 0, originY = 0) {
+    addComponent(GameObjectWorld, Transform2DComponent, id);
+    Transform2DComponent.data[id][TRANSFORM.IS_ROOT] = 0;
+    Transform2DComponent.data[id][TRANSFORM.DIRTY] = 1;
+    Transform2DComponent.data[id][TRANSFORM.X] = x;
+    Transform2DComponent.data[id][TRANSFORM.Y] = y;
+    Transform2DComponent.data[id][TRANSFORM.SCALE_X] = 1;
+    Transform2DComponent.data[id][TRANSFORM.SCALE_Y] = 1;
+    Transform2DComponent.data[id][TRANSFORM.ORIGIN_X] = originX;
+    Transform2DComponent.data[id][TRANSFORM.ORIGIN_Y] = originY;
+    Transform2DComponent.data[id][TRANSFORM.AXIS_ALIGNED] = 1;
   }
 
   // ../phaser-genesis/src/components/transform/UpdateExtent.ts
   function UpdateExtent(id, width, height) {
-    const x = -Transform2DComponent.data[id][TRANSFORM.ORIGIN_X] * width;
-    const y = -Transform2DComponent.data[id][TRANSFORM.ORIGIN_Y] * height;
-    Transform2DComponent.data[id][TRANSFORM.FRAME_X1] = x;
-    Transform2DComponent.data[id][TRANSFORM.FRAME_Y1] = y;
-    Transform2DComponent.data[id][TRANSFORM.FRAME_X2] = x + width;
-    Transform2DComponent.data[id][TRANSFORM.FRAME_Y2] = y + height;
-    Transform2DComponent.data[id][TRANSFORM.FRAME_WIDTH] = width;
-    Transform2DComponent.data[id][TRANSFORM.FRAME_HEIGHT] = height;
-    Transform2DComponent.data[id][TRANSFORM.WORLD_A] = x;
-    Transform2DComponent.data[id][TRANSFORM.WORLD_B] = y;
-    Transform2DComponent.data[id][TRANSFORM.WORLD_C] = x + width;
-    Transform2DComponent.data[id][TRANSFORM.WORLD_D] = y + height;
-    Transform2DComponent.data[id][TRANSFORM.WORLD_TX] = width;
-    Transform2DComponent.data[id][TRANSFORM.WORLD_TY] = height;
+    const data = Transform2DComponent.data[id];
+    const x = -data[TRANSFORM.ORIGIN_X] * width;
+    const y = -data[TRANSFORM.ORIGIN_Y] * height;
+    data[TRANSFORM.FRAME_X1] = x;
+    data[TRANSFORM.FRAME_Y1] = y;
+    data[TRANSFORM.FRAME_X2] = x + width;
+    data[TRANSFORM.FRAME_Y2] = y + height;
+    data[TRANSFORM.FRAME_WIDTH] = width;
+    data[TRANSFORM.FRAME_HEIGHT] = height;
+    data[TRANSFORM.WORLD_A] = x;
+    data[TRANSFORM.WORLD_B] = y;
+    data[TRANSFORM.WORLD_C] = x + width;
+    data[TRANSFORM.WORLD_D] = y + height;
+    data[TRANSFORM.WORLD_TX] = width;
+    data[TRANSFORM.WORLD_TY] = height;
     SetDirtyTransform(id);
   }
 
@@ -3923,13 +3663,6 @@ void main (void)
       return Transform2DComponent.data[this.id][TRANSFORM.ORIGIN_Y];
     }
   };
-
-  // ../phaser-genesis/src/renderer/webgl1/renderpass/PopColor.ts
-  function PopColor(renderPass, color) {
-    if (color.colorMatrixEnabled && color.willColorChildren) {
-      renderPass.colorMatrix.pop();
-    }
-  }
 
   // ../phaser-genesis/src/components/transform/Position.ts
   var Position = class {
@@ -3999,13 +3732,6 @@ void main (void)
     }
   };
 
-  // ../phaser-genesis/src/renderer/webgl1/renderpass/SetColor.ts
-  function SetColor(renderPass, color) {
-    if (color.colorMatrixEnabled && color.willColorChildren) {
-      renderPass.colorMatrix.set(color);
-    }
-  }
-
   // ../phaser-genesis/src/components/transform/Size.ts
   var Size = class {
     id;
@@ -4046,10 +3772,11 @@ void main (void)
 
   // ../phaser-genesis/src/components/transform/UpdateAxisAligned.ts
   function UpdateAxisAligned(id) {
-    const rotation = Transform2DComponent.data[id][TRANSFORM.ROTATION];
-    const skewX = Transform2DComponent.data[id][TRANSFORM.SKEW_X];
-    const skewY = Transform2DComponent.data[id][TRANSFORM.SKEW_Y];
-    Transform2DComponent.data[id][TRANSFORM.AXIS_ALIGNED] = Number(rotation === 0 && skewX === 0 && skewY === 0);
+    const data = Transform2DComponent.data[id];
+    const rotation = data[TRANSFORM.ROTATION];
+    const skewX = data[TRANSFORM.SKEW_X];
+    const skewY = data[TRANSFORM.SKEW_Y];
+    data[TRANSFORM.AXIS_ALIGNED] = Number(rotation === 0 && skewX === 0 && skewY === 0);
   }
 
   // ../phaser-genesis/src/components/transform/Skew.ts
@@ -4087,6 +3814,637 @@ void main (void)
       return this._y;
     }
   };
+
+  // ../phaser-genesis/src/components/dirty/ClearDirtyTransforms.ts
+  function ClearDirtyTransforms(id) {
+    const data = Transform2DComponent.data[id];
+    data[TRANSFORM.DIRTY] = 0;
+    data[TRANSFORM.DIRTY_WORLD] = 0;
+  }
+
+  // ../phaser-genesis/src/components/dirty/SetDirtyChildWorldTransform.ts
+  function SetDirtyChildWorldTransform(id) {
+    DirtyComponent.data[id][DIRTY.CHILD_WORLD_TRANSFORM] = 1;
+  }
+
+  // ../phaser-genesis/src/components/vertices/SetQuadPosition.ts
+  function SetQuadPosition(id, x0, y0, x1, y1, x2, y2, x3, y3) {
+    const data = QuadVertexComponent.values[id];
+    data[0] = x0;
+    data[1] = y0;
+    data[9] = x1;
+    data[10] = y1;
+    data[18] = x2;
+    data[19] = y2;
+    data[27] = x0;
+    data[28] = y0;
+    data[36] = x2;
+    data[37] = y2;
+    data[45] = x3;
+    data[46] = y3;
+  }
+
+  // ../phaser-genesis/src/components/transform/UpdateLocalTransform.ts
+  function UpdateLocalTransform(worldID, entities) {
+    let prevParent = 0;
+    let total2 = 0;
+    let dirtyWorld = false;
+    for (let i = 0; i < entities.length; i++) {
+      const id = entities[i];
+      if (!HasDirtyTransform(id)) {
+        continue;
+      }
+      const data = Transform2DComponent.data[id];
+      const isRoot = data[TRANSFORM.IS_ROOT];
+      const tx = data[TRANSFORM.X];
+      const ty = data[TRANSFORM.Y];
+      const rotation = data[TRANSFORM.ROTATION];
+      const scaleX = data[TRANSFORM.SCALE_X];
+      const scaleY = data[TRANSFORM.SCALE_Y];
+      const skewX = data[TRANSFORM.SKEW_X];
+      const skewY = data[TRANSFORM.SKEW_Y];
+      const axisAligned = data[TRANSFORM.AXIS_ALIGNED];
+      const x = data[TRANSFORM.FRAME_X1];
+      const y = data[TRANSFORM.FRAME_Y1];
+      const right = data[TRANSFORM.FRAME_X2];
+      const bottom = data[TRANSFORM.FRAME_Y2];
+      let a = scaleX;
+      let b = 0;
+      let c = 0;
+      let d = scaleY;
+      if (!axisAligned) {
+        a = Math.cos(rotation + skewY) * scaleX;
+        b = Math.sin(rotation + skewY) * scaleX;
+        c = -Math.sin(rotation - skewX) * scaleY;
+        d = Math.cos(rotation - skewX) * scaleY;
+      }
+      data[TRANSFORM.LOCAL_A] = a;
+      data[TRANSFORM.LOCAL_B] = b;
+      data[TRANSFORM.LOCAL_C] = c;
+      data[TRANSFORM.LOCAL_D] = d;
+      data[TRANSFORM.LOCAL_TX] = tx;
+      data[TRANSFORM.LOCAL_TY] = ty;
+      if (isRoot) {
+        data[TRANSFORM.WORLD_A] = a;
+        data[TRANSFORM.WORLD_B] = b;
+        data[TRANSFORM.WORLD_C] = c;
+        data[TRANSFORM.WORLD_D] = d;
+        data[TRANSFORM.WORLD_TX] = tx;
+        data[TRANSFORM.WORLD_TY] = ty;
+        if (axisAligned) {
+          const x0 = x * a + tx;
+          const y0 = y * d + ty;
+          const x1 = x * a + tx;
+          const y1 = bottom * d + ty;
+          const x2 = right * a + tx;
+          const y2 = bottom * d + ty;
+          const x3 = right * a + tx;
+          const y3 = y * d + ty;
+          data[TRANSFORM.BOUNDS_X1] = x0;
+          data[TRANSFORM.BOUNDS_Y1] = y0;
+          data[TRANSFORM.BOUNDS_X2] = x2;
+          data[TRANSFORM.BOUNDS_Y2] = y2;
+          SetQuadPosition(id, x0, y0, x1, y1, x2, y2, x3, y3);
+        } else {
+          const x0 = x * a + y * c + tx;
+          const y0 = x * b + y * d + ty;
+          const x1 = x * a + bottom * c + tx;
+          const y1 = x * b + bottom * d + ty;
+          const x2 = right * a + bottom * c + tx;
+          const y2 = right * b + bottom * d + ty;
+          const x3 = right * a + y * c + tx;
+          const y3 = right * b + y * d + ty;
+          data[TRANSFORM.BOUNDS_X1] = Math.min(x0, x1, x2, x3);
+          data[TRANSFORM.BOUNDS_Y1] = Math.min(y0, y1, y2, y3);
+          data[TRANSFORM.BOUNDS_X2] = Math.max(x0, x1, x2, x3);
+          data[TRANSFORM.BOUNDS_Y2] = Math.max(y0, y1, y2, y3);
+          SetQuadPosition(id, x0, y0, x1, y1, x2, y2, x3, y3);
+        }
+        ClearDirtyTransforms(id);
+      } else {
+        const parentID = GetParentID(id);
+        if (parentID !== prevParent) {
+          SetDirtyParents(id);
+          prevParent = parentID;
+        }
+        dirtyWorld = true;
+      }
+      SetDirtyChildTransform(id);
+      total2++;
+    }
+    if (dirtyWorld) {
+      SetDirtyChildWorldTransform(worldID);
+    }
+    return total2;
+  }
+
+  // ../phaser-genesis/src/components/dirty/SetDirtyWorldTransform.ts
+  function SetDirtyWorldTransform(id) {
+    Transform2DComponent.data[id][TRANSFORM.DIRTY_WORLD] = 1;
+  }
+
+  // ../phaser-genesis/src/components/transform/CopyLocalToWorld.ts
+  function CopyLocalToWorld(source, target) {
+    const targetData = Transform2DComponent.data[target];
+    const sourceData = Transform2DComponent.data[source];
+    targetData[TRANSFORM.WORLD_A] = sourceData[TRANSFORM.LOCAL_A];
+    targetData[TRANSFORM.WORLD_B] = sourceData[TRANSFORM.LOCAL_B];
+    targetData[TRANSFORM.WORLD_C] = sourceData[TRANSFORM.LOCAL_C];
+    targetData[TRANSFORM.WORLD_D] = sourceData[TRANSFORM.LOCAL_D];
+    targetData[TRANSFORM.WORLD_TX] = sourceData[TRANSFORM.LOCAL_TX];
+    targetData[TRANSFORM.WORLD_TY] = sourceData[TRANSFORM.LOCAL_TY];
+    SetDirtyWorldTransform(target);
+  }
+
+  // ../phaser-genesis/src/components/transform/CopyWorldToWorld.ts
+  function CopyWorldToWorld(source, target) {
+    const targetData = Transform2DComponent.data[target];
+    const sourceData = Transform2DComponent.data[source];
+    targetData[TRANSFORM.WORLD_A] = sourceData[TRANSFORM.WORLD_A];
+    targetData[TRANSFORM.WORLD_B] = sourceData[TRANSFORM.WORLD_B];
+    targetData[TRANSFORM.WORLD_C] = sourceData[TRANSFORM.WORLD_C];
+    targetData[TRANSFORM.WORLD_D] = sourceData[TRANSFORM.WORLD_D];
+    targetData[TRANSFORM.WORLD_TX] = sourceData[TRANSFORM.WORLD_TX];
+    targetData[TRANSFORM.WORLD_TY] = sourceData[TRANSFORM.WORLD_TY];
+    SetDirtyWorldTransform(target);
+  }
+
+  // ../phaser-genesis/src/components/transform/MultiplyLocalWithWorld.ts
+  function MultiplyLocalWithWorld(parentID, childID) {
+    const parentData = Transform2DComponent.data[parentID];
+    const childData = Transform2DComponent.data[childID];
+    const pa = parentData[TRANSFORM.WORLD_A];
+    const pb = parentData[TRANSFORM.WORLD_B];
+    const pc = parentData[TRANSFORM.WORLD_C];
+    const pd = parentData[TRANSFORM.WORLD_D];
+    const ptx = parentData[TRANSFORM.WORLD_TX];
+    const pty = parentData[TRANSFORM.WORLD_TY];
+    const a = childData[TRANSFORM.LOCAL_A];
+    const b = childData[TRANSFORM.LOCAL_B];
+    const c = childData[TRANSFORM.LOCAL_C];
+    const d = childData[TRANSFORM.LOCAL_D];
+    const tx = childData[TRANSFORM.LOCAL_TX];
+    const ty = childData[TRANSFORM.LOCAL_TY];
+    childData[TRANSFORM.WORLD_A] = a * pa + b * pc;
+    childData[TRANSFORM.WORLD_B] = a * pb + b * pd;
+    childData[TRANSFORM.WORLD_C] = c * pa + d * pc;
+    childData[TRANSFORM.WORLD_D] = c * pb + d * pd;
+    childData[TRANSFORM.WORLD_TX] = tx * pa + ty * pc + ptx;
+    childData[TRANSFORM.WORLD_TY] = tx * pb + ty * pd + pty;
+    SetDirtyWorldTransform(childID);
+  }
+
+  // ../phaser-genesis/src/components/transform/UpdateWorldTransform.ts
+  function UpdateWorldTransform(id) {
+    const parentID = GetParentID(id);
+    if (!hasComponent(GameObjectWorld, Transform2DComponent, parentID)) {
+      CopyLocalToWorld(id, id);
+    } else if (!WillTransformChildren(id)) {
+      CopyWorldToWorld(parentID, id);
+    } else {
+      MultiplyLocalWithWorld(parentID, id);
+    }
+  }
+
+  // ../phaser-genesis/src/components/vertices/AddQuadVertex.ts
+  function AddQuadVertex(id, width = 0, height = 0, flipY = true) {
+    addComponent(GameObjectWorld, QuadVertexComponent, id);
+    if (width || height) {
+      SetUV(id, 0, 0, 1, 1);
+      SetQuadPosition(id, 0, 0, 0, height, width, height, width, 0);
+    }
+  }
+
+  // ../phaser-genesis/src/components/dirty/ClearDirtyChildTransform.ts
+  function ClearDirtyChildTransform(id) {
+    DirtyComponent.data[id][DIRTY.CHILD_TRANSFORM] = 0;
+  }
+
+  // ../phaser-genesis/src/components/dirty/ClearDirtyWorldTransform.ts
+  function ClearDirtyWorldTransform(id) {
+    Transform2DComponent.data[id][TRANSFORM.DIRTY_WORLD] = 0;
+  }
+
+  // ../phaser-genesis/src/components/dirty/HasDirtyWorldTransform.ts
+  function HasDirtyWorldTransform(id) {
+    return Boolean(Transform2DComponent.data[id][TRANSFORM.DIRTY_WORLD]);
+  }
+
+  // ../phaser-genesis/src/components/vertices/SetQuadFromWorld.ts
+  function SetQuadFromWorld(id) {
+    const data = Transform2DComponent.data[id];
+    const a = data[TRANSFORM.WORLD_A];
+    const b = data[TRANSFORM.WORLD_B];
+    const c = data[TRANSFORM.WORLD_C];
+    const d = data[TRANSFORM.WORLD_D];
+    const tx = data[TRANSFORM.WORLD_TX];
+    const ty = data[TRANSFORM.WORLD_TY];
+    const x = data[TRANSFORM.FRAME_X1];
+    const y = data[TRANSFORM.FRAME_Y1];
+    const right = data[TRANSFORM.FRAME_X2];
+    const bottom = data[TRANSFORM.FRAME_Y2];
+    const x0 = x * a + y * c + tx;
+    const y0 = x * b + y * d + ty;
+    const x1 = x * a + bottom * c + tx;
+    const y1 = x * b + bottom * d + ty;
+    const x2 = right * a + bottom * c + tx;
+    const y2 = right * b + bottom * d + ty;
+    const x3 = right * a + y * c + tx;
+    const y3 = right * b + y * d + ty;
+    data[TRANSFORM.BOUNDS_X1] = Math.min(x0, x1, x2, x3);
+    data[TRANSFORM.BOUNDS_Y1] = Math.min(y0, y1, y2, y3);
+    data[TRANSFORM.BOUNDS_X2] = Math.max(x0, x1, x2, x3);
+    data[TRANSFORM.BOUNDS_Y2] = Math.max(y0, y1, y2, y3);
+    SetQuadPosition(id, x0, y0, x1, y1, x2, y2, x3, y3);
+  }
+
+  // ../phaser-genesis/src/components/vertices/UpdateVertexPositionSystem.ts
+  function UpdateVertexPositionSystem(entities) {
+    let total2 = 0;
+    const len = entities.length;
+    for (let i = 0; i < len; i++) {
+      const id = entities[i];
+      if (HasDirtyWorldTransform(id)) {
+        SetQuadFromWorld(id);
+        ClearDirtyWorldTransform(id);
+        ClearDirtyChildTransform(id);
+        total2++;
+      }
+    }
+    return total2;
+  }
+
+  // ../phaser-genesis/src/renderer/webgl1/renderpass/GetVertexBufferEntry.ts
+  var bufferEntry = {
+    buffer: null,
+    F32: null,
+    offset: 0
+  };
+  function GetVertexBufferEntry(renderPass, addToCount = 0) {
+    const buffer = renderPass.vertexbuffer.current;
+    if (renderPass.count + addToCount >= buffer.batchSize) {
+      Flush(renderPass);
+    }
+    bufferEntry.buffer = buffer;
+    bufferEntry.F32 = buffer.vertexViewF32;
+    bufferEntry.offset = renderPass.count * buffer.entryElementSize;
+    renderPass.count += addToCount;
+    return bufferEntry;
+  }
+
+  // ../phaser-genesis/src/components/vertices/SetQuadTextureIndex.ts
+  function SetQuadTextureIndex(id, textureIndex) {
+    const data = QuadVertexComponent.values[id];
+    if (data[4] !== textureIndex) {
+      data[4] = textureIndex;
+      data[13] = textureIndex;
+      data[22] = textureIndex;
+      data[31] = textureIndex;
+      data[40] = textureIndex;
+      data[49] = textureIndex;
+    }
+  }
+
+  // ../phaser-genesis/src/renderer/webgl1/draw/BatchTexturedQuadBuffer.ts
+  function BatchTexturedQuadBuffer(texture, id, renderPass) {
+    const { F32, offset } = GetVertexBufferEntry(renderPass, 2);
+    const textureIndex = renderPass.textures.set(texture);
+    SetQuadTextureIndex(id, textureIndex);
+    F32.set(QuadVertexComponent.values[id], offset);
+  }
+
+  // ../phaser-genesis/src/components/color/Color.ts
+  var Color2 = class {
+    id;
+    colorMatrixEnabled = false;
+    constructor(id, red = 255, green = 255, blue = 255, alpha = 1) {
+      AddColorComponent(id);
+      this.id = id;
+      this.set(red, green, blue, alpha);
+    }
+    set(red, green, blue, alpha) {
+      this.red = red;
+      this.green = green;
+      this.blue = blue;
+      this.alpha = alpha;
+    }
+    set tint(value) {
+      this.red = value >> 16 & 255;
+      this.green = value >> 8 & 255;
+      this.blue = value & 255;
+    }
+    get tint() {
+      return this.red << 16 | this.green << 8 | this.blue;
+    }
+    set willColorChildren(value) {
+      SetWillColorChildren(this.id, value);
+    }
+    get willColorChildren() {
+      return WillColorChildren(this.id);
+    }
+    set colorMatrix(value) {
+      ColorComponent.colorMatrix[this.id].set(value);
+      SetDirtyColor(this.id);
+      this.colorMatrixEnabled = true;
+    }
+    get colorMatrix() {
+      return ColorComponent.colorMatrix[this.id];
+    }
+    set colorOffset(value) {
+      ColorComponent.colorOffset[this.id].set(value);
+      SetDirtyColor(this.id);
+    }
+    get colorOffset() {
+      return ColorComponent.colorOffset[this.id];
+    }
+    set red(value) {
+      ColorComponent.r[this.id] = value;
+      SetDirtyColor(this.id);
+    }
+    get red() {
+      return ColorComponent.r[this.id];
+    }
+    set green(value) {
+      ColorComponent.g[this.id] = value;
+      SetDirtyColor(this.id);
+    }
+    get green() {
+      return ColorComponent.g[this.id];
+    }
+    set blue(value) {
+      ColorComponent.b[this.id] = value;
+      SetDirtyColor(this.id);
+    }
+    get blue() {
+      return ColorComponent.b[this.id];
+    }
+    set alpha(value) {
+      ColorComponent.a[this.id] = value;
+      SetDirtyColor(this.id);
+    }
+    get alpha() {
+      return ColorComponent.a[this.id];
+    }
+  };
+
+  // ../phaser-genesis/src/display/RemoveChildrenBetween.ts
+  function RemoveChildrenBetween(parent, beginIndex = 0, endIndex) {
+    const parentID = parent.id;
+    if (endIndex === void 0) {
+      endIndex = children.length;
+    }
+    const range = endIndex - beginIndex;
+    if (range > 0 && range <= endIndex) {
+      const removed2 = children.splice(beginIndex, range);
+      removed2.forEach((childID) => {
+        ClearWorldAndParentID(childID);
+      });
+      UpdateChildIndexes(parentID);
+      return removed2.map((id) => GameObjectCache.get(id));
+    } else {
+      return [];
+    }
+  }
+
+  // ../phaser-genesis/src/display/DestroyChildren.ts
+  function DestroyChildren(parent, beginIndex = 0, endIndex) {
+    const removed2 = RemoveChildrenBetween(parent, beginIndex, endIndex);
+    removed2.forEach((child) => {
+      child.destroy();
+    });
+    UpdateChildIndexes(parent.id);
+    SetDirtyWorldDisplayList(parent.id);
+  }
+
+  // ../phaser-genesis/src/gameobjects/events/DestroyEvent.ts
+  var DestroyEvent = "destroy";
+
+  // ../phaser-genesis/src/components/hierarchy/ClearHierarchyComponent.ts
+  function ClearHierarchyComponent(id) {
+    HierarchyComponent.data[id].fill(0);
+  }
+
+  // ../phaser-genesis/src/components/hierarchy/GetLastChildID.ts
+  function GetLastChildID(id) {
+    return HierarchyComponent.data[id][HIERARCHY.LAST];
+  }
+
+  // ../phaser-genesis/src/display/IsValidParent.ts
+  function IsValidParent(parent, child) {
+    return !(child.id === parent.id || parent.id === GetParentID(child.id));
+  }
+
+  // ../phaser-genesis/src/components/hierarchy/SetFirstChildID.ts
+  function SetFirstChildID(parentID, childID) {
+    HierarchyComponent.data[parentID][HIERARCHY.FIRST] = childID;
+  }
+
+  // ../phaser-genesis/src/components/hierarchy/SetLastChildID.ts
+  function SetLastChildID(parentID, childID) {
+    HierarchyComponent.data[parentID][HIERARCHY.LAST] = childID;
+  }
+
+  // ../phaser-genesis/src/components/hierarchy/SetNextSiblingID.ts
+  function SetNextSiblingID(parentID, childID) {
+    HierarchyComponent.data[parentID][HIERARCHY.NEXT] = childID;
+  }
+
+  // ../phaser-genesis/src/components/hierarchy/SetPreviousSiblingID.ts
+  function SetPreviousSiblingID(parentID, childID) {
+    HierarchyComponent.data[parentID][HIERARCHY.PREV] = childID;
+  }
+
+  // ../phaser-genesis/src/display/ClearWorld.ts
+  function ClearWorld(childID) {
+    const worldID = HierarchyComponent.world[childID];
+    const world2 = GameObjectCache.get(worldID);
+    removeComponent(GameObjectWorld, world2.tag, childID);
+    HierarchyComponent.world[childID] = 0;
+    SetDirtyDisplayList(worldID);
+  }
+
+  // ../phaser-genesis/src/components/dirty/SetDirtyChildColor.ts
+  function SetDirtyChildColor(id) {
+    DirtyComponent.data[id][DIRTY.CHILD_COLOR] = 1;
+  }
+
+  // ../phaser-genesis/src/display/SetWorld.ts
+  function SetWorld(world2, ...entries) {
+    const worldID = world2.id;
+    const worldTag = world2.tag;
+    entries.forEach((entry) => {
+      const children2 = DepthFirstSearchFromParentID(entry.id, false);
+      children2.map((id) => {
+        const currentWorldID = GetWorldID(id);
+        if (currentWorldID > 0 && currentWorldID !== worldID) {
+          ClearWorld(id);
+        }
+        if (currentWorldID !== worldID) {
+          addComponent(GameObjectWorld, worldTag, id);
+          SetWorldID(id, worldID);
+        }
+      });
+    });
+    SetDirtyDisplayList(worldID);
+    SetDirtyChildColor(worldID);
+    SetDirtyChildTransform(worldID);
+    return entries;
+  }
+
+  // ../phaser-genesis/src/display/AddChildAt.ts
+  function AddChildAt(parent, child, index) {
+    if (IsValidParent(parent, child)) {
+      const childID = child.id;
+      const parentID = parent.id;
+      const numChildren = GetNumChildren(parentID);
+      const world2 = GetWorldFromParentID(parentID);
+      ClearHierarchyComponent(childID);
+      if (index === -1) {
+        if (numChildren === 0) {
+          SetIndex(childID, 0);
+          SetFirstChildID(parentID, childID);
+          SetLastChildID(parentID, childID);
+        } else {
+          const lastChild = GetLastChildID(parentID);
+          SetNextSiblingID(lastChild, childID);
+          SetPreviousSiblingID(childID, lastChild);
+          SetIndex(childID, numChildren);
+          SetLastChildID(parentID, childID);
+        }
+        SetParentID(childID, parentID);
+        SetNumChildren(parentID, numChildren + 1);
+        SetDirtyTransform(childID);
+      } else {
+      }
+      SetDirtyParents(childID);
+      if (world2) {
+        SetWorld(world2, child);
+      }
+    }
+    return child;
+  }
+
+  // ../phaser-genesis/src/display/SetParent.ts
+  function SetParent2(parent, ...children2) {
+    children2.forEach((child) => {
+      AddChildAt(parent, child);
+    });
+    return children2;
+  }
+
+  // ../phaser-genesis/src/display/ReparentChildren.ts
+  function ReparentChildren(parent, newParent, beginIndex = 0, endIndex) {
+    const moved = RemoveChildrenBetween(parent, beginIndex, endIndex);
+    SetParent2(newParent, ...moved);
+    return moved;
+  }
+
+  // ../phaser-genesis/src/gameobjects/GameObject.ts
+  var GameObject = class {
+    id = addEntity(GameObjectWorld);
+    type = "GameObject";
+    name = "";
+    events;
+    constructor() {
+      const id = this.id;
+      AddHierarchyComponent(id);
+      AddPermissionsComponent(id);
+      AddDirtyComponent(id);
+      GameObjectCache.set(id, this);
+      this.events = new Map();
+    }
+    isRenderable() {
+      return WillRender(this.id);
+    }
+    beforeUpdate(delta, time) {
+    }
+    update(delta, time) {
+    }
+    afterUpdate(delta, time) {
+    }
+    preRenderGL(renderPass) {
+    }
+    renderGL(renderPass) {
+    }
+    renderCanvas(renderer) {
+    }
+    postRenderGL(renderPass) {
+    }
+    postRenderCanvas(renderer) {
+    }
+    set visible(value) {
+      SetVisible(this.id, value);
+    }
+    get visible() {
+      return GetVisible(this.id);
+    }
+    set visibleChildren(value) {
+      SetVisibleChildren(this.id, value);
+    }
+    get visibleChildren() {
+      return GetVisibleChildren(this.id);
+    }
+    set depth(value) {
+      SetDepth(this.id, value);
+    }
+    get depth() {
+      return GetDepth(this.id);
+    }
+    hasParent(id) {
+      const parentID = GetParentID(this.id);
+      if (id) {
+        return parentID === id;
+      } else {
+        return parentID > 0;
+      }
+    }
+    getParent() {
+      return GetParentGameObject(this.id);
+    }
+    getChildren() {
+      return GetChildrenFromParentID(this.id);
+    }
+    getNumChildren() {
+      return GetNumChildren(this.id);
+    }
+    toString() {
+      return `${this.type} id="${this.id}" name="${this.name}"`;
+    }
+    destroy(reparentChildren) {
+      if (reparentChildren) {
+        ReparentChildren(this, reparentChildren);
+      } else {
+        DestroyChildren(this);
+      }
+      Emit(this, DestroyEvent, this);
+      this.events.clear();
+      this.events = null;
+    }
+  };
+
+  // ../phaser-genesis/src/config/defaultorigin/GetDefaultOriginX.ts
+  function GetDefaultOriginX() {
+    return ConfigStore.get(CONFIG_DEFAULTS.DEFAULT_ORIGIN).x;
+  }
+
+  // ../phaser-genesis/src/config/defaultorigin/GetDefaultOriginY.ts
+  function GetDefaultOriginY() {
+    return ConfigStore.get(CONFIG_DEFAULTS.DEFAULT_ORIGIN).y;
+  }
+
+  // ../phaser-genesis/src/renderer/webgl1/renderpass/PopColor.ts
+  function PopColor(renderPass, color) {
+    if (color.colorMatrixEnabled && color.willColorChildren) {
+      renderPass.colorMatrix.pop();
+    }
+  }
+
+  // ../phaser-genesis/src/renderer/webgl1/renderpass/SetColor.ts
+  function SetColor(renderPass, color) {
+    if (color.colorMatrixEnabled && color.willColorChildren) {
+      renderPass.colorMatrix.set(color);
+    }
+  }
 
   // ../phaser-genesis/src/gameobjects/container/Container.ts
   var Container = class extends GameObject {
@@ -4182,115 +4540,11 @@ void main (void)
     }
   };
 
-  // ../phaser-genesis/src/utils/array/GetRandom.ts
-  function GetRandom(array, startIndex = 0, length) {
-    if (!length) {
-      length = array.length;
-    }
-    const randomIndex = startIndex + Math.floor(Math.random() * length);
-    return array[randomIndex];
-  }
-
-  // ../phaser-genesis/src/display/RemoveChildAt.ts
-  function RemoveChildAt(parent, index) {
-    const parentID = parent.id;
-    const children = GameObjectTree.get(parentID);
-    if (index >= 0 && index < children.length) {
-      const removedID = children.splice(index, 1)[0];
-      if (removedID) {
-        ClearWorldAndParentID(removedID);
-        UpdateChildIndexes(parentID);
-        return GameObjectCache.get(removedID);
-      }
-    }
-  }
-
-  // ../phaser-genesis/src/display/RemoveChild.ts
-  function RemoveChild(parent, child) {
-    if (parent && child.hasParent(parent.id)) {
-      RemoveChildAt(parent, GetChildIndex(child));
-    }
-    return child;
-  }
-
-  // ../phaser-genesis/src/display/RemoveChildren.ts
-  function RemoveChildren(parent, ...children) {
-    children.forEach((child) => {
-      RemoveChild(parent, child);
-    });
-    return children;
-  }
-
-  // ../phaser-genesis/src/components/vertices/SetQuadPosition.ts
-  function SetQuadPosition(id, x0, y0, x1, y1, x2, y2, x3, y3) {
-    const data = QuadVertexComponent.values[id];
-    data[0] = x0;
-    data[1] = y0;
-    data[9] = x1;
-    data[10] = y1;
-    data[18] = x2;
-    data[19] = y2;
-    data[27] = x0;
-    data[28] = y0;
-    data[36] = x2;
-    data[37] = y2;
-    data[45] = x3;
-    data[46] = y3;
-  }
-
-  // ../phaser-genesis/src/components/vertices/AddQuadVertex.ts
-  function AddQuadVertex(id, width = 0, height = 0, flipY = true) {
-    addComponent(GameObjectWorld, QuadVertexComponent, id);
-    if (width || height) {
-      SetUV(id, 0, 0, 1, 1);
-      SetQuadPosition(id, 0, 0, 0, height, width, height, width, 0);
-    }
-  }
-
-  // ../phaser-genesis/src/renderer/webgl1/renderpass/GetVertexBufferEntry.ts
-  var bufferEntry = {
-    buffer: null,
-    F32: null,
-    offset: 0
-  };
-  function GetVertexBufferEntry(renderPass, addToCount = 0) {
-    const buffer = renderPass.vertexbuffer.current;
-    if (renderPass.count + addToCount >= buffer.batchSize) {
-      Flush(renderPass);
-    }
-    bufferEntry.buffer = buffer;
-    bufferEntry.F32 = buffer.vertexViewF32;
-    bufferEntry.offset = renderPass.count * buffer.entryElementSize;
-    renderPass.count += addToCount;
-    return bufferEntry;
-  }
-
-  // ../phaser-genesis/src/components/vertices/SetQuadTextureIndex.ts
-  function SetQuadTextureIndex(id, textureIndex) {
-    const data = QuadVertexComponent.values[id];
-    if (data[4] !== textureIndex) {
-      data[4] = textureIndex;
-      data[13] = textureIndex;
-      data[22] = textureIndex;
-      data[31] = textureIndex;
-      data[40] = textureIndex;
-      data[49] = textureIndex;
-    }
-  }
-
-  // ../phaser-genesis/src/renderer/webgl1/draw/BatchTexturedQuadBuffer.ts
-  function BatchTexturedQuadBuffer(texture, id, renderPass) {
-    const { F32, offset } = GetVertexBufferEntry(renderPass, 2);
-    const textureIndex = renderPass.textures.set(texture);
-    SetQuadTextureIndex(id, textureIndex);
-    F32.set(QuadVertexComponent.values[id], offset);
-  }
-
   // ../phaser-genesis/src/gameobjects/sprite/SetFrame.ts
-  function SetFrame(texture, key, ...children) {
+  function SetFrame(texture, key, ...children2) {
     const frame2 = texture.getFrame(key);
     const pivot = frame2.pivot;
-    children.forEach((child) => {
+    children2.forEach((child) => {
       if (!child || frame2 === child.frame) {
         return;
       }
@@ -4302,13 +4556,13 @@ void main (void)
       frame2.copyToExtent(child);
       frame2.copyToVertices(child.id);
     });
-    return children;
+    return children2;
   }
 
   // ../phaser-genesis/src/gameobjects/sprite/SetTexture.ts
-  function SetTexture(key, frame2, ...children) {
+  function SetTexture(key, frame2, ...children2) {
     if (!key) {
-      children.forEach((child) => {
+      children2.forEach((child) => {
         child.texture = null;
         child.frame = null;
         child.hasTexture = false;
@@ -4326,13 +4580,13 @@ void main (void)
       if (!texture) {
         console.warn(`Invalid Texture key: ${key}`);
       } else {
-        children.forEach((child) => {
+        children2.forEach((child) => {
           child.texture = texture;
         });
-        SetFrame(texture, frame2, ...children);
+        SetFrame(texture, frame2, ...children2);
       }
     }
-    return children;
+    return children2;
   }
 
   // ../phaser-genesis/src/gameobjects/sprite/Sprite.ts
@@ -4382,6 +4636,100 @@ void main (void)
       this.hasTexture = false;
     }
   };
+
+  // ../phaser-genesis/src/gameobjects/layer/Layer.ts
+  var Layer = class extends GameObject {
+    constructor() {
+      super();
+      SetWillTransformChildren(this.id, false);
+    }
+  };
+
+  // ../phaser-genesis/src/components/transform/UpdateRootTransform.ts
+  function UpdateRootTransform(id) {
+    let currentParent = GetParentID(id);
+    let isRootTransform = true;
+    while (currentParent) {
+      if (WillTransformChildren(currentParent)) {
+        isRootTransform = false;
+        break;
+      }
+      currentParent = GetParentID(currentParent);
+    }
+    Transform2DComponent.data[id][TRANSFORM.IS_ROOT] = Number(isRootTransform);
+  }
+
+  // ../phaser-genesis/src/display/AddChild.ts
+  function AddChild(parent, child) {
+    if (IsValidParent(parent, child)) {
+      const childID = child.id;
+      const parentID = parent.id;
+      const numChildren = GetNumChildren(parentID);
+      const world2 = GetWorldFromParentID(parentID);
+      if (numChildren === 0) {
+        SetIndex(childID, 0);
+        SetFirstChildID(parentID, childID);
+      } else {
+        const lastChild = GetLastChildID(parentID);
+        SetNextSiblingID(lastChild, childID);
+        SetPreviousSiblingID(childID, lastChild);
+        SetIndex(childID, numChildren);
+      }
+      SetParentID(childID, parentID);
+      SetDirtyTransform(childID);
+      SetDirtyParents(childID);
+      UpdateRootTransform(childID);
+      SetLastChildID(parentID, childID);
+      SetNumChildren(parentID, numChildren + 1);
+      if (world2) {
+        SetWorld(world2, child);
+      }
+    }
+    return child;
+  }
+
+  // ../phaser-genesis/src/display/GetChildIndex.ts
+  function GetChildIndex(child) {
+    return HierarchyComponent.index[child.id];
+  }
+
+  // ../phaser-genesis/src/utils/array/GetRandom.ts
+  function GetRandom(array, startIndex = 0, length) {
+    if (!length) {
+      length = array.length;
+    }
+    const randomIndex = startIndex + Math.floor(Math.random() * length);
+    return array[randomIndex];
+  }
+
+  // ../phaser-genesis/src/display/RemoveChildAt.ts
+  function RemoveChildAt(parent, index) {
+    const parentID = parent.id;
+    if (index >= 0 && index < children.length) {
+      const removedID = children.splice(index, 1)[0];
+      if (removedID) {
+        ClearWorldAndParentID(removedID);
+        UpdateChildIndexes(parentID);
+        return GameObjectCache.get(removedID);
+      }
+    }
+  }
+
+  // ../phaser-genesis/src/display/RemoveChild.ts
+  function RemoveChild(parent, child) {
+    if (parent && child.hasParent(parent.id)) {
+      RemoveChildAt(parent, GetChildIndex(child));
+    }
+    return child;
+  }
+
+  // ../phaser-genesis/src/display/RemoveChildren.ts
+  function RemoveChildren(parent, ...children2) {
+    children2.forEach((child) => {
+      RemoveChild(parent, child);
+    });
+    return children2;
+  }
 
   // ../phaser-genesis/src/loader/CreateFile.ts
   function CreateFile(key, url, skipCache = false) {
@@ -4866,7 +5214,6 @@ void main (void)
       desynchronized: true,
       preserveDrawingBuffer: true
     });
-    SetWorldSize();
   }
 
   // ../phaser-genesis/src/components/timer/UpdateDelta.ts
@@ -5041,120 +5388,6 @@ void main (void)
     }
   };
 
-  // ../phaser-genesis/src/components/bounds/BoundsIntersects.ts
-  function BoundsIntersects(id, x, y, right, bottom) {
-    const bx = Transform2DComponent.data[id][TRANSFORM.BOUNDS_X1];
-    const by = Transform2DComponent.data[id][TRANSFORM.BOUNDS_Y1];
-    const br = Transform2DComponent.data[id][TRANSFORM.BOUNDS_X2];
-    const bb = Transform2DComponent.data[id][TRANSFORM.BOUNDS_Y2];
-    return !(right < bx || bottom < by || x > br || y > bb);
-  }
-
-  // ../phaser-genesis/src/components/vertices/SetQuadColor.ts
-  function SetQuadColor(id, red, green, blue, alpha) {
-    const data = QuadVertexComponent.values[id];
-    data[5] = red;
-    data[6] = green;
-    data[7] = blue;
-    data[8] = alpha;
-    data[14] = red;
-    data[15] = green;
-    data[16] = blue;
-    data[17] = alpha;
-    data[23] = red;
-    data[24] = green;
-    data[25] = blue;
-    data[26] = alpha;
-    data[32] = red;
-    data[33] = green;
-    data[34] = blue;
-    data[35] = alpha;
-    data[41] = red;
-    data[42] = green;
-    data[43] = blue;
-    data[44] = alpha;
-    data[50] = red;
-    data[51] = green;
-    data[52] = blue;
-    data[53] = alpha;
-  }
-
-  // ../phaser-genesis/src/components/color/UpdateQuadColorSystem.ts
-  var entities;
-  var total = 0;
-  var system = defineSystem((world2) => {
-    for (let i = 0; i < entities.length; i++) {
-      const id = entities[i];
-      if (HasDirtyColor(id)) {
-        const r = ColorComponent.r[id] / 255;
-        const g = ColorComponent.g[id] / 255;
-        const b = ColorComponent.b[id] / 255;
-        const a = ColorComponent.a[id];
-        SetQuadColor(id, r, g, b, a);
-        total++;
-        ClearDirtyColor(id);
-      }
-    }
-    return world2;
-  });
-  var UpdateQuadColorSystem = (id, world2, query) => {
-    total = 0;
-    entities = query(world2);
-    if (entities.length > 0) {
-      system(world2);
-    }
-    return total;
-  };
-
-  // ../phaser-genesis/src/components/hierarchy/SetWorldID.ts
-  function SetWorldID(id, worldID) {
-    HierarchyComponent.world[id] = worldID;
-  }
-
-  // ../phaser-genesis/src/components/permissions/WillRenderChildren.ts
-  function WillRenderChildren(id) {
-    return GetVisibleChildren(id) && Boolean(PermissionsComponent.data[id][PERMISSION.WILL_RENDER_CHILDREN]);
-  }
-
-  // ../phaser-genesis/src/components/permissions/HasRenderableChildren.ts
-  function HasRenderableChildren(id) {
-    if (!WillRenderChildren(id) || GetNumChildren(id) === 0) {
-      return false;
-    }
-    if (!WillCacheChildren(id) || WillCacheChildren(id) && HasDirtyChildCache(id)) {
-      return true;
-    }
-    return false;
-  }
-
-  // ../phaser-genesis/src/components/permissions/WillUpdate.ts
-  function WillUpdate(id) {
-    return Boolean(PermissionsComponent.data[id][PERMISSION.WILL_UPDATE]);
-  }
-
-  // ../phaser-genesis/src/world/RenderDataComponent.ts
-  var RenderData = defineComponent({
-    gameFrame: Types.ui32,
-    dirtyLocal: Types.ui32,
-    dirtyVertices: Types.ui32,
-    numChildren: Types.ui32,
-    numRendered: Types.ui32,
-    numRenderable: Types.ui32,
-    rebuiltList: Types.ui8,
-    rebuiltWorld: Types.ui8
-  });
-  var RenderDataComponent = RenderData;
-
-  // ../phaser-genesis/src/components/hierarchy/IsRoot.ts
-  function IsRoot(id) {
-    return GetWorldID(id) === GetParentID(id);
-  }
-
-  // ../phaser-genesis/src/components/dirty/ClearDirtyWorldTransform.ts
-  function ClearDirtyWorldTransform(id) {
-    DirtyComponent.worldTransform[id] = 0;
-  }
-
   // ../phaser-genesis/src/world/events/WorldAfterUpdateEvent.ts
   var WorldAfterUpdateEvent = "afterupdate";
 
@@ -5172,11 +5405,6 @@ void main (void)
 
   // ../phaser-genesis/src/world/events/WorldUpdateEvent.ts
   var WorldUpdateEvent = "update";
-
-  // ../phaser-genesis/src/world/AddRenderDataComponent.ts
-  function AddRenderDataComponent(id) {
-    addComponent(GameObjectWorld, RenderDataComponent, id);
-  }
 
   // ../phaser-genesis/src/scenes/events/SceneDestroyEvent.ts
   var SceneDestroyEvent = "destroy";
@@ -5199,7 +5427,7 @@ void main (void)
       const tag = this.tag;
       this.scene = scene;
       this.totalChildrenQuery = defineQuery([tag]);
-      AddRenderDataComponent(id);
+      this.renderList = new Uint32Array(512 * 4);
       SetWorldID(id, id);
       WorldList.get(scene).push(this);
       this.color = new Color2(id);
@@ -5261,10 +5489,35 @@ void main (void)
     SetCamera(renderPass, camera);
   }
 
-  // ../phaser-genesis/src/components/hierarchy/MoveNextRenderable.ts
-  function MoveNextRenderable(id) {
+  // ../phaser-genesis/src/components/dirty/ClearDirtyChildColor.ts
+  function ClearDirtyChildColor(id) {
+    DirtyComponent.data[id][DIRTY.CHILD_COLOR] = 0;
+  }
+
+  // ../phaser-genesis/src/components/dirty/ClearDirtyChildWorldTransform.ts
+  function ClearDirtyChildWorldTransform(id) {
+    DirtyComponent.data[id][DIRTY.CHILD_WORLD_TRANSFORM] = 0;
+  }
+
+  // ../phaser-genesis/src/components/dirty/HasDirtyChildColor.ts
+  function HasDirtyChildColor(id) {
+    return Boolean(DirtyComponent.data[id][DIRTY.CHILD_COLOR]);
+  }
+
+  // ../phaser-genesis/src/components/dirty/HasDirtyChildTransform.ts
+  function HasDirtyChildTransform(id) {
+    return Boolean(DirtyComponent.data[id][DIRTY.CHILD_TRANSFORM]);
+  }
+
+  // ../phaser-genesis/src/components/dirty/HasDirtyChildWorldTransform.ts
+  function HasDirtyChildWorldTransform(id) {
+    return Boolean(DirtyComponent.data[id][DIRTY.CHILD_WORLD_TRANSFORM]);
+  }
+
+  // ../phaser-genesis/src/components/hierarchy/MoveNextUpdatable.ts
+  function MoveNextUpdatable(id) {
     const firstChild = GetFirstChildID(id);
-    if (firstChild > 0 && WillRenderChildren(id)) {
+    if (firstChild > 0 && WillUpdateChildren(id)) {
       return firstChild;
     } else {
       const sibling = GetNextSiblingID(id);
@@ -5281,95 +5534,63 @@ void main (void)
     }
   }
 
-  // ../phaser-genesis/src/world/ResetWorldRenderData.ts
-  function ResetWorldRenderData(id, gameFrame) {
-    RenderDataComponent.gameFrame[id] = gameFrame;
-    RenderDataComponent.dirtyLocal[id] = 0;
-    RenderDataComponent.dirtyVertices[id] = 0;
-    RenderDataComponent.numRendered[id] = 0;
+  // ../phaser-genesis/src/world/AddToRenderList.ts
+  function AddToRenderList(world2, id, renderType) {
+    let len = world2.listLength;
+    const list = world2.renderList;
+    if (len > 0) {
+      const prevEntity = list[len - 1];
+      const prevType = list[len];
+      if (prevEntity === id && prevType === 0 && renderType === 1) {
+        list[len - 1] = 2;
+        return;
+      }
+    }
+    list[len] = id;
+    list[len + 1] = renderType;
+    world2.listLength += 2;
+    len += 2;
+    if (len === list.length) {
+      const newList = new Uint32Array(len + 512 * 4);
+      newList.set(list, 0);
+      world2.renderList = newList;
+    }
   }
 
-  // ../phaser-genesis/src/components/transform/UpdateLocalTransformList.ts
-  function UpdateLocalTransformList(entities2) {
-    let prevParent = 0;
-    let total3 = 0;
-    for (let i = 0; i < entities2.length; i++) {
-      const id = entities2[i];
-      if (!HasDirtyTransform(id)) {
-        continue;
-      }
-      const isRoot = IsRoot(id);
-      const data = Transform2DComponent.data[id];
-      const tx = data[TRANSFORM.X];
-      const ty = data[TRANSFORM.Y];
-      const rotation = data[TRANSFORM.ROTATION];
-      const scaleX = data[TRANSFORM.SCALE_X];
-      const scaleY = data[TRANSFORM.SCALE_Y];
-      const skewX = data[TRANSFORM.SKEW_X];
-      const skewY = data[TRANSFORM.SKEW_Y];
-      const axisAligned = data[TRANSFORM.AXIS_ALIGNED];
-      const x = data[TRANSFORM.FRAME_X1];
-      const y = data[TRANSFORM.FRAME_Y1];
-      const right = data[TRANSFORM.FRAME_X2];
-      const bottom = data[TRANSFORM.FRAME_Y2];
-      let a = scaleX;
-      let b = 0;
-      let c = 0;
-      let d = scaleY;
-      if (!axisAligned) {
-        a = Math.cos(rotation + skewY) * scaleX;
-        b = Math.sin(rotation + skewY) * scaleX;
-        c = -Math.sin(rotation - skewX) * scaleY;
-        d = Math.cos(rotation - skewX) * scaleY;
-      }
-      data[TRANSFORM.LOCAL_A] = a;
-      data[TRANSFORM.LOCAL_B] = b;
-      data[TRANSFORM.LOCAL_C] = c;
-      data[TRANSFORM.LOCAL_D] = d;
-      data[TRANSFORM.LOCAL_TX] = tx;
-      data[TRANSFORM.LOCAL_TY] = ty;
-      if (isRoot) {
-        if (axisAligned) {
-          const x0 = x * a + tx;
-          const y0 = y * d + ty;
-          const x1 = x * a + tx;
-          const y1 = bottom * d + ty;
-          const x2 = right * a + tx;
-          const y2 = bottom * d + ty;
-          const x3 = right * a + tx;
-          const y3 = y * d + ty;
-          data[TRANSFORM.BOUNDS_X1] = x0;
-          data[TRANSFORM.BOUNDS_Y1] = y0;
-          data[TRANSFORM.BOUNDS_X2] = x2;
-          data[TRANSFORM.BOUNDS_Y2] = y2;
-          SetQuadPosition(id, x0, y0, x1, y1, x2, y2, x3, y3);
-        } else {
-          const x0 = x * a + y * c + tx;
-          const y0 = x * b + y * d + ty;
-          const x1 = x * a + bottom * c + tx;
-          const y1 = x * b + bottom * d + ty;
-          const x2 = right * a + bottom * c + tx;
-          const y2 = right * b + bottom * d + ty;
-          const x3 = right * a + y * c + tx;
-          const y3 = right * b + y * d + ty;
-          data[TRANSFORM.BOUNDS_X1] = Math.min(x0, x1, x2, x3);
-          data[TRANSFORM.BOUNDS_Y1] = Math.min(y0, y1, y2, y3);
-          data[TRANSFORM.BOUNDS_X2] = Math.max(x0, x1, x2, x3);
-          data[TRANSFORM.BOUNDS_Y2] = Math.max(y0, y1, y2, y3);
-          SetQuadPosition(id, x0, y0, x1, y1, x2, y2, x3, y3);
+  // ../phaser-genesis/src/world/RebuildWorldList.ts
+  function RebuildWorldList(world2, parent) {
+    if (WillRender(parent)) {
+      if (HasRenderableChildren(parent)) {
+        if (parent !== world2.id) {
+          AddToRenderList(world2, parent, 0);
         }
-        ClearDirtyTransform(id);
-        ClearDirtyWorldTransform(id);
-      } else {
-        const parentID = GetParentID(id);
-        if (parentID !== prevParent) {
-          SetDirtyParents(id);
-          prevParent = parentID;
+        const children2 = GetChildIDsFromParentID(parent);
+        for (let i = 0; i < children2.length; i++) {
+          const childID = children2[i];
+          if (WillRender(childID)) {
+            RebuildWorldList(world2, childID);
+          }
         }
+        AddToRenderList(world2, parent, 1);
+      } else if (parent !== world2.id) {
+        AddToRenderList(world2, parent, 2);
       }
-      total3++;
     }
-    return total3;
+  }
+
+  // ../phaser-genesis/src/world/RebuildWorldTransforms.ts
+  function RebuildWorldTransforms(entities) {
+    let total2 = 0;
+    for (let i = 0; i < entities.length; i++) {
+      const id = entities[i];
+      const parentID = GetParentID(id);
+      if (HasDirtyTransform(id) || HasDirtyChildTransform(parentID)) {
+        UpdateWorldTransform(id);
+        ClearDirtyTransform(id);
+        total2++;
+      }
+    }
+    return total2;
   }
 
   // ../phaser-genesis/src/camera/WorldCamera.ts
@@ -5460,9 +5681,7 @@ void main (void)
     type = "StaticWorld";
     colorQuery;
     transformQuery;
-    rendered;
-    list = [];
-    renderList2 = [];
+    renderData;
     constructor(scene) {
       super(scene);
       const tag = this.tag;
@@ -5470,96 +5689,108 @@ void main (void)
       this.transformQuery = defineQuery([tag, Transform2DComponent]);
       const renderer = RendererInstance.get();
       this.camera = new WorldCamera(renderer.width, renderer.height);
+      this.renderData = {
+        gameFrame: 0,
+        dirtyLocal: 0,
+        dirtyWorld: 0,
+        dirtyQuad: 0,
+        dirtyColor: 0,
+        numChildren: 0,
+        rendered: 0,
+        renderMs: 0,
+        updated: 0,
+        updateMs: 0,
+        rebuiltWorld: false
+      };
+      SetWillTransformChildren(this.id, false);
+      SetWillCacheChildren(this.id, false);
     }
     preRender(gameFrame) {
       const id = this.id;
-      ResetWorldRenderData(id, gameFrame);
-      RenderDataComponent.rebuiltList[id] = 0;
-      RenderDataComponent.rebuiltWorld[id] = 0;
+      const renderData = this.renderData;
+      renderData.gameFrame = gameFrame;
+      renderData.dirtyLocal = 0;
+      renderData.dirtyWorld = 0;
+      renderData.dirtyQuad = 0;
+      renderData.dirtyColor = 0;
+      renderData.rebuiltWorld = false;
       ClearDirtyChild(id);
-      const totalDirty = UpdateLocalTransformList(this.transformQuery(GameObjectWorld));
-      RenderDataComponent.dirtyLocal[id] = totalDirty;
-      if (HasDirtyColor(id)) {
-        UpdateQuadColorSystem(id, GameObjectWorld, this.colorQuery);
-        ClearDirtyColor(id);
+      const entities = this.transformQuery(GameObjectWorld);
+      if (HasDirtyChildTransform(id)) {
+        const dirtyLocal = UpdateLocalTransform(id, entities);
+        ClearDirtyChildTransform(id);
+        renderData.dirtyLocal = dirtyLocal;
+      }
+      if (HasDirtyChildWorldTransform(id)) {
+        const dirtyWorld = RebuildWorldTransforms(entities);
+        const dirtyQuad = UpdateVertexPositionSystem(entities);
+        ClearDirtyChildWorldTransform(id);
+        renderData.dirtyWorld = dirtyWorld;
+        renderData.dirtyQuad = dirtyQuad;
+      }
+      if (HasDirtyChildColor(id)) {
+        const dirtyColor = UpdateQuadColorSystem(this.colorQuery(GameObjectWorld));
+        ClearDirtyChildColor(id);
+        renderData.dirtyColor = dirtyColor;
+      }
+      if (HasDirtyDisplayList(id)) {
+        RebuildWorldList(this, id);
+        ClearDirtyDisplayList(id);
+        renderData.rebuiltWorld = true;
       }
       return true;
     }
     update(delta, time) {
-      const list = this.list;
-      const len = list.length;
-      for (let i = 0; i < len; i++) {
-        const gameObject = list[i];
-        gameObject.update(delta, time);
+      Emit(this, WorldBeforeUpdateEvent, this);
+      const start = performance.now();
+      let next = GetFirstChildID(this.id);
+      let total2 = 0;
+      while (next > 0) {
+        if (WillUpdate(next)) {
+          GameObjectCache.get(next).update(delta, time);
+          total2++;
+        }
+        next = MoveNextUpdatable(next);
       }
+      this.renderData.updated = total2;
+      this.renderData.updateMs = performance.now() - start;
+      Emit(this, WorldUpdateEvent, this);
     }
-    listRender(renderPass, camera) {
+    render(renderPass, camera) {
       const x = camera.getBoundsX();
       const y = camera.getBoundsY();
       const right = camera.getBoundsRight();
       const bottom = camera.getBoundsBottom();
-      let next = GetFirstChildID(this.id);
-      while (next > 0) {
-        if (WillRender(next)) {
-          const intersects = BoundsIntersects(next, x, y, right, bottom);
-          if (intersects) {
-            const gameObject = GameObjectCache.get(next);
-            this.rendered++;
-            gameObject.renderGL(renderPass);
-            gameObject.postRenderGL(renderPass);
+      let total2 = 0;
+      const len = this.listLength;
+      const list = this.renderList;
+      const start = performance.now();
+      for (let i = 0; i < len; i += 2) {
+        const id = list[i];
+        const type = list[i + 1];
+        const entry = GameObjectCache.get(id);
+        if (type === 1) {
+          entry.postRenderGL(renderPass);
+        } else if (BoundsIntersects(id, x, y, right, bottom)) {
+          entry.renderGL(renderPass);
+          if (type === 2) {
+            entry.postRenderGL(renderPass);
           }
-        }
-        next = MoveNextRenderable(next);
-      }
-    }
-    runRender(renderPass, entry, x, y, right, bottom) {
-      if (WillRender(entry)) {
-        const intersects = entry !== this.id && BoundsIntersects(entry, x, y, right, bottom);
-        let gameObject;
-        if (intersects) {
-          gameObject = GameObjectCache.get(entry);
-        }
-        if (HasRenderableChildren(entry)) {
-          if (intersects) {
-            this.rendered++;
-            gameObject.renderGL(renderPass);
-          }
-          const children = GameObjectTree.get(entry);
-          for (let i = 0; i < children.length; i++) {
-            const childID = children[i];
-            if (WillRender(childID)) {
-              this.runRender(renderPass, childID, x, y, right, bottom);
-            }
-          }
-          if (intersects) {
-            gameObject.postRenderGL(renderPass);
-          }
-        } else if (intersects) {
-          this.rendered++;
-          gameObject.renderGL(renderPass);
-          gameObject.postRenderGL(renderPass);
+          total2++;
         }
       }
+      this.renderData.rendered = total2;
+      this.renderData.renderMs = performance.now() - start;
     }
     renderGL(renderPass) {
       SetColor(renderPass, this.color);
       Emit(this, WorldRenderEvent, this);
       const camera = this.camera;
       Begin(renderPass, camera);
-      this.rendered = 0;
-      this.listRender(renderPass, camera);
+      this.render(renderPass, camera);
       PopColor(renderPass, this.color);
-      const id = this.id;
-      window["renderStats"] = {
-        gameFrame: RenderDataComponent.gameFrame[id],
-        numChildren: this.getNumChildren(),
-        numRendered: this.rendered,
-        numRenderable: RenderDataComponent.numRenderable[id],
-        dirtyLocal: RenderDataComponent.dirtyLocal[id],
-        dirtyVertices: RenderDataComponent.dirtyVertices[id],
-        rebuiltList: RenderDataComponent.rebuiltList[id],
-        rebuiltWorld: RenderDataComponent.rebuiltWorld[id]
-      };
+      this.renderData.numChildren = this.getNumChildren();
+      window["renderStats"] = this.renderData;
       Emit(this, WorldPostRenderEvent, renderPass, this);
     }
   };
@@ -5604,33 +5835,35 @@ void main (void)
       this.texture = GetTexture("items");
       this.createGrass();
       this.createLandscape();
-      for (let i = 0; i < total2; i++) {
+      for (let i = 0; i < total; i++) {
         const flake = new Snowflake();
         AddChild(world2, flake);
-        world2.list.push(flake);
-        world2.renderList2.push(flake.id);
       }
       this.camera.setPosition(-16384, -16384);
     }
     createGrass() {
+      const layer = new Layer();
+      SetWillUpdateChildren(layer.id, false);
       for (let y = 0; y < 64; y++) {
         for (let x = 0; x < 64; x++) {
-          const s = AddChild(this.world, new Sprite(x * 512, y * 512, "grass").setOrigin(0, 0));
-          this.world.renderList2.push(s.id);
+          AddChild(layer, new Sprite(x * 512, y * 512, "grass").setOrigin(0, 0));
         }
       }
+      AddChild(this.world, layer);
     }
     createLandscape() {
       const frames = Array.from(this.texture.frames.keys());
       frames.shift();
+      const layer = new Layer();
+      SetWillUpdateChildren(layer.id, false);
       const size = 512;
       for (let y = 0; y < size; y++) {
         for (let x = 0; x < size; x++) {
           const frame2 = GetRandom(frames);
-          const s = AddChild(this.world, new Sprite(256 + x * 128, size + y * 128, "items", frame2).setOrigin(0.5, 1));
-          this.world.renderList2.push(s.id);
+          AddChild(layer, new Sprite(256 + x * 128, size + y * 128, "items", frame2).setOrigin(0.5, 1));
         }
       }
+      AddChild(this.world, layer);
     }
     update() {
       if (!this.camera) {
@@ -5650,14 +5883,14 @@ void main (void)
       this.camera.y = Clamp(this.camera.y, -32168, 0);
       const rs = window.renderStats;
       if (rs) {
-        msg.innerText = `Frame: ${rs.gameFrame} - Game Objects: ${rs.numChildren} - Rendered: ${rs.numRendered} - Updated: ${rs.dirtyLocal}`;
+        msg.innerText = `Frame: ${rs.gameFrame} - Game Objects: ${rs.numChildren} - Rendered: ${rs.rendered} - Updated: ${rs.dirtyLocal}`;
       }
     }
   };
   var params = new URLSearchParams(document.location.search);
-  var total2 = parseInt(params.get("t"));
-  if (!total2 || total2 === 0) {
-    total2 = 25e3;
+  var total = parseInt(params.get("t"));
+  if (!total || total === 0) {
+    total = 25e3;
   }
   var msg = document.createElement("p");
   msg.innerHTML = "Warning: This demo requires over 1GB RAM<br />When loaded use cursors to move";
@@ -5666,7 +5899,7 @@ void main (void)
   button.innerText = "Run Demo";
   var game;
   button.onclick = () => {
-    const sprites = 266240 + total2;
+    const sprites = 266240 + total;
     msg.innerText = `Please wait, generating ${sprites} Sprites`;
     window.defaultSize = sprites + 1e3;
     game = new Game(WebGL(), BatchSize(4096), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(657930), Scenes(Demo));
