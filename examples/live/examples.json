@@ -428,6 +428,28 @@
       "name": "gameobjects",
       "children": [
         {
+          "path": "examples/live/gameobjects/container",
+          "name": "container",
+          "children": [
+            {
+              "path": "examples/live/gameobjects/container/add children.js",
+              "name": "add children.js",
+              "size": 165666,
+              "extension": ".js",
+              "type": "file"
+            },
+            {
+              "path": "examples/live/gameobjects/container/banshee.js",
+              "name": "banshee.js",
+              "size": 186196,
+              "extension": ".js",
+              "type": "file"
+            }
+          ],
+          "size": 351862,
+          "type": "directory"
+        },
+        {
           "path": "examples/live/gameobjects/directdraw",
           "name": "directdraw",
           "children": [
@@ -701,7 +723,7 @@
           "type": "directory"
         }
       ],
-      "size": 5451585,
+      "size": 5803447,
       "type": "directory"
     },
     {
@@ -904,7 +926,7 @@
         {
           "path": "examples/live/test/screensnow.js",
           "name": "screensnow.js",
-          "size": 161612,
+          "size": 166348,
           "extension": ".js",
           "type": "file"
         },
@@ -944,7 +966,7 @@
           "type": "file"
         }
       ],
-      "size": 1926078,
+      "size": 1930814,
       "type": "directory"
     },
     {
@@ -1019,6 +1041,6 @@
       "type": "directory"
     }
   ],
-  "size": 17876282,
+  "size": 18232880,
   "type": "directory"
 }

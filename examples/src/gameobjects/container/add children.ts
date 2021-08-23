@@ -1,13 +1,12 @@
-import { AddChild, AddChildren, ConsoleTreeChildren } from '../../../../phaser-genesis/src/display/';
-import { BackgroundColor, GlobalVar, Parent, Scenes, Size, WebGL } from '../../../../phaser-genesis/src/config';
+import { AddChild, AddChildren, ConsoleTreeChildren } from '../../../../../phaser-genesis/src/display/';
+import { BackgroundColor, GlobalVar, Parent, Scenes, Size, WebGL } from '../../../../../phaser-genesis/src/config';
 
-import { Game } from '../../../../phaser-genesis/src/Game';
-import { ImageFile } from '../../../../phaser-genesis/src/loader/files/ImageFile';
-import { Loader } from '../../../../phaser-genesis/src/loader/Loader';
-import { On } from '../../../../phaser-genesis/src/events';
-import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
-import { Sprite } from '../../../../phaser-genesis/src/gameobjects/';
-import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
+import { Game } from '../../../../../phaser-genesis/src/Game';
+import { ImageFile } from '../../../../../phaser-genesis/src/loader/files/ImageFile';
+import { On } from '../../../../../phaser-genesis/src/events';
+import { Scene } from '../../../../../phaser-genesis/src/scenes/Scene';
+import { Sprite } from '../../../../../phaser-genesis/src/gameobjects/';
+import { StaticWorld } from '../../../../../phaser-genesis/src/world/StaticWorld';
 
 class Demo extends Scene
 {
@@ -19,20 +18,16 @@ class Demo extends Scene
 
         this.world = new StaticWorld(this);
 
-        const loader = new Loader();
-
-        loader.setPath('assets/');
-
-        loader.add(ImageFile('256', 'f-texture.png'));
-        loader.add(ImageFile('64', 'box-item-boxed.png'));
-        loader.add(ImageFile('32', 'shinyball.png'));
-        loader.add(ImageFile('16', 'skull.png'));
-
-        loader.start().then(() => this.create());
+        this.create();
     }
 
-    create ()
+    async create ()
     {
+        await ImageFile('256', 'assets/f-texture.png');
+        await ImageFile('64', 'assets/box-item-boxed.png');
+        await ImageFile('32', 'assets/shinyball.png');
+        await ImageFile('16', 'assets/skull.png');
+
         const parent = new Sprite(400, 300, '256');
 
         parent.name = 'P';
@@ -77,22 +72,35 @@ class Demo extends Scene
 
         ConsoleTreeChildren(this.world);
 
-        On(this, 'update', (delta, time) =>
+        On(this.world, 'update', (delta, time) =>
         {
             parent.rotation += 0.005;
 
             child1.rotation += 0.01;
             child5.rotation -= 0.03;
 
-            parent.scaleX = Math.cos(i) * 2;
-            parent.scaleY = Math.cos(i) * 2;
+            parent.scale.x = Math.cos(i) * 2;
+            parent.scale.y = Math.cos(i) * 2;
 
             i += 0.01;
+
+            const rs = window.renderStats;
+
+            if (rs)
+            {
+                msg.innerText = `Frame: ${rs.gameFrame} - Rendered: ${rs.rendered} - Local: ${rs.dirtyLocal} - World: ${rs.dirtyWorld} - Quad: ${rs.dirtyQuad}`;
+            }
+
         });
     }
 }
 
-new Game(
+const msg = document.createElement('p');
+
+msg.innerText = `Please wait, generating Sprites`;
+msg.style.paddingLeft = '150px';
+
+const game = new Game(
     WebGL(),
     GlobalVar('Phaser4'),
     Size(800, 600),
@@ -100,3 +108,12 @@ new Game(
     BackgroundColor(0x2d2d2d),
     Scenes(Demo)
 );
+
+const button = document.createElement('button');
+button.innerText = 'Pause';
+button.onclick = () => {
+    game.isPaused = true;
+}
+
+document.body.appendChild(msg);
+document.body.appendChild(button);
