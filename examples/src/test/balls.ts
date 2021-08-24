@@ -1,47 +1,60 @@
 import { BackgroundColor, BatchSize, GlobalVar, Parent, Scenes, WebGL } from '../../../../phaser-genesis/src/config';
-import { Between, Clamp } from '../../../../phaser-genesis/src/math';
+import { Between, FloatBetween } from '../../../../phaser-genesis/src/math';
 import { DownKey, LeftKey, RightKey, UpKey } from '../../../../phaser-genesis/src/input/keyboard/keys';
-import { GetTexture, Texture } from '../../../../phaser-genesis/src/textures';
 import { Layer, Sprite } from '../../../../phaser-genesis/src/gameobjects';
 
 import { AddChild } from '../../../../phaser-genesis/src/display';
-import { AtlasFile } from '../../../../phaser-genesis/src/loader/files/AtlasFile';
 import { Game } from '../../../../phaser-genesis/src/Game';
-import { GetRandom } from '../../../../phaser-genesis/src/utils/array/GetRandom';
 import { ImageFile } from '../../../../phaser-genesis/src/loader/files/ImageFile';
 import { Keyboard } from '../../../../phaser-genesis/src/input/keyboard';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
 import { SetWillUpdateChildren } from '../../../../phaser-genesis/src/components/permissions/SetWillUpdateChildren';
+import { SpriteSheetFile } from '../../../../phaser-genesis/src/loader/files/SpriteSheetFile';
 import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
-import { WillUpdateChildren } from '../../../../phaser-genesis/src/components/permissions/WillUpdateChildren';
 import { WorldCamera } from '../../../../phaser-genesis/src/camera/WorldCamera';
 
-class Snowflake extends Sprite
+//  40000 = 1,567,501 sprites
+//  20000 = 395,626 sprites
+const worldSize = 20000;
+
+class Ball extends Sprite
 {
     speedX: number;
     speedY: number;
 
     constructor ()
     {
-        super(Between(0, 32768), Between(0, 32768), 'snow');
+        super(Between(-worldSize, worldSize), Between(-worldSize, worldSize), 'balls', Between(0, 5));
 
-        this.speedX = Between(1, 8);
-        this.speedY = Between(1, 8);
+        this.speedX = FloatBetween(-4, 4);
+        this.speedY = FloatBetween(-4, 4);
     }
 
     update (): void
     {
-        this.x -= this.speedX;
+        this.x += this.speedX;
         this.y += this.speedY;
 
-        if (this.x < 0)
+        if (this.x < -worldSize)
         {
-            this.x = 32768;
+            this.x = -worldSize;
+            this.speedX *= -1;
+        }
+        else if (this.x > worldSize)
+        {
+            this.x = worldSize;
+            this.speedX *= -1;
         }
 
-        if (this.y > 32768)
+        if (this.y < -worldSize)
         {
-            this.y = 0;
+            this.y = -worldSize;
+            this.speedY *= -1;
+        }
+        else if (this.y > worldSize)
+        {
+            this.y = worldSize;
+            this.speedY *= -1;
         }
     }
 }
@@ -55,7 +68,6 @@ class Demo extends Scene
 
     camera: WorldCamera;
     world: StaticWorld;
-    texture: Texture;
 
     cameraSpeed: number = 16;
 
@@ -77,9 +89,9 @@ class Demo extends Scene
 
     async create ()
     {
-        await AtlasFile('items', 'assets/land.png', 'assets/land.json');
-        await ImageFile('grass', 'assets/textures/grass-plain.png');
-        await ImageFile('snow', 'assets/particle1.png');
+        await SpriteSheetFile('balls', 'assets/balls.png', { frameWidth: 17 });
+        await ImageFile('ball', 'assets/8x8.png');
+        await ImageFile('bit', 'assets/1bitblock2.png');
 
         const world = new StaticWorld(this);
         
@@ -87,72 +99,26 @@ class Demo extends Scene
 
         this.camera = this.world.camera;
 
-        this.texture = GetTexture('items');
+        const layer = new Layer();
 
-        this.createGrass();
-        this.createLandscape();
+        SetWillUpdateChildren(layer.id, false);
 
-        // for (let i = 0; i < 200000; i++)
-        // for (let i = 0; i < 100000; i++)
-        // for (let i = 0; i < 80000; i++)
-        // for (let i = 0; i < 75000; i++)
-        // for (let i = 0; i < 25000; i++)
-        // for (let i = 0; i < 100; i++)
-        // for (let i = 0; i < 10; i++)
+        for (let y = -worldSize; y < worldSize; y += 64)
+        {
+            for (let x = -worldSize; x < worldSize; x += 64)
+            {
+                AddChild(layer, new Sprite(x, y, 'bit').setAlpha(0.2));
+            }
+        }
+
+        AddChild(this.world, layer);
+
         for (let i = 0; i < total; i++)
         {
-            const flake = new Snowflake();
+            const flake = new Ball();
 
             AddChild(world, flake);
         }
-
-        this.camera.setPosition(-16384, -16384);
-    }
-
-    createGrass ()
-    {
-        //  Grass texture is 512 x 512
-        //  World is 64 x 64 tiles = 32,768 x 32,768
-
-        const layer = new Layer();
-
-        SetWillUpdateChildren(layer.id, false);
-
-        for (let y = 0; y < 64; y++)
-        {
-            for (let x = 0; x < 64; x++)
-            {
-                AddChild(layer, new Sprite(x * 512, y * 512, 'grass').setOrigin(0, 0));
-            }
-        }
-
-        AddChild(this.world, layer);
-    }
-
-    createLandscape ()
-    {
-        const frames = Array.from(this.texture.frames.keys());
-
-        //  Remove __BASE texture
-        frames.shift();
-
-        const layer = new Layer();
-
-        SetWillUpdateChildren(layer.id, false);
-
-        const size = 512;
-
-        for (let y = 0; y < size; y++)
-        {
-            for (let x = 0; x < size; x++)
-            {
-                const frame = GetRandom(frames);
-
-                AddChild(layer, new Sprite(256 + (x * 128), size + (y * 128), 'items', frame).setOrigin(0.5, 1));
-            }
-        }
-
-        AddChild(this.world, layer);
     }
 
     update (): void
@@ -195,39 +161,28 @@ let total = parseInt(params.get('t'));
 
 if (!total || total === 0)
 {
-    total = 25000;
+    total = 5000;
 }
 
 const msg = document.createElement('p');
 
-msg.innerHTML = 'Warning: This demo requires over 1GB RAM<br />When loaded use cursors to move';
+msg.innerHTML = 'Please wait, generating Sprites';
 msg.style.paddingLeft = '150px';
 
+const game = new Game(
+    WebGL(),
+    BatchSize(4096),
+    Parent('gameParent'),
+    GlobalVar('Phaser4'),
+    BackgroundColor(0x0a0a0a),
+    Scenes(Demo)
+);
+
 const button = document.createElement('button');
-button.innerText = 'Run Demo';
-
-let game;
-
-button.onclick = () =>
-{
-    //  266240 - grass + items
-    const sprites = 266240 + total;
-
-    msg.innerText = `Please wait, generating ${sprites} Sprites`;
-
-    window.defaultSize = sprites + 1000;
-
-    game = new Game(
-        WebGL(),
-        BatchSize(4096),
-        Parent('gameParent'),
-        GlobalVar('Phaser4'),
-        BackgroundColor(0x0a0a0a),
-        Scenes(Demo)
-    );
-
-    document.body.removeChild(button);
-}
+button.innerText = 'Pause';
+button.onclick = () => {
+    game.isPaused = true;
+};
 
 document.body.appendChild(msg);
 document.body.appendChild(button);

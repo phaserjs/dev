@@ -2867,6 +2867,11 @@ void main (void)
     return Math.floor(Math.random() * (max - min + 1) + min);
   }
 
+  // ../phaser-genesis/src/math/FloatBetween.ts
+  function FloatBetween(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+
   // ../phaser-genesis/src/events/Emit.ts
   function Emit(emitter, event, ...args) {
     if (emitter.events.size === 0 || !emitter.events.has(event)) {
@@ -2998,129 +3003,6 @@ void main (void)
       super("ArrowUp");
     }
   };
-
-  // ../phaser-genesis/src/textures/parsers/AtlasParser.ts
-  function AtlasParser(texture, data) {
-    let frames;
-    if (Array.isArray(data.textures)) {
-      frames = data.textures[0].frames;
-    } else if (Array.isArray(data.frames)) {
-      frames = data.frames;
-    } else if (data.hasOwnProperty("frames")) {
-      frames = [];
-      for (const [filename, frame2] of Object.entries(data.frames)) {
-        frame2["filename"] = filename;
-        frames.push(frame2);
-      }
-    } else {
-      console.warn("Invalid Texture Atlas JSON");
-    }
-    if (frames) {
-      let newFrame;
-      for (let i = 0; i < frames.length; i++) {
-        const src = frames[i];
-        newFrame = texture.addFrame(src.filename, src.frame.x, src.frame.y, src.frame.w, src.frame.h);
-        if (src.trimmed) {
-          newFrame.setTrim(src.sourceSize.w, src.sourceSize.h, src.spriteSourceSize.x, src.spriteSourceSize.y, src.spriteSourceSize.w, src.spriteSourceSize.h);
-        } else {
-          newFrame.setSourceSize(src.sourceSize.w, src.sourceSize.h);
-        }
-        if (src.rotated) {
-        }
-        if (src.anchor) {
-          newFrame.setPivot(src.anchor.x, src.anchor.y);
-        }
-      }
-    }
-  }
-
-  // ../phaser-genesis/src/textures/CreateCanvas.ts
-  function CreateCanvas(width, height) {
-    const canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
-    return canvas.getContext("2d");
-  }
-
-  // ../phaser-genesis/src/textures/TextureManagerInstance.ts
-  var instance4;
-  var TextureManagerInstance = {
-    get: () => {
-      return instance4;
-    },
-    set: (manager) => {
-      if (instance4) {
-        throw new Error("Cannot instantiate TextureManager more than once");
-      }
-      instance4 = manager;
-    }
-  };
-
-  // ../phaser-genesis/src/textures/TextureManager.ts
-  var TextureManager = class {
-    textures;
-    constructor() {
-      TextureManagerInstance.set(this);
-      this.textures = new Map();
-      this.createDefaultTextures();
-    }
-    createDefaultTextures() {
-      this.add("__BLANK", new Texture(CreateCanvas(2, 2).canvas));
-      const missing = CreateCanvas(32, 32);
-      missing.strokeStyle = "#0f0";
-      missing.moveTo(0, 0);
-      missing.lineTo(32, 32);
-      missing.stroke();
-      missing.strokeRect(0.5, 0.5, 31, 31);
-      this.add("__MISSING", new Texture(missing.canvas));
-      const white = CreateCanvas(2, 2);
-      white.fillStyle = "#fff";
-      white.fillRect(0, 0, 2, 2);
-      const whiteTexture = this.add("__WHITE", new Texture(white.canvas));
-      WhiteTexture.set(whiteTexture);
-    }
-    get(key) {
-      const textures = this.textures;
-      if (textures.has(key)) {
-        return textures.get(key);
-      } else {
-        return textures.get("__MISSING");
-      }
-    }
-    has(key) {
-      return this.textures.has(key);
-    }
-    add(key, source, glConfig) {
-      let texture;
-      if (!this.textures.has(key)) {
-        if (source instanceof Texture) {
-          texture = source;
-        } else {
-          texture = new Texture(source, 0, 0, glConfig);
-        }
-        texture.key = key;
-        this.textures.set(key, texture);
-      }
-      return texture;
-    }
-    update(key, source, glConfig) {
-      const texture = this.textures.get(key);
-      if (texture) {
-        texture.update(source, glConfig);
-      }
-      return texture;
-    }
-  };
-
-  // ../phaser-genesis/src/textures/CreateTextureManager.ts
-  function CreateTextureManager() {
-    new TextureManager();
-  }
-
-  // ../phaser-genesis/src/textures/GetTexture.ts
-  function GetTexture(key) {
-    return TextureManagerInstance.get().get(key);
-  }
 
   // ../phaser-genesis/src/components/bounds/BoundsIntersects.ts
   function BoundsIntersects(id, x, y, right, bottom) {
@@ -4546,6 +4428,25 @@ void main (void)
     return children2;
   }
 
+  // ../phaser-genesis/src/textures/TextureManagerInstance.ts
+  var instance4;
+  var TextureManagerInstance = {
+    get: () => {
+      return instance4;
+    },
+    set: (manager) => {
+      if (instance4) {
+        throw new Error("Cannot instantiate TextureManager more than once");
+      }
+      instance4 = manager;
+    }
+  };
+
+  // ../phaser-genesis/src/textures/GetTexture.ts
+  function GetTexture(key) {
+    return TextureManagerInstance.get().get(key);
+  }
+
   // ../phaser-genesis/src/gameobjects/sprite/SetTexture.ts
   function SetTexture(key, frame2, ...children2) {
     if (!key) {
@@ -4633,6 +4534,133 @@ void main (void)
     }
   };
 
+  // ../phaser-genesis/src/textures/parsers/SpriteSheetParser.ts
+  function SpriteSheetParser(texture, x, y, width, height, frameConfig) {
+    const {
+      frameWidth = null,
+      endFrame = -1,
+      margin = 0,
+      spacingX = 0,
+      spacingY = 0
+    } = frameConfig;
+    let {
+      frameHeight = null,
+      startFrame = 0
+    } = frameConfig;
+    if (!frameHeight) {
+      frameHeight = frameWidth;
+    }
+    if (frameWidth === null) {
+      throw new Error("SpriteSheetParser: Invalid frameWidth");
+    }
+    const row = Math.floor((width - margin + spacingX) / (frameWidth + spacingX));
+    const column = Math.floor((height - margin + spacingY) / (frameHeight + spacingY));
+    let total2 = row * column;
+    if (total2 === 0) {
+      console.warn("SpriteSheetParser: Frame config will result in zero frames");
+    }
+    if (startFrame > total2 || startFrame < -total2) {
+      startFrame = 0;
+    }
+    if (startFrame < 0) {
+      startFrame = total2 + startFrame;
+    }
+    if (endFrame !== -1) {
+      total2 = startFrame + (endFrame + 1);
+    }
+    let fx = margin;
+    let fy = margin;
+    let ax = 0;
+    let ay = 0;
+    for (let i = 0; i < total2; i++) {
+      ax = 0;
+      ay = 0;
+      const w = fx + frameWidth;
+      const h = fy + frameHeight;
+      if (w > width) {
+        ax = w - width;
+      }
+      if (h > height) {
+        ay = h - height;
+      }
+      texture.addFrame(i, x + fx, y + fy, frameWidth - ax, frameHeight - ay);
+      fx += frameWidth + spacingX;
+      if (fx + frameWidth > width) {
+        fx = margin;
+        fy += frameHeight + spacingY;
+      }
+    }
+  }
+
+  // ../phaser-genesis/src/textures/CreateCanvas.ts
+  function CreateCanvas(width, height) {
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    return canvas.getContext("2d");
+  }
+
+  // ../phaser-genesis/src/textures/TextureManager.ts
+  var TextureManager = class {
+    textures;
+    constructor() {
+      TextureManagerInstance.set(this);
+      this.textures = new Map();
+      this.createDefaultTextures();
+    }
+    createDefaultTextures() {
+      this.add("__BLANK", new Texture(CreateCanvas(2, 2).canvas));
+      const missing = CreateCanvas(32, 32);
+      missing.strokeStyle = "#0f0";
+      missing.moveTo(0, 0);
+      missing.lineTo(32, 32);
+      missing.stroke();
+      missing.strokeRect(0.5, 0.5, 31, 31);
+      this.add("__MISSING", new Texture(missing.canvas));
+      const white = CreateCanvas(2, 2);
+      white.fillStyle = "#fff";
+      white.fillRect(0, 0, 2, 2);
+      const whiteTexture = this.add("__WHITE", new Texture(white.canvas));
+      WhiteTexture.set(whiteTexture);
+    }
+    get(key) {
+      const textures = this.textures;
+      if (textures.has(key)) {
+        return textures.get(key);
+      } else {
+        return textures.get("__MISSING");
+      }
+    }
+    has(key) {
+      return this.textures.has(key);
+    }
+    add(key, source, glConfig) {
+      let texture;
+      if (!this.textures.has(key)) {
+        if (source instanceof Texture) {
+          texture = source;
+        } else {
+          texture = new Texture(source, 0, 0, glConfig);
+        }
+        texture.key = key;
+        this.textures.set(key, texture);
+      }
+      return texture;
+    }
+    update(key, source, glConfig) {
+      const texture = this.textures.get(key);
+      if (texture) {
+        texture.update(source, glConfig);
+      }
+      return texture;
+    }
+  };
+
+  // ../phaser-genesis/src/textures/CreateTextureManager.ts
+  function CreateTextureManager() {
+    new TextureManager();
+  }
+
   // ../phaser-genesis/src/components/transform/UpdateRootTransform.ts
   function UpdateRootTransform(id) {
     let currentParent = GetParentID(id);
@@ -4681,15 +4709,6 @@ void main (void)
     return HierarchyComponent.index[child.id];
   }
 
-  // ../phaser-genesis/src/utils/array/GetRandom.ts
-  function GetRandom(array, startIndex = 0, length) {
-    if (!length) {
-      length = array.length;
-    }
-    const randomIndex = startIndex + Math.floor(Math.random() * length);
-    return array[randomIndex];
-  }
-
   // ../phaser-genesis/src/display/RemoveChildAt.ts
   function RemoveChildAt(parent, index) {
     const parentID = parent.id;
@@ -4717,136 +4736,6 @@ void main (void)
       RemoveChild(parent, child);
     });
     return children2;
-  }
-
-  // ../phaser-genesis/src/loader/CreateFile.ts
-  function CreateFile(key, url, skipCache = false) {
-    return {
-      key,
-      url,
-      skipCache
-    };
-  }
-
-  // ../phaser-genesis/src/loader/GetURL.ts
-  function GetURL(key, url, extension) {
-    if (!url) {
-      url = `${key}.${extension}`;
-    }
-    if (/^(?:blob:|data:|http:\/\/|https:\/\/|\/\/)/.exec(url)) {
-      return url;
-    } else {
-      return url;
-    }
-  }
-
-  // ../phaser-genesis/src/loader/RequestFile.ts
-  async function RequestFile(file, preload, onload, fileData) {
-    if (!preload(file)) {
-      return Promise.reject(file);
-    }
-    try {
-      const request = new Request(file.url, fileData?.requestInit);
-      file.response = await fetch(request);
-      if (file.response.ok && await onload(file)) {
-        return Promise.resolve(file);
-      } else {
-        return Promise.reject(file);
-      }
-    } catch (error) {
-      file.error = error;
-      return Promise.reject(file);
-    }
-  }
-
-  // ../phaser-genesis/src/loader/files/ImageFile.ts
-  async function ImageFile(key, url, fileData = {}) {
-    const file = CreateFile(key, GetURL(key, url, "png"), fileData?.skipCache);
-    const textureManager = TextureManagerInstance.get();
-    const preload = () => {
-      return textureManager && (!textureManager.has(key) || !textureManager.get(key).locked);
-    };
-    const onload = async (file2) => {
-      const blob = await file2.response.blob();
-      let image;
-      if (window && "createImageBitmap" in window && !fileData?.getImage) {
-        image = await createImageBitmap(blob);
-      } else {
-        image = await new Promise((resolve, reject) => {
-          const url2 = URL.createObjectURL(blob);
-          const img = new Image();
-          img.onload = () => {
-            URL.revokeObjectURL(url2);
-            resolve(img);
-          };
-          img.onerror = () => {
-            reject();
-          };
-          img.src = url2;
-          if (img.complete && img.width && img.height) {
-            img.onload = null;
-            img.onerror = null;
-            resolve(img);
-          }
-        });
-      }
-      if (!image) {
-        return false;
-      }
-      if (fileData.skipCache) {
-        file2.data = image;
-      } else if (textureManager.has(key)) {
-        file2.data = textureManager.update(key, image, fileData?.glConfig);
-      } else {
-        file2.data = textureManager.add(key, image, fileData?.glConfig);
-      }
-      return true;
-    };
-    return RequestFile(file, preload, onload, fileData);
-  }
-
-  // ../phaser-genesis/src/cache/Cache.ts
-  var caches = new Map();
-  var Cache = {
-    get: (type) => {
-      if (!caches.has(type)) {
-        caches.set(type, new Map());
-      }
-      return caches.get(type);
-    },
-    getEntry: (cache, entry) => {
-      if (caches.has(cache)) {
-        return caches.get(cache).get(entry);
-      }
-    }
-  };
-
-  // ../phaser-genesis/src/loader/files/JSONFile.ts
-  async function JSONFile(key, url, fileData = {}) {
-    const file = CreateFile(key, GetURL(key, url, "json"), fileData.skipCache);
-    const cache = Cache.get("JSON");
-    const preload = (file2) => {
-      return cache && (!cache.has(key) || !file2.skipCache);
-    };
-    const onload = async (file2) => {
-      file2.data = await file2.response.json();
-      if (!file2.skipCache) {
-        cache.set(key, file2.data);
-      }
-      return true;
-    };
-    return RequestFile(file, preload, onload, fileData);
-  }
-
-  // ../phaser-genesis/src/loader/files/AtlasFile.ts
-  async function AtlasFile(key, textureURL, atlasURL, fileData = {}) {
-    try {
-      await ImageFile(key, textureURL, Object.assign({}, fileData, { skipCache: false }));
-      const json = await JSONFile(key, atlasURL, Object.assign({}, fileData, { skipCache: true }));
-      AtlasParser(GetTexture(key), json.data);
-    } catch (error) {
-      return Promise.reject();
-    }
   }
 
   // ../phaser-genesis/src/config/banner/AddBanner.ts
@@ -5298,6 +5187,92 @@ void main (void)
     }
   };
 
+  // ../phaser-genesis/src/loader/CreateFile.ts
+  function CreateFile(key, url, skipCache = false) {
+    return {
+      key,
+      url,
+      skipCache
+    };
+  }
+
+  // ../phaser-genesis/src/loader/GetURL.ts
+  function GetURL(key, url, extension) {
+    if (!url) {
+      url = `${key}.${extension}`;
+    }
+    if (/^(?:blob:|data:|http:\/\/|https:\/\/|\/\/)/.exec(url)) {
+      return url;
+    } else {
+      return url;
+    }
+  }
+
+  // ../phaser-genesis/src/loader/RequestFile.ts
+  async function RequestFile(file, preload, onload, fileData) {
+    if (!preload(file)) {
+      return Promise.reject(file);
+    }
+    try {
+      const request = new Request(file.url, fileData?.requestInit);
+      file.response = await fetch(request);
+      if (file.response.ok && await onload(file)) {
+        return Promise.resolve(file);
+      } else {
+        return Promise.reject(file);
+      }
+    } catch (error) {
+      file.error = error;
+      return Promise.reject(file);
+    }
+  }
+
+  // ../phaser-genesis/src/loader/files/ImageFile.ts
+  async function ImageFile(key, url, fileData = {}) {
+    const file = CreateFile(key, GetURL(key, url, "png"), fileData?.skipCache);
+    const textureManager = TextureManagerInstance.get();
+    const preload = () => {
+      return textureManager && (!textureManager.has(key) || !textureManager.get(key).locked);
+    };
+    const onload = async (file2) => {
+      const blob = await file2.response.blob();
+      let image;
+      if (window && "createImageBitmap" in window && !fileData?.getImage) {
+        image = await createImageBitmap(blob);
+      } else {
+        image = await new Promise((resolve, reject) => {
+          const url2 = URL.createObjectURL(blob);
+          const img = new Image();
+          img.onload = () => {
+            URL.revokeObjectURL(url2);
+            resolve(img);
+          };
+          img.onerror = () => {
+            reject();
+          };
+          img.src = url2;
+          if (img.complete && img.width && img.height) {
+            img.onload = null;
+            img.onerror = null;
+            resolve(img);
+          }
+        });
+      }
+      if (!image) {
+        return false;
+      }
+      if (fileData.skipCache) {
+        file2.data = image;
+      } else if (textureManager.has(key)) {
+        file2.data = textureManager.update(key, image, fileData?.glConfig);
+      } else {
+        file2.data = textureManager.add(key, image, fileData?.glConfig);
+      }
+      return true;
+    };
+    return RequestFile(file, preload, onload, fileData);
+  }
+
   // ../phaser-genesis/src/input/keyboard/Keyboard.ts
   var Keyboard = class extends EventEmitter {
     keys;
@@ -5376,6 +5351,19 @@ void main (void)
       Emit(this, "destroy");
     }
   };
+
+  // ../phaser-genesis/src/loader/files/SpriteSheetFile.ts
+  async function SpriteSheetFile(key, url, frameConfig, fileData = {}) {
+    try {
+      await ImageFile(key, url, Object.assign({}, fileData, { skipCache: false }));
+      const texture = GetTexture(key);
+      if (texture) {
+        SpriteSheetParser(texture, 0, 0, texture.width, texture.height, frameConfig);
+      }
+    } catch (error) {
+      return Promise.reject();
+    }
+  }
 
   // ../phaser-genesis/src/world/events/WorldAfterUpdateEvent.ts
   var WorldAfterUpdateEvent = "afterupdate";
@@ -5752,21 +5740,30 @@ void main (void)
     }
   };
 
-  // examples/src/test/snow.ts
-  var Snowflake = class extends Sprite {
+  // examples/src/test/balls.ts
+  var worldSize = 2e4;
+  var Ball = class extends Sprite {
     constructor() {
-      super(Between(0, 32768), Between(0, 32768), "snow");
-      this.speedX = Between(1, 8);
-      this.speedY = Between(1, 8);
+      super(Between(-worldSize, worldSize), Between(-worldSize, worldSize), "balls", Between(0, 5));
+      this.speedX = FloatBetween(-4, 4);
+      this.speedY = FloatBetween(-4, 4);
     }
     update() {
-      this.x -= this.speedX;
+      this.x += this.speedX;
       this.y += this.speedY;
-      if (this.x < 0) {
-        this.x = 32768;
+      if (this.x < -worldSize) {
+        this.x = -worldSize;
+        this.speedX *= -1;
+      } else if (this.x > worldSize) {
+        this.x = worldSize;
+        this.speedX *= -1;
       }
-      if (this.y > 32768) {
-        this.y = 0;
+      if (this.y < -worldSize) {
+        this.y = -worldSize;
+        this.speedY *= -1;
+      } else if (this.y > worldSize) {
+        this.y = worldSize;
+        this.speedY *= -1;
       }
     }
   };
@@ -5783,44 +5780,24 @@ void main (void)
       this.create();
     }
     async create() {
-      await AtlasFile("items", "assets/land.png", "assets/land.json");
-      await ImageFile("grass", "assets/textures/grass-plain.png");
-      await ImageFile("snow", "assets/particle1.png");
+      await SpriteSheetFile("balls", "assets/balls.png", { frameWidth: 17 });
+      await ImageFile("ball", "assets/8x8.png");
+      await ImageFile("bit", "assets/1bitblock2.png");
       const world2 = new StaticWorld(this);
       this.world = world2;
       this.camera = this.world.camera;
-      this.texture = GetTexture("items");
-      this.createGrass();
-      this.createLandscape();
+      const layer = new Layer();
+      SetWillUpdateChildren(layer.id, false);
+      for (let y = -worldSize; y < worldSize; y += 64) {
+        for (let x = -worldSize; x < worldSize; x += 64) {
+          AddChild(layer, new Sprite(x, y, "bit").setAlpha(0.2));
+        }
+      }
+      AddChild(this.world, layer);
       for (let i = 0; i < total; i++) {
-        const flake = new Snowflake();
+        const flake = new Ball();
         AddChild(world2, flake);
       }
-      this.camera.setPosition(-16384, -16384);
-    }
-    createGrass() {
-      const layer = new Layer();
-      SetWillUpdateChildren(layer.id, false);
-      for (let y = 0; y < 64; y++) {
-        for (let x = 0; x < 64; x++) {
-          AddChild(layer, new Sprite(x * 512, y * 512, "grass").setOrigin(0, 0));
-        }
-      }
-      AddChild(this.world, layer);
-    }
-    createLandscape() {
-      const frames = Array.from(this.texture.frames.keys());
-      frames.shift();
-      const layer = new Layer();
-      SetWillUpdateChildren(layer.id, false);
-      const size = 512;
-      for (let y = 0; y < size; y++) {
-        for (let x = 0; x < size; x++) {
-          const frame2 = GetRandom(frames);
-          AddChild(layer, new Sprite(256 + x * 128, size + y * 128, "items", frame2).setOrigin(0.5, 1));
-        }
-      }
-      AddChild(this.world, layer);
     }
     update() {
       if (!this.camera) {
@@ -5845,20 +5822,16 @@ void main (void)
   var params = new URLSearchParams(document.location.search);
   var total = parseInt(params.get("t"));
   if (!total || total === 0) {
-    total = 25e3;
+    total = 5e3;
   }
   var msg = document.createElement("p");
-  msg.innerHTML = "Warning: This demo requires over 1GB RAM<br />When loaded use cursors to move";
+  msg.innerHTML = "Please wait, generating Sprites";
   msg.style.paddingLeft = "150px";
+  var game = new Game(WebGL(), BatchSize(4096), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(657930), Scenes(Demo));
   var button = document.createElement("button");
-  button.innerText = "Run Demo";
-  var game;
+  button.innerText = "Pause";
   button.onclick = () => {
-    const sprites = 266240 + total;
-    msg.innerText = `Please wait, generating ${sprites} Sprites`;
-    window.defaultSize = sprites + 1e3;
-    game = new Game(WebGL(), BatchSize(4096), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(657930), Scenes(Demo));
-    document.body.removeChild(button);
+    game.isPaused = true;
   };
   document.body.appendChild(msg);
   document.body.appendChild(button);
@@ -5868,4 +5841,4 @@ void main (void)
  * @copyright    2020 Photon Storm Ltd.
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
  */
-//# sourceMappingURL=snow.js.map
+//# sourceMappingURL=balls.js.map
