@@ -15,7 +15,11 @@ import { WorldCamera } from '../../../../phaser-genesis/src/camera/WorldCamera';
 
 //  40000 = 1,567,501 sprites
 //  20000 = 395,626 sprites
-const worldSize = 20000;
+//  10000 = 97,970 sprites
+
+//  (worldSize * 2) / 64 squared
+
+const worldSize = 10000;
 
 class Ball extends Sprite
 {
@@ -119,6 +123,8 @@ class Demo extends Scene
 
             AddChild(world, flake);
         }
+
+        msg.innerText = `Running. Press the button to start a 10 second capture.`;
     }
 
     update (): void
@@ -148,9 +154,24 @@ class Demo extends Scene
 
         const rs = window.renderStats;
 
-        if (rs)
+        if (capture)
         {
-            msg.innerText = `Frame: ${rs.gameFrame} - Game Objects: ${rs.numChildren} - Rendered: ${rs.rendered} in ${rs.renderMs.toFixed(2)}ms - Updated: ${rs.updated}`;
+            if (startFrame === 0)
+            {
+                startFrame = rs.gameFrame;
+                totalSprites = rs.numChildren;
+            }
+
+            renderMS.push(rs.renderMs);
+            updateMS.push(rs.updateMs);
+            fps.push(rs.fps);
+
+            if (performance.now() >= endTime)
+            {
+                endCapture(rs.gameFrame);
+            }
+
+            // msg.innerText = `Frame: ${rs.gameFrame} - Game Objects: ${rs.numChildren} - Rendered: ${rs.rendered} in ${rs.renderMs.toFixed(2)}ms - Updated: ${rs.updated}`;
         }
     }
 }
@@ -166,8 +187,10 @@ if (!total || total === 0)
 
 const msg = document.createElement('p');
 
-msg.innerHTML = 'Please wait, generating Sprites';
-msg.style.paddingLeft = '150px';
+const ts = (worldSize * 2) / 64;
+
+msg.innerHTML = `Please wait, generating ${ts * ts} Sprites`;
+msg.style.paddingLeft = '50px';
 
 const game = new Game(
     WebGL(),
@@ -178,11 +201,145 @@ const game = new Game(
     Scenes(Demo)
 );
 
+let capture = false;
+const renderMS = [];
+const updateMS = [];
+const fps = [];
+let startTime = 0;
+let endTime = 0;
+let startFrame = 0;
+let totalSprites = 0;
+
 const button = document.createElement('button');
-button.innerText = 'Pause';
+
+button.innerText = 'Start Capture';
+
 button.onclick = () => {
-    game.isPaused = true;
+
+    if (!capture)
+    {
+        capture = true;
+        startTime = performance.now();
+        endTime = startTime + 10000;
+    
+        msg.innerText = `Capturing. Please wait 10 seconds.`;
+    }
+
 };
+
+function endCapture (endFrame: number)
+{
+    msg.innerText = `Results are in the console`;
+
+    capture = false;
+    game.isPaused = true;
+
+    //  Average renderMS
+    let renderTotal = 0;
+    let renderMin = Number.MAX_SAFE_INTEGER;
+    let renderMax = 0;
+
+    renderMS.forEach(value => {
+
+        renderTotal += value;
+
+        if (value > renderMax)
+        {
+            renderMax = value;
+        }
+        
+        if (value < renderMin)
+        {
+            renderMin = value;
+        }
+
+    });
+
+    const renderAvg = renderTotal / renderMS.length;
+
+    //  Average updateMS
+    let updateTotal = 0;
+    let updateMin = Number.MAX_SAFE_INTEGER;
+    let updateMax = 0;
+
+    updateMS.forEach(value => {
+
+        updateTotal += value;
+
+        if (value > updateMax)
+        {
+            updateMax = value;
+        }
+        
+        if (value < updateMin)
+        {
+            updateMin = value;
+        }
+
+    });
+
+    const updateAvg = updateTotal / updateMS.length;
+
+    //  Average updateMS
+    let fpsTotal = 0;
+    let fpsMin = Number.MAX_SAFE_INTEGER;
+    let fpsMax = 0;
+
+    fps.forEach(value => {
+
+        fpsTotal += value;
+
+        if (value > fpsMax)
+        {
+            fpsMax = value;
+        }
+        
+        if (value < fpsMin)
+        {
+            fpsMin = value;
+        }
+
+    });
+
+    const fpsAvg = fpsTotal / fps.length;
+
+    const totalFrames = endFrame - startFrame;
+
+    console.log('Total Sprites:', totalSprites);
+    console.log('Updating Sprites:', total);
+    console.log('Static Sprites:', totalSprites - total);
+
+    console.log('');
+
+    console.log('Start Frame:', startFrame);
+    console.log('End Frame:', endFrame);
+    console.log('Total Frames:', totalFrames);
+    console.log('Time per Frame:', (endTime - startTime) / totalFrames);
+
+    console.log('');
+
+    console.log('Start Time:', startTime);
+    console.log('End Time:', endTime);
+    console.log('Duration:', endTime - startTime, 'ms');
+
+    console.log('');
+
+    console.log('Average Render Time:', renderAvg, 'ms per frame');
+    console.log('Min Render Time:', renderMin, 'ms');
+    console.log('Max Render Time:', renderMax, 'ms');
+
+    console.log('');
+
+    console.log('Average Update Time:', updateAvg, 'ms per frame');
+    console.log('Min Update Time:', updateMin, 'ms');
+    console.log('Max Update Time:', updateMax, 'ms');
+
+    console.log('');
+
+    console.log('Average FPS Rate:', fpsAvg);
+    console.log('Min FPS Rate:', fpsMin);
+    console.log('Max FPS Rate:', fpsMax);
+}
 
 document.body.appendChild(msg);
 document.body.appendChild(button);

@@ -1,5 +1,5 @@
 import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../../phaser-genesis/src/config';
-import { EffectLayer, Rectangle, RenderLayer, Sprite } from '../../../../../phaser-genesis/src/gameobjects';
+import { EffectLayer, Layer, Rectangle, RenderLayer, Sprite } from '../../../../../phaser-genesis/src/gameobjects';
 
 import { AddChildren } from '../../../../../phaser-genesis/src/display';
 import { FXShader } from '../../../../../phaser-genesis/src/renderer/webgl1/shaders/FXShader';
@@ -448,47 +448,42 @@ class Demo extends Scene
 
         const world = new StaticWorld(this);
 
-        // const layer = new EffectLayer();
-        const layer2 = new RenderLayer();
+        const baselayer = new Layer();
+        const renderlayer = new RenderLayer();
+        const fxlayer = new EffectLayer();
 
         dots.timeScale = 0.001;
         stars.timeScale = 0.001;
         flower.timeScale = 0.001;
 
-        // layer.shaders.push(flower);
-        // layer.shaders.push(plasma);
-        // layer.shaders.push(stars);
-        // layer.shaders.push(sine);
-        // layer.shaders.push(clouds);
-        // layer.shaders.push(dots);
+        fxlayer.shaders.push(flower);
+        // fxlayer.shaders.push(plasma);
+        // fxlayer.shaders.push(stars);
+        fxlayer.shaders.push(sine);
+        // fxlayer.shaders.push(clouds);
+        // fxlayer.shaders.push(dots);
 
         const rect = new Rectangle(400, 300, 512, 512, 0xff00ff);
         const rect2 = new Rectangle(400, 300, 256, 256, 0xffff00);
 
-        rect.skew.set(2, 1);
-
         On(world, 'update', () => {
 
-            // rect.rotation += 0.01;
+            rect.rotation += 0.01;
+            rect2.rotation -= 0.005;
 
         });
 
-        setInterval(() => {
+        //  Updates: YES
+        // AddChildren(baselayer, rect, rect2);
+        // AddChildren(world, baselayer);
 
-            rect.rotation += 0.02;
+        //  Updates: YES (SetDirtyTransform call SetDirtyParents)
+        // AddChildren(renderlayer, rect, rect2);
+        // AddChildren(world, renderlayer);
 
-        }, 1000);
-
-        AddChildren(layer2, rect, rect2);
-
-        AddChildren(world, layer2);
-
-        // const bob = new Sprite(200, 300, layer2.texture).setScale(0.5);
-
-        // AddChildren(world, bob);
-
-        // AddChildren(layer, rect);
-        // AddChildren(world, layer);
+        //  Updates: YES
+        AddChildren(fxlayer, rect, rect2);
+        AddChildren(world, fxlayer);
     }
 }
 

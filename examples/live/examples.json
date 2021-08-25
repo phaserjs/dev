@@ -520,7 +520,7 @@
             {
               "path": "examples/live/gameobjects/effectlayer/create effect layer.js",
               "name": "create effect layer.js",
-              "size": 176024,
+              "size": 182500,
               "extension": ".js",
               "type": "file"
             },
@@ -541,12 +541,12 @@
             {
               "path": "examples/live/gameobjects/effectlayer/rectangle effect layer.js",
               "name": "rectangle effect layer.js",
-              "size": 161144,
+              "size": 176272,
               "extension": ".js",
               "type": "file"
             }
           ],
-          "size": 666408,
+          "size": 688012,
           "type": "directory"
         },
         {
@@ -723,7 +723,7 @@
           "type": "directory"
         }
       ],
-      "size": 5803447,
+      "size": 5825051,
       "type": "directory"
     },
     {
@@ -827,7 +827,7 @@
         {
           "path": "examples/live/test/balls.js",
           "name": "balls.js",
-          "size": 172606,
+          "size": 175632,
           "extension": ".js",
           "type": "file"
         },
@@ -987,7 +987,7 @@
           "type": "file"
         }
       ],
-      "size": 2462702,
+      "size": 2465728,
       "type": "directory"
     },
     {
@@ -1062,6 +1062,6 @@
       "type": "directory"
     }
   ],
-  "size": 18764768,
+  "size": 18789398,
   "type": "directory"
 }

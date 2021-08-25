@@ -414,19 +414,20 @@ class Demo extends Scene
     {
         super();
 
-        const loader = new Loader();
+        this.preload();
+    }
 
-        loader.setPath('assets/');
+    async preload ()
+    {
+        await ImageFile('background', 'assets/farm-background.png');
+        await ImageFile('ayu', 'assets/ayu.png');
+        await ImageFile('logo', 'assets/logo.png');
+        await ImageFile('rocket', 'assets/rocket.png');
+        await ImageFile('farm', 'assets/farm-logo.png');
+        await ImageFile('star', 'assets/star.png');
+        await ImageFile('bubble', 'assets/bubble256.png');
 
-        loader.add(ImageFile('background', 'farm-background.png'));
-        loader.add(ImageFile('ayu', 'ayu.png'));
-        loader.add(ImageFile('logo', 'logo.png'));
-        loader.add(ImageFile('rocket', 'rocket.png'));
-        loader.add(ImageFile('farm', 'farm-logo.png'));
-        loader.add(ImageFile('star', 'star.png'));
-        loader.add(ImageFile('bubble', 'bubble256.png'));
-
-        loader.start().then(() => this.create()).catch();
+        this.create();
     }
 
     create ()
@@ -449,6 +450,7 @@ class Demo extends Scene
 
         const layer = new EffectLayer();
         const layer2 = new EffectLayer();
+        const layer3 = new EffectLayer();
 
         // layer.shaders.push(red);
         // layer.shaders.push(blurX, red);
@@ -463,8 +465,11 @@ class Demo extends Scene
         // layer.shaders.push(empty);
         layer.shaders.push(clouds);
 
-        layer2.shaders.push(plasma);
         layer2.shaders.push(sine);
+        layer2.shaders.push(plasma);
+
+        layer3.shaders.push(sine);
+        layer3.shaders.push(lazer);
 
         const bg = new Sprite(400, 300, 'background');
         const logo = new Sprite(200, 300, 'logo');
@@ -474,11 +479,13 @@ class Demo extends Scene
         const bubble = new Sprite(400, 450, 'bubble');
         const star = new Sprite(650, 500, 'star');
 
-        AddChildren(layer, ayu, logo, rocket, bubble);
+        AddChildren(layer, ayu, logo, rocket);
+
+        AddChildren(layer3, bubble);
 
         AddChildren(layer2, farm);
 
-        AddChildren(world, bg, layer, layer2, star);
+        AddChildren(world, bg, layer, layer2, layer3, star);
     }
 }
 
