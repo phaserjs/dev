@@ -1,9 +1,11 @@
+import { AddChild, AddChildren } from '../../../../phaser-genesis/src/display';
 import { BackgroundColor, BatchSize, GlobalVar, Parent, Scenes, WebGL } from '../../../../phaser-genesis/src/config';
-import { Between, FloatBetween } from '../../../../phaser-genesis/src/math';
+import { Between, Easing, FloatBetween } from '../../../../phaser-genesis/src/math';
+import { Container, Layer, Sprite } from '../../../../phaser-genesis/src/gameobjects';
 import { DownKey, LeftKey, RightKey, UpKey } from '../../../../phaser-genesis/src/input/keyboard/keys';
-import { Layer, Sprite } from '../../../../phaser-genesis/src/gameobjects';
 
-import { AddChild } from '../../../../phaser-genesis/src/display';
+import { AddTween } from '../../../../phaser-genesis/src/motion/tween/nano/AddTween';
+import { AtlasFile } from '../../../../phaser-genesis/src/loader/files/AtlasFile';
 import { Game } from '../../../../phaser-genesis/src/Game';
 import { ImageFile } from '../../../../phaser-genesis/src/loader/files/ImageFile';
 import { Keyboard } from '../../../../phaser-genesis/src/input/keyboard';
@@ -13,25 +15,50 @@ import { SpriteSheetFile } from '../../../../phaser-genesis/src/loader/files/Spr
 import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
 import { WorldCamera } from '../../../../phaser-genesis/src/camera/WorldCamera';
 
-//  40000 = 1,567,501 sprites
-//  20000 = 395,626 sprites
-//  10000 = 97,970 sprites
+const worldSize = 5000;
 
-//  (worldSize * 2) / 64 squared
-
-const worldSize = 10000;
-
-class Ball extends Sprite
+class Banshee extends Container
 {
     speedX: number;
     speedY: number;
 
     constructor ()
     {
-        super(Between(-worldSize, worldSize), Between(-worldSize, worldSize), 'balls', Between(0, 5));
+        super(Between(-worldSize, worldSize), Between(-worldSize, worldSize));
 
-        this.speedX = FloatBetween(-4, 4);
-        this.speedY = FloatBetween(-4, 4);
+        //  Back arm
+        const arm1 = new Sprite(50, -200, 'banshee', 'arm1');
+        const hand1 = new Sprite(110, -200, 'banshee', 'hand1').setOrigin(0, 0.5);
+
+        const body = new Sprite(0, 0, 'banshee', 'body');
+
+        //  Front arm
+        const arm2 = new Sprite(50, -250, 'banshee', 'arm2').setOrigin(1, 0.5);
+        const hand2 = new Sprite(-180, -25, 'banshee', 'hand2').setOrigin(0, 0);
+
+        AddChild(arm2, hand2);
+
+        const head = new Sprite(60, -305, 'banshee', 'head').setOrigin(0.5, 1);
+
+        AddChildren(this, hand1, arm1, body, arm2, head);
+
+        // AddTween(this).to(300, { y: 300 }).yoyo(true).repeat(-1).easing(Easing.Sine.InOut);
+        AddTween(head).to(300, { rotation: 0.25 }).yoyo(true).repeat(-1).easing(Easing.Sine.InOut);
+        AddTween(arm2).to(300, { x: 60, rotation: -0.20 }).yoyo(true).repeat(-1).easing(Easing.Sine.InOut);
+        AddTween(hand2).to(300, { rotation: 0.30 }).yoyo(true).repeat(-1).easing(Easing.Sine.InOut);
+        AddTween(hand1).to(300, { rotation: -0.20 }).yoyo(true).repeat(-1).easing(Easing.Sine.InOut);
+
+        this.speedX = FloatBetween(-2, 2);
+        this.speedY = FloatBetween(-2, 2);
+
+        if (this.speedX < 0)
+        {
+            this.setScale(-0.5, 0.5);
+        }
+        else
+        {
+            this.setScale(0.5, 0.5);
+        }
     }
 
     update (): void
@@ -43,11 +70,13 @@ class Ball extends Sprite
         {
             this.x = -worldSize;
             this.speedX *= -1;
+            this.scale.x *= -1;
         }
         else if (this.x > worldSize)
         {
             this.x = worldSize;
             this.speedX *= -1;
+            this.scale.x *= -1;
         }
 
         if (this.y < -worldSize)
@@ -93,6 +122,7 @@ class Demo extends Scene
 
     async create ()
     {
+        await AtlasFile('banshee', 'assets/banshee.png', 'assets/banshee.json');
         await SpriteSheetFile('balls', 'assets/balls.png', { frameWidth: 17 });
         await ImageFile('ball', 'assets/8x8.png');
         await ImageFile('bit', 'assets/1bitblock2.png');
@@ -119,7 +149,7 @@ class Demo extends Scene
 
         for (let i = 0; i < total; i++)
         {
-            const flake = new Ball();
+            const flake = new Banshee();
 
             AddChild(world, flake);
         }
@@ -170,12 +200,10 @@ class Demo extends Scene
             {
                 endCapture(rs.gameFrame);
             }
-
-            // msg.innerText = `Frame: ${rs.gameFrame} - Game Objects: ${rs.numChildren} - Rendered: ${rs.rendered} in ${rs.renderMs.toFixed(2)}ms - Updated: ${rs.updated}`;
         }
         else if (rs)
         {
-            msg.innerText = `Frame: ${rs.gameFrame} - Game Objects: ${rs.numChildren} - Rendered: ${rs.rendered} in ${rs.renderMs.toFixed(2)}ms - Updated: ${rs.updated} - InView: ${rs.dirtyView}`;
+            msg.innerText = `Frame: ${rs.gameFrame} - Game Objects: ${rs.numChildren} - Rendered: ${rs.rendered} in ${rs.renderMs.toFixed(2)}ms - Updated: ${rs.updated} - ViewUpdate: ${rs.dirtyView}`;
         }
     }
 }
@@ -186,7 +214,7 @@ let total = parseInt(params.get('t'));
 
 if (!total || total === 0)
 {
-    total = 5000;
+    total = 1000;
 }
 
 const msg = document.createElement('p');
