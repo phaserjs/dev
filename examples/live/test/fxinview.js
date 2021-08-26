@@ -898,7 +898,7 @@
   if (window["defaultSize"]) {
     setDefaultSize(parseInt(window["defaultSize"]));
   } else {
-    setDefaultSize(15e4);
+    setDefaultSize(5e4);
   }
   var world = createWorld();
   var GameObjectWorld = world;
@@ -2008,7 +2008,12 @@
   function AddQuadVertex(id, width = 0, height = 0, flipY = true) {
     addComponent(GameObjectWorld, QuadVertexComponent, id);
     if (width || height) {
-      SetUV(id, 0, 0, 1, 1);
+      if (flipY) {
+        console.log("flipY", id);
+        SetUV(id, 0, 0.5, 1, 1);
+      } else {
+        SetUV(id, 0, 0, 1, 1);
+      }
       SetQuadPosition(id, 0, 0, 0, height, width, height, width, 0);
     }
   }
@@ -7253,33 +7258,6 @@ void main( void ) {
 	}
 	gl_FragColor = vec4(tcolor.rgb * color, tcolor.a);
 }`;
-  var verticalBarsFragmentShader = `
-#define SHADER_NAME BARS_FRAG
-
-precision mediump float;
-
-varying vec2 vTextureCoord;
-varying float vTextureId;
-varying vec4 vTintColor;
-
-uniform sampler2D uTexture;
-uniform float uTime;
-uniform vec2 uResolution;
-
-#define PI 0.01
-
-void main (void)
-{
-    vec4 color = texture2D(uTexture, vTextureCoord);
-
-    vec2 p = (gl_FragCoord.xy / uResolution.xy) - 0.5;
-
-    float sx = 0.4 * sin(25.0 * p.y - (uTime * 0.001) * 2.0);
-
-    float dy = 2.0 / (5.0 * abs(p.y - sx));
-
-    gl_FragColor = color * vec4((p.x + 0.5) * dy, 0.5 * dy, dy - 1.65, 0.5);
-}`;
   var lazerBeamFragmentShader = `
 precision highp float;
 
@@ -7304,6 +7282,112 @@ void main (void)
 
     gl_FragColor = color * vec4((p.x + 0.1) * dy, 0.3 * dy, dy, 1.1);
 }`;
+  var purpleHazeFragmentShader = `
+precision mediump float;
+
+#extension GL_OES_standard_derivatives : enable
+
+#define NUM_OCTAVES 16
+
+varying vec2 vTextureCoord;
+varying float vTextureId;
+varying vec4 vTintColor;
+
+uniform sampler2D uTexture;
+uniform float uTime;
+uniform vec2 uResolution;
+
+// uniform float time;
+// uniform vec2 resolution;
+
+mat3 rotX(float a) {
+	float c = cos(a);
+	float s = sin(a);
+	return mat3(
+		1, 0, 0,
+		0, c, -s,
+		0, s, c
+	);
+}
+mat3 rotY(float a) {
+	float c = cos(a);
+	float s = sin(a);
+	return mat3(
+		c, 0, -s,
+		0, 1, 0,
+		s, 0, c
+	);
+}
+
+float random(vec2 pos) {
+	return fract(sin(dot(pos.xy, vec2(1399.9898, 78.233))) * 43758.5453123);
+}
+
+float noise(vec2 pos) {
+	vec2 i = floor(pos);
+	vec2 f = fract(pos);
+	float a = random(i + vec2(0.0, 0.0));
+	float b = random(i + vec2(1.0, 0.0));
+	float c = random(i + vec2(0.0, 1.0));
+	float d = random(i + vec2(1.0, 1.0));
+	vec2 u = f * f * (3.0 - 2.0 * f);
+	return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+}
+
+float fbm(vec2 pos) {
+	float v = 0.0;
+	float a = 0.5;
+	vec2 shift = vec2(100.0);
+	mat2 rot = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.5));
+	for (int i=0; i<NUM_OCTAVES; i++) {
+		v += a * noise(pos);
+		pos = rot * pos * 2.0 + shift;
+		a *= 0.5;
+	}
+	return v;
+}
+
+void main(void) {
+
+    vec4 tcolor = texture2D(uTexture, vTextureCoord);
+
+    vec2 p = (gl_FragCoord.xy * 2.0 - uResolution.xy) / min(uResolution.x, uResolution.y);
+
+	float t = 0.0, d;
+
+	float time2 = 3.0 * uTime / 2.0;
+
+	vec2 q = vec2(0.0);
+	q.x = fbm(p + 0.00 * time2);
+	q.y = fbm(p + vec2(1.0));
+	vec2 r = vec2(0.0);
+	r.x = fbm(p + 1.0 * q + vec2(1.7, 9.2) + 0.15 * time2);
+	r.y = fbm(p + 1.0 * q + vec2(8.3, 2.8) + 0.126 * time2);
+	float f = fbm(p + r);
+	vec3 color = mix(
+		vec3(0.101961, 0.866667, 0.319608),
+		vec3(.466667, 0.698039, 0.666667),
+		clamp((f * f) * 4.0, 0.0, 1.0)
+	);
+
+	color = mix(
+		color,
+		vec3(0.34509803921, 0.06666666666, 0.83137254902),
+		clamp(length(q), 0.0, 1.0)
+	);
+
+
+	color = mix(
+		color,
+		vec3(0.1, -0.5, 0.1),
+		clamp(length(r.x), 0.0, 1.0)
+	);
+
+	color = (f *f * f + 0.6 * f * f + 0.5 * f) * color;
+
+	gl_FragColor = tcolor * vec4(color, 1.0);
+}
+`;
   var worldSize = 5e3;
   var Banshee = class extends Container {
     constructor() {
@@ -7365,7 +7449,8 @@ void main (void)
       await AtlasFile("banshee", "assets/banshee.png", "assets/banshee.json");
       await SpriteSheetFile("balls", "assets/balls.png", { frameWidth: 17 });
       await ImageFile("ball", "assets/8x8.png");
-      await ImageFile("bit", "assets/1bitblock2.png");
+      await ImageFile("bit", "assets/box-item-boxed.png");
+      await SpriteSheetFile("tiles", "assets/fantasy-tiles.png", { frameWidth: 64, frameHeight: 64 });
       const plasma = new FXShader({ fragmentShader: plasmaFragmentShader });
       const sine = new FXShader({ fragmentShader: sineWaveFragmentShader });
       const clouds = new FXShader({ fragmentShader: cloudsFragmentShader });
@@ -7373,21 +7458,21 @@ void main (void)
       const dots = new FXShader({ fragmentShader: dotsFragmentShader });
       const stars = new FXShader({ fragmentShader: starsFragmentShader });
       const lazer = new FXShader({ fragmentShader: lazerBeamFragmentShader });
-      const bars = new FXShader({ fragmentShader: verticalBarsFragmentShader });
+      const purple = new FXShader({ fragmentShader: purpleHazeFragmentShader });
       const fxlayer = new EffectLayer();
       dots.timeScale = 1e-3;
       stars.timeScale = 1e-3;
       flower.timeScale = 1e-3;
+      purple.timeScale = 1e-3;
       fxlayer.shaders.push(stars);
       const world2 = new StaticWorld(this);
       this.world = world2;
       this.camera = this.world.camera;
-      const layer = new EffectLayer();
-      layer.shaders.push(flower);
+      const layer = new RenderLayer();
       SetWillUpdateChildren(layer.id, false);
       for (let y = -worldSize; y < worldSize; y += 64) {
         for (let x = -worldSize; x < worldSize; x += 64) {
-          AddChild(layer, new Sprite(x, y, "bit").setAlpha(0.5));
+          AddChild(layer, new Sprite(x, y, "tiles", Between(0, 55)).setAlpha(0.5));
         }
       }
       AddChild(this.world, layer);
