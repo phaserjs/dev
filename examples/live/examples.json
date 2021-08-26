@@ -541,12 +541,12 @@
             {
               "path": "examples/live/gameobjects/effectlayer/rectangle effect layer.js",
               "name": "rectangle effect layer.js",
-              "size": 176264,
+              "size": 178454,
               "extension": ".js",
               "type": "file"
             }
           ],
-          "size": 677886,
+          "size": 680076,
           "type": "directory"
         },
         {
@@ -723,7 +723,7 @@
           "type": "directory"
         }
       ],
-      "size": 5749153,
+      "size": 5751343,
       "type": "directory"
     },
     {
@@ -861,6 +861,13 @@
           "type": "directory"
         },
         {
+          "path": "examples/live/test/fxinview.js",
+          "name": "fxinview.js",
+          "size": 197394,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
           "path": "examples/live/test/gamedraw.js",
           "name": "gamedraw.js",
           "size": 136244,
@@ -891,7 +898,7 @@
         {
           "path": "examples/live/test/inviewcontainer.js",
           "name": "inviewcontainer.js",
-          "size": 179662,
+          "size": 200631,
           "extension": ".js",
           "type": "file"
         },
@@ -994,7 +1001,7 @@
           "type": "file"
         }
       ],
-      "size": 2630391,
+      "size": 2848754,
       "type": "directory"
     },
     {
@@ -1069,6 +1076,6 @@
       "type": "directory"
     }
   ],
-  "size": 18729475,
+  "size": 18950028,
   "type": "directory"
 }

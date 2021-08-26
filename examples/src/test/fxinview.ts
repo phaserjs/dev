@@ -1,0 +1,935 @@
+import { AddChild, AddChildren } from '../../../../phaser-genesis/src/display';
+import { BackgroundColor, BatchSize, GlobalVar, Parent, Scenes, WebGL } from '../../../../phaser-genesis/src/config';
+import { Between, Easing, FloatBetween } from '../../../../phaser-genesis/src/math';
+import { Container, EffectLayer, Layer, RenderLayer, Sprite } from '../../../../phaser-genesis/src/gameobjects';
+import { DownKey, LeftKey, RightKey, UpKey } from '../../../../phaser-genesis/src/input/keyboard/keys';
+
+import { AddTween } from '../../../../phaser-genesis/src/motion/tween/nano/AddTween';
+import { AtlasFile } from '../../../../phaser-genesis/src/loader/files/AtlasFile';
+import { FXShader } from '../../../../phaser-genesis/src/renderer/webgl1/shaders/FXShader';
+import { Game } from '../../../../phaser-genesis/src/Game';
+import { ImageFile } from '../../../../phaser-genesis/src/loader/files/ImageFile';
+import { Keyboard } from '../../../../phaser-genesis/src/input/keyboard';
+import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
+import { SetWillUpdateChildren } from '../../../../phaser-genesis/src/components/permissions/SetWillUpdateChildren';
+import { SpriteSheetFile } from '../../../../phaser-genesis/src/loader/files/SpriteSheetFile';
+import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
+import { WorldCamera } from '../../../../phaser-genesis/src/camera/WorldCamera';
+
+const cloudsFragmentShader = `
+#define SHADER_NAME CLOUDS_FRAG
+
+/*
+ * Original shader from: https://www.shadertoy.com/view/MtjGRK
+ */
+
+precision mediump float;
+
+varying vec2 vTextureCoord;
+varying float vTextureId;
+varying vec4 vTintColor;
+
+uniform sampler2D uTexture;
+uniform float uTime;
+uniform vec2 uResolution;
+
+#define PI 3.14159265358979323
+
+//Random
+float rand(vec2 uv)
+{
+    float dt = dot(uv, vec2(12.9898, 78.233));
+	return fract(sin(mod(dt, PI / 2.0)) * 43758.5453);
+}
+
+//Clouds from (https://www.shadertoy.com/view/MlS3z1)
+const int iter = 8;
+
+float turbulence(vec2 fragCoord, float octave, int id)
+{
+    float col = 0.0;
+    vec2 xy;
+    vec2 frac;
+    vec2 tmp1;
+    vec2 tmp2;
+    float i2;
+    float amp;
+    float maxOct = octave;
+    float time = uTime / 1000.0;
+    for (int i = 0; i < iter; i++)
+    {
+        amp = maxOct / octave;
+        i2 = float(i);
+        xy = id == 1 || id == 4? (fragCoord + 50.0 * float(id) * time / (4.0 + i2)) / octave : fragCoord / octave;
+        frac = fract(xy);
+        tmp1 = mod(floor(xy) + uResolution.xy, uResolution.xy);
+        tmp2 = mod(tmp1 + uResolution.xy - 1.0, uResolution.xy);
+        col += frac.x * frac.y * rand(tmp1) / amp;
+        col += frac.x * (1.0 - frac.y) * rand(vec2(tmp1.x, tmp2.y)) / amp;
+        col += (1.0 - frac.x) * frac.y * rand(vec2(tmp2.x, tmp1.y)) / amp;
+        col += (1.0 - frac.x) * (1.0 - frac.y) * rand(tmp2) / amp;
+        octave /= 2.0;
+    }
+    return (col);
+}
+//____________________________________________________
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+	vec2 uv = fragCoord.xy / uResolution.xy;
+
+    vec3 sky = clamp(vec3(0.2, sin(uv.y), 1.0) + 0.3, 0.0, 1.0);
+
+    vec4 color = texture2D(uTexture, vTextureCoord);
+
+    // vec4 skyandtexture = mix(sky, color);
+
+    float cloud1 = turbulence(fragCoord, 128.0, 1);
+    float cloud2 = turbulence(fragCoord + 2000.0, 128.0, 1);
+    float cloudss = clamp(pow(mix(cloud1, cloud2, 0.5), 30.0) / 9.0, 0.0, 1.0);
+
+	// fragColor = sky + color + vec4(cloudss, 1.0);
+
+    fragColor = color * vec4(sky + cloudss, 1.0);
+}
+
+void main(void)
+{
+    mainImage(gl_FragColor, gl_FragCoord.xy);
+}
+`;
+
+const sineWaveFragmentShader = `
+precision mediump float;
+
+varying vec2 vTextureCoord;
+varying float vTextureId;
+varying vec4 vTintColor;
+
+uniform sampler2D uTexture;
+uniform float uTime;
+uniform vec2 uResolution;
+
+void main (void)
+{
+    vec2 uv = gl_FragCoord.xy / uResolution.xy;
+
+    // Represents the v/y coord(0 to 1) that will not sway.
+    float fixedBasePosY = 0.0;
+
+    // Configs for you to get the sway just right.
+    float speed = 3.0;
+    float verticleDensity = 6.0;
+    float swayIntensity = 0.2;
+
+    // Putting it all together.
+    float offsetX = sin(uv.y * verticleDensity + (uTime * 0.001) * speed) * swayIntensity;
+
+    // Offsettin the u/x coord.
+    uv.x += offsetX * (uv.y - fixedBasePosY);
+
+    gl_FragColor = texture2D(uTexture, uv);
+}`;
+
+const plasmaFragmentShader = `
+precision mediump float;
+
+varying vec2 vTextureCoord;
+varying float vTextureId;
+varying vec4 vTintColor;
+
+uniform sampler2D uTexture;
+uniform float uTime;
+uniform vec2 uResolution;
+
+const float PI = 3.14159265;
+float ptime = uTime * 0.0001;
+float alpha = 1.0;
+float size = 0.03;
+float redShift = 0.5;
+float greenShift = 0.5;
+float blueShift = 0.9;
+
+void main (void)
+{
+    vec4 tcolor = texture2D(uTexture, vTextureCoord);
+
+    float color1, color2, color;
+
+    color1 = (sin(dot(gl_FragCoord.xy, vec2(sin(ptime * 3.0), cos(ptime * 3.0))) * 0.02 + ptime * 3.0) + 1.0) / 2.0;
+    vec2 center = vec2(640.0 / 2.0, 360.0 / 2.0) + vec2(640.0 / 2.0 * sin(-ptime * 3.0), 360.0 / 2.0 * cos(-ptime * 3.0));
+    color2 = (cos(length(gl_FragCoord.xy - center) * size) + 1.0) / 2.0;
+    color = (color1 + color2) / 2.0;
+
+    float red = (cos(PI * color / redShift + ptime * 3.0) + 1.0) / 2.0;
+    float green = (sin(PI * color / greenShift + ptime * 3.0) + 1.0) / 2.0;
+    float blue = (sin(PI * color / blueShift + ptime * 3.0) + 1.0) / 2.0;
+
+    gl_FragColor = tcolor * vec4(red, green, blue, alpha);
+}`;
+
+const dotsFragmentShader = `
+precision mediump float;
+
+varying vec2 vTextureCoord;
+varying float vTextureId;
+varying vec4 vTintColor;
+
+uniform sampler2D uTexture;
+
+uniform float time;
+uniform vec2 resolution;
+
+vec2 rotate(vec2 v, float a)
+{
+	float s = sin(a);
+	float c = cos(a);
+	mat2 m = mat2(c, -s, s, c);
+	return m * v;
+}
+
+float tw()
+{
+	return sin(time) * 0.25 + 1.25;
+}
+
+float circle(vec2 pt, float radius)
+{
+	return step(length(pt), radius + sin(pt.x * radius * 44.*tw()) * cos(pt.y * radius *44.*tw()));
+}
+
+void main( void )
+{
+    vec4 tcolor = texture2D(uTexture, vTextureCoord);
+
+    vec2 uv = (gl_FragCoord.xy * 2. - resolution) / resolution.y; //* mix(0.067, 3.0, tw());
+
+	vec3 color;
+	float t = uv.x * 72. + time * 50. + tw() * 1000.;
+	for (int i = 0; i < 3; i++) {
+		float d = abs(uv.y - sin(radians(t)) * .3 * float(i) * sin(time));
+		color[i] = .05 / (d * d);
+		t += 120.;
+	}
+	uv = rotate(uv, time*1.0);
+	color *= circle(uv, 0.45);
+	
+	gl_FragColor = vec4(tcolor.rgb * color, tcolor.a);
+}`;
+
+const starsFragmentShader = `
+#ifdef GL_ES
+precision highp float;
+#endif
+ 
+uniform float time;
+uniform vec2 resolution;
+
+varying vec2 vTextureCoord;
+varying float vTextureId;
+varying vec4 vTintColor;
+
+uniform sampler2D uTexture;
+
+#define mouse vec2(sin(time)/48., cos(time)/48.)
+#define iterations 14
+#define formuparam2 0.79
+ 
+#define volsteps 5
+#define stepsize 0.390
+ 
+#define zoom 0.900
+#define tile   0.850
+#define speed2  100.0 
+#define brightness 0.003
+#define darkmatter 0.400
+#define distfading 0.560
+#define saturation 0.800
+
+
+#define transverseSpeed zoom*2.0
+#define cloud 0.11 
+
+ 
+float triangle(float x, float a) { 
+	float output2 = 2.0*abs(  2.0*  ( (x/a) - floor( (x/a) + 0.5) ) ) - 1.0;
+	return output2;
+}
+ 
+float field(in vec3 p) {	
+	float strength = 7. + .03 * log(1.e-6 + fract(sin(time) * 4373.11));
+	float accum = 0.;
+	float prev = 0.;
+	float tw = 0.;	
+
+	for (int i = 0; i < 6; ++i) {
+		float mag = dot(p, p);
+		p = abs(p) / mag + vec3(-.5, -.8 + 0.1*sin(time*0.7 + 2.0), -1.1+0.3*cos(time*0.3));
+		float w = exp(-float(i) / 7.);
+		accum += w * exp(-strength * pow(abs(mag - prev), 2.3));
+		tw += w;
+		prev = mag;
+	}
+	return max(0., 5. * accum / tw - .7);
+}
+
+
+
+void main() {   
+     	vec2 uv2 = 2. * gl_FragCoord.xy / vec2(512) - 1.;
+	vec2 uvs = uv2 * vec2(512)  / 512.;
+	
+	float time2 = time;               
+        float speed = speed2;
+        speed = .01 * cos(time2*0.02 + 3.1415926/4.0);          
+		
+    	float formuparam = formuparam2;
+	
+    		
+	vec2 uv = uvs;		       
+	
+	float a_xz = 0.9;
+	float a_yz = -.6;
+	float a_xy = 0.9 + time*0.08;	
+	
+	mat2 rot_xz = mat2(cos(a_xz),sin(a_xz),-sin(a_xz),cos(a_xz));	
+	mat2 rot_yz = mat2(cos(a_yz),sin(a_yz),-sin(a_yz),cos(a_yz));		
+	mat2 rot_xy = mat2(cos(a_xy),sin(a_xy),-sin(a_xy),cos(a_xy));
+	
+
+	float v2 =1.0;	
+	vec3 dir=vec3(uv*zoom,1.); 
+	vec3 from=vec3(0.0, 0.0,0.0);                               
+        from.x -= 5.0*(mouse.x-0.5);
+        from.y -= 5.0*(mouse.y-0.5);
+               
+               
+	vec3 forward = vec3(0.,0.,1.);   
+	from.x += transverseSpeed*(1.0)*cos(0.01*time) + 0.001*time;
+	from.y += transverseSpeed*(1.0)*sin(0.01*time) +0.001*time;
+	from.z += 0.003*time;	
+	
+	dir.xy*=rot_xy;
+	forward.xy *= rot_xy;
+	dir.xz*=rot_xz;
+	forward.xz *= rot_xz;	
+	dir.yz*= rot_yz;
+	forward.yz *= rot_yz;
+	
+	from.xy*=-rot_xy;
+	from.xz*=rot_xz;
+	from.yz*= rot_yz;
+	
+	float zooom = (time2-3311.)*speed;
+	from += forward* zooom;
+	float sampleShift = mod( zooom, stepsize );
+	 
+	float zoffset = -sampleShift;
+	sampleShift /= stepsize;
+	
+	
+	float s=0.24;
+	float s3 = s + stepsize/2.0;
+	vec3 v=vec3(0.);
+	float t3 = 0.0;	
+	
+	vec3 backCol2 = vec3(0.);
+	for (int r=0; r<volsteps; r++) {
+		vec3 p2=from+(s+zoffset)*dir;
+		vec3 p3=from+(s3+zoffset)*dir;
+		
+		p2 = abs(vec3(tile)-mod(p2,vec3(tile*2.)));
+		p3 = abs(vec3(tile)-mod(p3,vec3(tile*2.)));		
+		#ifdef cloud
+		t3 = field(p3);
+		#endif
+		
+		float pa,a=pa=0.;
+		for (int i=0; i<iterations; i++) {
+			p2=abs(p2)/dot(p2,p2)-formuparam;
+			
+			float D = abs(length(p2)-pa);
+			a += i > 7 ? min( 12., D) : D;
+			pa=length(p2);
+		}
+		
+		
+		
+		a*=a*a;
+		
+		float s1 = s+zoffset;
+		
+		float fade = pow(distfading,max(0.,float(r)-sampleShift));		
+			
+		v+=fade;
+	       	
+
+		
+		if( r == 0 )
+			fade *= (1. - (sampleShift));
+		
+		if( r == volsteps-1 )
+			fade *= sampleShift;
+		v+=vec3(s1,s1*s1,s1*s1*s1*s1)*a*brightness*fade;
+		
+		backCol2 += mix(.4, 1., v2) * vec3(1.8 * t3 * t3 * t3, 1.4 * t3 * t3, t3) * fade;
+
+		
+		s+=stepsize;
+		s3 += stepsize;		
+	}
+		       
+	v=mix(vec3(length(v)),v,saturation);	
+
+	vec4 forCol2 = vec4(v*.01,1.);	
+	#ifdef cloud
+	backCol2 *= cloud;
+	#endif	
+	backCol2.b *= 1.8;
+	backCol2.r *= 0.05;	
+	
+	backCol2.b = 0.5*mix(backCol2.g, backCol2.b, 0.8);
+	backCol2.g = 0.0;
+	backCol2.bg = mix(backCol2.gb, backCol2.bg, 0.5*(cos(time*0.01) + 1.0));
+
+    vec4 tcolor = texture2D(uTexture, vTextureCoord);
+
+	gl_FragColor = vec4(tcolor.rgb * (forCol2.rgb + backCol2), tcolor.a);
+}`;
+
+
+const flowerFragmentShader = `
+precision mediump float;
+
+varying vec2 vTextureCoord;
+varying float vTextureId;
+varying vec4 vTintColor;
+
+uniform float uTime;
+uniform vec2 uResolution;
+uniform sampler2D uTexture;
+
+vec2 rotate(vec2 v, float a) {
+	float s = sin(a);
+	float c = cos(a);
+	mat2 m = mat2(c, -s, s, c);
+	return m * v;
+}
+
+float tw()
+{
+	return sin(uTime) * 0.5 + 0.5;
+}
+
+void main( void ) {
+    vec4 tcolor = texture2D(uTexture, vTextureCoord);
+
+    vec2 uv = gl_FragCoord.xy / uResolution.y * 2.;
+	uv.y = uv.y - 0.5;
+	uv.x = uv.x - 1.0 - sin(uTime/4.0);
+	uv = rotate(uv, uTime * 0.5) * length(uv)/3.;
+	uv = 0.3 * uv * length(uv +cos(uTime*uv.x*sin(uv.y)) + 2.0 * tw());
+	uv = floor(uv * 20.) / 20.0 + tw();
+	
+	vec3 color;
+	float t = uv.x * 120.0 + 45.0 * uTime;
+	for (int i = 0; i < 3; i++) {
+		float d = sin(radians(t)) * 0.5 + 0.5;
+		color[i] = d;
+		t -= 120.;
+	}
+	gl_FragColor = vec4(tcolor.rgb * color, tcolor.a);
+}`;
+
+const verticalBarsFragmentShader = `
+#define SHADER_NAME BARS_FRAG
+
+precision mediump float;
+
+varying vec2 vTextureCoord;
+varying float vTextureId;
+varying vec4 vTintColor;
+
+uniform sampler2D uTexture;
+uniform float uTime;
+uniform vec2 uResolution;
+
+#define PI 0.01
+
+void main (void)
+{
+    vec4 color = texture2D(uTexture, vTextureCoord);
+
+    vec2 p = (gl_FragCoord.xy / uResolution.xy) - 0.5;
+
+    float sx = 0.4 * sin(25.0 * p.y - (uTime * 0.001) * 2.0);
+
+    float dy = 2.0 / (5.0 * abs(p.y - sx));
+
+    gl_FragColor = color * vec4((p.x + 0.5) * dy, 0.5 * dy, dy - 1.65, 0.5);
+}`;
+
+const lazerBeamFragmentShader = `
+precision highp float;
+
+varying vec2 vTextureCoord;
+varying float vTextureId;
+varying vec4 vTintColor;
+
+uniform sampler2D uTexture;
+uniform float uTime;
+uniform vec2 uResolution;
+
+void main (void)
+{
+    vec4 color = texture2D(uTexture, vTextureCoord);
+
+    vec2 p = (gl_FragCoord.yx / uResolution.yx) - 0.5;
+
+    float sx = 0.3 * (p.x + 0.8) * sin(900.0 * p.x - 1.0 * pow(uTime / 1000.0, 0.55) * 5.0);
+    float dy = 4.0 / (500.0 * abs(p.y - sx));
+
+    dy += 1.0 / (25.0 * length(p - vec2(p.x, 0.0)));
+
+    gl_FragColor = color * vec4((p.x + 0.1) * dy, 0.3 * dy, dy, 1.1);
+}`;
+
+const worldSize = 5000;
+// const worldSize = 1000;
+// const worldSize = 800;
+
+class Ball extends Sprite
+{
+    speedX: number;
+    speedY: number;
+
+    constructor ()
+    {
+        super(Between(-worldSize, worldSize), Between(-worldSize, worldSize), 'balls', Between(0, 5));
+
+        this.speedX = FloatBetween(-4, 4);
+        this.speedY = FloatBetween(-4, 4);
+    }
+
+    update (): void
+    {
+        this.x += this.speedX;
+        this.y += this.speedY;
+
+        if (this.x < -worldSize)
+        {
+            this.x = -worldSize;
+            this.speedX *= -1;
+        }
+        else if (this.x > worldSize)
+        {
+            this.x = worldSize;
+            this.speedX *= -1;
+        }
+
+        if (this.y < -worldSize)
+        {
+            this.y = -worldSize;
+            this.speedY *= -1;
+        }
+        else if (this.y > worldSize)
+        {
+            this.y = worldSize;
+            this.speedY *= -1;
+        }
+    }
+}
+
+class Banshee extends Container
+{
+    speedX: number;
+    speedY: number;
+
+    constructor ()
+    {
+        super(Between(-worldSize, worldSize), Between(-worldSize, worldSize));
+
+        //  Back arm
+        const arm1 = new Sprite(50, -200, 'banshee', 'arm1');
+        const hand1 = new Sprite(110, -200, 'banshee', 'hand1').setOrigin(0, 0.5);
+
+        const body = new Sprite(0, 0, 'banshee', 'body');
+
+        //  Front arm
+        const arm2 = new Sprite(50, -250, 'banshee', 'arm2').setOrigin(1, 0.5);
+        const hand2 = new Sprite(-180, -25, 'banshee', 'hand2').setOrigin(0, 0);
+
+        AddChild(arm2, hand2);
+
+        const head = new Sprite(60, -305, 'banshee', 'head').setOrigin(0.5, 1);
+
+        AddChildren(this, hand1, arm1, body, arm2, head);
+
+        AddTween(head).to(300, { rotation: 0.25 }).yoyo(true).repeat(-1).easing(Easing.Sine.InOut);
+        AddTween(arm2).to(300, { x: 60, rotation: -0.20 }).yoyo(true).repeat(-1).easing(Easing.Sine.InOut);
+        AddTween(hand2).to(300, { rotation: 0.30 }).yoyo(true).repeat(-1).easing(Easing.Sine.InOut);
+        AddTween(hand1).to(300, { rotation: -0.20 }).yoyo(true).repeat(-1).easing(Easing.Sine.InOut);
+
+        this.speedX = FloatBetween(-2, 2);
+        this.speedY = FloatBetween(-2, 2);
+
+        if (this.speedX < 0)
+        {
+            this.setScale(-0.5, 0.5);
+        }
+        else
+        {
+            this.setScale(0.5, 0.5);
+        }
+    }
+
+    update (): void
+    {
+        this.x += this.speedX;
+        this.y += this.speedY;
+
+        if (this.x < -worldSize)
+        {
+            this.x = -worldSize;
+            this.speedX *= -1;
+            this.scale.x *= -1;
+        }
+        else if (this.x > worldSize)
+        {
+            this.x = worldSize;
+            this.speedX *= -1;
+            this.scale.x *= -1;
+        }
+
+        if (this.y < -worldSize)
+        {
+            this.y = -worldSize;
+            this.speedY *= -1;
+        }
+        else if (this.y > worldSize)
+        {
+            this.y = worldSize;
+            this.speedY *= -1;
+        }
+    }
+}
+
+class Demo extends Scene
+{
+    leftKey: LeftKey;
+    rightKey: RightKey;
+    upKey: RightKey;
+    downKey: RightKey;
+
+    camera: WorldCamera;
+    world: StaticWorld;
+
+    cameraSpeed: number = 16;
+
+    constructor ()
+    {
+        super();
+
+        const keyboard = new Keyboard();
+
+        this.leftKey = new LeftKey();
+        this.rightKey = new RightKey();
+        this.upKey = new UpKey();
+        this.downKey = new DownKey();
+
+        keyboard.addKeys(this.leftKey, this.rightKey, this.upKey, this.downKey);
+
+        this.create();
+    }
+
+    async create ()
+    {
+        await AtlasFile('banshee', 'assets/banshee.png', 'assets/banshee.json');
+        await SpriteSheetFile('balls', 'assets/balls.png', { frameWidth: 17 });
+        await ImageFile('ball', 'assets/8x8.png');
+        await ImageFile('bit', 'assets/1bitblock2.png');
+
+        const plasma = new FXShader({ fragmentShader: plasmaFragmentShader });
+        const sine = new FXShader({ fragmentShader: sineWaveFragmentShader });
+        const clouds = new FXShader({ fragmentShader: cloudsFragmentShader });
+        const flower = new FXShader({ fragmentShader: flowerFragmentShader });
+        const dots = new FXShader({ fragmentShader: dotsFragmentShader });
+        const stars = new FXShader({ fragmentShader: starsFragmentShader });
+        const lazer = new FXShader({ fragmentShader: lazerBeamFragmentShader });
+        const bars = new FXShader({ fragmentShader: verticalBarsFragmentShader });
+
+        const fxlayer = new EffectLayer();
+
+        dots.timeScale = 0.001;
+        stars.timeScale = 0.001;
+        flower.timeScale = 0.001;
+
+        // fxlayer.shaders.push(flower);
+        // fxlayer.shaders.push(plasma);
+        fxlayer.shaders.push(stars);
+        // fxlayer.shaders.push(sine);
+        // fxlayer.shaders.push(clouds);
+        // fxlayer.shaders.push(dots);
+
+        const world = new StaticWorld(this);
+        
+        this.world = world;
+
+        this.camera = this.world.camera;
+
+        // const layer = new Layer();
+        // const layer = new RenderLayer();
+        const layer = new EffectLayer();
+
+        // layer.shaders.push(plasma);
+        // layer.shaders.push(stars);
+        // layer.shaders.push(sine);
+        layer.shaders.push(flower);
+
+        SetWillUpdateChildren(layer.id, false);
+
+        for (let y = -worldSize; y < worldSize; y += 64)
+        {
+            for (let x = -worldSize; x < worldSize; x += 64)
+            {
+                AddChild(layer, new Sprite(x, y, 'bit').setAlpha(0.5));
+            }
+        }
+
+        AddChild(this.world, layer);
+
+        for (let i = 0; i < total; i++)
+        {
+            const ghost = new Banshee();
+
+            AddChild(fxlayer, ghost);
+
+            // AddChild(world, ghost);
+
+            // const ball = new Ball();
+            // AddChild(fxlayer, ball);
+        }
+
+        AddChild(world, fxlayer);
+
+        msg.innerText = `Running. Press the button to start a 10 second capture.`;
+    }
+
+    update (): void
+    {
+        if (!this.camera)
+        {
+            return;
+        }
+
+        if (this.leftKey.isDown)
+        {
+            this.camera.x += this.cameraSpeed;
+        }
+        else if (this.rightKey.isDown)
+        {
+            this.camera.x -= this.cameraSpeed;
+        }
+
+        if (this.upKey.isDown)
+        {
+            this.camera.y += this.cameraSpeed;
+        }
+        else if (this.downKey.isDown)
+        {
+            this.camera.y -= this.cameraSpeed;
+        }
+
+        const rs = window.renderStats;
+
+        if (capture)
+        {
+            if (startFrame === 0)
+            {
+                startFrame = rs.gameFrame;
+                totalSprites = rs.numChildren;
+            }
+
+            renderMS.push(rs.renderMs);
+            updateMS.push(rs.updateMs);
+            fps.push(rs.fps);
+
+            if (performance.now() >= endTime)
+            {
+                endCapture(rs.gameFrame);
+            }
+        }
+        else if (rs)
+        {
+            msg.innerText = `Frame: ${rs.gameFrame} - Game Objects: ${rs.numChildren} - Rendered: ${rs.rendered} in ${rs.renderMs.toFixed(2)}ms - Updated: ${rs.updated} - ViewUpdate: ${rs.dirtyView}`;
+        }
+    }
+}
+
+const params = new URLSearchParams(document.location.search);
+    
+let total = parseInt(params.get('t'));
+
+if (!total || total === 0)
+{
+    total = 1000;
+}
+
+const msg = document.createElement('p');
+
+const ts = (worldSize * 2) / 64;
+
+msg.innerHTML = `Please wait, generating ${ts * ts} Sprites`;
+msg.style.paddingLeft = '50px';
+
+const game = new Game(
+    WebGL(),
+    BatchSize(4096),
+    Parent('gameParent'),
+    GlobalVar('Phaser4'),
+    BackgroundColor(0x0a0a0a),
+    Scenes(Demo)
+);
+
+let capture = false;
+const renderMS = [];
+const updateMS = [];
+const fps = [];
+let startTime = 0;
+let endTime = 0;
+let startFrame = 0;
+let totalSprites = 0;
+
+const button = document.createElement('button');
+
+button.innerText = 'Start Capture';
+
+button.onclick = () => {
+
+    if (!capture)
+    {
+        capture = true;
+        startTime = performance.now();
+        endTime = startTime + 10000;
+    
+        msg.innerText = `Capturing. Please wait 10 seconds.`;
+    }
+
+};
+
+function endCapture (endFrame: number)
+{
+    msg.innerText = `Results are in the console`;
+
+    capture = false;
+    game.isPaused = true;
+
+    //  Average renderMS
+    let renderTotal = 0;
+    let renderMin = Number.MAX_SAFE_INTEGER;
+    let renderMax = 0;
+
+    renderMS.forEach(value => {
+
+        renderTotal += value;
+
+        if (value > renderMax)
+        {
+            renderMax = value;
+        }
+        
+        if (value < renderMin)
+        {
+            renderMin = value;
+        }
+
+    });
+
+    const renderAvg = renderTotal / renderMS.length;
+
+    //  Average updateMS
+    let updateTotal = 0;
+    let updateMin = Number.MAX_SAFE_INTEGER;
+    let updateMax = 0;
+
+    updateMS.forEach(value => {
+
+        updateTotal += value;
+
+        if (value > updateMax)
+        {
+            updateMax = value;
+        }
+        
+        if (value < updateMin)
+        {
+            updateMin = value;
+        }
+
+    });
+
+    const updateAvg = updateTotal / updateMS.length;
+
+    //  Average updateMS
+    let fpsTotal = 0;
+    let fpsMin = Number.MAX_SAFE_INTEGER;
+    let fpsMax = 0;
+
+    fps.forEach(value => {
+
+        fpsTotal += value;
+
+        if (value > fpsMax)
+        {
+            fpsMax = value;
+        }
+        
+        if (value < fpsMin)
+        {
+            fpsMin = value;
+        }
+
+    });
+
+    const fpsAvg = fpsTotal / fps.length;
+
+    const totalFrames = endFrame - startFrame;
+
+    console.log('Total Sprites:', totalSprites);
+    console.log('Updating Sprites:', total);
+    console.log('Static Sprites:', totalSprites - total);
+
+    console.log('');
+
+    console.log('Start Frame:', startFrame);
+    console.log('End Frame:', endFrame);
+    console.log('Total Frames:', totalFrames);
+    console.log('Time per Frame:', (endTime - startTime) / totalFrames);
+
+    console.log('');
+
+    console.log('Start Time:', startTime);
+    console.log('End Time:', endTime);
+    console.log('Duration:', endTime - startTime, 'ms');
+
+    console.log('');
+
+    console.log('Average Render Time:', renderAvg, 'ms per frame');
+    console.log('Min Render Time:', renderMin, 'ms');
+    console.log('Max Render Time:', renderMax, 'ms');
+
+    console.log('');
+
+    console.log('Average Update Time:', updateAvg, 'ms per frame');
+    console.log('Min Update Time:', updateMin, 'ms');
+    console.log('Max Update Time:', updateMax, 'ms');
+
+    console.log('');
+
+    console.log('Average FPS Rate:', fpsAvg);
+    console.log('Min FPS Rate:', fpsMin);
+    console.log('Max FPS Rate:', fpsMax);
+}
+
+document.body.appendChild(msg);
+document.body.appendChild(button);
