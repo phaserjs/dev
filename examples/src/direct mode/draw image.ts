@@ -4,7 +4,7 @@ import { DrawImage } from '../../../../phaser-genesis/src/renderer/webgl1/draw/D
 import { Game } from '../../../../phaser-genesis/src/Game';
 import { GetTexture } from '../../../../phaser-genesis/src/textures/GetTexture';
 import { IRenderPass } from '../../../../phaser-genesis/src/renderer/webgl1/renderpass/IRenderPass';
-import { ImageFile } from '../../../../phaser-genesis/src/loader/files/ImageFile';
+import { LoadImageFile } from '../../../../phaser-genesis/src/loader/files/LoadImageFile';
 import { On } from '../../../../phaser-genesis/src/events/On';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
 import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
@@ -21,7 +21,7 @@ class Demo extends Scene
 
     async create ()
     {
-        await ImageFile('gundam', 'assets/gundam-ex-maxi-on-half.jpg');
+        await LoadImageFile('gundam', 'assets/gundam-ex-maxi-on-half.jpg');
 
         const texture = GetTexture('gundam');
 

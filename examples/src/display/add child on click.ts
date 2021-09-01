@@ -2,7 +2,7 @@ import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../p
 
 import { AddChild } from '../../../../phaser-genesis/src/display';
 import { Game } from '../../../../phaser-genesis/src/Game';
-import { ImageFile } from '../../../../phaser-genesis/src/loader/files/ImageFile';
+import { LoadImageFile } from '../../../../phaser-genesis/src/loader/files/LoadImageFile';
 import { Mouse } from '../../../../phaser-genesis/src/input/mouse/Mouse';
 import { On } from '../../../../phaser-genesis/src/events';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
@@ -20,7 +20,7 @@ class Demo extends Scene
 
     async create ()
     {
-        await ImageFile('frog', 'assets/frog.png');
+        await LoadImageFile('frog', 'assets/frog.png');
 
         const world = new StaticWorld(this);
 

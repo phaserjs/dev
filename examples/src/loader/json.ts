@@ -2,7 +2,7 @@ import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../p
 
 import { Cache } from '../../../../phaser-genesis/src/cache/Cache';
 import { Game } from '../../../../phaser-genesis/src/Game';
-import { JSONFile } from '../../../../phaser-genesis/src/loader/files';
+import { LoadJSONFile } from '../../../../phaser-genesis/src/loader/files';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
 
 class Demo extends Scene
@@ -16,7 +16,7 @@ class Demo extends Scene
 
     async create ()
     {
-        await JSONFile('items', 'assets/cartoon-items.json');
+        await LoadJSONFile('items', 'assets/cartoon-items.json');
 
         const cache = Cache.get('JSON');
 

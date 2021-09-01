@@ -1,12 +1,12 @@
 import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../phaser-genesis/src/config';
-import { CSVFile, SpriteSheetFile } from '../../../../phaser-genesis/src/loader/files';
+import { LoadCSVFile, LoadSpriteSheetFile } from '../../../../phaser-genesis/src/loader/files';
 
 import { AddChild } from '../../../../phaser-genesis/src/display';
 import { Cache } from '../../../../phaser-genesis/src/cache/Cache';
-import { FlatWorld } from '../../../../phaser-genesis/src/world';
 import { Game } from '../../../../phaser-genesis/src/Game';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
 import { Sprite } from '../../../../phaser-genesis/src/gameobjects';
+import { StaticWorld } from '../../../../phaser-genesis/src/world';
 
 class Demo extends Scene
 {
@@ -19,15 +19,15 @@ class Demo extends Scene
 
     async create ()
     {
-        await CSVFile('map', 'assets/minimap.csv');
-        await SpriteSheetFile('tiles', 'assets/fantasy-tiles.png', { frameWidth: 64, frameHeight: 64 });
+        await LoadCSVFile('map', 'assets/minimap.csv');
+        await LoadSpriteSheetFile('tiles', 'assets/fantasy-tiles.png', { frameWidth: 64, frameHeight: 64 });
 
         //  Parse the csv data
         const data = (Cache.getEntry('CSV', 'map') as string).split('\n').flatMap(row => row.split(','));
 
         const mapData = data.map(tile => Number(tile));
 
-        const world = new FlatWorld(this);
+        const world = new StaticWorld(this);
 
         let x = 0;
         let y = 0;

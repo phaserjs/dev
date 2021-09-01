@@ -26,9 +26,13 @@ class Demo extends Scene
 
         dd.render = () =>
         {
-            dd.fillRect(100, 100, 340, 240, 0xff0000);
-            dd.fillRect(200, 200, 512, 64, 0xffff00, 0.6);
-            dd.fillRect(300, 300, 48, 210, 0xff00ff);
+            dd.rect(100, 100, 340, 240, 0xff0000);
+
+            dd.alpha = 0.6;
+            dd.rect(200, 200, 512, 64, 0xffff00);
+
+            dd.alpha = 1;
+            dd.rect(300, 300, 48, 210, 0xff00ff);
         };
 
         AddChild(world, dd);

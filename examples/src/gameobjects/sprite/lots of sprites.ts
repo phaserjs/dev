@@ -3,11 +3,11 @@ import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../.
 import { AddChild } from '../../../../../phaser-genesis/src/display/';
 import { Between } from '../../../../../phaser-genesis/src/math';
 import { Game } from '../../../../../phaser-genesis/src/Game';
-import { ImageFile } from '../../../../../phaser-genesis/src/loader/files/ImageFile';
+import { LoadImageFile } from '../../../../../phaser-genesis/src/loader/files/LoadImageFile';
+import { LoadSpriteSheetFile } from '../../../../../phaser-genesis/src/loader/files/LoadSpriteSheetFile';
 import { On } from '../../../../../phaser-genesis/src/events';
 import { Scene } from '../../../../../phaser-genesis/src/scenes/Scene';
 import { Sprite } from '../../../../../phaser-genesis/src/gameobjects/';
-import { SpriteSheetFile } from '../../../../../phaser-genesis/src/loader/files';
 import { StaticWorld } from '../../../../../phaser-genesis/src/world/StaticWorld';
 
 class Demo extends Scene
@@ -21,8 +21,8 @@ class Demo extends Scene
 
     async create ()
     {
-        await ImageFile('sky', 'assets/sky5.png').load();
-        await SpriteSheetFile('witches', 'assets/witches-95x80x1.png', { frameWidth: 95, frameHeight: 80, spacingX: 1, spacingY: 1 }).load();
+        await LoadImageFile('sky', 'assets/sky5.png');
+        await LoadSpriteSheetFile('witches', 'assets/witches-95x80x1.png', { frameWidth: 95, frameHeight: 80, spacingX: 1, spacingY: 1 });
 
         const world = new StaticWorld(this);
 

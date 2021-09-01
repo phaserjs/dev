@@ -27,7 +27,7 @@ class Demo extends Scene
 
             AddChild(world, sprite);
 
-            On(this, 'update', () => {
+            On(world, 'update', () => {
 
                 sprite.rotation -= 0.03;
 

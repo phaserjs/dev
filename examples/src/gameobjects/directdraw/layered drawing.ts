@@ -4,7 +4,7 @@ import { DirectDraw, Sprite } from '../../../../../phaser-genesis/src/gameobject
 import { AddChildren } from '../../../../../phaser-genesis/src/display';
 import { Game } from '../../../../../phaser-genesis/src/Game';
 import { GetTexture } from '../../../../../phaser-genesis/src/textures';
-import { ImageFile } from '../../../../../phaser-genesis/src/loader/files';
+import { LoadImageFile } from '../../../../../phaser-genesis/src/loader/files';
 import { Scene } from '../../../../../phaser-genesis/src/scenes/Scene';
 import { StaticWorld } from '../../../../../phaser-genesis/src/world/StaticWorld';
 
@@ -19,8 +19,8 @@ class Demo extends Scene
 
     async create ()
     {
-        await ImageFile('logo', 'assets/logo.png').load();
-        await ImageFile('brain', 'assets/brain.png').load();
+        await LoadImageFile('logo', 'assets/logo.png');
+        await LoadImageFile('brain', 'assets/brain.png');
 
         const world = new StaticWorld(this);
 

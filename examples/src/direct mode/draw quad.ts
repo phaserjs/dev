@@ -6,7 +6,7 @@ import { Easing } from '../../../../phaser-genesis/src/math';
 import { Game } from '../../../../phaser-genesis/src/Game';
 import { GetTexture } from '../../../../phaser-genesis/src/textures/GetTexture';
 import { IRenderPass } from '../../../../phaser-genesis/src/renderer/webgl1/renderpass/IRenderPass';
-import { ImageFile } from '../../../../phaser-genesis/src/loader/files/ImageFile';
+import { LoadImageFile } from '../../../../phaser-genesis/src/loader/files/LoadImageFile';
 import { On } from '../../../../phaser-genesis/src/events/On';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
 import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
@@ -24,7 +24,7 @@ class Demo extends Scene
 
     async create ()
     {
-        await ImageFile('512', 'assets/512x512.png').load();
+        await LoadImageFile('512', 'assets/512x512.png');
 
         const texture = GetTexture('512');
 

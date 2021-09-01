@@ -24,8 +24,18 @@ class Demo extends Scene
 
         dd.render = () =>
         {
-            dd.circle(400, 300, 256, 0xff0000);
+            dd.box(100, 100, 600, 400, 3, 0xffff00);
+
+            dd.circle(400, 300, 128, 0xff0000);
+
+            dd.triangle(350, 250, 350, 450, 550, 450, 0x00a651);
+
+            dd.rect(90, 50, 256, 128, 0xec008c);
+
+            dd.line(100, 100, 700, 500, 1, 0xffff00);
         };
+
+        console.log(dd);
 
         AddChild(world, dd);
     }

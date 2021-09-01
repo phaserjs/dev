@@ -3,6 +3,7 @@ import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../.
 import { AddChild } from '../../../../../phaser-genesis/src/display/';
 import { Between } from '../../../../../phaser-genesis/src/math';
 import { Game } from '../../../../../phaser-genesis/src/Game';
+import { GetTexture } from '../../../../../phaser-genesis/src/textures/GetTexture';
 import { Keyboard } from '../../../../../phaser-genesis/src/input/keyboard';
 import { Loader } from '../../../../../phaser-genesis/src/loader/Loader';
 import { On } from '../../../../../phaser-genesis/src/events';
@@ -26,9 +27,16 @@ class Demo extends Scene
             const world = new StaticWorld(this);
             const keyboard = new Keyboard();
     
+            console.log(GetTexture('fruits'));
+
             On(keyboard, 'keydown', (event: KeyboardEvent) => {
     
-                const frame = Math.min(0, event.key.charCodeAt(0) - 96);
+                let frame = Math.max(0, event.key.charCodeAt(0) - 96);
+
+                if (frame > 36)
+                {
+                    frame = 36;
+                }
     
                 const x = Between(0, 800);
                 const y = Between(0, 600);

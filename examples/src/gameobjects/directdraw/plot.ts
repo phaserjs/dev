@@ -3,7 +3,6 @@ import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../.
 import { AddChild } from '../../../../../phaser-genesis/src/display';
 import { DirectDraw } from '../../../../../phaser-genesis/src/gameobjects';
 import { Game } from '../../../../../phaser-genesis/src/Game';
-import { ImageFile } from '../../../../../phaser-genesis/src/loader/files';
 import { Scene } from '../../../../../phaser-genesis/src/scenes/Scene';
 import { StaticWorld } from '../../../../../phaser-genesis/src/world/StaticWorld';
 

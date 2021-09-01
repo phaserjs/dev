@@ -2,7 +2,7 @@ import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../p
 
 import { FillRect } from '../../../../phaser-genesis/src/renderer/webgl1/draw/FillRect';
 import { Game } from '../../../../phaser-genesis/src/Game';
-import { GetColorSpectrum } from '../../../../phaser-genesis/src/color';
+import { GetColorSpectrum } from '../../../../phaser-genesis/src/color/GetColorSpectrum';
 import { IRenderPass } from '../../../../phaser-genesis/src/renderer/webgl1/renderpass/IRenderPass';
 import { On } from '../../../../phaser-genesis/src/events/On';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
@@ -29,11 +29,15 @@ class Demo extends Scene
             {
                 f = Wrap(c + y, 0, colors.length - 1);
 
-                FillRect(renderPass, 0, y, 400, 8, colors[Math.floor(f)]);
+                const color1 = colors[Math.floor(f)];
+
+                FillRect(renderPass, 0, y, 400, 8, color1.r, color1.g, color1.b, 1);
 
                 f = Wrap(c - y, 0, colors.length - 1);
 
-                FillRect(renderPass, 400, y, 400, 8, colors[Math.floor(f)]);
+                const color2 = colors[Math.floor(f)];
+
+                FillRect(renderPass, 400, y, 400, 8, color2.r, color2.g, color2.b, 1);
             }
 
             c += 4;

@@ -1,11 +1,11 @@
 import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../phaser-genesis/src/config';
 
 import { AddChild } from '../../../../phaser-genesis/src/display';
-import { FlatWorld } from '../../../../phaser-genesis/src/world';
 import { Game } from '../../../../phaser-genesis/src/Game';
+import { LoadSpriteSheetFile } from '../../../../phaser-genesis/src/loader/files';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
 import { Sprite } from '../../../../phaser-genesis/src/gameobjects';
-import { SpriteSheetFile } from '../../../../phaser-genesis/src/loader/files';
+import { StaticWorld } from '../../../../phaser-genesis/src/world';
 
 class Demo extends Scene
 {
@@ -18,9 +18,9 @@ class Demo extends Scene
 
     async create ()
     {
-        await SpriteSheetFile('tiles', 'assets/fantasy-tiles.png', { frameWidth: 64, frameHeight: 64 });
+        await LoadSpriteSheetFile('tiles', 'assets/fantasy-tiles.png', { frameWidth: 64, frameHeight: 64 });
 
-        const world = new FlatWorld(this);
+        const world = new StaticWorld(this);
 
         AddChild(world, new Sprite(200, 200, 'tiles', 31));
         AddChild(world, new Sprite(400, 200, 'tiles', 32));

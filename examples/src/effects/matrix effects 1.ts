@@ -4,8 +4,7 @@ import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../p
 
 import { AddChildren } from '../../../../phaser-genesis/src/display';
 import { Game } from '../../../../phaser-genesis/src/Game';
-import { ImageFile } from '../../../../phaser-genesis/src/loader/files/ImageFile';
-import { On } from '../../../../phaser-genesis/src/events';
+import { LoadImageFile } from '../../../../phaser-genesis/src/loader/files/LoadImageFile';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
 import { Sprite } from '../../../../phaser-genesis/src/gameobjects';
 import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
@@ -21,7 +20,7 @@ class Demo extends Scene
 
     async create ()
     {
-        await ImageFile('pic', 'assets/traps.png').load();
+        await LoadImageFile('pic', 'assets/traps.png');
 
         const world = new StaticWorld(this);
 
@@ -33,8 +32,8 @@ class Demo extends Scene
         AddChildren(world, original, variation1, variation2, variation3);
 
         Effects.BlackWhite(variation1);
-        Effects.Brightness(variation2, 0.5);
-        Effects.Brown(variation3);
+        // Effects.Brightness(variation2, 0.5);
+        // Effects.Brown(variation3);
     }
 }
 

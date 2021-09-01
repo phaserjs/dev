@@ -4,9 +4,9 @@ import { DrawFrame } from '../../../../phaser-genesis/src/renderer/webgl1/draw/D
 import { Game } from '../../../../phaser-genesis/src/Game';
 import { GetTexture } from '../../../../phaser-genesis/src/textures/GetTexture';
 import { IRenderPass } from '../../../../phaser-genesis/src/renderer/webgl1/renderpass/IRenderPass';
+import { LoadSpriteSheetFile } from '../../../../phaser-genesis/src/loader/files/LoadSpriteSheetFile';
 import { On } from '../../../../phaser-genesis/src/events/On';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
-import { SpriteSheetFile } from '../../../../phaser-genesis/src/loader/files/SpriteSheetFile';
 import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
 import { WorldPostRenderEvent } from '../../../../phaser-genesis/src/world/events';
 
@@ -21,7 +21,7 @@ class Demo extends Scene
 
     async create ()
     {
-        await SpriteSheetFile('tiles', 'assets/fantasy-tiles.png', { frameWidth: 64 }).load();
+        await LoadSpriteSheetFile('tiles', 'assets/fantasy-tiles.png', { frameWidth: 64 });
 
         const texture = GetTexture('tiles');
 

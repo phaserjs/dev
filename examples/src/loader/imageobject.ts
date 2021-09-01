@@ -1,11 +1,11 @@
 import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../phaser-genesis/src/config';
 
 import { AddChild } from '../../../../phaser-genesis/src/display';
-import { FlatWorld } from '../../../../phaser-genesis/src/world';
 import { Game } from '../../../../phaser-genesis/src/Game';
-import { ImageFile } from '../../../../phaser-genesis/src/loader/files';
+import { LoadImageFile } from '../../../../phaser-genesis/src/loader/files';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
 import { Sprite } from '../../../../phaser-genesis/src/gameobjects';
+import { StaticWorld } from '../../../../phaser-genesis/src/world';
 
 class Demo extends Scene
 {
@@ -18,7 +18,7 @@ class Demo extends Scene
 
     async create ()
     {
-        const file = await ImageFile('beat', 'assets/beat.png', { getImage: true, skipCache: true });
+        const file = await LoadImageFile('beat', 'assets/beat.png', { getImage: true, skipCache: true });
 
         //  The Image is available in file.data
 

@@ -2,12 +2,13 @@ import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../p
 import { Easing, Wrap } from '../../../../phaser-genesis/src/math';
 
 import { AddTween } from '../../../../phaser-genesis/src/motion/tween/nano/AddTween';
-import { CSVFile } from '../../../../phaser-genesis/src/loader/files';
+import { CSVFile } from '../../../../phaser-genesis/src/loader/files/CSVFile';
 import { Cache } from '../../../../phaser-genesis/src/cache/Cache';
 import { DrawFrame } from '../../../../phaser-genesis/src/renderer/webgl1/draw/DrawFrame';
 import { FillRect } from '../../../../phaser-genesis/src/renderer/webgl1/draw/FillRect';
 import { Game } from '../../../../phaser-genesis/src/Game';
 import { GetColorSpectrum } from '../../../../phaser-genesis/src/color/GetColorSpectrum';
+import { GetRGBArray } from '../../../../phaser-genesis/src/renderer/webgl1/colors/GetRGBArray';
 import { GetTexture } from '../../../../phaser-genesis/src/textures/GetTexture';
 import { IRenderPass } from '../../../../phaser-genesis/src/renderer/webgl1/renderpass/IRenderPass';
 import { Loader } from '../../../../phaser-genesis/src/loader/Loader';
@@ -59,7 +60,9 @@ class Demo extends Scene
             {
                 let f = Wrap((Math.abs(offset.y) + y) * 0.4, 0, colors.length - 1);
 
-                FillRect(renderPass, 0, y, 800, 8, colors[Math.floor(f)]);
+                const color = colors[Math.floor(f)];
+
+                FillRect(renderPass, 0, y, 800, 8, color.r, color.g, color.b, 1);
             }
 
             let x = 0;

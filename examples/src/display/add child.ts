@@ -3,7 +3,7 @@ import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../p
 import { AddChild } from '../../../../phaser-genesis/src/display';
 import { DebugHierarchyComponent } from '../../../../phaser-genesis/src/components/hierarchy/DebugHierarchyComponent';
 import { Game } from '../../../../phaser-genesis/src/Game';
-import { ImageFile } from '../../../../phaser-genesis/src/loader/files/ImageFile';
+import { LoadImageFile } from '../../../../phaser-genesis/src/loader/files/LoadImageFile';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
 import { Sprite } from '../../../../phaser-genesis/src/gameobjects';
 import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
@@ -19,7 +19,7 @@ class Demo extends Scene
 
     async create ()
     {
-        await ImageFile('gundam', 'assets/gundam-ex-maxi-on-half.jpg');
+        await LoadImageFile('gundam', 'assets/gundam-ex-maxi-on-half.jpg');
 
         const world = new StaticWorld(this);
 

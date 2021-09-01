@@ -5,7 +5,7 @@ import { DrawImagePart } from '../../../../phaser-genesis/src/renderer/webgl1/dr
 import { Game } from '../../../../phaser-genesis/src/Game';
 import { GetTexture } from '../../../../phaser-genesis/src/textures/GetTexture';
 import { IRenderPass } from '../../../../phaser-genesis/src/renderer/webgl1/renderpass/IRenderPass';
-import { ImageFile } from '../../../../phaser-genesis/src/loader/files/ImageFile';
+import { LoadImageFile } from '../../../../phaser-genesis/src/loader/files/LoadImageFile';
 import { On } from '../../../../phaser-genesis/src/events/On';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
 import { Sine } from '../../../../phaser-genesis/src/math/easing/';
@@ -25,7 +25,7 @@ class Demo extends Scene
     async create ()
     {
         //  256 x 192
-        await ImageFile('city', 'assets/city.png', { minFilter: gl.NEAREST, magFilter: gl.NEAREST }).load();
+        await LoadImageFile('city', 'assets/city.png', { glConfig: { minFilter: gl.NEAREST, magFilter: gl.NEAREST }});
 
         const texture = GetTexture('city');
 

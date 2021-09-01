@@ -5,7 +5,6 @@ import { Between } from '../../../../phaser-genesis/src/math';
 import { Game } from '../../../../phaser-genesis/src/Game';
 import { ImageFile } from '../../../../phaser-genesis/src/loader/files/ImageFile';
 import { Loader } from '../../../../phaser-genesis/src/loader';
-import { Mouse } from '../../../../phaser-genesis/src/input/mouse/Mouse';
 import { On } from '../../../../phaser-genesis/src/events';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
 import { Sprite } from '../../../../phaser-genesis/src/gameobjects';
@@ -40,7 +39,7 @@ class Demo extends Scene
                     const x = Between(0, 800);
                     const y = Between(0, 600);
     
-                    // AddChild(world, new Sprite(x, y, 'frog'));
+                    AddChild(world, new Sprite(x, y, 'frog'));
 
                     t = 0;
                     i++;

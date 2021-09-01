@@ -4,11 +4,9 @@ import { DrawFrame } from '../../../../phaser-genesis/src/renderer/webgl1/draw/D
 import { Game } from '../../../../phaser-genesis/src/Game';
 import { GetTexture } from '../../../../phaser-genesis/src/textures/GetTexture';
 import { IRenderPass } from '../../../../phaser-genesis/src/renderer/webgl1/renderpass/IRenderPass';
-import { ImageFile } from '../../../../phaser-genesis/src/loader/files/ImageFile';
-import { Loader } from '../../../../phaser-genesis/src/loader/Loader';
+import { LoadSpriteSheetFile } from '../../../../phaser-genesis/src/loader/files/LoadSpriteSheetFile';
 import { On } from '../../../../phaser-genesis/src/events/On';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
-import { SpriteSheetFile } from '../../../../phaser-genesis/src/loader/files/SpriteSheetFile';
 import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
 import { WorldPostRenderEvent } from '../../../../phaser-genesis/src/world/events';
 import { gl } from '../../../../phaser-genesis/src/renderer/webgl1/GL';
@@ -24,7 +22,7 @@ class Demo extends Scene
 
     async create ()
     {
-        await SpriteSheetFile('fruit', 'assets/32x32-item-pack.png', { frameWidth: 32 }, { minFilter: gl.NEAREST, magFilter: gl.NEAREST }).load();
+        await LoadSpriteSheetFile('fruit', 'assets/32x32-item-pack.png', { frameWidth: 32 }, { glConfig: { minFilter: gl.NEAREST, magFilter: gl.NEAREST }});
 
         const texture = GetTexture('fruit');
 

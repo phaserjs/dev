@@ -1,11 +1,11 @@
 import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../phaser-genesis/src/config';
 
 import { AddChild } from '../../../../phaser-genesis/src/display';
-import { AtlasFile } from '../../../../phaser-genesis/src/loader/files';
-import { FlatWorld } from '../../../../phaser-genesis/src/world';
 import { Game } from '../../../../phaser-genesis/src/Game';
+import { LoadAtlasFile } from '../../../../phaser-genesis/src/loader/files/LoadAtlasFile';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
 import { Sprite } from '../../../../phaser-genesis/src/gameobjects';
+import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
 
 class Demo extends Scene
 {
@@ -18,9 +18,9 @@ class Demo extends Scene
 
     async create ()
     {
-        await AtlasFile('items', 'assets/cartoon-items.png', 'assets/cartoon-items.json');
+        await LoadAtlasFile('items', 'assets/cartoon-items.png', 'assets/cartoon-items.json');
 
-        const world = new FlatWorld(this);
+        const world = new StaticWorld(this);
 
         AddChild(world, new Sprite(200, 200, 'items', 'coin-silver-1'));
         AddChild(world, new Sprite(400, 200, 'items', 'pouch-1'));

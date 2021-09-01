@@ -21,6 +21,13 @@ class Demo extends Scene
     {
         super();
 
+        const keyboard = new Keyboard();
+
+        this.leftKey = new LeftKey();
+        this.rightKey = new RightKey();
+
+        keyboard.addKeys(this.leftKey, this.rightKey);
+
         const loader = new Loader();
 
         loader.add(ImageFile('brain', 'assets/brain.png'));
@@ -30,13 +37,6 @@ class Demo extends Scene
             const world = new StaticWorld(this);
 
             this.player = new Sprite(400, 300, 'brain');
-
-            const keyboard = new Keyboard();
-
-            this.leftKey = new LeftKey();
-            this.rightKey = new RightKey();
-    
-            keyboard.addKeys(this.leftKey, this.rightKey);
     
             AddChild(world, this.player);
     

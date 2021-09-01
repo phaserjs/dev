@@ -9,6 +9,7 @@ import { DefineQuery } from '../../../../../phaser-genesis/src/components/Define
 import { DefineSystem } from '../../../../../phaser-genesis/src/components/DefineSystem';
 import { Game } from '../../../../../phaser-genesis/src/Game';
 import { GameObjectCache } from '../../../../../phaser-genesis/src/gameobjects/GameObjectCache';
+import { IContainer } from '../../../../../phaser-genesis/src/gameobjects/container/IContainer';
 import { Loader } from '../../../../../phaser-genesis/src/loader/Loader';
 import { On } from '../../../../../phaser-genesis/src/events';
 import { Scene } from '../../../../../phaser-genesis/src/scenes/Scene';
@@ -59,14 +60,14 @@ class Demo extends Scene
                 for (let i = 0; i < entities.length; i++)
                 {
                     const id = entities[i];
-                    const sprite = GameObjectCache.get(id);
+                    const sprite = GameObjectCache.get(id) as IContainer;
 
-                    sprite.x = Wrap(sprite.x + speedComponent.speedX[id], 0, 800);
-                    sprite.y = Wrap(sprite.y + speedComponent.speedY[id], 0, 600);
+                    sprite.x = Wrap(sprite.x + speedComponent.speedX[id], -50, 850);
+                    sprite.y = Wrap(sprite.y + speedComponent.speedY[id], -50, 650);
                 }
             });
 
-            On(this, 'update', () => {
+            On(world, 'update', () => {
 
                 updateParticlesSystem();
 
@@ -80,6 +81,6 @@ new Game(
     WebGL(),
     Parent('gameParent'),
     GlobalVar('Phaser4'),
-    BackgroundColor(0x000000),
+    BackgroundColor(0x080888),
     Scenes(Demo)
 );

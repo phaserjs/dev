@@ -18,7 +18,7 @@ class Demo extends Scene
 
         On(world, WorldPostRenderEvent, (renderPass: IRenderPass) => {
 
-            FillTriangle(renderPass, 100, 100, 100, 200, 200, 200, 0x00ff00);
+            FillTriangle(renderPass, 100, 100, 100, 200, 200, 200, 0, 1, 0, 1);
 
         });
     }

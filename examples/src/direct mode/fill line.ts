@@ -18,7 +18,7 @@ class Demo extends Scene
 
         On(world, WorldPostRenderEvent, (renderPass: IRenderPass) => {
 
-            FillLine(renderPass, 100, 100, 300, 300, 1, 0x00ff00);
+            FillLine(renderPass, 100, 100, 300, 300, 1, 0, 255, 0, 1);
 
         });
     }
