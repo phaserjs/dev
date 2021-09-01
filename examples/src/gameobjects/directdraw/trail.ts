@@ -7,7 +7,7 @@ import { DirectDraw } from '../../../../../phaser-genesis/src/gameobjects';
 import { Easing } from '../../../../../phaser-genesis/src/math';
 import { Game } from '../../../../../phaser-genesis/src/Game';
 import { GetTexture } from '../../../../../phaser-genesis/src/textures';
-import { ImageFile } from '../../../../../phaser-genesis/src/loader/files';
+import { LoadImageFile } from '../../../../../phaser-genesis/src/loader/files';
 import { Scene } from '../../../../../phaser-genesis/src/scenes/Scene';
 import { StaticWorld } from '../../../../../phaser-genesis/src/world/StaticWorld';
 
@@ -22,7 +22,7 @@ class Demo extends Scene
 
     async create ()
     {
-        await ImageFile('flash', 'assets/muzzleflash2.png').load();
+        await LoadImageFile('flash', 'assets/muzzleflash2.png');
 
         const world = new StaticWorld(this);
 

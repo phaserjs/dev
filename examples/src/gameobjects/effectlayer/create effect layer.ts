@@ -419,13 +419,19 @@ class Demo extends Scene
 
     async preload ()
     {
-        await ImageFile('background', 'assets/farm-background.png');
-        await ImageFile('ayu', 'assets/ayu.png');
-        await ImageFile('logo', 'assets/logo.png');
-        await ImageFile('rocket', 'assets/rocket.png');
-        await ImageFile('farm', 'assets/farm-logo.png');
-        await ImageFile('star', 'assets/star.png');
-        await ImageFile('bubble', 'assets/bubble256.png');
+        const loader = new Loader();
+
+        loader.add(
+            ImageFile('background', 'assets/farm-background.png'),
+            ImageFile('ayu', 'assets/ayu.png'),
+            ImageFile('logo', 'assets/logo.png'),
+            ImageFile('rocket', 'assets/rocket.png'),
+            ImageFile('farm', 'assets/farm-logo.png'),
+            ImageFile('star', 'assets/star.png'),
+            ImageFile('bubble', 'assets/bubble256.png')
+        );
+
+        await loader.start();
 
         this.create();
     }

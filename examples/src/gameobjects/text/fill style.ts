@@ -3,7 +3,7 @@ import { SetFillStyle, Text } from '../../../../../phaser-genesis/src/gameobject
 
 import { AddChildren } from '../../../../../phaser-genesis/src/display';
 import { Game } from '../../../../../phaser-genesis/src/Game';
-import { ImageFile } from '../../../../../phaser-genesis/src/loader/files/ImageFile';
+import { LoadImageFile } from '../../../../../phaser-genesis/src/loader/files/LoadImageFile';
 import { Scene } from '../../../../../phaser-genesis/src/scenes/Scene';
 import { StaticWorld } from '../../../../../phaser-genesis/src/world/StaticWorld';
 import { TextureManagerInstance } from '../../../../../phaser-genesis/src/textures/TextureManagerInstance';
@@ -19,7 +19,7 @@ class Demo extends Scene
 
     async create ()
     {
-        await ImageFile('8x8', 'assets/8x8.png');
+        await LoadImageFile('8x8', 'assets/8x8.png');
 
         const world = new StaticWorld(this);
 

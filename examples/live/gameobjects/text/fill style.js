@@ -157,6 +157,13 @@
     ConfigStore.set(CONFIG_DEFAULTS.SIZE, { width, height, resolution });
   }
 
+  // Users/rich/Documents/GitHub/phaser-genesis/src/config/size/Size.ts
+  function Size(width = 800, height = 600, resolution = 1) {
+    return () => {
+      SetSize(width, height, resolution);
+    };
+  }
+
   // Users/rich/Documents/GitHub/phaser-genesis/src/renderer/webgl1/GL.ts
   var gl;
   var GL = {
@@ -2788,119 +2795,167 @@ void main (void)
     ConfigStore.set(CONFIG_DEFAULTS.WEBGL_CONTEXT, contextAttributes);
   }
 
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/HierarchyComponent.ts
-  var HIERARCHY = {
-    WORLD: 0,
-    PARENT: 1,
-    NEXT: 2,
-    PREV: 3,
-    FIRST: 4,
-    LAST: 5,
-    NUM_CHILDREN: 6,
-    DEPTH: 7
-  };
-  var HierarchyComponent = defineComponent({
-    data: [Types.ui32, 8]
+  // Users/rich/Documents/GitHub/phaser-genesis/src/gameobjects/text/SetFillStyle.ts
+  function SetFillStyle(style, ...text) {
+    text.forEach((entity) => {
+      entity.fillStyle = style;
+      entity.updateText();
+    });
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/textures/CreateCanvas.ts
+  function CreateCanvas(width, height) {
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    return canvas.getContext("2d");
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/textures/types/CanvasTexture.ts
+  function CanvasTexture(width = 32, height = 32) {
+    const ctx = CreateCanvas(width, height);
+    return new Texture(ctx.canvas);
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/vertices/QuadVertexComponent.ts
+  var QuadVertexComponent = defineComponent({
+    values: [Types.f32, 54]
   });
 
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/GetLastChildID.ts
-  function GetLastChildID(parentID) {
-    return HierarchyComponent.data[parentID][HIERARCHY.LAST];
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/vertices/SetQuadColor.ts
+  function SetQuadColor(id, red, green, blue, alpha) {
+    const data = QuadVertexComponent.values[id];
+    data[5] = red;
+    data[6] = green;
+    data[7] = blue;
+    data[8] = alpha;
+    data[14] = red;
+    data[15] = green;
+    data[16] = blue;
+    data[17] = alpha;
+    data[23] = red;
+    data[24] = green;
+    data[25] = blue;
+    data[26] = alpha;
+    data[32] = red;
+    data[33] = green;
+    data[34] = blue;
+    data[35] = alpha;
+    data[41] = red;
+    data[42] = green;
+    data[43] = blue;
+    data[44] = alpha;
+    data[50] = red;
+    data[51] = green;
+    data[52] = blue;
+    data[53] = alpha;
   }
 
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/GetNumChildren.ts
-  function GetNumChildren(id) {
-    return HierarchyComponent.data[id][HIERARCHY.NUM_CHILDREN];
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/vertices/SetQuadPosition.ts
+  function SetQuadPosition(id, x0, y0, x1, y1, x2, y2, x3, y3) {
+    const data = QuadVertexComponent.values[id];
+    data[0] = x0;
+    data[1] = y0;
+    data[9] = x1;
+    data[10] = y1;
+    data[18] = x2;
+    data[19] = y2;
+    data[27] = x0;
+    data[28] = y0;
+    data[36] = x2;
+    data[37] = y2;
+    data[45] = x3;
+    data[46] = y3;
   }
 
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/GetParentID.ts
-  function GetParentID(id) {
-    return HierarchyComponent.data[id][HIERARCHY.PARENT];
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/vertices/SetUV.ts
+  function SetUV(id, u0, v0, u1, v1) {
+    const data = QuadVertexComponent.values[id];
+    data[2] = u0;
+    data[3] = v0;
+    data[11] = u0;
+    data[12] = v1;
+    data[20] = u1;
+    data[21] = v1;
+    data[29] = u0;
+    data[30] = v0;
+    data[38] = u1;
+    data[39] = v1;
+    data[47] = u1;
+    data[48] = v0;
   }
 
-  // Users/rich/Documents/GitHub/phaser-genesis/src/display/IsValidParent.ts
-  function IsValidParent(parent, child) {
-    const childID = child.id;
-    const parentID = parent.id;
-    return !(parentID === 0 || childID === parentID || parentID === GetParentID(childID));
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/SetNextSiblingID.ts
-  function SetNextSiblingID(parentID, childID) {
-    HierarchyComponent.data[parentID][HIERARCHY.NEXT] = childID;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/SetPreviousSiblingID.ts
-  function SetPreviousSiblingID(parentID, childID) {
-    HierarchyComponent.data[parentID][HIERARCHY.PREV] = childID;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/LinkSiblings.ts
-  function LinkSiblings(childA, childB) {
-    SetNextSiblingID(childA, childB);
-    SetPreviousSiblingID(childB, childA);
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/GetFirstChildID.ts
-  function GetFirstChildID(parentID) {
-    return HierarchyComponent.data[parentID][HIERARCHY.FIRST];
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/GetNextSiblingID.ts
-  function GetNextSiblingID(id) {
-    return HierarchyComponent.data[id][HIERARCHY.NEXT];
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/GetPreviousSiblingID.ts
-  function GetPreviousSiblingID(id) {
-    return HierarchyComponent.data[id][HIERARCHY.PREV];
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/AddHierarchyComponent.ts
-  function AddHierarchyComponent(id) {
-    addComponent(GameObjectWorld, HierarchyComponent, id);
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/DecreaseNumChildren.ts
-  function DecreaseNumChildren(parentID, total = 1) {
-    const data = HierarchyComponent.data[parentID];
-    data[HIERARCHY.NUM_CHILDREN] -= total;
-    if (data[HIERARCHY.NUM_CHILDREN] < 0) {
-      data[HIERARCHY.NUM_CHILDREN] = 0;
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/vertices/AddQuadVertex.ts
+  function AddQuadVertex(id, width = 0, height = 0, flipY = true) {
+    addComponent(GameObjectWorld, QuadVertexComponent, id);
+    if (width || height) {
+      if (flipY) {
+        SetUV(id, 0, 1, 1, 0);
+      } else {
+        SetUV(id, 0, 0, 1, 1);
+      }
+      SetQuadColor(id, 1, 1, 1, 1);
+      SetQuadPosition(id, 0, 0, 0, height, width, height, width, 0);
     }
   }
 
-  // Users/rich/Documents/GitHub/phaser-genesis/src/gameobjects/GameObjectCache.ts
-  var GameObjectCache = {
-    local: [],
-    set: function(index, object) {
-      this.local[index] = object;
-    },
-    get: function(index) {
-      return this.local[index];
-    },
-    clear: function() {
-      this.local.length = 0;
-    },
-    remove: function(index) {
-      this.local[index] = null;
-    }
+  // Users/rich/Documents/GitHub/phaser-genesis/src/renderer/webgl1/renderpass/GetVertexBufferEntry.ts
+  var bufferEntry = {
+    buffer: null,
+    F32: null,
+    offset: 0
   };
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/GetWorldID.ts
-  function GetWorldID(id) {
-    return HierarchyComponent.data[id][HIERARCHY.WORLD];
+  function GetVertexBufferEntry(renderPass, addToCount = 0) {
+    const buffer = renderPass.vertexbuffer.current;
+    if (renderPass.count + addToCount >= buffer.batchSize) {
+      Flush(renderPass);
+    }
+    bufferEntry.buffer = buffer;
+    bufferEntry.F32 = buffer.vertexViewF32;
+    bufferEntry.offset = renderPass.count * buffer.entryElementSize;
+    renderPass.count += addToCount;
+    return bufferEntry;
   }
 
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/GetParents.ts
-  function GetParents(id) {
-    const results = [];
-    let currentParent = GetParentID(id);
-    while (currentParent) {
-      results.push(currentParent);
-      currentParent = GetParentID(currentParent);
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/vertices/SetQuadTextureIndex.ts
+  function SetQuadTextureIndex(id, textureIndex) {
+    const data = QuadVertexComponent.values[id];
+    if (data[4] !== textureIndex) {
+      data[4] = textureIndex;
+      data[13] = textureIndex;
+      data[22] = textureIndex;
+      data[31] = textureIndex;
+      data[40] = textureIndex;
+      data[49] = textureIndex;
     }
-    return results;
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/renderer/webgl1/draw/BatchTexturedQuadBuffer.ts
+  function BatchTexturedQuadBuffer(texture, id, renderPass) {
+    const { F32, offset } = GetVertexBufferEntry(renderPass, 2);
+    const textureIndex = renderPass.textures.set(texture);
+    SetQuadTextureIndex(id, textureIndex);
+    F32.set(QuadVertexComponent.values[id], offset);
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/color/ColorComponent.ts
+  var ColorComponent = defineComponent({
+    r: Types.ui8c,
+    g: Types.ui8c,
+    b: Types.ui8c,
+    a: Types.f32,
+    colorMatrix: [Types.f32, 16],
+    colorOffset: [Types.f32, 4]
+  });
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/color/AddColorComponent.ts
+  function AddColorComponent(id) {
+    addComponent(GameObjectWorld, ColorComponent, id);
+    ColorComponent.r[id] = 255;
+    ColorComponent.g[id] = 255;
+    ColorComponent.b[id] = 255;
+    ColorComponent.a[id] = 1;
+    ColorComponent.colorMatrix[id].set(DEFAULT_COLOR_MATRIX);
   }
 
   // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/DirtyComponent.ts
@@ -2917,6 +2972,81 @@ void main (void)
     data: [Types.ui8, 7]
   });
 
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/HierarchyComponent.ts
+  var HIERARCHY = {
+    WORLD: 0,
+    PARENT: 1,
+    NEXT: 2,
+    PREV: 3,
+    FIRST: 4,
+    LAST: 5,
+    NUM_CHILDREN: 6,
+    DEPTH: 7
+  };
+  var HierarchyComponent = defineComponent({
+    data: [Types.ui32, 8]
+  });
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/GetWorldID.ts
+  function GetWorldID(id) {
+    return HierarchyComponent.data[id][HIERARCHY.WORLD];
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/SetDirtyColor.ts
+  function SetDirtyColor(id) {
+    DirtyComponent.data[id][DIRTY.COLOR] = 1;
+    const world2 = GetWorldID(id);
+    if (world2) {
+      DirtyComponent.data[world2][DIRTY.CHILD_COLOR] = 1;
+    }
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/AddDirtyComponent.ts
+  function AddDirtyComponent(id) {
+    addComponent(GameObjectWorld, DirtyComponent, id);
+    SetDirtyColor(id);
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/ClearDirtyChild.ts
+  function ClearDirtyChild(id) {
+    DirtyComponent.data[id][DIRTY.CHILD] = 0;
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/ClearDirtyColor.ts
+  function ClearDirtyColor(id) {
+    DirtyComponent.data[id][DIRTY.COLOR] = 0;
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/ClearDirtyDisplayList.ts
+  function ClearDirtyDisplayList(id) {
+    DirtyComponent.data[id][DIRTY.DISPLAY_LIST] = 0;
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/ClearDirtyTransform.ts
+  function ClearDirtyTransform(id) {
+    Transform2DComponent.data[id][TRANSFORM.DIRTY] = 0;
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/HasDirtyChildCache.ts
+  function HasDirtyChildCache(id) {
+    return Boolean(DirtyComponent.data[id][DIRTY.CHILD_CACHE]);
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/HasDirtyColor.ts
+  function HasDirtyColor(id) {
+    return Boolean(DirtyComponent.data[id][DIRTY.COLOR]);
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/HasDirtyDisplayList.ts
+  function HasDirtyDisplayList(id) {
+    return Boolean(DirtyComponent.data[id][DIRTY.DISPLAY_LIST]);
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/HasDirtyTransform.ts
+  function HasDirtyTransform(id) {
+    return Boolean(Transform2DComponent.data[id][TRANSFORM.DIRTY]);
+  }
+
   // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/SetDirtyChild.ts
   function SetDirtyChild(id) {
     DirtyComponent.data[id][DIRTY.CHILD] = 1;
@@ -2925,6 +3055,27 @@ void main (void)
   // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/SetDirtyChildCache.ts
   function SetDirtyChildCache(id) {
     DirtyComponent.data[id][DIRTY.CHILD_CACHE] = 1;
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/SetDirtyDisplayList.ts
+  function SetDirtyDisplayList(id) {
+    DirtyComponent.data[id][DIRTY.DISPLAY_LIST] = 1;
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/GetParentID.ts
+  function GetParentID(id) {
+    return HierarchyComponent.data[id][HIERARCHY.PARENT];
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/GetParents.ts
+  function GetParents(id) {
+    const results = [];
+    let currentParent = GetParentID(id);
+    while (currentParent) {
+      results.push(currentParent);
+      currentParent = GetParentID(currentParent);
+    }
+    return results;
   }
 
   // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/SetDirtyChildTransform.ts
@@ -2983,379 +3134,12 @@ void main (void)
     }
   }
 
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/ClearWorldAndParentID.ts
-  function ClearWorldAndParentID(id) {
-    const worldID = GetWorldID(id);
-    const parentID = GetParentID(id);
-    const world2 = GameObjectCache.get(worldID);
-    HierarchyComponent.data[id][HIERARCHY.WORLD] = 0;
-    HierarchyComponent.data[id][HIERARCHY.PARENT] = 0;
-    if (world2 && hasComponent(GameObjectWorld, world2.tag, id)) {
-      removeComponent(GameObjectWorld, world2.tag, id);
-    }
-    DecreaseNumChildren(parentID);
-    SetDirtyParents(id);
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/MoveNext.ts
-  function MoveNext(id, rootID) {
-    const firstChild = GetFirstChildID(id);
-    if (firstChild > 0) {
-      return firstChild;
-    } else {
-      const sibling = GetNextSiblingID(id);
-      if (sibling === 0) {
-        const parent = GetParentID(id);
-        if (parent === rootID) {
-          return 0;
-        } else {
-          return GetNextSiblingID(parent);
-        }
-      } else {
-        return sibling;
-      }
-    }
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/DepthFirstSearchFromParentID.ts
-  function DepthFirstSearchFromParentID(parentID, removeParent = true) {
-    const output = [parentID];
-    let next = GetFirstChildID(parentID);
-    while (next > 0) {
-      output.push(next);
-      next = MoveNext(next, parentID);
-    }
-    if (removeParent) {
-      output.shift();
-    }
-    return output;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/GetChildIDsFromParent.ts
-  function GetChildIDsFromParent(parent) {
-    let next = GetFirstChildID(parent.id);
-    const output = [];
-    while (next > 0) {
-      output.push(next);
-      next = GetNextSiblingID(next);
-    }
-    return output;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/GetChildrenFromParentID.ts
-  function GetChildrenFromParentID(id) {
-    const out = [];
-    let next = GetFirstChildID(id);
-    while (next > 0) {
-      out.push(GameObjectCache.get(next));
-      next = GetNextSiblingID(next);
-    }
-    return out;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/GetDepth.ts
-  function GetDepth(id) {
-    return HierarchyComponent.data[id][HIERARCHY.DEPTH];
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/GetParentGameObject.ts
-  function GetParentGameObject(id) {
-    return GameObjectCache.get(HierarchyComponent.data[id][HIERARCHY.PARENT]);
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/GetWorldFromID.ts
-  function GetWorldFromID(childID) {
-    const worldID = GetWorldID(childID);
-    if (worldID) {
-      return GameObjectCache.get(worldID);
-    }
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/GetWorldFromParentID.ts
-  function GetWorldFromParentID(parentID) {
-    const worldID = GetWorldID(parentID);
-    return GameObjectCache.get(worldID);
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/SetDepth.ts
-  function SetDepth(id, depth) {
-    HierarchyComponent.data[id][HIERARCHY.DEPTH] = depth;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/SetNumChildren.ts
-  function SetNumChildren(parentID, total) {
-    HierarchyComponent.data[parentID][HIERARCHY.NUM_CHILDREN] = total;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/SetParentID.ts
-  function SetParentID(childID, parentID) {
-    HierarchyComponent.data[childID][HIERARCHY.PARENT] = parentID;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/SetWorldID.ts
-  function SetWorldID(id, worldID) {
-    HierarchyComponent.data[id][HIERARCHY.WORLD] = worldID;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/RemoveWorldTag.ts
-  function RemoveWorldTag(id) {
-    const world2 = GetWorldFromParentID(id);
-    const children = DepthFirstSearchFromParentID(id, false);
-    children.map((childID) => {
-      removeComponent(GameObjectWorld, world2.tag, childID);
-      SetWorldID(childID, 0);
-    });
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/SetFirstChildID.ts
-  function SetFirstChildID(parentID, childID) {
-    HierarchyComponent.data[parentID][HIERARCHY.FIRST] = childID;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/SetLastChildID.ts
-  function SetLastChildID(parentID, childID) {
-    HierarchyComponent.data[parentID][HIERARCHY.LAST] = childID;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/RemoveChildIDFromCurrentParent.ts
-  function RemoveChildIDFromCurrentParent(childID, newParentID) {
-    const parentID = GetParentID(childID);
-    if (parentID) {
-      const firstID = GetFirstChildID(parentID);
-      const lastID = GetLastChildID(parentID);
-      const nextID = GetNextSiblingID(childID);
-      const prevID = GetPreviousSiblingID(childID);
-      if (childID === firstID) {
-        SetFirstChildID(parentID, nextID);
-      }
-      if (childID === lastID) {
-        SetLastChildID(parentID, prevID);
-      }
-      if (nextID) {
-        SetPreviousSiblingID(nextID, prevID);
-      }
-      if (prevID) {
-        SetNextSiblingID(prevID, nextID);
-      }
-      SetDirtyParents(childID);
-      SetParentID(childID, 0);
-      SetNumChildren(parentID, GetNumChildren(parentID) - 1);
-    }
-    const oldWorld = GetWorldFromID(childID);
-    const newWorld = newParentID ? GetWorldFromID(newParentID) : null;
-    if (oldWorld && oldWorld !== newWorld) {
-      RemoveWorldTag(childID);
-    }
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/SetDirtyChildColor.ts
-  function SetDirtyChildColor(id) {
-    DirtyComponent.data[id][DIRTY.CHILD_COLOR] = 1;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/SetDirtyDisplayList.ts
-  function SetDirtyDisplayList(id) {
-    DirtyComponent.data[id][DIRTY.DISPLAY_LIST] = 1;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/SetWorldTag.ts
-  function SetWorldTag(world2, id) {
-    const worldID = world2.id;
-    const worldTag = world2.tag;
-    const children = DepthFirstSearchFromParentID(id, false);
-    children.map((childID) => {
-      addComponent(GameObjectWorld, worldTag, childID);
-      SetWorldID(childID, worldID);
-    });
-    SetDirtyDisplayList(worldID);
-    SetDirtyChildColor(worldID);
-    SetDirtyChildTransform(worldID);
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/transform/UpdateRootTransform.ts
-  function UpdateRootTransform(id) {
-    const worldID = GetWorldID(id);
-    let currentParent = GetParentID(id);
-    let isRootTransform = true;
-    while (currentParent && currentParent !== worldID) {
-      if (WillTransformChildren(currentParent)) {
-        isRootTransform = false;
-        break;
-      }
-      currentParent = GetParentID(currentParent);
-    }
-    Transform2DComponent.data[id][TRANSFORM.IS_ROOT] = Number(isRootTransform);
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/SetAndUpdateParent.ts
-  function SetAndUpdateParent(parentID, childID, addChildren = 1) {
-    SetParentID(childID, parentID);
-    SetDirtyTransform(childID);
-    SetDirtyParents(childID);
-    UpdateRootTransform(childID);
-    SetNumChildren(parentID, GetNumChildren(parentID) + addChildren);
-    const world2 = GetWorldFromParentID(parentID);
-    if (world2) {
-      SetWorldTag(world2, childID);
-    }
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/display/AddChild.ts
-  function AddChild(parent, child) {
-    if (IsValidParent(parent, child)) {
-      const childID = child.id;
-      const parentID = parent.id;
-      const numChildren = GetNumChildren(parentID);
-      RemoveChildIDFromCurrentParent(childID, parentID);
-      if (numChildren === 0) {
-        SetFirstChildID(parentID, childID);
-      } else {
-        const lastChild = GetLastChildID(parentID);
-        LinkSiblings(lastChild, childID);
-      }
-      SetLastChildID(parentID, childID);
-      SetAndUpdateParent(parentID, childID);
-    }
-    return child;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/RelinkChildren.ts
-  function RelinkChildren(parentID, children) {
-    const len = children.length;
-    if (len === 0) {
-      SetNumChildren(parentID, 0);
-      SetFirstChildID(parentID, 0);
-      SetLastChildID(parentID, 0);
-      return;
-    }
-    let total = 1;
-    let childA = children[0];
-    SetFirstChildID(parentID, childA);
-    if (len === 1) {
-      SetLastChildID(parentID, childA);
-      SetNumChildren(parentID, total);
-      return;
-    }
-    for (let i = 1; i < len; i++) {
-      const childB = children[i];
-      LinkSiblings(childA, childB);
-      childA = childB;
-      total++;
-    }
-    SetLastChildID(parentID, childA);
-    SetNumChildren(parentID, total);
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/display/RemoveChildrenBetween.ts
-  function RemoveChildrenBetween(parent, beginIndex = 0, endIndex) {
-    const parentID = parent.id;
-    if (endIndex === void 0) {
-      endIndex = GetNumChildren(parentID);
-    }
-    const range = endIndex - beginIndex;
-    if (range > 0 && range <= endIndex) {
-      const children = GetChildIDsFromParent(parent);
-      const removed2 = children.splice(beginIndex, range);
-      removed2.forEach((childID) => {
-        ClearWorldAndParentID(childID);
-      });
-      RelinkChildren(parentID, children);
-      return removed2.map((id) => GameObjectCache.get(id));
-    } else {
-      return [];
-    }
-  }
-
   // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/SetDirtyWorldDisplayList.ts
   function SetDirtyWorldDisplayList(id) {
     const worldID = GetWorldID(id);
     if (worldID > 0) {
       DirtyComponent.data[worldID][DIRTY.DISPLAY_LIST];
     }
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/display/DestroyChildren.ts
-  function DestroyChildren(parent, beginIndex = 0, endIndex) {
-    const removed2 = RemoveChildrenBetween(parent, beginIndex, endIndex);
-    removed2.forEach((child) => {
-      child.destroy();
-    });
-    SetDirtyWorldDisplayList(parent.id);
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/color/ColorComponent.ts
-  var ColorComponent = defineComponent({
-    r: Types.ui8c,
-    g: Types.ui8c,
-    b: Types.ui8c,
-    a: Types.f32,
-    colorMatrix: [Types.f32, 16],
-    colorOffset: [Types.f32, 4]
-  });
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/color/AddColorComponent.ts
-  function AddColorComponent(id) {
-    addComponent(GameObjectWorld, ColorComponent, id);
-    ColorComponent.r[id] = 255;
-    ColorComponent.g[id] = 255;
-    ColorComponent.b[id] = 255;
-    ColorComponent.a[id] = 1;
-    ColorComponent.colorMatrix[id].set(DEFAULT_COLOR_MATRIX);
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/SetDirtyColor.ts
-  function SetDirtyColor(id) {
-    DirtyComponent.data[id][DIRTY.COLOR] = 1;
-    const world2 = GetWorldID(id);
-    if (world2) {
-      DirtyComponent.data[world2][DIRTY.CHILD_COLOR] = 1;
-    }
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/AddDirtyComponent.ts
-  function AddDirtyComponent(id) {
-    addComponent(GameObjectWorld, DirtyComponent, id);
-    SetDirtyColor(id);
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/ClearDirtyChild.ts
-  function ClearDirtyChild(id) {
-    DirtyComponent.data[id][DIRTY.CHILD] = 0;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/ClearDirtyColor.ts
-  function ClearDirtyColor(id) {
-    DirtyComponent.data[id][DIRTY.COLOR] = 0;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/ClearDirtyDisplayList.ts
-  function ClearDirtyDisplayList(id) {
-    DirtyComponent.data[id][DIRTY.DISPLAY_LIST] = 0;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/ClearDirtyTransform.ts
-  function ClearDirtyTransform(id) {
-    Transform2DComponent.data[id][TRANSFORM.DIRTY] = 0;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/HasDirtyChildCache.ts
-  function HasDirtyChildCache(id) {
-    return Boolean(DirtyComponent.data[id][DIRTY.CHILD_CACHE]);
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/HasDirtyColor.ts
-  function HasDirtyColor(id) {
-    return Boolean(DirtyComponent.data[id][DIRTY.COLOR]);
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/HasDirtyDisplayList.ts
-  function HasDirtyDisplayList(id) {
-    return Boolean(DirtyComponent.data[id][DIRTY.DISPLAY_LIST]);
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/HasDirtyTransform.ts
-  function HasDirtyTransform(id) {
-    return Boolean(Transform2DComponent.data[id][TRANSFORM.DIRTY]);
   }
 
   // Users/rich/Documents/GitHub/phaser-genesis/src/components/permissions/SetWillColorChildren.ts
@@ -3442,10 +3226,168 @@ void main (void)
     }
   };
 
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/AddHierarchyComponent.ts
+  function AddHierarchyComponent(id) {
+    addComponent(GameObjectWorld, HierarchyComponent, id);
+  }
+
   // Users/rich/Documents/GitHub/phaser-genesis/src/components/permissions/AddPermissionsComponent.ts
   function AddPermissionsComponent(id) {
     addComponent(GameObjectWorld, PermissionsComponent, id);
     PermissionsComponent.data[id].set([1, 1, 1, 1, 1, 1, 1, 1, 1]);
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/DecreaseNumChildren.ts
+  function DecreaseNumChildren(parentID, total = 1) {
+    const data = HierarchyComponent.data[parentID];
+    data[HIERARCHY.NUM_CHILDREN] -= total;
+    if (data[HIERARCHY.NUM_CHILDREN] < 0) {
+      data[HIERARCHY.NUM_CHILDREN] = 0;
+    }
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/gameobjects/GameObjectCache.ts
+  var GameObjectCache = {
+    local: [],
+    set: function(index, object) {
+      this.local[index] = object;
+    },
+    get: function(index) {
+      return this.local[index];
+    },
+    clear: function() {
+      this.local.length = 0;
+    },
+    remove: function(index) {
+      this.local[index] = null;
+    }
+  };
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/ClearWorldAndParentID.ts
+  function ClearWorldAndParentID(id) {
+    const worldID = GetWorldID(id);
+    const parentID = GetParentID(id);
+    const world2 = GameObjectCache.get(worldID);
+    HierarchyComponent.data[id][HIERARCHY.WORLD] = 0;
+    HierarchyComponent.data[id][HIERARCHY.PARENT] = 0;
+    if (world2 && hasComponent(GameObjectWorld, world2.tag, id)) {
+      removeComponent(GameObjectWorld, world2.tag, id);
+    }
+    DecreaseNumChildren(parentID);
+    SetDirtyParents(id);
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/GetFirstChildID.ts
+  function GetFirstChildID(parentID) {
+    return HierarchyComponent.data[parentID][HIERARCHY.FIRST];
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/GetNextSiblingID.ts
+  function GetNextSiblingID(id) {
+    return HierarchyComponent.data[id][HIERARCHY.NEXT];
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/GetChildIDsFromParent.ts
+  function GetChildIDsFromParent(parent) {
+    let next = GetFirstChildID(parent.id);
+    const output = [];
+    while (next > 0) {
+      output.push(next);
+      next = GetNextSiblingID(next);
+    }
+    return output;
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/GetNumChildren.ts
+  function GetNumChildren(id) {
+    return HierarchyComponent.data[id][HIERARCHY.NUM_CHILDREN];
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/SetNextSiblingID.ts
+  function SetNextSiblingID(parentID, childID) {
+    HierarchyComponent.data[parentID][HIERARCHY.NEXT] = childID;
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/SetPreviousSiblingID.ts
+  function SetPreviousSiblingID(parentID, childID) {
+    HierarchyComponent.data[parentID][HIERARCHY.PREV] = childID;
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/LinkSiblings.ts
+  function LinkSiblings(childA, childB) {
+    SetNextSiblingID(childA, childB);
+    SetPreviousSiblingID(childB, childA);
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/SetFirstChildID.ts
+  function SetFirstChildID(parentID, childID) {
+    HierarchyComponent.data[parentID][HIERARCHY.FIRST] = childID;
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/SetLastChildID.ts
+  function SetLastChildID(parentID, childID) {
+    HierarchyComponent.data[parentID][HIERARCHY.LAST] = childID;
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/SetNumChildren.ts
+  function SetNumChildren(parentID, total) {
+    HierarchyComponent.data[parentID][HIERARCHY.NUM_CHILDREN] = total;
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/RelinkChildren.ts
+  function RelinkChildren(parentID, children) {
+    const len = children.length;
+    if (len === 0) {
+      SetNumChildren(parentID, 0);
+      SetFirstChildID(parentID, 0);
+      SetLastChildID(parentID, 0);
+      return;
+    }
+    let total = 1;
+    let childA = children[0];
+    SetFirstChildID(parentID, childA);
+    if (len === 1) {
+      SetLastChildID(parentID, childA);
+      SetNumChildren(parentID, total);
+      return;
+    }
+    for (let i = 1; i < len; i++) {
+      const childB = children[i];
+      LinkSiblings(childA, childB);
+      childA = childB;
+      total++;
+    }
+    SetLastChildID(parentID, childA);
+    SetNumChildren(parentID, total);
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/display/RemoveChildrenBetween.ts
+  function RemoveChildrenBetween(parent, beginIndex = 0, endIndex) {
+    const parentID = parent.id;
+    if (endIndex === void 0) {
+      endIndex = GetNumChildren(parentID);
+    }
+    const range = endIndex - beginIndex;
+    if (range > 0 && range <= endIndex) {
+      const children = GetChildIDsFromParent(parent);
+      const removed2 = children.splice(beginIndex, range);
+      removed2.forEach((childID) => {
+        ClearWorldAndParentID(childID);
+      });
+      RelinkChildren(parentID, children);
+      return removed2.map((id) => GameObjectCache.get(id));
+    } else {
+      return [];
+    }
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/display/DestroyChildren.ts
+  function DestroyChildren(parent, beginIndex = 0, endIndex) {
+    const removed2 = RemoveChildrenBetween(parent, beginIndex, endIndex);
+    removed2.forEach((child) => {
+      child.destroy();
+    });
+    SetDirtyWorldDisplayList(parent.id);
   }
 
   // Users/rich/Documents/GitHub/phaser-genesis/src/gameobjects/events/DestroyEvent.ts
@@ -3470,6 +3412,27 @@ void main (void)
     return true;
   }
 
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/GetChildrenFromParentID.ts
+  function GetChildrenFromParentID(id) {
+    const out = [];
+    let next = GetFirstChildID(id);
+    while (next > 0) {
+      out.push(GameObjectCache.get(next));
+      next = GetNextSiblingID(next);
+    }
+    return out;
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/GetDepth.ts
+  function GetDepth(id) {
+    return HierarchyComponent.data[id][HIERARCHY.DEPTH];
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/GetParentGameObject.ts
+  function GetParentGameObject(id) {
+    return GameObjectCache.get(HierarchyComponent.data[id][HIERARCHY.PARENT]);
+  }
+
   // Users/rich/Documents/GitHub/phaser-genesis/src/components/permissions/GetVisible.ts
   function GetVisible(id) {
     return Boolean(PermissionsComponent.data[id][PERMISSION.VISIBLE]);
@@ -3478,6 +3441,193 @@ void main (void)
   // Users/rich/Documents/GitHub/phaser-genesis/src/components/permissions/GetVisibleChildren.ts
   function GetVisibleChildren(id) {
     return Boolean(PermissionsComponent.data[id][PERMISSION.VISIBLE_CHILDREN]);
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/GetLastChildID.ts
+  function GetLastChildID(parentID) {
+    return HierarchyComponent.data[parentID][HIERARCHY.LAST];
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/display/IsValidParent.ts
+  function IsValidParent(parent, child) {
+    const childID = child.id;
+    const parentID = parent.id;
+    return !(parentID === 0 || childID === parentID || parentID === GetParentID(childID));
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/GetPreviousSiblingID.ts
+  function GetPreviousSiblingID(id) {
+    return HierarchyComponent.data[id][HIERARCHY.PREV];
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/MoveNext.ts
+  function MoveNext(id, rootID) {
+    const firstChild = GetFirstChildID(id);
+    if (firstChild > 0) {
+      return firstChild;
+    } else {
+      const sibling = GetNextSiblingID(id);
+      if (sibling === 0) {
+        const parent = GetParentID(id);
+        if (parent === rootID) {
+          return 0;
+        } else {
+          return GetNextSiblingID(parent);
+        }
+      } else {
+        return sibling;
+      }
+    }
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/DepthFirstSearchFromParentID.ts
+  function DepthFirstSearchFromParentID(parentID, removeParent = true) {
+    const output = [parentID];
+    let next = GetFirstChildID(parentID);
+    while (next > 0) {
+      output.push(next);
+      next = MoveNext(next, parentID);
+    }
+    if (removeParent) {
+      output.shift();
+    }
+    return output;
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/GetWorldFromID.ts
+  function GetWorldFromID(childID) {
+    const worldID = GetWorldID(childID);
+    if (worldID) {
+      return GameObjectCache.get(worldID);
+    }
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/GetWorldFromParentID.ts
+  function GetWorldFromParentID(parentID) {
+    const worldID = GetWorldID(parentID);
+    return GameObjectCache.get(worldID);
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/SetDepth.ts
+  function SetDepth(id, depth) {
+    HierarchyComponent.data[id][HIERARCHY.DEPTH] = depth;
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/SetParentID.ts
+  function SetParentID(childID, parentID) {
+    HierarchyComponent.data[childID][HIERARCHY.PARENT] = parentID;
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/SetWorldID.ts
+  function SetWorldID(id, worldID) {
+    HierarchyComponent.data[id][HIERARCHY.WORLD] = worldID;
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/RemoveWorldTag.ts
+  function RemoveWorldTag(id) {
+    const world2 = GetWorldFromParentID(id);
+    const children = DepthFirstSearchFromParentID(id, false);
+    children.map((childID) => {
+      removeComponent(GameObjectWorld, world2.tag, childID);
+      SetWorldID(childID, 0);
+    });
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/RemoveChildIDFromCurrentParent.ts
+  function RemoveChildIDFromCurrentParent(childID, newParentID) {
+    const parentID = GetParentID(childID);
+    if (parentID) {
+      const firstID = GetFirstChildID(parentID);
+      const lastID = GetLastChildID(parentID);
+      const nextID = GetNextSiblingID(childID);
+      const prevID = GetPreviousSiblingID(childID);
+      if (childID === firstID) {
+        SetFirstChildID(parentID, nextID);
+      }
+      if (childID === lastID) {
+        SetLastChildID(parentID, prevID);
+      }
+      if (nextID) {
+        SetPreviousSiblingID(nextID, prevID);
+      }
+      if (prevID) {
+        SetNextSiblingID(prevID, nextID);
+      }
+      SetDirtyParents(childID);
+      SetParentID(childID, 0);
+      SetNumChildren(parentID, GetNumChildren(parentID) - 1);
+    }
+    const oldWorld = GetWorldFromID(childID);
+    const newWorld = newParentID ? GetWorldFromID(newParentID) : null;
+    if (oldWorld && oldWorld !== newWorld) {
+      RemoveWorldTag(childID);
+    }
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/SetDirtyChildColor.ts
+  function SetDirtyChildColor(id) {
+    DirtyComponent.data[id][DIRTY.CHILD_COLOR] = 1;
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/SetWorldTag.ts
+  function SetWorldTag(world2, id) {
+    const worldID = world2.id;
+    const worldTag = world2.tag;
+    const children = DepthFirstSearchFromParentID(id, false);
+    children.map((childID) => {
+      addComponent(GameObjectWorld, worldTag, childID);
+      SetWorldID(childID, worldID);
+    });
+    SetDirtyDisplayList(worldID);
+    SetDirtyChildColor(worldID);
+    SetDirtyChildTransform(worldID);
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/transform/UpdateRootTransform.ts
+  function UpdateRootTransform(id) {
+    const worldID = GetWorldID(id);
+    let currentParent = GetParentID(id);
+    let isRootTransform = true;
+    while (currentParent && currentParent !== worldID) {
+      if (WillTransformChildren(currentParent)) {
+        isRootTransform = false;
+        break;
+      }
+      currentParent = GetParentID(currentParent);
+    }
+    Transform2DComponent.data[id][TRANSFORM.IS_ROOT] = Number(isRootTransform);
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/SetAndUpdateParent.ts
+  function SetAndUpdateParent(parentID, childID, addChildren = 1) {
+    SetParentID(childID, parentID);
+    SetDirtyTransform(childID);
+    SetDirtyParents(childID);
+    UpdateRootTransform(childID);
+    SetNumChildren(parentID, GetNumChildren(parentID) + addChildren);
+    const world2 = GetWorldFromParentID(parentID);
+    if (world2) {
+      SetWorldTag(world2, childID);
+    }
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/display/AddChild.ts
+  function AddChild(parent, child) {
+    if (IsValidParent(parent, child)) {
+      const childID = child.id;
+      const parentID = parent.id;
+      const numChildren = GetNumChildren(parentID);
+      RemoveChildIDFromCurrentParent(childID, parentID);
+      if (numChildren === 0) {
+        SetFirstChildID(parentID, childID);
+      } else {
+        const lastChild = GetLastChildID(parentID);
+        LinkSiblings(lastChild, childID);
+      }
+      SetLastChildID(parentID, childID);
+      SetAndUpdateParent(parentID, childID);
+    }
+    return child;
   }
 
   // Users/rich/Documents/GitHub/phaser-genesis/src/display/ReparentChildren.ts
@@ -3591,6 +3741,16 @@ void main (void)
     }
   };
 
+  // Users/rich/Documents/GitHub/phaser-genesis/src/config/defaultorigin/GetDefaultOriginX.ts
+  function GetDefaultOriginX() {
+    return ConfigStore.get(CONFIG_DEFAULTS.DEFAULT_ORIGIN).x;
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/config/defaultorigin/GetDefaultOriginY.ts
+  function GetDefaultOriginY() {
+    return ConfigStore.get(CONFIG_DEFAULTS.DEFAULT_ORIGIN).y;
+  }
+
   // Users/rich/Documents/GitHub/phaser-genesis/src/components/transform/UpdateExtent.ts
   function UpdateExtent(id, width, height) {
     const data = Transform2DComponent.data[id];
@@ -3610,6 +3770,39 @@ void main (void)
     data[TRANSFORM.WORLD_TY] = height;
     SetDirtyTransform(id);
   }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/transform/Origin.ts
+  var Origin = class {
+    id;
+    constructor(id, x = 0, y = 0) {
+      this.id = id;
+      this.x = x;
+      this.y = y;
+    }
+    set(x, y = x) {
+      const id = this.id;
+      Transform2DComponent.data[id][TRANSFORM.ORIGIN_X] = x;
+      Transform2DComponent.data[id][TRANSFORM.ORIGIN_Y] = y;
+      UpdateExtent(id, Transform2DComponent.data[id][TRANSFORM.FRAME_WIDTH], Transform2DComponent.data[id][TRANSFORM.FRAME_HEIGHT]);
+      return this;
+    }
+    set x(value) {
+      const id = this.id;
+      Transform2DComponent.data[id][TRANSFORM.ORIGIN_X] = value;
+      UpdateExtent(id, Transform2DComponent.data[id][TRANSFORM.FRAME_WIDTH], Transform2DComponent.data[id][TRANSFORM.FRAME_HEIGHT]);
+    }
+    get x() {
+      return Transform2DComponent.data[this.id][TRANSFORM.ORIGIN_X];
+    }
+    set y(value) {
+      const id = this.id;
+      Transform2DComponent.data[id][TRANSFORM.ORIGIN_Y] = value;
+      UpdateExtent(id, Transform2DComponent.data[id][TRANSFORM.FRAME_WIDTH], Transform2DComponent.data[id][TRANSFORM.FRAME_HEIGHT]);
+    }
+    get y() {
+      return Transform2DComponent.data[this.id][TRANSFORM.ORIGIN_Y];
+    }
+  };
 
   // Users/rich/Documents/GitHub/phaser-genesis/src/renderer/webgl1/renderpass/PopColor.ts
   function PopColor(renderPass, color) {
@@ -3652,6 +3845,40 @@ void main (void)
     }
   };
 
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/transform/Scale.ts
+  var Scale = class {
+    id;
+    _x;
+    _y;
+    constructor(id, x = 1, y = 1) {
+      this.id = id;
+      this.set(x, y);
+    }
+    set(x, y = x) {
+      this.x = x;
+      this.y = y;
+      return this;
+    }
+    set x(value) {
+      this._x = value;
+      const id = this.id;
+      Transform2DComponent.data[id][TRANSFORM.SCALE_X] = value;
+      SetDirtyTransform(id);
+    }
+    get x() {
+      return this._x;
+    }
+    set y(value) {
+      this._y = value;
+      const id = this.id;
+      Transform2DComponent.data[id][TRANSFORM.SCALE_Y] = value;
+      SetDirtyTransform(id);
+    }
+    get y() {
+      return this._y;
+    }
+  };
+
   // Users/rich/Documents/GitHub/phaser-genesis/src/renderer/webgl1/renderpass/SetColor.ts
   function SetColor(renderPass, color) {
     if (color.colorMatrixEnabled && color.willColorChildren) {
@@ -3660,7 +3887,7 @@ void main (void)
   }
 
   // Users/rich/Documents/GitHub/phaser-genesis/src/components/transform/Size.ts
-  var Size = class {
+  var Size2 = class {
     id;
     constructor(id, width = 0, height = 0) {
       this.id = id;
@@ -3697,6 +3924,215 @@ void main (void)
     }
   };
 
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/transform/UpdateAxisAligned.ts
+  function UpdateAxisAligned(id) {
+    const data = Transform2DComponent.data[id];
+    const rotation = data[TRANSFORM.ROTATION];
+    const skewX = data[TRANSFORM.SKEW_X];
+    const skewY = data[TRANSFORM.SKEW_Y];
+    data[TRANSFORM.AXIS_ALIGNED] = Number(rotation === 0 && skewX === 0 && skewY === 0);
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/transform/Skew.ts
+  var Skew = class {
+    id;
+    _x;
+    _y;
+    constructor(id, x = 0, y = 0) {
+      this.id = id;
+      this.set(x, y);
+    }
+    set(x, y = x) {
+      this.x = x;
+      this.y = y;
+      return this;
+    }
+    set x(value) {
+      this._x = value;
+      const id = this.id;
+      Transform2DComponent.data[id][TRANSFORM.SKEW_X] = value;
+      UpdateAxisAligned(id);
+      SetDirtyTransform(id);
+    }
+    get x() {
+      return this._x;
+    }
+    set y(value) {
+      this._y = value;
+      const id = this.id;
+      Transform2DComponent.data[id][TRANSFORM.SKEW_Y] = value;
+      UpdateAxisAligned(id);
+      SetDirtyTransform(id);
+    }
+    get y() {
+      return this._y;
+    }
+  };
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/gameobjects/container/Container.ts
+  var Container = class extends GameObject {
+    type = "Container";
+    position;
+    scale;
+    skew;
+    origin;
+    size;
+    color;
+    shader;
+    _rotation = 0;
+    constructor(x = 0, y = 0) {
+      super();
+      const id = this.id;
+      AddTransform2DComponent(id, x, y, GetDefaultOriginX(), GetDefaultOriginY());
+      this.position = new Position(id, x, y);
+      this.scale = new Scale(id);
+      this.skew = new Skew(id);
+      this.size = new Size2(id);
+      this.origin = new Origin(id, GetDefaultOriginX(), GetDefaultOriginY());
+      this.color = new Color(id);
+    }
+    renderGL(renderPass) {
+      if (this.shader) {
+        Flush(renderPass);
+        renderPass.shader.set(this.shader, 0);
+      }
+      SetColor(renderPass, this.color);
+      this.preRenderGL(renderPass);
+    }
+    postRenderGL(renderPass) {
+      if (this.shader) {
+        Flush(renderPass);
+        renderPass.shader.pop();
+      }
+      PopColor(renderPass, this.color);
+    }
+    set x(value) {
+      this.position.x = value;
+    }
+    get x() {
+      return this.position.x;
+    }
+    set y(value) {
+      this.position.y = value;
+    }
+    get y() {
+      return this.position.y;
+    }
+    set rotation(value) {
+      this._rotation = value;
+      const id = this.id;
+      Transform2DComponent.data[id][TRANSFORM.ROTATION] = value;
+      UpdateAxisAligned(id);
+      SetDirtyTransform(id);
+    }
+    get rotation() {
+      return this._rotation;
+    }
+    get alpha() {
+      return this.color.alpha;
+    }
+    set alpha(value) {
+      this.color.alpha = value;
+    }
+    setAlpha(value) {
+      this.alpha = value;
+      return this;
+    }
+    setPosition(x, y) {
+      this.position.set(x, y);
+      return this;
+    }
+    setScale(x, y) {
+      this.scale.set(x, y);
+      return this;
+    }
+    setRotation(value) {
+      this.rotation = value;
+      return this;
+    }
+    setSkew(x, y) {
+      this.skew.set(x, y);
+      return this;
+    }
+    setOrigin(x, y) {
+      this.origin.set(x, y);
+      return this;
+    }
+    getBounds() {
+      const data = Transform2DComponent.data[this.id];
+      const x = data[TRANSFORM.BOUNDS_X1];
+      const y = data[TRANSFORM.BOUNDS_Y1];
+      const right = data[TRANSFORM.BOUNDS_X2];
+      const bottom = data[TRANSFORM.BOUNDS_Y2];
+      return new Rectangle(x, y, right - x, bottom - y);
+    }
+    destroy(reparentChildren) {
+      super.destroy(reparentChildren);
+    }
+  };
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/transform/SetExtent.ts
+  function SetExtent(id, x, y, width, height) {
+    const data = Transform2DComponent.data[id];
+    data[TRANSFORM.FRAME_X1] = x;
+    data[TRANSFORM.FRAME_Y1] = y;
+    data[TRANSFORM.FRAME_X2] = x + width;
+    data[TRANSFORM.FRAME_Y2] = y + height;
+    data[TRANSFORM.FRAME_WIDTH] = width;
+    data[TRANSFORM.FRAME_HEIGHT] = height;
+    SetDirtyTransform(id);
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/textures/SetExtentFromFrame.ts
+  function SetExtentFromFrame(child, frame2) {
+    const originX = child.origin.x;
+    const originY = child.origin.y;
+    const sourceSizeWidth = frame2.sourceSizeWidth;
+    const sourceSizeHeight = frame2.sourceSizeHeight;
+    let x;
+    let y;
+    let width;
+    let height;
+    if (frame2.trimmed) {
+      x = frame2.spriteSourceSizeX - originX * sourceSizeWidth;
+      y = frame2.spriteSourceSizeY - originY * sourceSizeHeight;
+      width = frame2.spriteSourceSizeWidth;
+      height = frame2.spriteSourceSizeHeight;
+    } else {
+      x = -originX * sourceSizeWidth;
+      y = -originY * sourceSizeHeight;
+      width = sourceSizeWidth;
+      height = sourceSizeHeight;
+    }
+    SetExtent(child.id, x, y, width, height);
+    return child;
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/textures/SetVertexUVsFromFrame.ts
+  function SetVertexUVsFromFrame(id, frame2) {
+    SetUV(id, frame2.u0, frame2.v0, frame2.u1, frame2.v1);
+    return frame2;
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/gameobjects/sprite/SetFrame.ts
+  function SetFrame(texture, key, ...children) {
+    const frame2 = texture.getFrame(key);
+    const pivot = frame2.pivot;
+    children.forEach((child) => {
+      if (!child || frame2 === child.frame) {
+        return;
+      }
+      child.frame = frame2;
+      child.hasTexture = true;
+      if (pivot) {
+        child.origin.set(pivot.x, pivot.y);
+      }
+      SetExtentFromFrame(child, frame2);
+      SetVertexUVsFromFrame(child.id, frame2);
+    });
+    return children;
+  }
+
   // Users/rich/Documents/GitHub/phaser-genesis/src/textures/TextureManagerInstance.ts
   var instance4;
   var TextureManagerInstance = {
@@ -3710,6 +4146,283 @@ void main (void)
       instance4 = manager;
     }
   };
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/textures/GetTexture.ts
+  function GetTexture(key) {
+    return TextureManagerInstance.get().get(key);
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/gameobjects/sprite/SetTexture.ts
+  function SetTexture(key, frame2, ...children) {
+    if (!key) {
+      children.forEach((child) => {
+        child.texture = null;
+        child.frame = null;
+        child.hasTexture = false;
+      });
+    } else {
+      let texture;
+      if (key instanceof Frame) {
+        frame2 = key;
+        texture = key.texture;
+      } else if (key instanceof Texture) {
+        texture = key;
+      } else {
+        texture = GetTexture(key);
+      }
+      if (!texture) {
+        console.warn(`Invalid Texture key: ${key}`);
+      } else {
+        children.forEach((child) => {
+          child.texture = texture;
+        });
+        SetFrame(texture, frame2, ...children);
+      }
+    }
+    return children;
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/gameobjects/sprite/Sprite.ts
+  var Sprite = class extends Container {
+    type = "Sprite";
+    texture;
+    frame;
+    hasTexture = false;
+    constructor(x, y, texture = "__BLANK", frame2) {
+      super(x, y);
+      AddQuadVertex(this.id);
+      this.setTexture(texture, frame2);
+    }
+    setTexture(key, frame2) {
+      SetTexture(key, frame2, this);
+      return this;
+    }
+    setFrame(key) {
+      SetFrame(this.texture, key, this);
+      return this;
+    }
+    isRenderable() {
+      return this.visible && this.hasTexture && WillRender(this.id) && this.alpha > 0;
+    }
+    renderGL(renderPass) {
+      const color = this.color;
+      if (this.shader) {
+        Flush(renderPass);
+        renderPass.shader.set(this.shader, 0);
+      }
+      if (color.colorMatrixEnabled) {
+        renderPass.colorMatrix.set(color);
+      }
+      this.preRenderGL(renderPass);
+      BatchTexturedQuadBuffer(this.texture, this.id, renderPass);
+      if (color.colorMatrixEnabled && !color.willColorChildren) {
+        Flush(renderPass);
+        renderPass.colorMatrix.pop();
+      }
+    }
+    renderCanvas(renderer) {
+    }
+    destroy(reparentChildren) {
+      super.destroy(reparentChildren);
+      this.texture = null;
+      this.frame = null;
+      this.hasTexture = false;
+    }
+  };
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/gameobjects/text/Text.ts
+  var Text = class extends Sprite {
+    type = "Text";
+    _text;
+    preRenderCallback;
+    wordWrapCallback;
+    canvas;
+    context;
+    splitRegExp = /(?:\r\n|\r|\n)/;
+    padding = { left: 0, right: 0, top: 0, bottom: 0 };
+    verticalAlign = "ascent";
+    lineSpacing = 0;
+    resolution;
+    font = "16px monospace";
+    fillStyle = "#fff";
+    strokeStyle = "";
+    backgroundStyle = "";
+    cornerRadius = 0;
+    textAlign = "left";
+    textBaseline = "alphabetic";
+    lineWidth = 0;
+    lineDash = [];
+    fixedWidth;
+    fixedHeight;
+    antialias = false;
+    constructor(x, y, text = "", font, fillStyle) {
+      super(x, y, CanvasTexture());
+      const renderer = RendererInstance.get();
+      this.resolution = renderer.resolution;
+      this.canvas = this.texture.image;
+      this.context = this.canvas.getContext("2d");
+      if (font) {
+        this.font = font;
+      }
+      if (fillStyle) {
+        this.fillStyle = fillStyle;
+      }
+      this.setText(text);
+    }
+    syncContext(canvas, ctx) {
+      if (this.preRenderCallback) {
+        this.preRenderCallback(canvas, ctx);
+      }
+      ctx.font = this.font;
+      ctx.textBaseline = this.textBaseline;
+      ctx.textAlign = this.textAlign;
+      ctx.fillStyle = this.fillStyle;
+      ctx.strokeStyle = this.strokeStyle;
+      ctx.lineWidth = this.lineWidth;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.setLineDash(this.lineDash);
+      ctx.imageSmoothingEnabled = this.antialias;
+    }
+    updateText() {
+      const canvas = this.canvas;
+      const ctx = this.context;
+      const resolution = this.resolution;
+      const lines = this._text.split(this.splitRegExp);
+      const padding = this.padding;
+      const fillStyle = this.fillStyle;
+      const strokeStyle = this.strokeStyle;
+      const strokeWidth = this.lineWidth;
+      const lineSpacing = this.lineSpacing;
+      const strokeWidthHalf = strokeWidth > 0 ? strokeWidth / 2 : 0;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      this.syncContext(canvas, ctx);
+      ctx.textAlign = "start";
+      let maxWidth = 0;
+      let maxHeight = 0;
+      let y = 0;
+      const lineMetrics = [];
+      const vAlignAscent = this.verticalAlign === "ascent";
+      const metrics = ctx.measureText("|M\xC9q");
+      const averageLineHeight = Math.ceil(Math.abs(metrics.actualBoundingBoxAscent) + Math.abs(metrics.actualBoundingBoxDescent)) + strokeWidth;
+      for (let i = 0; i < lines.length; i++) {
+        const metrics2 = ctx.measureText(lines[i]);
+        const left = metrics2.actualBoundingBoxLeft;
+        const right = metrics2.actualBoundingBoxRight;
+        let ascent = metrics2.actualBoundingBoxAscent;
+        let descent = metrics2.actualBoundingBoxDescent;
+        if (!ascent && !descent || lines[i] === "") {
+          ascent = averageLineHeight;
+          descent = 0;
+        }
+        const lineWidth = Math.ceil(Math.abs(left) + Math.abs(right)) + strokeWidth;
+        const lineHeight = Math.ceil(Math.abs(ascent) + Math.abs(descent)) + strokeWidth;
+        if (vAlignAscent) {
+          y += ascent + strokeWidthHalf;
+          if (i > 0) {
+            y += lineSpacing + strokeWidthHalf;
+          }
+          maxHeight = y + descent + strokeWidthHalf;
+        } else {
+          y = maxHeight + (lineHeight - descent - strokeWidthHalf);
+          maxHeight += lineHeight;
+          if (i < lines.length - 1) {
+            maxHeight += lineSpacing;
+          }
+        }
+        maxWidth = Math.max(maxWidth, lineWidth);
+        lineMetrics.push({ lineWidth, lineHeight, ascent, descent, left, right, y });
+      }
+      maxWidth += padding.left + padding.right;
+      maxHeight += padding.top + padding.bottom;
+      const displayWidth = this.fixedWidth ? this.fixedWidth : maxWidth;
+      const displayHeight = this.fixedHeight ? this.fixedHeight : maxHeight;
+      const canvasWidth = Math.ceil(displayWidth * resolution);
+      const canvasHeight = Math.ceil(displayHeight * resolution);
+      if (canvas.width !== canvasWidth || canvas.height !== canvasHeight) {
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
+        this.texture.setSize(displayWidth, displayHeight);
+        this.size.set(displayWidth, displayHeight);
+      }
+      ctx.save();
+      ctx.scale(resolution, resolution);
+      this.syncContext(canvas, ctx);
+      const backgroundStyle = this.backgroundStyle;
+      if (backgroundStyle) {
+        ctx.save();
+        ctx.fillStyle = backgroundStyle;
+        ctx.strokeStyle = backgroundStyle;
+        const cornerRadius = this.cornerRadius;
+        const halfRadius = cornerRadius > 0 ? cornerRadius / 2 : 0;
+        if (cornerRadius) {
+          ctx.lineWidth = cornerRadius;
+          ctx.strokeRect(halfRadius, halfRadius, displayWidth - cornerRadius, displayHeight - cornerRadius);
+        }
+        ctx.fillRect(halfRadius, halfRadius, displayWidth - cornerRadius, displayHeight - cornerRadius);
+        ctx.restore();
+      }
+      const textAlign = this.textAlign;
+      const isCenter = textAlign === "center";
+      const isRight = textAlign === "right" || textAlign === "end";
+      const yOffset = (displayHeight - maxHeight) / 2 + padding.top;
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const metrics2 = lineMetrics[i];
+        let tx = padding.left + metrics2.left + strokeWidthHalf;
+        const ty = yOffset + metrics2.y;
+        if (isCenter) {
+          tx = displayWidth / 2;
+        } else if (isRight) {
+          tx = displayWidth - strokeWidthHalf;
+        }
+        if (strokeStyle) {
+          ctx.strokeText(line, tx, ty);
+        }
+        if (fillStyle) {
+          ctx.fillText(line, tx, ty);
+        }
+      }
+      ctx.restore();
+      if (this.texture.binding) {
+        this.texture.binding.update();
+      }
+      return this;
+    }
+    get text() {
+      return this._text;
+    }
+    set text(value) {
+      this.setText(value);
+    }
+    setText(value = "") {
+      if (Array.isArray(value)) {
+        value = value.join("\n");
+      }
+      if (value !== this._text) {
+        this._text = value.toString();
+        this.updateText();
+      }
+      return this;
+    }
+    destroy(reparentChildren) {
+      this.texture.destroy();
+      this.fillStyle = null;
+      this.strokeStyle = null;
+      this.backgroundStyle = null;
+      this.canvas = null;
+      this.context = null;
+      super.destroy(reparentChildren);
+    }
+  };
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/display/AddChildren.ts
+  function AddChildren(parent, ...children) {
+    children.forEach((child) => {
+      AddChild(parent, child);
+    });
+    return children;
+  }
 
   // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/ClearSiblings.ts
   function ClearSiblings(childID) {
@@ -3751,1170 +4464,6 @@ void main (void)
       RemoveChild(parent, child);
     });
     return children;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/vertices/QuadVertexComponent.ts
-  var QuadVertexComponent = defineComponent({
-    values: [Types.f32, 54]
-  });
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/vertices/SetQuadColor.ts
-  function SetQuadColor(id, red, green, blue, alpha) {
-    const data = QuadVertexComponent.values[id];
-    data[5] = red;
-    data[6] = green;
-    data[7] = blue;
-    data[8] = alpha;
-    data[14] = red;
-    data[15] = green;
-    data[16] = blue;
-    data[17] = alpha;
-    data[23] = red;
-    data[24] = green;
-    data[25] = blue;
-    data[26] = alpha;
-    data[32] = red;
-    data[33] = green;
-    data[34] = blue;
-    data[35] = alpha;
-    data[41] = red;
-    data[42] = green;
-    data[43] = blue;
-    data[44] = alpha;
-    data[50] = red;
-    data[51] = green;
-    data[52] = blue;
-    data[53] = alpha;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/vertices/SetQuadPosition.ts
-  function SetQuadPosition(id, x0, y0, x1, y1, x2, y2, x3, y3) {
-    const data = QuadVertexComponent.values[id];
-    data[0] = x0;
-    data[1] = y0;
-    data[9] = x1;
-    data[10] = y1;
-    data[18] = x2;
-    data[19] = y2;
-    data[27] = x0;
-    data[28] = y0;
-    data[36] = x2;
-    data[37] = y2;
-    data[45] = x3;
-    data[46] = y3;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/renderer/webgl1/renderpass/GetVertexBufferEntry.ts
-  var bufferEntry = {
-    buffer: null,
-    F32: null,
-    offset: 0
-  };
-  function GetVertexBufferEntry(renderPass, addToCount = 0) {
-    const buffer = renderPass.vertexbuffer.current;
-    if (renderPass.count + addToCount >= buffer.batchSize) {
-      Flush(renderPass);
-    }
-    bufferEntry.buffer = buffer;
-    bufferEntry.F32 = buffer.vertexViewF32;
-    bufferEntry.offset = renderPass.count * buffer.entryElementSize;
-    renderPass.count += addToCount;
-    return bufferEntry;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/color/UpdateQuadColorSystem.ts
-  function UpdateQuadColorSystem(entities) {
-    let total = 0;
-    const len = entities.length;
-    for (let i = 0; i < len; i++) {
-      const id = entities[i];
-      if (HasDirtyColor(id)) {
-        const r = ColorComponent.r[id] / 255;
-        const g = ColorComponent.g[id] / 255;
-        const b = ColorComponent.b[id] / 255;
-        const a = ColorComponent.a[id];
-        SetQuadColor(id, r, g, b, a);
-        ClearDirtyColor(id);
-        total++;
-      }
-    }
-    return total;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/permissions/WillRenderChildren.ts
-  function WillRenderChildren(id) {
-    return GetVisibleChildren(id) && Boolean(PermissionsComponent.data[id][PERMISSION.WILL_RENDER_CHILDREN]);
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/permissions/HasRenderableChildren.ts
-  function HasRenderableChildren(id, dirtyCamera) {
-    const numChildren = GetNumChildren(id);
-    if (numChildren === 0 || !WillRenderChildren(id)) {
-      return 0;
-    }
-    if (dirtyCamera || !WillCacheChildren(id) || WillCacheChildren(id) && HasDirtyChildCache(id)) {
-      return numChildren;
-    }
-    return 0;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/permissions/SetWillCacheChildren.ts
-  function SetWillCacheChildren(id, value) {
-    PermissionsComponent.data[id][PERMISSION.WILL_CACHE_CHILDREN] = Number(value);
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/permissions/SetWillTransformChildren.ts
-  function SetWillTransformChildren(id, value) {
-    PermissionsComponent.data[id][PERMISSION.WILL_TRANSFORM_CHILDREN] = Number(value);
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/permissions/WillUpdate.ts
-  function WillUpdate(id) {
-    return Boolean(PermissionsComponent.data[id][PERMISSION.WILL_UPDATE]);
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/permissions/WillUpdateChildren.ts
-  function WillUpdateChildren(id) {
-    return Boolean(PermissionsComponent.data[id][PERMISSION.WILL_UPDATE_CHILDREN]);
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/math/vec2/Vec2FromArray.ts
-  function Vec2FromArray(dst, src = [], index = 0) {
-    return dst.set(src[index], src[index + 1]);
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/math/vec2/Vec2ToArray.ts
-  function Vec2ToArray(v, dst = [], index = 0) {
-    dst[index] = v.x;
-    dst[index + 1] = v.y;
-    return dst;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/math/vec2/Vec2.ts
-  var Vec2 = class {
-    x;
-    y;
-    constructor(x = 0, y = 0) {
-      this.set(x, y);
-    }
-    set(x = 0, y = 0) {
-      this.x = x;
-      this.y = y;
-      return this;
-    }
-    toArray(dst = [], index = 0) {
-      return Vec2ToArray(this, dst, index);
-    }
-    fromArray(src, index = 0) {
-      Vec2FromArray(this, src, index);
-      return this;
-    }
-    toString() {
-      return `{ x=${this.x}, y=${this.y} }`;
-    }
-  };
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/ClearDirtyTransforms.ts
-  function ClearDirtyTransforms(id) {
-    const data = Transform2DComponent.data[id];
-    data[TRANSFORM.DIRTY] = 0;
-    data[TRANSFORM.DIRTY_WORLD] = 0;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/SetDirtyChildWorldTransform.ts
-  function SetDirtyChildWorldTransform(id) {
-    DirtyComponent.data[id][DIRTY.CHILD_WORLD_TRANSFORM] = 1;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/transform/UpdateLocalTransform.ts
-  function UpdateLocalTransform(worldID, entities, camera, gameFrame) {
-    const cx = camera.getBoundsX();
-    const cy = camera.getBoundsY();
-    const cright = camera.getBoundsRight();
-    const cbottom = camera.getBoundsBottom();
-    let total = 0;
-    let prevParent = 0;
-    let dirtyWorld = false;
-    const len = entities.length;
-    for (let i = 0; i < len; i++) {
-      const id = entities[i];
-      const data = Transform2DComponent.data[id];
-      if (data[TRANSFORM.DIRTY] === 0) {
-        continue;
-      }
-      const isRoot = data[TRANSFORM.IS_ROOT];
-      const tx = data[TRANSFORM.X];
-      const ty = data[TRANSFORM.Y];
-      const rotation = data[TRANSFORM.ROTATION];
-      const scaleX = data[TRANSFORM.SCALE_X];
-      const scaleY = data[TRANSFORM.SCALE_Y];
-      const skewX = data[TRANSFORM.SKEW_X];
-      const skewY = data[TRANSFORM.SKEW_Y];
-      const axisAligned = data[TRANSFORM.AXIS_ALIGNED];
-      const x = data[TRANSFORM.FRAME_X1];
-      const y = data[TRANSFORM.FRAME_Y1];
-      const right = data[TRANSFORM.FRAME_X2];
-      const bottom = data[TRANSFORM.FRAME_Y2];
-      let a = scaleX;
-      let b = 0;
-      let c = 0;
-      let d = scaleY;
-      if (!axisAligned) {
-        a = Math.cos(rotation + skewY) * scaleX;
-        b = Math.sin(rotation + skewY) * scaleX;
-        c = -Math.sin(rotation - skewX) * scaleY;
-        d = Math.cos(rotation - skewX) * scaleY;
-      }
-      data[TRANSFORM.LOCAL_A] = a;
-      data[TRANSFORM.LOCAL_B] = b;
-      data[TRANSFORM.LOCAL_C] = c;
-      data[TRANSFORM.LOCAL_D] = d;
-      data[TRANSFORM.LOCAL_TX] = tx;
-      data[TRANSFORM.LOCAL_TY] = ty;
-      if (isRoot) {
-        data[TRANSFORM.WORLD_A] = a;
-        data[TRANSFORM.WORLD_B] = b;
-        data[TRANSFORM.WORLD_C] = c;
-        data[TRANSFORM.WORLD_D] = d;
-        data[TRANSFORM.WORLD_TX] = tx;
-        data[TRANSFORM.WORLD_TY] = ty;
-        data[TRANSFORM.UPDATED] = gameFrame;
-        if (axisAligned) {
-          const x0 = x * a + tx;
-          const y0 = y * d + ty;
-          const x1 = x * a + tx;
-          const y1 = bottom * d + ty;
-          const x2 = right * a + tx;
-          const y2 = bottom * d + ty;
-          const x3 = right * a + tx;
-          const y3 = y * d + ty;
-          data[TRANSFORM.BOUNDS_X1] = x0;
-          data[TRANSFORM.BOUNDS_Y1] = y0;
-          data[TRANSFORM.BOUNDS_X2] = x2;
-          data[TRANSFORM.BOUNDS_Y2] = y2;
-          data[TRANSFORM.IN_VIEW] = Number(!(cright < x0 || cbottom < y0 || cx > x2 || cy > y2));
-          SetQuadPosition(id, x0, y0, x1, y1, x2, y2, x3, y3);
-        } else {
-          const x0 = x * a + y * c + tx;
-          const y0 = x * b + y * d + ty;
-          const x1 = x * a + bottom * c + tx;
-          const y1 = x * b + bottom * d + ty;
-          const x2 = right * a + bottom * c + tx;
-          const y2 = right * b + bottom * d + ty;
-          const x3 = right * a + y * c + tx;
-          const y3 = right * b + y * d + ty;
-          const bx = Math.min(x0, x1, x2, x3);
-          const by = Math.min(y0, y1, y2, y3);
-          const br = Math.max(x0, x1, x2, x3);
-          const bb = Math.max(y0, y1, y2, y3);
-          data[TRANSFORM.BOUNDS_X1] = bx;
-          data[TRANSFORM.BOUNDS_Y1] = by;
-          data[TRANSFORM.BOUNDS_X2] = br;
-          data[TRANSFORM.BOUNDS_Y2] = bb;
-          data[TRANSFORM.IN_VIEW] = Number(!(cright < bx || cbottom < by || cx > br || cy > bb));
-          SetQuadPosition(id, x0, y0, x1, y1, x2, y2, x3, y3);
-        }
-        ClearDirtyTransforms(id);
-      } else {
-        const parentID = GetParentID(id);
-        if (parentID !== prevParent) {
-          SetDirtyParents(id);
-          prevParent = parentID;
-        }
-        dirtyWorld = true;
-      }
-      SetDirtyChildTransform(id);
-      total++;
-    }
-    if (dirtyWorld) {
-      SetDirtyChildWorldTransform(worldID);
-    }
-    return total;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/SetDirtyWorldTransform.ts
-  function SetDirtyWorldTransform(id) {
-    Transform2DComponent.data[id][TRANSFORM.DIRTY_WORLD] = 1;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/transform/CopyLocalToWorld.ts
-  function CopyLocalToWorld(source, target) {
-    const targetData = Transform2DComponent.data[target];
-    const sourceData = Transform2DComponent.data[source];
-    targetData[TRANSFORM.WORLD_A] = sourceData[TRANSFORM.LOCAL_A];
-    targetData[TRANSFORM.WORLD_B] = sourceData[TRANSFORM.LOCAL_B];
-    targetData[TRANSFORM.WORLD_C] = sourceData[TRANSFORM.LOCAL_C];
-    targetData[TRANSFORM.WORLD_D] = sourceData[TRANSFORM.LOCAL_D];
-    targetData[TRANSFORM.WORLD_TX] = sourceData[TRANSFORM.LOCAL_TX];
-    targetData[TRANSFORM.WORLD_TY] = sourceData[TRANSFORM.LOCAL_TY];
-    SetDirtyWorldTransform(target);
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/transform/CopyWorldToWorld.ts
-  function CopyWorldToWorld(source, target) {
-    const targetData = Transform2DComponent.data[target];
-    const sourceData = Transform2DComponent.data[source];
-    targetData[TRANSFORM.WORLD_A] = sourceData[TRANSFORM.WORLD_A];
-    targetData[TRANSFORM.WORLD_B] = sourceData[TRANSFORM.WORLD_B];
-    targetData[TRANSFORM.WORLD_C] = sourceData[TRANSFORM.WORLD_C];
-    targetData[TRANSFORM.WORLD_D] = sourceData[TRANSFORM.WORLD_D];
-    targetData[TRANSFORM.WORLD_TX] = sourceData[TRANSFORM.WORLD_TX];
-    targetData[TRANSFORM.WORLD_TY] = sourceData[TRANSFORM.WORLD_TY];
-    SetDirtyWorldTransform(target);
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/transform/MultiplyLocalWithWorld.ts
-  function MultiplyLocalWithWorld(parentID, childID) {
-    const parentData = Transform2DComponent.data[parentID];
-    const childData = Transform2DComponent.data[childID];
-    const pa = parentData[TRANSFORM.WORLD_A];
-    const pb = parentData[TRANSFORM.WORLD_B];
-    const pc = parentData[TRANSFORM.WORLD_C];
-    const pd = parentData[TRANSFORM.WORLD_D];
-    const ptx = parentData[TRANSFORM.WORLD_TX];
-    const pty = parentData[TRANSFORM.WORLD_TY];
-    const a = childData[TRANSFORM.LOCAL_A];
-    const b = childData[TRANSFORM.LOCAL_B];
-    const c = childData[TRANSFORM.LOCAL_C];
-    const d = childData[TRANSFORM.LOCAL_D];
-    const tx = childData[TRANSFORM.LOCAL_TX];
-    const ty = childData[TRANSFORM.LOCAL_TY];
-    childData[TRANSFORM.WORLD_A] = a * pa + b * pc;
-    childData[TRANSFORM.WORLD_B] = a * pb + b * pd;
-    childData[TRANSFORM.WORLD_C] = c * pa + d * pc;
-    childData[TRANSFORM.WORLD_D] = c * pb + d * pd;
-    childData[TRANSFORM.WORLD_TX] = tx * pa + ty * pc + ptx;
-    childData[TRANSFORM.WORLD_TY] = tx * pb + ty * pd + pty;
-    SetDirtyWorldTransform(childID);
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/transform/UpdateWorldTransform.ts
-  function UpdateWorldTransform(id) {
-    const parentID = GetParentID(id);
-    if (!hasComponent(GameObjectWorld, Transform2DComponent, parentID)) {
-      CopyLocalToWorld(id, id);
-    } else if (!WillTransformChildren(id)) {
-      CopyWorldToWorld(parentID, id);
-    } else {
-      MultiplyLocalWithWorld(parentID, id);
-    }
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/ClearDirtyChildTransform.ts
-  function ClearDirtyChildTransform(id) {
-    DirtyComponent.data[id][DIRTY.CHILD_TRANSFORM] = 0;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/ClearDirtyWorldTransform.ts
-  function ClearDirtyWorldTransform(id) {
-    Transform2DComponent.data[id][TRANSFORM.DIRTY_WORLD] = 0;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/HasDirtyWorldTransform.ts
-  function HasDirtyWorldTransform(id) {
-    return Boolean(Transform2DComponent.data[id][TRANSFORM.DIRTY_WORLD]);
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/vertices/SetQuadFromWorld.ts
-  function SetQuadFromWorld(id, gameFrame, cx, cy, cright, cbottom) {
-    const data = Transform2DComponent.data[id];
-    const a = data[TRANSFORM.WORLD_A];
-    const b = data[TRANSFORM.WORLD_B];
-    const c = data[TRANSFORM.WORLD_C];
-    const d = data[TRANSFORM.WORLD_D];
-    const tx = data[TRANSFORM.WORLD_TX];
-    const ty = data[TRANSFORM.WORLD_TY];
-    const x = data[TRANSFORM.FRAME_X1];
-    const y = data[TRANSFORM.FRAME_Y1];
-    const right = data[TRANSFORM.FRAME_X2];
-    const bottom = data[TRANSFORM.FRAME_Y2];
-    const x0 = x * a + y * c + tx;
-    const y0 = x * b + y * d + ty;
-    const x1 = x * a + bottom * c + tx;
-    const y1 = x * b + bottom * d + ty;
-    const x2 = right * a + bottom * c + tx;
-    const y2 = right * b + bottom * d + ty;
-    const x3 = right * a + y * c + tx;
-    const y3 = right * b + y * d + ty;
-    const bx = Math.min(x0, x1, x2, x3);
-    const by = Math.min(y0, y1, y2, y3);
-    const br = Math.max(x0, x1, x2, x3);
-    const bb = Math.max(y0, y1, y2, y3);
-    data[TRANSFORM.BOUNDS_X1] = bx;
-    data[TRANSFORM.BOUNDS_Y1] = by;
-    data[TRANSFORM.BOUNDS_X2] = br;
-    data[TRANSFORM.BOUNDS_Y2] = bb;
-    data[TRANSFORM.IN_VIEW] = Number(!(cright < bx || cbottom < by || cx > br || cy > bb));
-    data[TRANSFORM.UPDATED] = gameFrame;
-    SetQuadPosition(id, x0, y0, x1, y1, x2, y2, x3, y3);
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/components/vertices/UpdateVertexPositionSystem.ts
-  function UpdateVertexPositionSystem(entities, camera, gameFrame) {
-    const cx = camera.getBoundsX();
-    const cy = camera.getBoundsY();
-    const cright = camera.getBoundsRight();
-    const cbottom = camera.getBoundsBottom();
-    let total = 0;
-    const len = entities.length;
-    for (let i = 0; i < len; i++) {
-      const id = entities[i];
-      if (HasDirtyWorldTransform(id)) {
-        SetQuadFromWorld(id, gameFrame, cx, cy, cright, cbottom);
-        ClearDirtyWorldTransform(id);
-        ClearDirtyChildTransform(id);
-        total++;
-      }
-    }
-    return total;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/renderer/webgl1/draw/BatchTexturedQuad.ts
-  function BatchTexturedQuad(F32, offset, textureIndex, x1, y1, x2, y2, x3, y3, x4, y4, u0, v0, u1, v1, r, g, b, a) {
-    F32[offset + 0] = x1;
-    F32[offset + 1] = y1;
-    F32[offset + 2] = u0;
-    F32[offset + 3] = v0;
-    F32[offset + 4] = textureIndex;
-    F32[offset + 5] = r;
-    F32[offset + 6] = g;
-    F32[offset + 7] = b;
-    F32[offset + 8] = a;
-    F32[offset + 9] = x2;
-    F32[offset + 10] = y2;
-    F32[offset + 11] = u0;
-    F32[offset + 12] = v1;
-    F32[offset + 13] = textureIndex;
-    F32[offset + 14] = r;
-    F32[offset + 15] = g;
-    F32[offset + 16] = b;
-    F32[offset + 17] = a;
-    F32[offset + 18] = x3;
-    F32[offset + 19] = y3;
-    F32[offset + 20] = u1;
-    F32[offset + 21] = v1;
-    F32[offset + 22] = textureIndex;
-    F32[offset + 23] = r;
-    F32[offset + 24] = g;
-    F32[offset + 25] = b;
-    F32[offset + 26] = a;
-    F32[offset + 27] = x1;
-    F32[offset + 28] = y1;
-    F32[offset + 29] = u0;
-    F32[offset + 30] = v0;
-    F32[offset + 31] = textureIndex;
-    F32[offset + 32] = r;
-    F32[offset + 33] = g;
-    F32[offset + 34] = b;
-    F32[offset + 35] = a;
-    F32[offset + 36] = x3;
-    F32[offset + 37] = y3;
-    F32[offset + 38] = u1;
-    F32[offset + 39] = v1;
-    F32[offset + 40] = textureIndex;
-    F32[offset + 41] = r;
-    F32[offset + 42] = g;
-    F32[offset + 43] = b;
-    F32[offset + 44] = a;
-    F32[offset + 45] = x4;
-    F32[offset + 46] = y4;
-    F32[offset + 47] = u1;
-    F32[offset + 48] = v0;
-    F32[offset + 49] = textureIndex;
-    F32[offset + 50] = r;
-    F32[offset + 51] = g;
-    F32[offset + 52] = b;
-    F32[offset + 53] = a;
-    return offset + 54;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/renderer/webgl1/draw/DrawFrame.ts
-  function DrawFrame(renderPass, texture, frame2, x, y, alpha = 1, scaleX = 1, scaleY = 1) {
-    const { F32, offset } = GetVertexBufferEntry(renderPass, 2);
-    frame2 = texture.getFrame(frame2);
-    const textureIndex = renderPass.textures.set(texture);
-    const displayWidth = frame2.width * scaleX;
-    const displayHeight = frame2.height * scaleY;
-    BatchTexturedQuad(F32, offset, textureIndex, x, y, x, y + displayHeight, x + displayWidth, y + displayHeight, x + displayWidth, y, frame2.u0, frame2.v0, frame2.u1, frame2.v1, 1, 1, 1, alpha);
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/renderer/webgl1/draw/DrawImage.ts
-  function DrawImage(renderPass, texture, x, y, alpha = 1, scaleX = 1, scaleY = 1) {
-    const { F32, offset } = GetVertexBufferEntry(renderPass, 2);
-    const frame2 = texture.firstFrame;
-    const textureIndex = renderPass.textures.set(texture);
-    const displayWidth = frame2.width * scaleX;
-    const displayHeight = frame2.height * scaleY;
-    BatchTexturedQuad(F32, offset, textureIndex, x, y, x, y + displayHeight, x + displayWidth, y + displayHeight, x + displayWidth, y, frame2.u0, frame2.v0, frame2.u1, frame2.v1, 1, 1, 1, alpha);
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/math/Clamp.ts
-  function Clamp(value, min, max) {
-    return Math.max(min, Math.min(max, value));
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/renderer/webgl1/draw/DrawImagePart.ts
-  function DrawImagePart(renderPass, texture, x0, y0, x1, y1, dx, dy, dw, dh, alpha = 1) {
-    const { F32, offset } = GetVertexBufferEntry(renderPass, 2);
-    const frame2 = texture.firstFrame;
-    const textureIndex = renderPass.textures.set(texture);
-    const frameWidth = frame2.width;
-    const frameHeight = frame2.height;
-    x0 = Clamp(x0, 0, frameWidth);
-    x1 = Clamp(x1, x0, frameWidth);
-    y0 = Clamp(y0, 0, frameHeight);
-    y1 = Clamp(y1, y0, frameHeight);
-    const uRange = frame2.u1 - frame2.u0;
-    const vRange = frame2.v1 - frame2.v0;
-    const u0 = frame2.u0 + uRange * (x0 / frameWidth);
-    const v0 = frame2.v0 + vRange * (y0 / frameHeight);
-    const u1 = frame2.u0 + uRange * (x1 / frameWidth);
-    const v1 = frame2.v0 + vRange * (y1 / frameHeight);
-    if (dw === void 0 || dw === null) {
-      dw = x1 - x0;
-    }
-    if (dh === void 0 || dh === null) {
-      dh = y1 - y0;
-    }
-    BatchTexturedQuad(F32, offset, textureIndex, dx, dy, dx, dy + dh, dx + dw, dy + dh, dx + dw, dy, u0, v0, u1, v1, 1, 1, 1, alpha);
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/renderer/webgl1/draw/DrawQuad.ts
-  function DrawQuad(renderPass, texture, frame2, x0, y0, x1, y1, x2, y2, x3, y3, alpha = 1) {
-    const { F32, offset } = GetVertexBufferEntry(renderPass, 2);
-    frame2 = texture.getFrame(frame2);
-    const textureIndex = renderPass.textures.set(texture);
-    BatchTexturedQuad(F32, offset, textureIndex, x0, y0, x1, y1, x2, y2, x3, y3, frame2.u0, frame2.v0, frame2.u1, frame2.v1, 1, 1, 1, alpha);
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/renderer/webgl1/draw/DrawTiles.ts
-  function DrawTiles(renderPass, texture, tileWidth, tileHeight, mapData, mapWidth, x = 0, y = 0, alpha = 1) {
-    let tx = 0;
-    let ty = 0;
-    let i = 0;
-    mapData.forEach((tile) => {
-      if (tile !== -1) {
-        DrawFrame(renderPass, texture, tile, Math.floor(x + tx), Math.floor(y + ty), alpha);
-      }
-      i++;
-      tx += tileWidth;
-      if (i === mapWidth) {
-        tx = 0;
-        ty += tileHeight;
-        i = 0;
-      }
-    });
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/renderer/webgl1/draw/BatchTriangle.ts
-  function BatchTriangle(F32, offset, textureIndex, x1, y1, x2, y2, x3, y3, r, g, b, a) {
-    F32.set([
-      x1,
-      y1,
-      0,
-      0,
-      textureIndex,
-      r,
-      g,
-      b,
-      a,
-      x2,
-      y2,
-      0,
-      1,
-      textureIndex,
-      r,
-      g,
-      b,
-      a,
-      x3,
-      y3,
-      1,
-      1,
-      textureIndex,
-      r,
-      g,
-      b,
-      a
-    ], offset);
-    return offset + 27;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/geom/circle/CircleContains.ts
-  function CircleContains(circle2, x, y) {
-    if (circle2.radius > 0 && x >= circle2.left && x <= circle2.right && y >= circle2.top && y <= circle2.bottom) {
-      const dx = (circle2.x - x) * (circle2.x - x);
-      const dy = (circle2.y - y) * (circle2.y - y);
-      return dx + dy <= circle2.radius * circle2.radius;
-    } else {
-      return false;
-    }
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/geom/circle/Circle.ts
-  var Circle = class {
-    x;
-    y;
-    _radius;
-    _diameter;
-    constructor(x = 0, y = 0, radius = 0) {
-      this.set(x, y, radius);
-    }
-    set(x = 0, y = 0, radius = 0) {
-      this.x = x;
-      this.y = y;
-      this.radius = radius;
-      return this;
-    }
-    contains(x, y) {
-      return CircleContains(this, x, y);
-    }
-    get radius() {
-      return this._radius;
-    }
-    set radius(value) {
-      this._radius = value;
-      this._diameter = value * 2;
-    }
-    get diameter() {
-      return this._diameter;
-    }
-    set diameter(value) {
-      this._diameter = value;
-      this._radius = value * 0.5;
-    }
-    get left() {
-      return this.x - this._radius;
-    }
-    set left(value) {
-      this.x = value + this._radius;
-    }
-    get right() {
-      return this.x + this._radius;
-    }
-    set right(value) {
-      this.x = value - this._radius;
-    }
-    get top() {
-      return this.y - this._radius;
-    }
-    set top(value) {
-      this.y = value + this._radius;
-    }
-    get bottom() {
-      return this.y + this._radius;
-    }
-    set bottom(value) {
-      this.y = value - this._radius;
-    }
-  };
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/math/FromPercent.ts
-  function FromPercent(percent, min, max) {
-    percent = Clamp(percent, 0, 1);
-    return (max - min) * percent;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/geom/circle/GetCircleCircumference.ts
-  function GetCircleCircumference(circle2) {
-    return 2 * (Math.PI * circle2.radius);
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/geom/circle/GetCircleCircumferencePoint.ts
-  function GetCircleCircumferencePoint(circle2, angle, out = new Vec2()) {
-    return out.set(circle2.x + circle2.radius * Math.cos(angle), circle2.y + circle2.radius * Math.sin(angle));
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/math/const.ts
-  var MATH_CONST = {
-    PI2: Math.PI * 2,
-    HALF_PI: Math.PI * 0.5,
-    EPSILON: 1e-6,
-    DEG_TO_RAD: Math.PI / 180,
-    RAD_TO_DEG: 180 / Math.PI,
-    MIN_SAFE_INTEGER: Number.MIN_SAFE_INTEGER || -9007199254740991,
-    MAX_SAFE_INTEGER: Number.MAX_SAFE_INTEGER || 9007199254740991
-  };
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/geom/circle/GetCirclePointsBetween.ts
-  function GetCirclePointsBetween(circle2, startAngle, endAngle, step, anticlockwise = false, includeCenter = false, quantity = 0, out = []) {
-    if (!quantity) {
-      quantity = GetCircleCircumference(circle2) / step;
-    }
-    for (let i = 0; i < quantity; i++) {
-      const angle = FromPercent(i / quantity, 0, MATH_CONST.PI2);
-      if (angle >= startAngle && angle <= endAngle) {
-        out.push(GetCircleCircumferencePoint(circle2, angle));
-      }
-    }
-    if (anticlockwise) {
-      out = out.reverse();
-    }
-    if (includeCenter) {
-      out.push(new Vec2(circle2.x, circle2.y));
-    }
-    return out;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/geom/PolyPartition.ts
-  function Area(a, b, c) {
-    return (b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y);
-  }
-  function IsConvex(p1, p2, p3) {
-    return Area(p1, p2, p3) < 0;
-  }
-  function Equals(a, b) {
-    return a.x === b.x && a.y === b.y;
-  }
-  function IsClockwise(polygon) {
-    let sum = 0;
-    for (let i = 0, len = polygon.length; i < len; ++i) {
-      const p1 = polygon[i];
-      const p2 = polygon[(i + 1) % len];
-      sum += (p2.x - p1.x) * (p2.y + p1.y);
-    }
-    return sum > 0;
-  }
-  function UpdateVertex(vertex, vertices) {
-    if (!vertex.shouldUpdate) {
-      return;
-    }
-    vertex.shouldUpdate = false;
-    const v1 = vertex.prev.point;
-    const v2 = vertex.point;
-    const v3 = vertex.next.point;
-    vertex.isConvex = IsConvex(v1, v2, v3);
-    let v1x = v1.x - v2.x;
-    let v1y = v1.y - v2.y;
-    const v1Len = Math.sqrt(v1x * v1x + v1y * v1y);
-    v1x /= v1Len;
-    v1y /= v1Len;
-    let v3x = v3.x - v2.x;
-    let v3y = v3.y - v2.y;
-    const v3Len = Math.sqrt(v3x * v3x + v3y * v3y);
-    v3x /= v3Len;
-    v3y /= v3Len;
-    vertex.angleCos = v1x * v3x + v1y * v3y;
-    if (vertex.isConvex) {
-      vertex.isEar = true;
-      for (let i = 0, len = vertices.length; i < len; ++i) {
-        const curr = vertices[i];
-        if (!curr.isActive || curr === vertex) {
-          continue;
-        }
-        if (Equals(v1, curr.point) || Equals(v2, curr.point) || Equals(v3, curr.point)) {
-          continue;
-        }
-        const areaA = Area(v1, curr.point, v2);
-        const areaB = Area(v2, curr.point, v3);
-        const areaC = Area(v3, curr.point, v1);
-        if (areaA > 0 && areaB > 0 && areaC > 0) {
-          vertex.isEar = false;
-          break;
-        }
-        if (areaA === 0 && areaB >= 0 && areaC >= 0) {
-          if (Area(v1, curr.prev.point, v2) > 0 || Area(v1, curr.next.point, v2) > 0) {
-            vertex.isEar = false;
-            break;
-          }
-        }
-        if (areaB === 0 && areaA >= 0 && areaC >= 0) {
-          if (Area(v2, curr.prev.point, v3) > 0 || Area(v2, curr.next.point, v3) > 0) {
-            vertex.isEar = false;
-            break;
-          }
-        }
-        if (areaC === 0 && areaA >= 0 && areaB >= 0) {
-          if (Area(v3, curr.prev.point, v1) > 0 || Area(v3, curr.next.point, v1) > 0) {
-            vertex.isEar = false;
-            break;
-          }
-        }
-      }
-    } else {
-      vertex.isEar = false;
-    }
-  }
-  function RemoveCollinearOrDuplicate(start) {
-    for (let curr = start, end = start; ; ) {
-      if (Equals(curr.point, curr.next.point) || Area(curr.prev.point, curr.point, curr.next.point) === 0) {
-        curr.prev.next = curr.next;
-        curr.next.prev = curr.prev;
-        curr.prev.shouldUpdate = true;
-        curr.next.shouldUpdate = true;
-        if (curr === curr.next) {
-          break;
-        }
-        end = curr.prev;
-        curr = curr.next;
-        continue;
-      }
-      curr = curr.next;
-      if (curr === end) {
-        break;
-      }
-    }
-  }
-  function Triangulate(polygon, doNotCheckOrdering = false) {
-    if (!doNotCheckOrdering) {
-      if (IsClockwise(polygon)) {
-        throw new Error("Polygon should be counterclockwise");
-      }
-    }
-    if (polygon.length < 4) {
-      return [polygon];
-    }
-    const len = polygon.length;
-    const vertices = [];
-    const triangles = [];
-    for (let i = 0; i < len; ++i) {
-      vertices.push({
-        isActive: true,
-        isConvex: false,
-        isEar: false,
-        point: polygon[i],
-        angleCos: 0,
-        shouldUpdate: true,
-        index: i
-      });
-    }
-    for (let i = 0; i < len; ++i) {
-      const vertex = vertices[i];
-      vertex.prev = vertices[(i + len - 1) % len];
-      vertex.next = vertices[(i + 1) % len];
-    }
-    vertices.forEach((vertex) => UpdateVertex(vertex, vertices));
-    for (let i = 0; i < len - 3; ++i) {
-      let ear = null;
-      for (let j = 0; j < len; ++j) {
-        const vertex = vertices[j];
-        if (!vertex.isActive || !vertex.isEar) {
-          continue;
-        }
-        if (!ear) {
-          ear = vertex;
-        } else if (vertex.angleCos > ear.angleCos) {
-          ear = vertex;
-        }
-      }
-      if (!ear) {
-        for (let i2 = 0; i2 < len; ++i2) {
-          const vertex = vertices[i2];
-          if (vertex.isActive) {
-            const p1 = vertex.prev.point;
-            const p2 = vertex.point;
-            const p3 = vertex.next.point;
-            if (Math.abs(Area(p1, p2, p3)) > 1e-5) {
-              throw new Error("Failed to find ear. There may be self-intersection in the polygon.");
-            }
-          }
-        }
-        break;
-      }
-      triangles.push([ear.prev.point, ear.point, ear.next.point]);
-      ear.isActive = false;
-      ear.prev.next = ear.next;
-      ear.next.prev = ear.prev;
-      ear.prev.shouldUpdate = true;
-      ear.next.shouldUpdate = true;
-      RemoveCollinearOrDuplicate(ear.next);
-      if (i === len - 4) {
-        break;
-      }
-      for (let i2 = 0; i2 < len; ++i2) {
-        UpdateVertex(vertices[i2], vertices);
-      }
-    }
-    for (let i = 0; i < len; ++i) {
-      const vertex = vertices[i];
-      if (vertex.isActive) {
-        vertex.prev.isActive = false;
-        vertex.next.isActive = false;
-        const p1 = vertex.prev.point;
-        const p2 = vertex.point;
-        const p3 = vertex.next.point;
-        if (Math.abs(Area(p1, p2, p3)) > 1e-5) {
-          triangles.push([p1, p2, p3]);
-        }
-      }
-    }
-    return triangles;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/renderer/webgl1/draw/FillArc.ts
-  var circle;
-  function FillArc(renderPass, x, y, radius, startAngle, endAngle, steps, anticlockwise, includeCenter, red, green, blue, alpha) {
-    if (!circle) {
-      circle = new Circle();
-    }
-    circle.set(x, y, radius);
-    const points = GetCirclePointsBetween(circle, startAngle, endAngle, steps, anticlockwise, includeCenter);
-    const tris = Triangulate(points);
-    if (!tris.length) {
-      return;
-    }
-    const { F32, offset } = GetVertexBufferEntry(renderPass, tris.length);
-    const textureIndex = renderPass.textures.setWhite();
-    let idx = offset;
-    tris.forEach((tri) => {
-      idx = BatchTriangle(F32, idx, textureIndex, tri[0].x, tri[0].y, tri[1].x, tri[1].y, tri[2].x, tri[2].y, red, green, blue, alpha);
-    });
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/renderer/webgl1/draw/BatchQuad.ts
-  function BatchQuad(F32, offset, textureIndex, x1, y1, x2, y2, x3, y3, x4, y4, r, g, b, a) {
-    F32.set([
-      x1,
-      y1,
-      0,
-      0,
-      textureIndex,
-      r,
-      g,
-      b,
-      a,
-      x2,
-      y2,
-      0,
-      1,
-      textureIndex,
-      r,
-      g,
-      b,
-      a,
-      x3,
-      y3,
-      1,
-      1,
-      textureIndex,
-      r,
-      g,
-      b,
-      a,
-      x1,
-      y1,
-      0,
-      0,
-      textureIndex,
-      r,
-      g,
-      b,
-      a,
-      x3,
-      y3,
-      1,
-      1,
-      textureIndex,
-      r,
-      g,
-      b,
-      a,
-      x4,
-      y4,
-      1,
-      0,
-      textureIndex,
-      r,
-      g,
-      b,
-      a
-    ], offset);
-    return offset + 54;
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/renderer/webgl1/draw/FillLine.ts
-  function FillLine(renderPass, x1, y1, x2, y2, width, red, green, blue, alpha) {
-    const { F32, offset } = GetVertexBufferEntry(renderPass, 2);
-    const textureIndex = renderPass.textures.setWhite();
-    const dx = x2 - x1;
-    const dy = y2 - y1;
-    const len = Math.sqrt(dx * dx + dy * dy);
-    width *= 0.5;
-    const al0 = width * (y2 - y1) / len;
-    const al1 = width * (x1 - x2) / len;
-    const bl0 = width * (y2 - y1) / len;
-    const bl1 = width * (x1 - x2) / len;
-    BatchQuad(F32, offset, textureIndex, Math.floor(x1 + al0), Math.floor(y1 + al1), Math.floor(x1 - al0), Math.floor(y1 - al1), Math.floor(x2 - bl0), Math.floor(y2 - bl1), Math.floor(x2 + bl0), Math.floor(y2 + bl1), red, green, blue, alpha);
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/renderer/webgl1/draw/FillRect.ts
-  function FillRect(renderPass, x, y, width, height, red, green, blue, alpha) {
-    const { F32, offset } = GetVertexBufferEntry(renderPass, 2);
-    const textureIndex = renderPass.textures.setWhite();
-    x = Math.round(x);
-    y = Math.round(y);
-    BatchQuad(F32, offset, textureIndex, x, y, x, y + height, x + width, y + height, x + width, y, red, green, blue, alpha);
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/renderer/webgl1/draw/FillTriangle.ts
-  function FillTriangle(renderPass, x1, y1, x2, y2, x3, y3, red, green, blue, alpha) {
-    const { F32, offset } = GetVertexBufferEntry(renderPass, 1);
-    const textureIndex = renderPass.textures.setWhite();
-    BatchTriangle(F32, offset, textureIndex, x1, y1, x2, y2, x3, y3, red, green, blue, alpha);
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/gameobjects/directdraw/DirectDraw.ts
-  var DirectDraw = class extends GameObject {
-    type = "DirectDraw";
-    red = 1;
-    green = 1;
-    blue = 1;
-    alpha = 1;
-    smoothness = 8;
-    renderPass;
-    _color;
-    constructor() {
-      super();
-    }
-    set color(value) {
-      if (value !== void 0 && value !== this._color) {
-        this.red = (value >> 16 & 255) / 255;
-        this.green = (value >> 8 & 255) / 255;
-        this.blue = (value & 255) / 255;
-        this._color = value;
-      }
-    }
-    setRGB(red, green, blue, alpha = 1) {
-      this.red = red / 255;
-      this.green = green / 255;
-      this.blue = blue / 255;
-      this.alpha = alpha;
-      return this;
-    }
-    arc(x, y, radius, startAngle = 0, endAngle = 6.283185307179586, anticlockwise = false, includeCenter = false, color) {
-      this.color = color;
-      FillArc(this.renderPass, x, y, radius, startAngle, endAngle, this.smoothness, anticlockwise, includeCenter, this.red, this.green, this.blue, this.alpha);
-      return this;
-    }
-    circle(x, y, radius, color) {
-      this.color = color;
-      FillArc(this.renderPass, x, y, radius, 0, Math.PI * 2, this.smoothness, false, false, this.red, this.green, this.blue, this.alpha);
-      return this;
-    }
-    plot(x, y, color) {
-      this.color = color;
-      FillRect(this.renderPass, x, y, 1, 1, this.red, this.green, this.blue, this.alpha);
-      return this;
-    }
-    box(x, y, width, height, thickness = 1, color) {
-      this.color = color;
-      const tw = thickness * 0.5;
-      this.line(x, y + tw, x + width, y + tw, thickness);
-      this.line(x, y + height - tw, x + width, y + height - tw, thickness);
-      this.line(x + tw, y + thickness, x + tw, y + height - thickness, thickness);
-      this.line(x + width - tw, y + thickness, x + width - tw, y + height - thickness, thickness);
-      return this;
-    }
-    rect(x, y, width, height, color) {
-      this.color = color;
-      FillRect(this.renderPass, x, y, width, height, this.red, this.green, this.blue, this.alpha);
-      return this;
-    }
-    triangle(x1, y1, x2, y2, x3, y3, color) {
-      this.color = color;
-      FillTriangle(this.renderPass, x1, y1, x2, y2, x3, y3, this.red, this.green, this.blue, this.alpha);
-      return this;
-    }
-    line(x1, y1, x2, y2, width, color) {
-      this.color = color;
-      FillLine(this.renderPass, x1, y1, x2, y2, width, this.red, this.green, this.blue, this.alpha);
-      return this;
-    }
-    image(texture, x, y, alpha = 1, scaleX = 1, scaleY = 1) {
-      DrawImage(this.renderPass, texture, x, y, alpha, scaleX, scaleY);
-      return this;
-    }
-    imagePart(texture, x0, y0, x1, y1, dx, dy, dw, dh, alpha = 1) {
-      DrawImagePart(this.renderPass, texture, x0, y0, x1, y1, dx, dy, dw, dh, alpha);
-      return this;
-    }
-    frame(texture, frame2, x, y, alpha = 1, scaleX = 1, scaleY = 1) {
-      DrawFrame(this.renderPass, texture, frame2, x, y, alpha, scaleX, scaleY);
-      return this;
-    }
-    quad(texture, frame2, x0, y0, x1, y1, x2, y2, x3, y3, alpha = 1) {
-      DrawQuad(this.renderPass, texture, frame2, x0, y0, x1, y1, x2, y2, x3, y3, alpha);
-      return this;
-    }
-    tiles(texture, tileWidth, tileHeight, mapData, mapWidth, x = 0, y = 0) {
-      DrawTiles(this.renderPass, texture, tileWidth, tileHeight, mapData, mapWidth, x, y, this.alpha);
-      return this;
-    }
-    render() {
-    }
-    renderGL(renderPass) {
-      this.renderPass = renderPass;
-      this.render();
-    }
-  };
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/textures/CreateCanvas.ts
-  function CreateCanvas(width, height) {
-    const canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
-    return canvas.getContext("2d");
-  }
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/textures/TextureManager.ts
-  var TextureManager = class {
-    textures;
-    constructor() {
-      TextureManagerInstance.set(this);
-      this.textures = new Map();
-      this.createDefaultTextures();
-    }
-    createDefaultTextures() {
-      this.add("__BLANK", new Texture(CreateCanvas(2, 2).canvas));
-      const missing = CreateCanvas(32, 32);
-      missing.strokeStyle = "#0f0";
-      missing.moveTo(0, 0);
-      missing.lineTo(32, 32);
-      missing.stroke();
-      missing.strokeRect(0.5, 0.5, 31, 31);
-      this.add("__MISSING", new Texture(missing.canvas));
-      const white = CreateCanvas(2, 2);
-      white.fillStyle = "#fff";
-      white.fillRect(0, 0, 2, 2);
-      const whiteTexture = this.add("__WHITE", new Texture(white.canvas));
-      WhiteTexture.set(whiteTexture);
-    }
-    get(key) {
-      const textures = this.textures;
-      if (textures.has(key)) {
-        return textures.get(key);
-      } else {
-        return textures.get("__MISSING");
-      }
-    }
-    has(key) {
-      return this.textures.has(key);
-    }
-    add(key, source, glConfig) {
-      let texture;
-      if (!this.textures.has(key)) {
-        if (source instanceof Texture) {
-          texture = source;
-        } else {
-          texture = new Texture(source, 0, 0, glConfig);
-        }
-        texture.key = key;
-        this.textures.set(key, texture);
-      }
-      return texture;
-    }
-    update(key, source, glConfig) {
-      const texture = this.textures.get(key);
-      if (texture) {
-        texture.update(source, glConfig);
-      }
-      return texture;
-    }
-  };
-
-  // Users/rich/Documents/GitHub/phaser-genesis/src/textures/CreateTextureManager.ts
-  function CreateTextureManager() {
-    new TextureManager();
   }
 
   // Users/rich/Documents/GitHub/phaser-genesis/src/config/banner/AddBanner.ts
@@ -5134,6 +4683,67 @@ void main (void)
     new SceneManager();
   }
 
+  // Users/rich/Documents/GitHub/phaser-genesis/src/textures/TextureManager.ts
+  var TextureManager = class {
+    textures;
+    constructor() {
+      TextureManagerInstance.set(this);
+      this.textures = new Map();
+      this.createDefaultTextures();
+    }
+    createDefaultTextures() {
+      this.add("__BLANK", new Texture(CreateCanvas(2, 2).canvas));
+      const missing = CreateCanvas(32, 32);
+      missing.strokeStyle = "#0f0";
+      missing.moveTo(0, 0);
+      missing.lineTo(32, 32);
+      missing.stroke();
+      missing.strokeRect(0.5, 0.5, 31, 31);
+      this.add("__MISSING", new Texture(missing.canvas));
+      const white = CreateCanvas(2, 2);
+      white.fillStyle = "#fff";
+      white.fillRect(0, 0, 2, 2);
+      const whiteTexture = this.add("__WHITE", new Texture(white.canvas));
+      WhiteTexture.set(whiteTexture);
+    }
+    get(key) {
+      const textures = this.textures;
+      if (textures.has(key)) {
+        return textures.get(key);
+      } else {
+        return textures.get("__MISSING");
+      }
+    }
+    has(key) {
+      return this.textures.has(key);
+    }
+    add(key, source, glConfig) {
+      let texture;
+      if (!this.textures.has(key)) {
+        if (source instanceof Texture) {
+          texture = source;
+        } else {
+          texture = new Texture(source, 0, 0, glConfig);
+        }
+        texture.key = key;
+        this.textures.set(key, texture);
+      }
+      return texture;
+    }
+    update(key, source, glConfig) {
+      const texture = this.textures.get(key);
+      if (texture) {
+        texture.update(source, glConfig);
+      }
+      return texture;
+    }
+  };
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/textures/CreateTextureManager.ts
+  function CreateTextureManager() {
+    new TextureManager();
+  }
+
   // Users/rich/Documents/GitHub/phaser-genesis/src/dom/DOMContentLoaded.ts
   function DOMContentLoaded(callback) {
     const readyState = document.readyState;
@@ -5331,6 +4941,107 @@ void main (void)
     }
   };
 
+  // Users/rich/Documents/GitHub/phaser-genesis/src/loader/CreateFile.ts
+  function CreateFile(key, url, skipCache = false) {
+    return {
+      key,
+      url,
+      skipCache
+    };
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/loader/IsAbsoluteURI.ts
+  function IsAbsoluteURI(url) {
+    return /^(?:blob:|data:|http:\/\/|https:\/\/|\/\/)/.test(url);
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/loader/GetURL.ts
+  function GetURL(key, url, extension, loader) {
+    if (!url) {
+      url = `${key}.${extension}`;
+    }
+    if (IsAbsoluteURI(url)) {
+      return url;
+    } else if (loader) {
+      return `${loader.baseURL}${loader.path}${url}`;
+    } else {
+      return url;
+    }
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/loader/RequestFile.ts
+  async function RequestFile(file, preload, onload, fileData) {
+    if (!preload(file)) {
+      return Promise.reject(file);
+    }
+    try {
+      const request = new Request(file.url, fileData?.requestInit);
+      file.response = await fetch(request);
+      if (file.response.ok && await onload(file)) {
+        return Promise.resolve(file);
+      } else {
+        return Promise.reject(file);
+      }
+    } catch (error) {
+      file.error = error;
+      return Promise.reject(file);
+    }
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/loader/files/ImageFile.ts
+  function ImageFile(key, url, fileData = {}) {
+    return (loader) => {
+      const file = CreateFile(key, GetURL(key, url, "png", loader), fileData?.skipCache);
+      const textureManager = TextureManagerInstance.get();
+      const preload = () => {
+        return textureManager && (!textureManager.has(key) || !textureManager.get(key).locked);
+      };
+      const onload = async (file2) => {
+        const blob = await file2.response.blob();
+        let image;
+        if (window && "createImageBitmap" in window && !fileData?.getImage) {
+          image = await createImageBitmap(blob);
+        } else {
+          image = await new Promise((resolve, reject) => {
+            const url2 = URL.createObjectURL(blob);
+            const img = new Image();
+            img.onload = () => {
+              URL.revokeObjectURL(url2);
+              resolve(img);
+            };
+            img.onerror = () => {
+              reject();
+            };
+            img.src = url2;
+            if (img.complete && img.width && img.height) {
+              img.onload = null;
+              img.onerror = null;
+              resolve(img);
+            }
+          });
+        }
+        if (!image) {
+          return false;
+        }
+        if (fileData.skipCache) {
+          file2.data = image;
+        } else if (textureManager.has(key)) {
+          file2.data = textureManager.update(key, image, fileData?.glConfig);
+        } else {
+          file2.data = textureManager.add(key, image, fileData?.glConfig);
+        }
+        return true;
+      };
+      return RequestFile(file, preload, onload, fileData);
+    };
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/loader/files/LoadImageFile.ts
+  async function LoadImageFile(key, url, fileData = {}) {
+    const load = ImageFile(key, url, fileData);
+    return load();
+  }
+
   // Users/rich/Documents/GitHub/phaser-genesis/src/world/events/WorldAfterUpdateEvent.ts
   var WorldAfterUpdateEvent = "afterupdate";
 
@@ -5348,6 +5059,23 @@ void main (void)
 
   // Users/rich/Documents/GitHub/phaser-genesis/src/world/events/WorldUpdateEvent.ts
   var WorldUpdateEvent = "update";
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/permissions/WillRenderChildren.ts
+  function WillRenderChildren(id) {
+    return GetVisibleChildren(id) && Boolean(PermissionsComponent.data[id][PERMISSION.WILL_RENDER_CHILDREN]);
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/permissions/HasRenderableChildren.ts
+  function HasRenderableChildren(id, dirtyCamera) {
+    const numChildren = GetNumChildren(id);
+    if (numChildren === 0 || !WillRenderChildren(id)) {
+      return 0;
+    }
+    if (dirtyCamera || !WillCacheChildren(id) || WillCacheChildren(id) && HasDirtyChildCache(id)) {
+      return numChildren;
+    }
+    return 0;
+  }
 
   // Users/rich/Documents/GitHub/phaser-genesis/src/components/transform/IsInView.ts
   function IsInView(id) {
@@ -5394,6 +5122,11 @@ void main (void)
 
   // Users/rich/Documents/GitHub/phaser-genesis/src/scenes/events/SceneDestroyEvent.ts
   var SceneDestroyEvent = "destroy";
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/permissions/WillUpdate.ts
+  function WillUpdate(id) {
+    return Boolean(PermissionsComponent.data[id][PERMISSION.WILL_UPDATE]);
+  }
 
   // Users/rich/Documents/GitHub/phaser-genesis/src/world/BaseWorld.ts
   var BaseWorld = class extends GameObject {
@@ -5477,6 +5210,11 @@ void main (void)
     DirtyComponent.data[id][DIRTY.CHILD_COLOR] = 0;
   }
 
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/ClearDirtyChildTransform.ts
+  function ClearDirtyChildTransform(id) {
+    DirtyComponent.data[id][DIRTY.CHILD_TRANSFORM] = 0;
+  }
+
   // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/ClearDirtyChildWorldTransform.ts
   function ClearDirtyChildWorldTransform(id) {
     DirtyComponent.data[id][DIRTY.CHILD_WORLD_TRANSFORM] = 0;
@@ -5495,6 +5233,11 @@ void main (void)
   // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/HasDirtyChildWorldTransform.ts
   function HasDirtyChildWorldTransform(id) {
     return Boolean(DirtyComponent.data[id][DIRTY.CHILD_WORLD_TRANSFORM]);
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/permissions/WillUpdateChildren.ts
+  function WillUpdateChildren(id) {
+    return Boolean(PermissionsComponent.data[id][PERMISSION.WILL_UPDATE_CHILDREN]);
   }
 
   // Users/rich/Documents/GitHub/phaser-genesis/src/components/hierarchy/MoveNextUpdatable.ts
@@ -5517,6 +5260,74 @@ void main (void)
     }
   }
 
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/SetDirtyWorldTransform.ts
+  function SetDirtyWorldTransform(id) {
+    Transform2DComponent.data[id][TRANSFORM.DIRTY_WORLD] = 1;
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/transform/CopyLocalToWorld.ts
+  function CopyLocalToWorld(source, target) {
+    const targetData = Transform2DComponent.data[target];
+    const sourceData = Transform2DComponent.data[source];
+    targetData[TRANSFORM.WORLD_A] = sourceData[TRANSFORM.LOCAL_A];
+    targetData[TRANSFORM.WORLD_B] = sourceData[TRANSFORM.LOCAL_B];
+    targetData[TRANSFORM.WORLD_C] = sourceData[TRANSFORM.LOCAL_C];
+    targetData[TRANSFORM.WORLD_D] = sourceData[TRANSFORM.LOCAL_D];
+    targetData[TRANSFORM.WORLD_TX] = sourceData[TRANSFORM.LOCAL_TX];
+    targetData[TRANSFORM.WORLD_TY] = sourceData[TRANSFORM.LOCAL_TY];
+    SetDirtyWorldTransform(target);
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/transform/CopyWorldToWorld.ts
+  function CopyWorldToWorld(source, target) {
+    const targetData = Transform2DComponent.data[target];
+    const sourceData = Transform2DComponent.data[source];
+    targetData[TRANSFORM.WORLD_A] = sourceData[TRANSFORM.WORLD_A];
+    targetData[TRANSFORM.WORLD_B] = sourceData[TRANSFORM.WORLD_B];
+    targetData[TRANSFORM.WORLD_C] = sourceData[TRANSFORM.WORLD_C];
+    targetData[TRANSFORM.WORLD_D] = sourceData[TRANSFORM.WORLD_D];
+    targetData[TRANSFORM.WORLD_TX] = sourceData[TRANSFORM.WORLD_TX];
+    targetData[TRANSFORM.WORLD_TY] = sourceData[TRANSFORM.WORLD_TY];
+    SetDirtyWorldTransform(target);
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/transform/MultiplyLocalWithWorld.ts
+  function MultiplyLocalWithWorld(parentID, childID) {
+    const parentData = Transform2DComponent.data[parentID];
+    const childData = Transform2DComponent.data[childID];
+    const pa = parentData[TRANSFORM.WORLD_A];
+    const pb = parentData[TRANSFORM.WORLD_B];
+    const pc = parentData[TRANSFORM.WORLD_C];
+    const pd = parentData[TRANSFORM.WORLD_D];
+    const ptx = parentData[TRANSFORM.WORLD_TX];
+    const pty = parentData[TRANSFORM.WORLD_TY];
+    const a = childData[TRANSFORM.LOCAL_A];
+    const b = childData[TRANSFORM.LOCAL_B];
+    const c = childData[TRANSFORM.LOCAL_C];
+    const d = childData[TRANSFORM.LOCAL_D];
+    const tx = childData[TRANSFORM.LOCAL_TX];
+    const ty = childData[TRANSFORM.LOCAL_TY];
+    childData[TRANSFORM.WORLD_A] = a * pa + b * pc;
+    childData[TRANSFORM.WORLD_B] = a * pb + b * pd;
+    childData[TRANSFORM.WORLD_C] = c * pa + d * pc;
+    childData[TRANSFORM.WORLD_D] = c * pb + d * pd;
+    childData[TRANSFORM.WORLD_TX] = tx * pa + ty * pc + ptx;
+    childData[TRANSFORM.WORLD_TY] = tx * pb + ty * pd + pty;
+    SetDirtyWorldTransform(childID);
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/transform/UpdateWorldTransform.ts
+  function UpdateWorldTransform(id) {
+    const parentID = GetParentID(id);
+    if (!hasComponent(GameObjectWorld, Transform2DComponent, parentID)) {
+      CopyLocalToWorld(id, id);
+    } else if (!WillTransformChildren(id)) {
+      CopyWorldToWorld(parentID, id);
+    } else {
+      MultiplyLocalWithWorld(parentID, id);
+    }
+  }
+
   // Users/rich/Documents/GitHub/phaser-genesis/src/world/RebuildWorldTransforms.ts
   function RebuildWorldTransforms(entities) {
     let total = 0;
@@ -5530,6 +5341,16 @@ void main (void)
       }
     }
     return total;
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/permissions/SetWillCacheChildren.ts
+  function SetWillCacheChildren(id, value) {
+    PermissionsComponent.data[id][PERMISSION.WILL_CACHE_CHILDREN] = Number(value);
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/permissions/SetWillTransformChildren.ts
+  function SetWillTransformChildren(id, value) {
+    PermissionsComponent.data[id][PERMISSION.WILL_TRANSFORM_CHILDREN] = Number(value);
   }
 
   // Users/rich/Documents/GitHub/phaser-genesis/src/components/transform/SetInViewFromBounds.ts
@@ -5563,6 +5384,207 @@ void main (void)
     return total;
   }
 
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/ClearDirtyTransforms.ts
+  function ClearDirtyTransforms(id) {
+    const data = Transform2DComponent.data[id];
+    data[TRANSFORM.DIRTY] = 0;
+    data[TRANSFORM.DIRTY_WORLD] = 0;
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/SetDirtyChildWorldTransform.ts
+  function SetDirtyChildWorldTransform(id) {
+    DirtyComponent.data[id][DIRTY.CHILD_WORLD_TRANSFORM] = 1;
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/transform/UpdateLocalTransform.ts
+  function UpdateLocalTransform(worldID, entities, camera, gameFrame) {
+    const cx = camera.getBoundsX();
+    const cy = camera.getBoundsY();
+    const cright = camera.getBoundsRight();
+    const cbottom = camera.getBoundsBottom();
+    let total = 0;
+    let prevParent = 0;
+    let dirtyWorld = false;
+    const len = entities.length;
+    for (let i = 0; i < len; i++) {
+      const id = entities[i];
+      const data = Transform2DComponent.data[id];
+      if (data[TRANSFORM.DIRTY] === 0) {
+        continue;
+      }
+      const isRoot = data[TRANSFORM.IS_ROOT];
+      const tx = data[TRANSFORM.X];
+      const ty = data[TRANSFORM.Y];
+      const rotation = data[TRANSFORM.ROTATION];
+      const scaleX = data[TRANSFORM.SCALE_X];
+      const scaleY = data[TRANSFORM.SCALE_Y];
+      const skewX = data[TRANSFORM.SKEW_X];
+      const skewY = data[TRANSFORM.SKEW_Y];
+      const axisAligned = data[TRANSFORM.AXIS_ALIGNED];
+      const x = data[TRANSFORM.FRAME_X1];
+      const y = data[TRANSFORM.FRAME_Y1];
+      const right = data[TRANSFORM.FRAME_X2];
+      const bottom = data[TRANSFORM.FRAME_Y2];
+      let a = scaleX;
+      let b = 0;
+      let c = 0;
+      let d = scaleY;
+      if (!axisAligned) {
+        a = Math.cos(rotation + skewY) * scaleX;
+        b = Math.sin(rotation + skewY) * scaleX;
+        c = -Math.sin(rotation - skewX) * scaleY;
+        d = Math.cos(rotation - skewX) * scaleY;
+      }
+      data[TRANSFORM.LOCAL_A] = a;
+      data[TRANSFORM.LOCAL_B] = b;
+      data[TRANSFORM.LOCAL_C] = c;
+      data[TRANSFORM.LOCAL_D] = d;
+      data[TRANSFORM.LOCAL_TX] = tx;
+      data[TRANSFORM.LOCAL_TY] = ty;
+      if (isRoot) {
+        data[TRANSFORM.WORLD_A] = a;
+        data[TRANSFORM.WORLD_B] = b;
+        data[TRANSFORM.WORLD_C] = c;
+        data[TRANSFORM.WORLD_D] = d;
+        data[TRANSFORM.WORLD_TX] = tx;
+        data[TRANSFORM.WORLD_TY] = ty;
+        data[TRANSFORM.UPDATED] = gameFrame;
+        if (axisAligned) {
+          const x0 = x * a + tx;
+          const y0 = y * d + ty;
+          const x1 = x * a + tx;
+          const y1 = bottom * d + ty;
+          const x2 = right * a + tx;
+          const y2 = bottom * d + ty;
+          const x3 = right * a + tx;
+          const y3 = y * d + ty;
+          data[TRANSFORM.BOUNDS_X1] = x0;
+          data[TRANSFORM.BOUNDS_Y1] = y0;
+          data[TRANSFORM.BOUNDS_X2] = x2;
+          data[TRANSFORM.BOUNDS_Y2] = y2;
+          data[TRANSFORM.IN_VIEW] = Number(!(cright < x0 || cbottom < y0 || cx > x2 || cy > y2));
+          SetQuadPosition(id, x0, y0, x1, y1, x2, y2, x3, y3);
+        } else {
+          const x0 = x * a + y * c + tx;
+          const y0 = x * b + y * d + ty;
+          const x1 = x * a + bottom * c + tx;
+          const y1 = x * b + bottom * d + ty;
+          const x2 = right * a + bottom * c + tx;
+          const y2 = right * b + bottom * d + ty;
+          const x3 = right * a + y * c + tx;
+          const y3 = right * b + y * d + ty;
+          const bx = Math.min(x0, x1, x2, x3);
+          const by = Math.min(y0, y1, y2, y3);
+          const br = Math.max(x0, x1, x2, x3);
+          const bb = Math.max(y0, y1, y2, y3);
+          data[TRANSFORM.BOUNDS_X1] = bx;
+          data[TRANSFORM.BOUNDS_Y1] = by;
+          data[TRANSFORM.BOUNDS_X2] = br;
+          data[TRANSFORM.BOUNDS_Y2] = bb;
+          data[TRANSFORM.IN_VIEW] = Number(!(cright < bx || cbottom < by || cx > br || cy > bb));
+          SetQuadPosition(id, x0, y0, x1, y1, x2, y2, x3, y3);
+        }
+        ClearDirtyTransforms(id);
+      } else {
+        const parentID = GetParentID(id);
+        if (parentID !== prevParent) {
+          SetDirtyParents(id);
+          prevParent = parentID;
+        }
+        dirtyWorld = true;
+      }
+      SetDirtyChildTransform(id);
+      total++;
+    }
+    if (dirtyWorld) {
+      SetDirtyChildWorldTransform(worldID);
+    }
+    return total;
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/color/UpdateQuadColorSystem.ts
+  function UpdateQuadColorSystem(entities) {
+    let total = 0;
+    const len = entities.length;
+    for (let i = 0; i < len; i++) {
+      const id = entities[i];
+      if (HasDirtyColor(id)) {
+        const r = ColorComponent.r[id] / 255;
+        const g = ColorComponent.g[id] / 255;
+        const b = ColorComponent.b[id] / 255;
+        const a = ColorComponent.a[id];
+        SetQuadColor(id, r, g, b, a);
+        ClearDirtyColor(id);
+        total++;
+      }
+    }
+    return total;
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/ClearDirtyWorldTransform.ts
+  function ClearDirtyWorldTransform(id) {
+    Transform2DComponent.data[id][TRANSFORM.DIRTY_WORLD] = 0;
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/dirty/HasDirtyWorldTransform.ts
+  function HasDirtyWorldTransform(id) {
+    return Boolean(Transform2DComponent.data[id][TRANSFORM.DIRTY_WORLD]);
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/vertices/SetQuadFromWorld.ts
+  function SetQuadFromWorld(id, gameFrame, cx, cy, cright, cbottom) {
+    const data = Transform2DComponent.data[id];
+    const a = data[TRANSFORM.WORLD_A];
+    const b = data[TRANSFORM.WORLD_B];
+    const c = data[TRANSFORM.WORLD_C];
+    const d = data[TRANSFORM.WORLD_D];
+    const tx = data[TRANSFORM.WORLD_TX];
+    const ty = data[TRANSFORM.WORLD_TY];
+    const x = data[TRANSFORM.FRAME_X1];
+    const y = data[TRANSFORM.FRAME_Y1];
+    const right = data[TRANSFORM.FRAME_X2];
+    const bottom = data[TRANSFORM.FRAME_Y2];
+    const x0 = x * a + y * c + tx;
+    const y0 = x * b + y * d + ty;
+    const x1 = x * a + bottom * c + tx;
+    const y1 = x * b + bottom * d + ty;
+    const x2 = right * a + bottom * c + tx;
+    const y2 = right * b + bottom * d + ty;
+    const x3 = right * a + y * c + tx;
+    const y3 = right * b + y * d + ty;
+    const bx = Math.min(x0, x1, x2, x3);
+    const by = Math.min(y0, y1, y2, y3);
+    const br = Math.max(x0, x1, x2, x3);
+    const bb = Math.max(y0, y1, y2, y3);
+    data[TRANSFORM.BOUNDS_X1] = bx;
+    data[TRANSFORM.BOUNDS_Y1] = by;
+    data[TRANSFORM.BOUNDS_X2] = br;
+    data[TRANSFORM.BOUNDS_Y2] = bb;
+    data[TRANSFORM.IN_VIEW] = Number(!(cright < bx || cbottom < by || cx > br || cy > bb));
+    data[TRANSFORM.UPDATED] = gameFrame;
+    SetQuadPosition(id, x0, y0, x1, y1, x2, y2, x3, y3);
+  }
+
+  // Users/rich/Documents/GitHub/phaser-genesis/src/components/vertices/UpdateVertexPositionSystem.ts
+  function UpdateVertexPositionSystem(entities, camera, gameFrame) {
+    const cx = camera.getBoundsX();
+    const cy = camera.getBoundsY();
+    const cright = camera.getBoundsRight();
+    const cbottom = camera.getBoundsBottom();
+    let total = 0;
+    const len = entities.length;
+    for (let i = 0; i < len; i++) {
+      const id = entities[i];
+      if (HasDirtyWorldTransform(id)) {
+        SetQuadFromWorld(id, gameFrame, cx, cy, cright, cbottom);
+        ClearDirtyWorldTransform(id);
+        ClearDirtyChildTransform(id);
+        total++;
+      }
+    }
+    return total;
+  }
+
   // Users/rich/Documents/GitHub/phaser-genesis/src/camera/WorldCamera.ts
   var WorldCamera = class {
     id = addEntity(GameObjectWorld);
@@ -5577,7 +5599,7 @@ void main (void)
       AddTransform2DComponent(id, 0, 0, 0, 0);
       this.matrix = new Matrix4();
       this.position = new Position(id, 0, 0);
-      this.size = new Size(id, width, height);
+      this.size = new Size2(id, width, height);
       this.reset(width, height);
     }
     set x(value) {
@@ -5766,26 +5788,38 @@ void main (void)
     }
   };
 
-  // Users/rich/Documents/GitHub/dev/examples/src/gameobjects/directdraw/circle.ts
+  // Users/rich/Documents/GitHub/dev/examples/src/gameobjects/text/fill style.ts
   var Demo = class extends Scene {
     constructor() {
       super();
       this.create();
     }
     async create() {
+      await LoadImageFile("8x8", "assets/8x8.png");
       const world2 = new StaticWorld(this);
-      const dd = new DirectDraw();
-      dd.render = () => {
-        dd.circle(400, 300, 256, 65535);
-      };
-      AddChild(world2, dd);
+      const text1 = new Text(400, 100, "Phaser 4 Text", "48px Arial Black");
+      SetFillStyle("#ff00ff", text1);
+      const text2 = new Text(400, 200, "Phaser 4 Text", "48px Arial Black");
+      SetFillStyle("aquamarine", text2);
+      const text3 = new Text(400, 300, "Phaser 4 Text", "48px Arial Black");
+      SetFillStyle("rgb(200, 123, 50)", text3);
+      const text4 = new Text(400, 400, "Phaser 4 Text", "48px Arial Black");
+      const gradient = text4.context.createLinearGradient(0, 0, 0, 32);
+      gradient.addColorStop(0, "lime");
+      gradient.addColorStop(1, "cyan");
+      SetFillStyle(gradient, text4);
+      const text5 = new Text(400, 500, "Phaser 4 Text", "48px Arial Black");
+      const texture = TextureManagerInstance.get().get("8x8");
+      const pattern = text5.context.createPattern(texture.image, "repeat");
+      SetFillStyle(pattern, text5);
+      AddChildren(world2, text1, text2, text3, text4, text5);
     }
   };
-  new Game(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(2960685), Scenes(Demo));
+  new Game(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), Size(800, 600), BackgroundColor(2960685), Scenes(Demo));
 })();
 /**
  * @author       Richard Davey <rich@photonstorm.com>
  * @copyright    2020 Photon Storm Ltd.
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
  */
-//# sourceMappingURL=circle.js.map
+//# sourceMappingURL=fill style.js.map

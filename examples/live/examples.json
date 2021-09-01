@@ -9,26 +9,26 @@
         {
           "path": "examples/live/3d/edit cube.js",
           "name": "edit cube.js",
-          "size": 439048,
+          "size": 427734,
           "extension": ".js",
           "type": "file"
         },
         {
           "path": "examples/live/3d/primitives.js",
           "name": "primitives.js",
-          "size": 149836,
+          "size": 145072,
           "extension": ".js",
           "type": "file"
         },
         {
           "path": "examples/live/3d/rotating cube.js",
           "name": "rotating cube.js",
-          "size": 141041,
+          "size": 136511,
           "extension": ".js",
           "type": "file"
         }
       ],
-      "size": 729925,
+      "size": 709317,
       "type": "directory"
     },
     {
@@ -219,7 +219,14 @@
             {
               "path": "examples/live/gameobjects/directdraw/circle.js",
               "name": "circle.js",
-              "size": 174193,
+              "size": 178654,
+              "extension": ".js",
+              "type": "file"
+            },
+            {
+              "path": "examples/live/gameobjects/directdraw/circle.min.js",
+              "name": "circle.min.js",
+              "size": 68399,
               "extension": ".js",
               "type": "file"
             },
@@ -250,9 +257,125 @@
               "size": 174249,
               "extension": ".js",
               "type": "file"
+            },
+            {
+              "path": "examples/live/gameobjects/directdraw/shapes.js",
+              "name": "shapes.js",
+              "size": 171725,
+              "extension": ".js",
+              "type": "file"
+            },
+            {
+              "path": "examples/live/gameobjects/directdraw/sprite bounds.js",
+              "name": "sprite bounds.js",
+              "size": 194880,
+              "extension": ".js",
+              "type": "file"
+            },
+            {
+              "path": "examples/live/gameobjects/directdraw/tiles.js",
+              "name": "tiles.js",
+              "size": 178607,
+              "extension": ".js",
+              "type": "file"
+            },
+            {
+              "path": "examples/live/gameobjects/directdraw/trail.js",
+              "name": "trail.js",
+              "size": 194095,
+              "extension": ".js",
+              "type": "file"
             }
           ],
-          "size": 887244,
+          "size": 1699411,
+          "type": "directory"
+        },
+        {
+          "path": "examples/live/gameobjects/effectlayer",
+          "name": "effectlayer",
+          "children": [
+            {
+              "path": "examples/live/gameobjects/effectlayer/create effect layer.js",
+              "name": "create effect layer.js",
+              "size": 188061,
+              "extension": ".js",
+              "type": "file"
+            },
+            {
+              "path": "examples/live/gameobjects/effectlayer/rectangle effect layer.js",
+              "name": "rectangle effect layer.js",
+              "size": 178196,
+              "extension": ".js",
+              "type": "file"
+            }
+          ],
+          "size": 366257,
+          "type": "directory"
+        },
+        {
+          "path": "examples/live/gameobjects/layer",
+          "name": "layer",
+          "children": [
+            {
+              "path": "examples/live/gameobjects/layer/create layer.js",
+              "name": "create layer.js",
+              "size": 172512,
+              "extension": ".js",
+              "type": "file"
+            }
+          ],
+          "size": 172512,
+          "type": "directory"
+        },
+        {
+          "path": "examples/live/gameobjects/rectangle",
+          "name": "rectangle",
+          "children": [
+            {
+              "path": "examples/live/gameobjects/rectangle/1024 rectangles.js",
+              "name": "1024 rectangles.js",
+              "size": 162537,
+              "extension": ".js",
+              "type": "file"
+            },
+            {
+              "path": "examples/live/gameobjects/rectangle/create rectangle.js",
+              "name": "create rectangle.js",
+              "size": 160024,
+              "extension": ".js",
+              "type": "file"
+            },
+            {
+              "path": "examples/live/gameobjects/rectangle/random rectangles.js",
+              "name": "random rectangles.js",
+              "size": 162350,
+              "extension": ".js",
+              "type": "file"
+            },
+            {
+              "path": "examples/live/gameobjects/rectangle/transforming rectangles.js",
+              "name": "transforming rectangles.js",
+              "size": 179034,
+              "extension": ".js",
+              "type": "file"
+            }
+          ],
+          "size": 663945,
+          "type": "directory"
+        },
+        {
+          "path": "examples/live/gameobjects/renderlayer",
+          "name": "renderlayer",
+          "children": [
+            {
+              "path": "examples/live/gameobjects/renderlayer/create render layer.js",
+              "name": "create render layer.js",
+              "size": 173530,
+              "extension": ".js",
+              "type": "file"
+            }
+          ],
+          "size": 173530,
           "type": "directory"
         },
         {
@@ -318,9 +441,38 @@
           ],
           "size": 1678364,
           "type": "directory"
+        },
+        {
+          "path": "examples/live/gameobjects/text",
+          "name": "text",
+          "children": [
+            {
+              "path": "examples/live/gameobjects/text/create text.js",
+              "name": "create text.js",
+              "size": 167824,
+              "extension": ".js",
+              "type": "file"
+            },
+            {
+              "path": "examples/live/gameobjects/text/fill style.js",
+              "name": "fill style.js",
+              "size": 179655,
+              "extension": ".js",
+              "type": "file"
+            },
+            {
+              "path": "examples/live/gameobjects/text/text stroke.js",
+              "name": "text stroke.js",
+              "size": 168262,
+              "extension": ".js",
+              "type": "file"
+            }
+          ],
+          "size": 515741,
+          "type": "directory"
         }
       ],
-      "size": 2565608,
+      "size": 5269760,
       "type": "directory"
     },
     {
@@ -475,6 +627,6 @@
       "type": "directory"
     }
   ],
-  "size": 9629487,
+  "size": 12313031,
   "type": "directory"
 }

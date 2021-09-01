@@ -4,7 +4,7 @@ import { Layer, Sprite } from '../../../../../phaser-genesis/src/gameobjects/';
 import { AddChild } from '../../../../../phaser-genesis/src/display/';
 import { Between } from '../../../../../phaser-genesis/src/math';
 import { Game } from '../../../../../phaser-genesis/src/Game';
-import { ImageFile } from '../../../../../phaser-genesis/src/loader/files/ImageFile';
+import { LoadImageFile } from '../../../../../phaser-genesis/src/loader/files/LoadImageFile';
 import { Mouse } from '../../../../../phaser-genesis/src/input/mouse';
 import { On } from '../../../../../phaser-genesis/src/events';
 import { Scene } from '../../../../../phaser-genesis/src/scenes/Scene';
@@ -21,8 +21,8 @@ class Demo extends Scene
 
     async create ()
     {
-        await ImageFile('snowflake', 'assets/snowflake-pixel.png');
-        await ImageFile('sonic', 'assets/sonic.png');
+        await LoadImageFile('snowflake', 'assets/snowflake-pixel.png');
+        await LoadImageFile('sonic', 'assets/sonic.png');
 
         const world = new StaticWorld(this);
 

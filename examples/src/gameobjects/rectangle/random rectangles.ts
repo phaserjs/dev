@@ -25,7 +25,7 @@ class Demo extends Scene
             const w = Between(8, 96);
             const h = Between(8, 96);
 
-            const rect = new Rectangle(x, y, w, h, colors[i]);
+            const rect = new Rectangle(x, y, w, h, colors[i].getColor());
 
             AddChild(world, rect);
         }

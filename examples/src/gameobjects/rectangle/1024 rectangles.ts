@@ -23,7 +23,7 @@ class Demo extends Scene
 
         colors.forEach(color => {
 
-            const rect = new Rectangle(x, y, 15, 23, color);
+            const rect = new Rectangle(x, y, 15, 23, color.getColor());
 
             AddChild(world, rect);
 

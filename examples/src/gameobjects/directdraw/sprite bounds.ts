@@ -3,7 +3,8 @@ import { DirectDraw, Sprite } from '../../../../../phaser-genesis/src/gameobject
 
 import { AddChildren } from '../../../../../phaser-genesis/src/display';
 import { Game } from '../../../../../phaser-genesis/src/Game';
-import { ImageFile } from '../../../../../phaser-genesis/src/loader/files';
+import { LoadImageFile } from '../../../../../phaser-genesis/src/loader/files';
+import { On } from '../../../../../phaser-genesis/src/events/On';
 import { Scene } from '../../../../../phaser-genesis/src/scenes/Scene';
 import { StaticWorld } from '../../../../../phaser-genesis/src/world/StaticWorld';
 
@@ -18,19 +19,15 @@ class Demo extends Scene
 
     async create ()
     {
-        await ImageFile('rocket', 'assets/rocket.png').load();
-        await ImageFile('ball', 'assets/energy-ball.png').load();
-        await ImageFile('eye', 'assets/lance-overdose-loader-eye.png').load();
+        await LoadImageFile('rocket', 'assets/rocket.png');
+        await LoadImageFile('ball', 'assets/energy-ball.png');
+        await LoadImageFile('eye', 'assets/lance-overdose-loader-eye.png');
 
         const world = new StaticWorld(this);
 
         const sprite1 = new Sprite(220, 180, 'rocket');
         const sprite2 = new Sprite(400, 300, 'ball');
         const sprite3 = new Sprite(600, 420, 'eye');
-
-        sprite1.name = 'rocket';
-        sprite2.name = 'ball';
-        sprite3.name = 'eye';
 
         const dd = new DirectDraw();
 
@@ -47,6 +44,12 @@ class Demo extends Scene
         };
 
         AddChildren(world, sprite1, sprite2, sprite3, dd);
+
+        On(world, 'update', () => {
+
+            sprite3.rotation += 0.01;
+
+        });
     }
 }
 

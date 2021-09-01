@@ -1,5 +1,5 @@
 import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../../phaser-genesis/src/config';
-import { CSVFile, SpriteSheetFile } from '../../../../../phaser-genesis/src/loader/files';
+import { LoadCSVFile, LoadSpriteSheetFile } from '../../../../../phaser-genesis/src/loader/files';
 
 import { AddChildren } from '../../../../../phaser-genesis/src/display';
 import { Cache } from '../../../../../phaser-genesis/src/cache/Cache';
@@ -20,8 +20,8 @@ class Demo extends Scene
 
     async create ()
     {
-        await SpriteSheetFile('tiles', 'assets/fantasy-tiles.png', { frameWidth: 64,frameHeight: 64 }).load();
-        await CSVFile('map', 'assets/minimap.csv').load();
+        await LoadSpriteSheetFile('tiles', 'assets/fantasy-tiles.png', { frameWidth: 64,frameHeight: 64 });
+        await LoadCSVFile('map', 'assets/minimap.csv');
 
         //  Parse the csv data into a number array
         const data = (Cache.getEntry('CSV', 'map') as string).split('\n').flatMap(row => row.split(','));

@@ -1,7 +1,6 @@
 import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../../phaser-genesis/src/config';
 
 import { AddChild } from '../../../../../phaser-genesis/src/display';
-import { Between } from '../../../../../phaser-genesis/src/math';
 import { DirectDraw } from '../../../../../phaser-genesis/src/gameobjects';
 import { Game } from '../../../../../phaser-genesis/src/Game';
 import { Scene } from '../../../../../phaser-genesis/src/scenes/Scene';
@@ -24,7 +23,7 @@ class Demo extends Scene
 
         dd.render = () =>
         {
-            dd.circle(400, 300, 256, 0xff0000);
+            dd.circle(400, 300, 256, 0x00ffff);
         };
 
         AddChild(world, dd);
