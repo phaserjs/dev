@@ -3576,6 +3576,16 @@ void main (void)
     getNumChildren() {
       return GetNumChildren(this.id);
     }
+    getDisplayData() {
+      const id = this.id;
+      const data = HierarchyComponent.data[id];
+      return {
+        id,
+        parent: data[HIERARCHY.PARENT],
+        world: data[HIERARCHY.WORLD],
+        numChildren: data[HIERARCHY.NUM_CHILDREN]
+      };
+    }
     toString() {
       return `${this.type} id="${this.id}" name="${this.name}"`;
     }
@@ -5767,12 +5777,17 @@ void main (void)
   }
 
   // Users/rich/Documents/GitHub/phaser-genesis/src/world/RenderChild.ts
+  var RENDER_LIST = [];
   var RENDER_CHILD_TOTAL = 0;
+  function GetRenderList() {
+    return RENDER_LIST;
+  }
   function GetRenderChildTotal() {
     return RENDER_CHILD_TOTAL;
   }
   function ResetRenderChildTotal() {
     RENDER_CHILD_TOTAL = 0;
+    RENDER_LIST.length = 0;
   }
   function RenderChild(renderPass, id) {
     const inView = IsInView(id) || WillCacheChildren(id);
@@ -5781,6 +5796,7 @@ void main (void)
       gameObject = GameObjectCache.get(id);
       gameObject.renderGL(renderPass);
       RENDER_CHILD_TOTAL++;
+      RENDER_LIST.push(gameObject);
     }
     const numChildren = HasRenderableChildren(id, renderPass.isCameraDirty());
     if (numChildren) {
@@ -5794,6 +5810,7 @@ void main (void)
             childGameObject.renderGL(renderPass);
             childGameObject.postRenderGL(renderPass);
             RENDER_CHILD_TOTAL++;
+            RENDER_LIST.push(childGameObject);
           }
         }
         childID = GetNextSiblingID(childID);
@@ -6090,7 +6107,8 @@ void main (void)
         updated: 0,
         updateMs: 0,
         fps: 0,
-        delta: 0
+        delta: 0,
+        renderList: []
       };
       SetWillTransformChildren(this.id, false);
       SetWillCacheChildren(this.id, false);
@@ -6175,8 +6193,12 @@ void main (void)
       renderData.numChildren = this.getNumChildren();
       renderData.fps = this.scene.game.time.fps;
       renderData.delta = this.scene.game.time.delta;
+      renderData.renderList = GetRenderList();
       this.scene.game.renderStats = renderData;
       Emit(this, WorldPostRenderEvent, renderPass, this);
+    }
+    getRenderList() {
+      return GetRenderList();
     }
   };
 
