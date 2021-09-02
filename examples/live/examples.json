@@ -213,6 +213,50 @@
       "name": "gameobjects",
       "children": [
         {
+          "path": "examples/live/gameobjects/animatedsprite",
+          "name": "animatedsprite",
+          "children": [
+            {
+              "path": "examples/live/gameobjects/animatedsprite/atlas animation.js",
+              "name": "atlas animation.js",
+              "size": 185224,
+              "extension": ".js",
+              "type": "file"
+            },
+            {
+              "path": "examples/live/gameobjects/animatedsprite/create animation from atlas.js",
+              "name": "create animation from atlas.js",
+              "size": 184690,
+              "extension": ".js",
+              "type": "file"
+            }
+          ],
+          "size": 369914,
+          "type": "directory"
+        },
+        {
+          "path": "examples/live/gameobjects/container",
+          "name": "container",
+          "children": [
+            {
+              "path": "examples/live/gameobjects/container/add children.js",
+              "name": "add children.js",
+              "size": 167174,
+              "extension": ".js",
+              "type": "file"
+            },
+            {
+              "path": "examples/live/gameobjects/container/banshee.js",
+              "name": "banshee.js",
+              "size": 196676,
+              "extension": ".js",
+              "type": "file"
+            }
+          ],
+          "size": 363850,
+          "type": "directory"
+        },
+        {
           "path": "examples/live/gameobjects/directdraw",
           "name": "directdraw",
           "children": [
@@ -302,6 +346,13 @@
               "type": "file"
             },
             {
+              "path": "examples/live/gameobjects/effectlayer/effect layer with sampler2d.js",
+              "name": "effect layer with sampler2d.js",
+              "size": 169784,
+              "extension": ".js",
+              "type": "file"
+            },
+            {
               "path": "examples/live/gameobjects/effectlayer/rectangle effect layer.js",
               "name": "rectangle effect layer.js",
               "size": 178196,
@@ -309,7 +360,7 @@
               "type": "file"
             }
           ],
-          "size": 366257,
+          "size": 536041,
           "type": "directory"
         },
         {
@@ -472,7 +523,7 @@
           "type": "directory"
         }
       ],
-      "size": 5269760,
+      "size": 6173308,
       "type": "directory"
     },
     {
@@ -627,6 +678,6 @@
       "type": "directory"
     }
   ],
-  "size": 12313031,
+  "size": 13216579,
   "type": "directory"
 }

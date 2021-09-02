@@ -7,22 +7,6 @@ import { Game } from '../../../../../phaser-genesis/src/Game';
 import { Scene } from '../../../../../phaser-genesis/src/scenes/Scene';
 import { StaticWorld } from '../../../../../phaser-genesis/src/world/StaticWorld';
 
-const plasmaFragmentShader = `
-precision mediump float;
-
-varying vec2 vTextureCoord;
-varying float vTextureId;
-varying vec4 vTintColor;
-
-uniform sampler2D uTexture;
-uniform float uTime;
-uniform vec2 uResolution;
-
-void main (void)
-{
-    vec4 tcolor = texture2D(uTexture, vTextureCoord);
-}`;
-
 const wigglesFragmentShader = `
 //  Original shader from https://www.shadertoy.com/view/NljGWd
 

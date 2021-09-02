@@ -2,7 +2,7 @@ import { AddChild, AddChildren, ConsoleTreeChildren } from '../../../../../phase
 import { BackgroundColor, GlobalVar, Parent, Scenes, Size, WebGL } from '../../../../../phaser-genesis/src/config';
 
 import { Game } from '../../../../../phaser-genesis/src/Game';
-import { ImageFile } from '../../../../../phaser-genesis/src/loader/files/ImageFile';
+import { LoadImageFile } from '../../../../../phaser-genesis/src/loader/files/LoadImageFile';
 import { On } from '../../../../../phaser-genesis/src/events';
 import { Scene } from '../../../../../phaser-genesis/src/scenes/Scene';
 import { Sprite } from '../../../../../phaser-genesis/src/gameobjects/';
@@ -23,10 +23,10 @@ class Demo extends Scene
 
     async create ()
     {
-        await ImageFile('256', 'assets/f-texture.png');
-        await ImageFile('64', 'assets/box-item-boxed.png');
-        await ImageFile('32', 'assets/shinyball.png');
-        await ImageFile('16', 'assets/skull.png');
+        await LoadImageFile('256', 'assets/f-texture.png');
+        await LoadImageFile('64', 'assets/box-item-boxed.png');
+        await LoadImageFile('32', 'assets/shinyball.png');
+        await LoadImageFile('16', 'assets/skull.png');
 
         const parent = new Sprite(400, 300, '256');
 
@@ -72,7 +72,7 @@ class Demo extends Scene
 
         ConsoleTreeChildren(this.world);
 
-        On(this.world, 'update', (delta, time) =>
+        On(this.world, 'update', () =>
         {
             parent.rotation += 0.005;
 
@@ -83,22 +83,9 @@ class Demo extends Scene
             parent.scale.y = Math.cos(i) * 2;
 
             i += 0.01;
-
-            const rs = window.renderStats;
-
-            if (rs)
-            {
-                msg.innerText = `Frame: ${rs.gameFrame} - Rendered: ${rs.rendered} - Local: ${rs.dirtyLocal} - World: ${rs.dirtyWorld} - Quad: ${rs.dirtyQuad}`;
-            }
-
         });
     }
 }
-
-const msg = document.createElement('p');
-
-msg.innerText = `Please wait, generating Sprites`;
-msg.style.paddingLeft = '150px';
 
 const game = new Game(
     WebGL(),
@@ -108,12 +95,3 @@ const game = new Game(
     BackgroundColor(0x2d2d2d),
     Scenes(Demo)
 );
-
-const button = document.createElement('button');
-button.innerText = 'Pause';
-button.onclick = () => {
-    game.isPaused = true;
-}
-
-document.body.appendChild(msg);
-document.body.appendChild(button);

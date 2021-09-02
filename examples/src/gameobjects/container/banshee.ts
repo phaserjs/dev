@@ -1,7 +1,7 @@
 import { AddChild, AddChildren } from '../../../../../phaser-genesis/src/display';
-import { AtlasFile, ImageFile } from '../../../../../phaser-genesis/src/loader/files';
 import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../../phaser-genesis/src/config';
 import { Container, Sprite } from '../../../../../phaser-genesis/src/gameobjects';
+import { LoadAtlasFile, LoadImageFile } from '../../../../../phaser-genesis/src/loader/files';
 
 import { AddTween } from '../../../../../phaser-genesis/src/motion/tween/nano/AddTween';
 import { DebugHierarchyComponent } from '../../../../../phaser-genesis/src/components/hierarchy/DebugHierarchyComponent';
@@ -21,8 +21,8 @@ class Demo extends Scene
 
     async create ()
     {
-        await ImageFile('logo', 'assets/logo.png');
-        await AtlasFile('banshee', 'assets/banshee.png', 'assets/banshee.json');
+        await LoadImageFile('logo', 'assets/logo.png');
+        await LoadAtlasFile('banshee', 'assets/banshee.png', 'assets/banshee.json');
 
         const world = new StaticWorld(this);
 
@@ -48,23 +48,11 @@ class Demo extends Scene
 
         AddChild(world, banshee);
 
-        DebugHierarchyComponent(banshee.id);
-
-        AddTween(banshee).to(300, { y: 300 }).yoyo(true).repeat(-1).easing(Easing.Sine.InOut);
-        AddTween(head).to(300, { rotation: 0.25 }).yoyo(true).repeat(-1).easing(Easing.Sine.InOut);
-        AddTween(arm2).to(300, { x: 60, rotation: -0.20 }).yoyo(true).repeat(-1).easing(Easing.Sine.InOut);
-        AddTween(hand2).to(300, { rotation: 0.30 }).yoyo(true).repeat(-1).easing(Easing.Sine.InOut);
-        AddTween(hand1).to(300, { rotation: -0.20 }).yoyo(true).repeat(-1).easing(Easing.Sine.InOut);
-    }
-
-    update (): void
-    {
-        const rs = window.renderStats;
-
-        if (rs)
-        {
-            msg.innerText = `Frame: ${rs.gameFrame} - Game Objects: ${rs.numChildren} - Rendered: ${rs.rendered} - Updated: ${rs.updated} - Time: ${rs.updateMs}ms`;
-        }
+        AddTween(banshee).to(3000, { y: 300 }).yoyo(true).repeat(-1).easing(Easing.Sine.InOut);
+        AddTween(head).to(3000, { rotation: 0.25 }).yoyo(true).repeat(-1).easing(Easing.Sine.InOut);
+        AddTween(arm2).to(3000, { x: 60, rotation: -0.20 }).yoyo(true).repeat(-1).easing(Easing.Sine.InOut);
+        AddTween(hand2).to(3000, { rotation: 0.30 }).yoyo(true).repeat(-1).easing(Easing.Sine.InOut);
+        AddTween(hand1).to(3000, { rotation: -0.20 }).yoyo(true).repeat(-1).easing(Easing.Sine.InOut);
     }
 }
 
@@ -75,15 +63,3 @@ const game = new Game(
     BackgroundColor(0x2d2d2d),
     Scenes(Demo)
 );
-
-const msg = document.createElement('p');
-
-msg.innerText = `Please wait, generating Sprites`;
-document.body.appendChild(msg);
-
-const button = document.createElement('button');
-button.innerText = 'Pause';
-button.onclick = () => {
-    game.isPaused = true;
-}
-document.body.appendChild(button);

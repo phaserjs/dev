@@ -1,14 +1,14 @@
-import { AtlasFile, ImageFile } from '../../../../phaser-genesis/src/loader/files';
-import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../phaser-genesis/src/config';
-import { CreateAnimationFromAtlas, Play } from '../../../../phaser-genesis/src/animation';
+import { AtlasFile, ImageFile } from '../../../../../phaser-genesis/src/loader/files';
+import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../../phaser-genesis/src/config';
+import { CreateAnimationFromAtlas, Play } from '../../../../../phaser-genesis/src/animation';
 
-import { AddChildren } from '../../../../phaser-genesis/src/display/';
-import { AnimatedSprite } from '../../../../phaser-genesis/src/gameobjects/animatedsprite';
-import { Game } from '../../../../phaser-genesis/src/Game';
-import { Loader } from '../../../../phaser-genesis/src/loader/Loader';
-import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
-import { Sprite } from '../../../../phaser-genesis/src/gameobjects/';
-import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
+import { AddChildren } from '../../../../../phaser-genesis/src/display/';
+import { AnimatedSprite } from '../../../../../phaser-genesis/src/gameobjects/animatedsprite';
+import { Game } from '../../../../../phaser-genesis/src/Game';
+import { Loader } from '../../../../../phaser-genesis/src/loader/Loader';
+import { Scene } from '../../../../../phaser-genesis/src/scenes/Scene';
+import { Sprite } from '../../../../../phaser-genesis/src/gameobjects/';
+import { StaticWorld } from '../../../../../phaser-genesis/src/world/StaticWorld';
 
 class Demo extends Scene
 {
