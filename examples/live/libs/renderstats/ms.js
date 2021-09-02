@@ -83,8 +83,8 @@ export function MS (game)
 
         const c = uplot.cursor;
 
-        const frame = (c.idx) ? data[0][c.idx] : game.frame;
-        const ms = (c.idx) ? data[1][c.idx] : game.delta;
+        const frame = (c.idx) ? data[0][c.idx] : renderStats.gameFrame;
+        const ms = (c.idx) ? data[1][c.idx] : renderStats.delta;
 
         if (c.idx)
         {

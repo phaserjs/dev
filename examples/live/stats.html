@@ -39,7 +39,7 @@
                 height: 195px;
             }
 
-            #fps, #ms, #local, #world, #msGauge, #gos {
+            #fps, #renderMs, #updateMs, #msGauge, #gos {
                 width: 300px;
                 padding-bottom: 4px;
                 font-size: 12px;
@@ -48,7 +48,7 @@
                 background-color: #27293b;
             }
 
-            #gameObjects, #vertices {
+            #local, #world, #gameObjects, #vertices {
                 width: 150px;
             }
 
@@ -161,30 +161,43 @@
                 </div>
 
             </div>
+
             <div class="col">
 
-                <div id="ms" class="rounded-2">
-                    <div id="msContainer"></div>
-                    <div class="text-center" id="msText">MS: 0</div>
+                <div id="renderMs" class="rounded-2">
+                    <div id="renderMsContainer"></div>
+                    <div class="text-center" id="renderMsText">Render MS: 0</div>
                 </div>
 
             </div>
+
             <div class="col">
 
-                <div id="local" class="rounded-2">
-                    <div id="localContainer"></div>
-                    <div class="text-center" id="localText">Local Transforms: 0</div>
+                <div id="updateMs" class="rounded-2">
+                    <div id="updateMsContainer"></div>
+                    <div class="text-center" id="updateMsText">Update MS: 0</div>
                 </div>
 
             </div>
+
             <div class="col">
 
-                <div id="world" class="rounded-2">
-                    <div id="worldContainer"></div>
-                    <div class="text-center" id="worldText">World Transforms: 0</div>
+                <div id="gos" class="row rounded-2 g-0">
+
+                    <div id="local" class="col">
+                        <div id="localContainer"></div>
+                        <div class="text-center" id="localText">Local: 0</div>
+                    </div>
+
+                    <div id="world" class="col">
+                        <div id="worldContainer"></div>
+                        <div class="text-center" id="worldText">World: 0</div>
+                    </div>
+
                 </div>
 
             </div>
+
             <div class="col">
 
                 <div id="msGauge" class="rounded-2">
@@ -193,6 +206,7 @@
                 </div>
 
             </div>
+
             <div class="col">
 
                 <div id="gos" class="row rounded-2 g-0">

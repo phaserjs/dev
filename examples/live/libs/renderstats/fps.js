@@ -9,7 +9,7 @@ export function FPS (game)
 
     let data = [ [], [] ];
 
-    let startFrame = game.frame - 100;
+    let startFrame = renderStats.gameFrame - 100;
 
     for (let i = 0; i < 100; i++)
     {
@@ -81,8 +81,8 @@ export function FPS (game)
 
         const c = uplot.cursor;
 
-        const frame = (c.idx) ? data[0][c.idx] : game.frame;
-        const fps = (c.idx) ? data[1][c.idx] : game.fps;
+        const frame = (c.idx) ? data[0][c.idx] : renderStats.gameFrame;
+        const fps = (c.idx) ? data[1][c.idx] : renderStats.fps;
 
         if (c.idx)
         {

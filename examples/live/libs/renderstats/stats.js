@@ -58,10 +58,12 @@ export function Stats (game, showPanel)
 
         // version.innerText = game.VERSION;
         frame.innerText = renderStats.gameFrame;
-        scenes.innerText = renderStats.numScenes;
-        worlds.innerText = renderStats.numWorlds;
-        gameObjects.innerText = renderStats.numGameObjects;
-        gameObjectsRendered.innerText = renderStats.numGameObjectsRendered;
+        // scenes.innerText = renderStats.numScenes;
+        // worlds.innerText = renderStats.numWorlds;
+        scenes.innerText = 1;
+        worlds.innerText = 1;
+        gameObjects.innerText = renderStats.numChildren;
+        gameObjectsRendered.innerText = renderStats.rendered;
 
     }, 13);
 

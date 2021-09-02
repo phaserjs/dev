@@ -35,7 +35,9 @@ export function MSGauge (game)
             return;
         }
 
-        gauge.set(renderStats.delta);
+        const g = renderStats.updateMs + renderStats.renderMs;
+
+        gauge.set(g);
     
     }, 100);
 }

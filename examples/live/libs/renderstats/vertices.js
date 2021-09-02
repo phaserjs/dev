@@ -55,7 +55,7 @@ export function Vertices (game)
             y: {
                 range: (u, dataMin, dataMax) => {
 
-                    return [ 0, renderStats.numGameObjects + 20 ]
+                    return [ 0, renderStats.numChildren + 20 ]
 
                 }
             }
@@ -84,10 +84,10 @@ export function Vertices (game)
             return;
         }
 
-        data[0][0] = renderStats.numGameObjects;
-        data[1][0] = renderStats.numDirtyVertices;
+        data[0][0] = renderStats.numChildren;
+        data[1][0] = renderStats.dirtyQuad;
     
-        verticesText.innerText = `Vertices: ${renderStats.numDirtyVertices}`;
+        verticesText.innerText = `Vertices: ${renderStats.dirtyQuad}`;
         
         uplot.setData(data);
     

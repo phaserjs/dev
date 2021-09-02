@@ -55,7 +55,7 @@ export function GameObjects (game)
             y: {
                 range: (u, dataMin, dataMax) => {
 
-                    return [ 0, renderStats.numGameObjects + 20 ]
+                    return [ 0, renderStats.numChildren + 20 ]
 
                 }
             }
@@ -84,10 +84,10 @@ export function GameObjects (game)
             return;
         }
 
-        data[0][0] = renderStats.numGameObjects;
-        data[1][0] = renderStats.numGameObjectsRendered;
+        data[0][0] = renderStats.numChildren;
+        data[1][0] = renderStats.rendered;
 
-        gameObjectsText.innerText = `Rendered: ${renderStats.numGameObjectsRendered}`;
+        gameObjectsText.innerText = `Rendered: ${renderStats.rendered}`;
     
         uplot.setData(data);
     

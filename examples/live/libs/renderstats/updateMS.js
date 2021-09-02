@@ -1,15 +1,15 @@
-export function WorldTransforms (game)
+export function UpdateMS (game)
 {
     const { linear } = uPlot.paths;
 
     const renderStats = game.renderStats;
 
-    const container = document.getElementById('worldContainer');
-    const worldText = document.getElementById('worldText');
+    const container = document.getElementById('updateMsContainer');
+    const msText = document.getElementById('updateMsText');
 
     let data = [ [], [] ];
 
-    let startFrame = renderStats.gameFrane - 100;
+    let startFrame = renderStats.gameFrame - 100;
 
     for (let i = 0; i < 100; i++)
     {
@@ -21,11 +21,11 @@ export function WorldTransforms (game)
 
     const fill = ctx.createLinearGradient(0, 0, 0, 400);
 
-    fill.addColorStop(0, 'rgba(97, 211, 181, 0.50)');
-    fill.addColorStop(1, 'rgba(97, 211, 181, 0.10)');
+    fill.addColorStop(0, 'rgba(193, 82, 177, 0.50)');
+    fill.addColorStop(1, 'rgba(193, 82, 177, 0.10)');
 
     const opts = {
-        width: 150,
+        width: 300,
         height: 200,
         legend: {
             show: false
@@ -38,12 +38,12 @@ export function WorldTransforms (game)
             },
             {
                 stroke: '#00ff00',
-                font: `10px Consolas, 'Courier New', monospace`,
-                size: 40,
+                font: `11px Consolas, 'Courier New', monospace`,
+                size: 32,
                 gap: 8,
                 grid: {
                     width: 1 / devicePixelRatio,
-                    stroke: '#2c6455',
+                    stroke: '#484163',
                 },
                 ticks: {
                     show: false
@@ -57,7 +57,9 @@ export function WorldTransforms (game)
             y: {
                 range: (u, dataMin, dataMax) => {
 
-                    return [ 0, renderStats.numChildren + 20 ]
+                    const m = (dataMax < 16) ? 16 : dataMax + 2;
+
+                    return [ 0, m ]
 
                 }
             }
@@ -65,7 +67,7 @@ export function WorldTransforms (game)
         series: [
             {},
             {
-                stroke: '#61d3b5',
+                stroke: '#c152b1',
                 fill,
                 points: {
                     show: false
@@ -82,16 +84,16 @@ export function WorldTransforms (game)
         const c = uplot.cursor;
 
         const frame = (c.idx) ? data[0][c.idx] : renderStats.gameFrame;
-        const world = (c.idx) ? data[1][c.idx] : renderStats.dirtyWorld;
+        const ms = (c.idx) ? data[1][c.idx] : renderStats.updateMs;
 
         if (c.idx)
         {
             //  Mouse is over the graph
-            worldText.innerText = `Frame: ${frame} World: ${world}`;
+            msText.innerText = `Frame: ${frame} - Update MS: ${ms.toFixed(4)}`;
         }
         else
         {
-            worldText.innerText = `World: ${world}`;
+            msText.innerText = `Update MS: ${ms.toFixed(4)}`;
         }
 
     }, 13);
@@ -107,7 +109,7 @@ export function WorldTransforms (game)
         data[1].shift();
 
         data[0].push(renderStats.gameFrame);
-        data[1].push(renderStats.dirtyWorld);
+        data[1].push(renderStats.updateMs);
     
         uplot.setData(data);
     

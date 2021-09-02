@@ -9,7 +9,7 @@ export function LocalTransforms (game)
 
     let data = [ [], [] ];
 
-    let startFrame = game.frame - 100;
+    let startFrame = renderStats.gameFrame - 100;
 
     for (let i = 0; i < 100; i++)
     {
@@ -25,7 +25,7 @@ export function LocalTransforms (game)
     fill.addColorStop(1, 'rgba(236, 101, 145, 0.10)');
 
     const opts = {
-        width: 300,
+        width: 150,
         height: 200,
         legend: {
             show: false
@@ -57,7 +57,7 @@ export function LocalTransforms (game)
             y: {
                 range: (u, dataMin, dataMax) => {
 
-                    return [ 0, renderStats.numGameObjectsRendered ]
+                    return [ 0, renderStats.numChildren + 20 ]
 
                 }
             }
@@ -81,17 +81,17 @@ export function LocalTransforms (game)
 
         const c = uplot.cursor;
 
-        const frame = (c.idx) ? data[0][c.idx] : game.frame;
-        const local = (c.idx) ? data[1][c.idx] : renderStats.numDirtyLocalTransforms;
+        const frame = (c.idx) ? data[0][c.idx] : renderStats.gameFrame;
+        const local = (c.idx) ? data[1][c.idx] : renderStats.dirtyLocal;
 
         if (c.idx)
         {
             //  Mouse is over the graph
-            localText.innerText = `Frame: ${frame} - Local Transforms: ${local}`;
+            localText.innerText = `Frame: ${frame} Local: ${local}`;
         }
         else
         {
-            localText.innerText = `Local Transforms: ${local}`;
+            localText.innerText = `Local: ${local}`;
         }
 
     }, 13);
@@ -107,7 +107,7 @@ export function LocalTransforms (game)
         data[1].shift();
 
         data[0].push(renderStats.gameFrame);
-        data[1].push(renderStats.numDirtyLocalTransforms);
+        data[1].push(renderStats.dirtyLocal);
     
         uplot.setData(data);
     

@@ -1,6 +1,7 @@
 import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../phaser-genesis/src/config';
 
 import { AddChild } from '../../../../phaser-genesis/src/display';
+import { AddTween } from '../../../../phaser-genesis/src/motion/tween/nano/AddTween';
 import { Game } from '../../../../phaser-genesis/src/Game';
 import { ImageFile } from '../../../../phaser-genesis/src/loader/files/ImageFile';
 import { Loader } from '../../../../phaser-genesis/src/loader';
@@ -42,7 +43,9 @@ class Demo extends Scene
                 }
                 else
                 {
-                    AddChild(parent2, new Sprite(x - 660, y - 300, 'redfrog'));
+                    const red = AddChild(parent2, new Sprite(x - 660, y - 300, 'redfrog'));
+
+                    AddTween(red).to(1000, { rotation: Math.PI * 2 }).repeat(-1);
                 }
     
             });
