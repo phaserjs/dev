@@ -31,6 +31,8 @@ class Snowflake extends Sprite
 
         this.speedX = Between(1, 8);
         this.speedY = Between(1, 8);
+
+        this.name = 'snow';
     }
 
     update (): void
@@ -212,11 +214,12 @@ let total = parseInt(params.get('t'));
 if (!total || total === 0)
 {
     total = 25000;
+    // total = 1;
 }
 
 const game = new Game(
     WebGL(),
-    BatchSize(4096 * 4),
+    BatchSize(4096),
     Parent('gameParent'),
     GlobalVar('Phaser4'),
     BackgroundColor(0x0a0a0a),
