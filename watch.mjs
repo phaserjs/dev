@@ -180,7 +180,7 @@ esbuild.build({
     sourcemap: true,
     minify: false,
     bundle: true,
-    plugins: [ inlineWorkerPlugin(), wasmPlugin ],
+    plugins: [ inlineWorkerPlugin() ],
     watch: {
         onRebuild(error, result)
         {
