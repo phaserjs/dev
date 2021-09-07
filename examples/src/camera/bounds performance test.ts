@@ -13,16 +13,17 @@ import { LoadAtlasFile } from '../../../../phaser-genesis/src/loader/files/LoadA
 import { LoadImageFile } from '../../../../phaser-genesis/src/loader/files/LoadImageFile';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
 import { SetWillUpdateChildren } from '../../../../phaser-genesis/src/components/permissions/SetWillUpdateChildren';
-import { StartStats } from '../../live/libs/stats.js';
 import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
 import { WillUpdateChildren } from '../../../../phaser-genesis/src/components/permissions/WillUpdateChildren';
 import { WorldCamera } from '../../../../phaser-genesis/src/camera/WorldCamera';
 
+// import { StartStats } from '../../live/libs/stats.js';
+
 // const worldSize = 131072;
 // const worldSize = 98304;
 // const worldSize = 65536;
-// const worldSize = 49152;
-const worldSize = 32768;
+const worldSize = 49152;
+// const worldSize = 32768;
 // const worldSize = 16384;
 // const worldSize = 8192;
 
@@ -123,7 +124,7 @@ class Demo extends Scene
 
         this.camera.setPosition(-(worldSize / 2), -(worldSize / 2));
 
-        StartStats(this.game);
+        // StartStats(this.game);
     }
 
     createGrass ()
@@ -221,7 +222,10 @@ let total = parseInt(params.get('t'));
 
 if (!total || total === 0)
 {
-    total = 25000;
+    // total = 25000;
+    // total = 15000;
+    total = 10000;
+    // total = 5000;
     // total = 1;
 }
 
@@ -235,3 +239,223 @@ const game = new Game(
 );
 
 window['game'] = game;
+
+//  Windows 10 (GeForce GTX 1660) - BranchSearch:
+
+/*
+
+10k - worldSize: 32768
+
+delta: 16.688333333283662
+dirtyColor: 0
+dirtyLocal: 10000
+dirtyQuad: 0
+dirtyView: 0
+dirtyWorld: 0
+fps: 59.922101268529495
+gameFrame: 360
+numChildren: 276242
+preRenderMs: 0.7000000029802322
+renderMs: 8.299999997019768
+rendered: 64
+updateMs: 1
+updated: 10002
+
+25k - worldSize: 32768
+
+delta: 16.957627118644066
+dirtyColor: 0
+dirtyLocal: 25000
+dirtyQuad: 0
+dirtyView: 0
+dirtyWorld: 0
+fps: 58.97051474262869
+gameFrame: 430
+numChildren: 291242
+preRenderMs: 1.699999988079071
+renderMs: 10
+rendered: 77
+updateMs: 2.300000011920929
+updated: 25002
+
+50k - worldSize: 32768
+
+delta: 20.38199999988079
+dirtyColor: 0
+dirtyLocal: 50000
+dirtyQuad: 0
+dirtyView: 0
+dirtyWorld: 0
+fps: 49.062898636338375
+gameFrame: 438
+numChildren: 316242
+preRenderMs: 3.6000000089406967
+renderMs: 11.799999997019768
+rendered: 77
+updateMs: 4.399999991059303
+updated: 50002
+
+100k - worldSize: 32768
+
+delta: 31.199999999819376
+dirtyColor: 0
+dirtyLocal: 100000
+dirtyQuad: 0
+dirtyView: 0
+dirtyWorld: 0
+fps: 32.0512820514676
+gameFrame: 258
+numChildren: 366242
+preRenderMs: 6.899999991059303
+renderMs: 14.399999991059303
+rendered: 101
+updateMs: 9.200000002980232
+updated: 100002
+
+10k - worldSize: 49152
+
+delta: 22.954545454545453
+dirtyColor: 0
+dirtyLocal: 10000
+dirtyQuad: 0
+dirtyView: 0
+dirtyWorld: 0
+fps: 43.56435643564357
+gameFrame: 365
+numChildren: 609042
+preRenderMs: 0.7000000029802322
+renderMs: 19.100000008940697
+rendered: 59
+updateMs: 0.7999999970197678
+updated: 10002
+
+25k - worldSize: 49152
+
+delta: 25.72307692315334
+dirtyColor: 0
+dirtyLocal: 25000
+dirtyQuad: 0
+dirtyView: 0
+dirtyWorld: 0
+fps: 38.875598086008914
+gameFrame: 280
+numChildren: 624042
+preRenderMs: 1.9000000059604645
+renderMs: 19.099999994039536
+rendered: 63
+updateMs: 3.0999999940395355
+updated: 25002
+
+50k - worldSize: 49152
+
+delta: 30.509090909000598
+dirtyColor: 0
+dirtyLocal: 50000
+dirtyQuad: 0
+dirtyView: 0
+dirtyWorld: 0
+fps: 32.77711561392301
+gameFrame: 246
+numChildren: 649042
+preRenderMs: 3.5
+renderMs: 24.299999997019768
+rendered: 68
+updateMs: 4.600000008940697
+updated: 50002
+
+100k - worldSize: 49152
+
+delta: 43.32083333345751
+dirtyColor: 0
+dirtyLocal: 100000
+dirtyQuad: 0
+dirtyView: 0
+dirtyWorld: 0
+fps: 23.083581802376845
+gameFrame: 174
+numChildren: 699042
+preRenderMs: 11.200000002980232
+renderMs: 27.200000002980232
+rendered: 73
+updateMs: 15.100000008940697
+updated: 100002
+
+*/
+
+//  Windows 10 (GeForce GTX 1660) - LL Iteration:
+
+/*
+
+10k - worldSize: 32768
+
+delta: 16.921666666616996
+dirtyColor: 0
+dirtyLocal: 10000
+dirtyQuad: 0
+dirtyView: 0
+dirtyWorld: 0
+fps: 59.09583374389453
+gameFrame: 509
+numChildren: 276242
+preRenderMs: 5
+renderMs: 9.399999991059303
+rendered: 64
+updateMs: 0.6000000089406967
+updated: 10002
+
+25k - worldSize: 32768
+
+delta: 19.856862745156473
+dirtyColor: 0
+dirtyLocal: 25000
+dirtyQuad: 0
+dirtyView: 0
+dirtyWorld: 0
+fps: 50.36042263241821
+gameFrame: 297
+numChildren: 291242
+preRenderMs: 6.700000002980232
+renderMs: 11.200000002980232
+rendered: 71
+updateMs: 1.2999999970197678
+updated: 25002
+
+50k - worldSize: 32768
+
+delta: 24.44146341448877
+dirtyColor: 0
+dirtyLocal: 50000
+dirtyQuad: 0
+dirtyView: 0
+dirtyWorld: 0
+fps: 40.91408043133806
+gameFrame: 217
+numChildren: 316242
+preRenderMs: 8.700000002980232
+renderMs: 11
+rendered: 82
+updateMs: 3
+updated: 50002
+
+100k - worldSize: 32768
+
+delta: 32.58064516129032
+dirtyColor: 0
+dirtyLocal: 100000
+dirtyQuad: 0
+dirtyView: 0
+dirtyWorld: 0
+fps: 30.693069306930692
+gameFrame: 250
+numChildren: 366242
+preRenderMs: 13.599999994039536
+renderMs: 13
+rendered: 112
+updateMs: 5.4000000059604645
+updated: 100002
+
+10k - worldSize: 49152
+
+Can't run at this world size! Errors in ULT reading IS_ROOT - array size error?
+
+*/
