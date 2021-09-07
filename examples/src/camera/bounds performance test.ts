@@ -13,12 +13,18 @@ import { LoadAtlasFile } from '../../../../phaser-genesis/src/loader/files/LoadA
 import { LoadImageFile } from '../../../../phaser-genesis/src/loader/files/LoadImageFile';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
 import { SetWillUpdateChildren } from '../../../../phaser-genesis/src/components/permissions/SetWillUpdateChildren';
+import { StartStats } from '../../live/libs/stats.js';
 import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
 import { WillUpdateChildren } from '../../../../phaser-genesis/src/components/permissions/WillUpdateChildren';
 import { WorldCamera } from '../../../../phaser-genesis/src/camera/WorldCamera';
 
+// const worldSize = 131072;
+// const worldSize = 98304;
+// const worldSize = 65536;
+// const worldSize = 49152;
 const worldSize = 32768;
-// const worldSize = 800;
+// const worldSize = 16384;
+// const worldSize = 8192;
 
 class Snowflake extends Sprite
 {
@@ -116,6 +122,8 @@ class Demo extends Scene
         console.log('Created snow in', (performance.now() - start), 'ms');
 
         this.camera.setPosition(-(worldSize / 2), -(worldSize / 2));
+
+        StartStats(this.game);
     }
 
     createGrass ()
@@ -129,9 +137,11 @@ class Demo extends Scene
 
         const start = performance.now();
 
-        for (let y = 0; y < 64; y++)
+        const size = worldSize / 512;
+
+        for (let y = 0; y < size; y++)
         {
-            for (let x = 0; x < 64; x++)
+            for (let x = 0; x < size; x++)
             {
                 AddChild(layer, new Sprite(x * 512, y * 512, 'grass').setOrigin(0, 0));
             }
@@ -153,9 +163,8 @@ class Demo extends Scene
 
         SetWillUpdateChildren(layer.id, false);
 
-        const size = 512;
-        // const size = 128;
-        // const size = 256;
+        const size = (worldSize / 512) * 8;
+
         let total = 0;
 
         console.log('Adding items ...');
@@ -164,7 +173,6 @@ class Demo extends Scene
 
         for (let y = 0; y < size; y++)
         {
-
             for (let x = 0; x < size; x++)
             {
                 const frame = GetRandom(frames);

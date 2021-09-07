@@ -4,6 +4,7 @@ import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../p
 import { BranchSearch } from '../../../../phaser-genesis/src/components/hierarchy/BranchSearch';
 import { Game } from '../../../../phaser-genesis/src/Game';
 import { LoadImageFile } from '../../../../phaser-genesis/src/loader/files/LoadImageFile';
+import { On } from '../../../../phaser-genesis/src/events/On';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
 import { Sprite } from '../../../../phaser-genesis/src/gameobjects';
 import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
@@ -32,8 +33,9 @@ class Demo extends Scene
         const A = new Sprite(350, 100, 'bolt');
         const B = new Sprite(400, 100, 'bolt');
         const C = new Sprite(450, 100, 'bolt');
+        const T = new Sprite(500, 100, 'bolt');
 
-        AddChildren(world, A, B, C);
+        AddChildren(world, A, B, C, T);
 
         const D = new Sprite(-50, 100, 'cd');
         const E = new Sprite(0, 100, 'cd');
@@ -66,6 +68,13 @@ class Demo extends Scene
 
         AddChildren(M, O, P);
 
+        On(world, 'update', () => {
+
+            A.rotation -= 0.01;
+            G.rotation -= 0.02;
+
+        });
+
         // const ids = [];
 
         // ids[world.id] = 'World';
@@ -90,10 +99,12 @@ class Demo extends Scene
     }
 }
 
-new Game(
+const game = new Game(
     WebGL(),
     Parent('gameParent'),
     GlobalVar('Phaser4'),
     BackgroundColor(0x0a0a0a),
     Scenes(Demo)
 );
+
+window['game'] = game;
