@@ -12,6 +12,7 @@ import { Keyboard } from '../../../../phaser-genesis/src/input/keyboard';
 import { LoadAtlasFile } from '../../../../phaser-genesis/src/loader/files/LoadAtlasFile';
 import { LoadImageFile } from '../../../../phaser-genesis/src/loader/files/LoadImageFile';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
+import { SetDepth } from '../../../../phaser-genesis/src/components/hierarchy/SetDepth';
 import { SetWillUpdateChildren } from '../../../../phaser-genesis/src/components/permissions/SetWillUpdateChildren';
 import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
 import { WillUpdateChildren } from '../../../../phaser-genesis/src/components/permissions/WillUpdateChildren';
@@ -22,8 +23,8 @@ import { WorldCamera } from '../../../../phaser-genesis/src/camera/WorldCamera';
 // const worldSize = 131072;
 // const worldSize = 98304;
 // const worldSize = 65536;
-const worldSize = 49152;
-// const worldSize = 32768;
+// const worldSize = 49152;
+const worldSize = 32768;
 // const worldSize = 16384;
 // const worldSize = 8192;
 
@@ -135,6 +136,7 @@ class Demo extends Scene
         const layer = new Layer();
 
         SetWillUpdateChildren(layer.id, false);
+        SetDepth(layer.id, 1);
 
         const start = performance.now();
 
@@ -163,6 +165,7 @@ class Demo extends Scene
         const layer = new Layer();
 
         SetWillUpdateChildren(layer.id, false);
+        SetDepth(layer.id, 1);
 
         const size = (worldSize / 512) * 8;
 
@@ -240,7 +243,313 @@ const game = new Game(
 
 window['game'] = game;
 
+//  ------------------------------------------------
+//  iMac M1 - 16GB - Big Sur 11.5.2  - BranchSearch:
+//  ------------------------------------------------
+
+/*
+
+10k - worldSize: 32768
+
+delta: 16.644262294300265
+dirtyColor: 0
+dirtyLocal: 10000
+dirtyQuad: 0
+dirtyView: 0
+dirtyWorld: 0
+fps: 60.08076430893812
+gameFrame: 649
+numChildren: 276242
+preRenderMs: 0.5
+renderMs: 4.599999904632568
+rendered: 66
+updateMs: 0.7000000476837158
+updated: 10002
+
+25k - worldSize: 32768
+
+delta: 16.668333331743877
+dirtyColor: 0
+dirtyLocal: 25000
+dirtyQuad: 0
+dirtyView: 0
+dirtyWorld: 0
+fps: 59.99400060566091
+gameFrame: 317
+numChildren: 291242
+preRenderMs: 1.1999998092651367
+renderMs: 4.900000095367432
+rendered: 74
+updateMs: 1.8000001907348633
+updated: 25002
+
+50k - worldSize: 32768
+
+delta: 16.671666665871935
+dirtyColor: 0
+dirtyLocal: 50000
+dirtyQuad: 0
+dirtyView: 0
+dirtyWorld: 0
+fps: 59.982005401239796
+gameFrame: 1836
+numChildren: 316242
+preRenderMs: 2.5
+renderMs: 5.099999904632568
+rendered: 85
+updateMs: 3.1000001430511475
+updated: 50002
+
+100k - worldSize: 32768
+
+delta: 16.675
+dirtyColor: 0
+dirtyLocal: 100000
+dirtyQuad: 0
+dirtyView: 0
+dirtyWorld: 0
+fps: 59.97001499250375
+gameFrame: 664
+numChildren: 366242
+preRenderMs: 4.5
+renderMs: 6.099999904632568
+rendered: 103
+updateMs: 5.200000047683716
+updated: 100002
+
+//  Using a reference: this._data = Transform2DComponent.data[id] saves us 1.2ms on 100k updates per frame
+updateMs: 4.900000095367432
+
+//  Using the prevParentID check in SetDirtyParents - saves us a massive extra 1.1ms on 100k updates per frame
+updateMs: 3.8000001907348633
+
+//  These 2 changes have taken the average update cost from 5.2ms to 3.7ms per frame (for 100k sprites) and it will scale horizontally well
+//  7.5ms for 200,000 moving sprites :) - without parent check it's 9.8ms (takes the test from 35fps to 40fps)
+
+
+
+10k - worldSize: 49152
+
+delta: 16.670491800933586
+dirtyColor: 0
+dirtyLocal: 10000
+dirtyQuad: 0
+dirtyView: 0
+dirtyWorld: 0
+fps: 59.986232676350774
+gameFrame: 328
+numChildren: 609042
+preRenderMs: 0.5
+renderMs: 9.900000095367432
+rendered: 58
+updateMs: 0.5
+updated: 10002
+
+25k - worldSize: 49152
+
+delta: 16.678688526153564
+dirtyColor: 0
+dirtyLocal: 25000
+dirtyQuad: 0
+dirtyView: 0
+dirtyWorld: 0
+fps: 59.9567525007687
+gameFrame: 422
+numChildren: 624042
+preRenderMs: 1.0999999046325684
+renderMs: 9.5
+rendered: 55
+updateMs: 1.5999999046325684
+updated: 25002
+
+50k - worldSize: 49152
+
+delta: 16.68166666428248
+dirtyColor: 0
+dirtyLocal: 50000
+dirtyQuad: 0
+dirtyView: 0
+dirtyWorld: 0
+fps: 59.94604856486697
+gameFrame: 454
+numChildren: 649042
+preRenderMs: 2.3000001907348633
+renderMs: 9.699999809265137
+rendered: 66
+updateMs: 2.6999998092651367
+updated: 50002
+
+100k - worldSize: 49152
+
+delta: 20.68979591739421
+dirtyColor: 0
+dirtyLocal: 100000
+dirtyQuad: 0
+dirtyView: 0
+dirtyWorld: 0
+fps: 48.33300453965742
+gameFrame: 307
+numChildren: 699042
+preRenderMs: 4.400000095367432
+renderMs: 9.900000095367432
+rendered: 82
+updateMs: 5.199999809265137
+updated: 100002
+
+10k - worldSize: 65536
+
+delta: 17.712280700081273
+dirtyColor: 0
+dirtyLocal: 10000
+dirtyQuad: 0
+dirtyView: 0
+dirtyWorld: 0
+fps: 56.458003174905166
+gameFrame: 433
+numChildren: 1074962
+preRenderMs: 0.39999985694885254
+renderMs: 15.5
+rendered: 64
+updateMs: 0.5
+updated: 10002
+
+25k - worldSize: 65536
+
+delta: 19.066037735849058
+dirtyColor: 0
+dirtyLocal: 25000
+dirtyQuad: 0
+dirtyView: 0
+dirtyWorld: 0
+fps: 52.449282533399305
+gameFrame: 345
+numChildren: 1089962
+preRenderMs: 1
+renderMs: 16.200000047683716
+rendered: 65
+updateMs: 1.3999998569488525
+updated: 25002
+
+50k - worldSize: 65536
+
+delta: 21.9195652163547
+dirtyColor: 0
+dirtyLocal: 50000
+dirtyQuad: 0
+dirtyView: 0
+dirtyWorld: 0
+fps: 45.62134285646672
+gameFrame: 614
+numChildren: 1114962
+preRenderMs: 2.0999999046325684
+renderMs: 16.200000047683716
+rendered: 58
+updateMs: 2.799999952316284
+updated: 50002
+
+100k - worldSize: 65536
+
+delta: 27.72702702960453
+dirtyColor: 0
+dirtyLocal: 100000
+dirtyQuad: 0
+dirtyView: 0
+dirtyWorld: 0
+fps: 36.06589335857343
+gameFrame: 207
+numChildren: 1164962
+preRenderMs: 4.400000095367432
+renderMs: 17.59999990463257
+rendered: 71
+updateMs: 5
+updated: 100002
+
+*/
+
+//  ------------------------------------------------
+//  iMac M1 - 16GB - Big Sur 11.5.2  - LL Iteration:
+//  ------------------------------------------------
+
+/*
+
+10k - worldSize: 32768
+
+delta: 16.672131147540984
+dirtyColor: 0
+dirtyLocal: 10000
+dirtyQuad: 0
+dirtyView: 0
+dirtyWorld: 0
+fps: 59.9803343166175
+gameFrame: 295
+numChildren: 276242
+preRenderMs: 4.8999998569488525
+renderMs: 6
+rendered: 64
+updateMs: 0.20000004768371582
+updated: 10002
+
+25k - worldSize: 32768
+
+delta: 17.91249999829701
+dirtyColor: 0
+dirtyLocal: 25000
+dirtyQuad: 0
+dirtyView: 0
+dirtyWorld: 0
+fps: 55.82693650216735
+gameFrame: 287
+numChildren: 291242
+preRenderMs: 4.200000047683716
+renderMs: 6.5
+rendered: 71
+updateMs: 0.7999999523162842
+updated: 25002
+
+50k - worldSize: 32768
+
+delta: 16.690000001589457
+dirtyColor: 0
+dirtyLocal: 50000
+dirtyQuad: 0
+dirtyView: 0
+dirtyWorld: 0
+fps: 59.91611742988412
+gameFrame: 282
+numChildren: 316242
+preRenderMs: 6
+renderMs: 6.700000047683716
+rendered: 76
+updateMs: 1.7000000476837158
+updated: 50002
+
+100k - worldSize: 32768
+
+delta: 19.23461538553238
+dirtyColor: 0
+dirtyLocal: 100000
+dirtyQuad: 0
+dirtyView: 0
+dirtyWorld: 0
+fps: 51.98960207710552
+gameFrame: 284
+numChildren: 366242
+preRenderMs: 7.800000190734863
+renderMs: 7.400000095367432
+rendered: 105
+updateMs: 3.0999999046325684
+updated: 100002
+
+10k - worldSize: 49152
+
+Can't run at this world size! Errors in ULT reading IS_ROOT - array size error?
+
+*/
+
+
+//  ---------------------------------------------
 //  Windows 10 (GeForce GTX 1660) - BranchSearch:
+//  ---------------------------------------------
 
 /*
 
@@ -382,7 +691,9 @@ updated: 100002
 
 */
 
+//  ---------------------------------------------
 //  Windows 10 (GeForce GTX 1660) - LL Iteration:
+//  ---------------------------------------------
 
 /*
 
