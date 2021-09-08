@@ -570,6 +570,23 @@ rendered: 64
 updateMs: 1
 updated: 10002
 
+//  10k after improvements:
+
+delta: 16.671666666368644
+dirtyColor: 0
+dirtyLocal: 10000
+dirtyQuad: 10002
+dirtyView: 0
+dirtyWorld: 0
+fps: 59.982005399452724
+gameFrame: 531
+numChildren: 276242
+preRenderMs: 0.5999999940395355
+renderMs: 7.9000000059604645
+rendered: 63
+updateMs: 0.5999999940395355
+updated: 10002
+
 25k - worldSize: 32768
 
 delta: 16.957627118644066
@@ -585,6 +602,23 @@ preRenderMs: 1.699999988079071
 renderMs: 10
 rendered: 77
 updateMs: 2.300000011920929
+updated: 25002
+
+//  25k after improvements:
+
+delta: 16.7
+dirtyColor: 0
+dirtyLocal: 25000
+dirtyQuad: 25002
+dirtyView: 0
+dirtyWorld: 0
+fps: 59.880239520958085
+gameFrame: 271
+numChildren: 291242
+preRenderMs: 1.600000023841858
+renderMs: 8.199999988079071
+rendered: 70
+updateMs: 1.5
 updated: 25002
 
 50k - worldSize: 32768
@@ -604,6 +638,23 @@ rendered: 77
 updateMs: 4.399999991059303
 updated: 50002
 
+//  50k after improvements:
+
+delta: 16.7316666662693
+dirtyColor: 0
+dirtyLocal: 50000
+dirtyQuad: 50002
+dirtyView: 0
+dirtyWorld: 0
+fps: 59.76690905610614
+gameFrame: 1726
+numChildren: 316242
+preRenderMs: 3.4000000059604645
+renderMs: 10.400000005960464
+rendered: 81
+updateMs: 2.699999988079071
+updated: 50002
+
 100k - worldSize: 32768
 
 delta: 31.199999999819376
@@ -620,6 +671,25 @@ renderMs: 14.399999991059303
 rendered: 101
 updateMs: 9.200000002980232
 updated: 100002
+
+//  100k after improvements:
+
+delta: 25.389999999850986
+dirtyColor: 0
+dirtyLocal: 100000
+dirtyQuad: 100002
+dirtyView: 0
+dirtyWorld: 0
+fps: 39.38558487616656
+gameFrame: 1510
+numChildren: 366242
+preRenderMs: 8.199999988079071
+renderMs: 10.800000011920929
+rendered: 109
+updateMs: 5.5
+updated: 100002
+
+
 
 10k - worldSize: 49152
 
