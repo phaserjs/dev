@@ -2,7 +2,7 @@ import { BackgroundColor, BatchSize, GlobalVar, Parent, Scenes, WebGL } from '..
 import { Between, Clamp } from '../../../../phaser-genesis/src/math';
 import { DownKey, LeftKey, RightKey, UpKey } from '../../../../phaser-genesis/src/input/keyboard/keys';
 import { GetTexture, Texture } from '../../../../phaser-genesis/src/textures';
-import { Layer, Sprite } from '../../../../phaser-genesis/src/gameobjects';
+import { Layer, SpatialGridLayer, Sprite } from '../../../../phaser-genesis/src/gameobjects';
 
 import { AddChild } from '../../../../phaser-genesis/src/display';
 import { DebugHierarchyComponent } from '../../../../phaser-genesis/src/components/hierarchy/DebugHierarchyComponent';
@@ -23,8 +23,8 @@ import { WorldCamera } from '../../../../phaser-genesis/src/camera/WorldCamera';
 // const worldSize = 131072;
 // const worldSize = 98304;
 // const worldSize = 65536;
-// const worldSize = 49152;
-const worldSize = 32768;
+const worldSize = 49152;
+// const worldSize = 32768;
 // const worldSize = 16384;
 // const worldSize = 8192;
 
@@ -133,10 +133,10 @@ class Demo extends Scene
         //  Grass texture is 512 x 512
         //  World is 64 x 64 tiles = 32,768 x 32,768
 
-        const layer = new Layer();
-
-        SetWillUpdateChildren(layer.id, false);
-        SetDepth(layer.id, 1);
+        // const layer = new Layer();
+        // SetWillUpdateChildren(layer.id, false);
+        
+        const layer = new SpatialGridLayer(256, 256, false);
 
         const start = performance.now();
 
@@ -162,10 +162,10 @@ class Demo extends Scene
         //  Remove __BASE texture
         frames.shift();
 
-        const layer = new Layer();
+        // const layer = new Layer();
+        // SetWillUpdateChildren(layer.id, false);
 
-        SetWillUpdateChildren(layer.id, false);
-        SetDepth(layer.id, 1);
+        const layer = new SpatialGridLayer(256, 256, false);
 
         const size = (worldSize / 512) * 8;
 
@@ -707,6 +707,37 @@ renderMs: 19.100000008940697
 rendered: 59
 updateMs: 0.7999999970197678
 updated: 10002
+
+----------------------------
+vvv Using SpatialHasGrid vvv
+----------------------------
+
+10k - worldSize: 49152
+
+delta: 16.666666666666668
+dirtyColor: 0
+dirtyLocal: 10000
+dirtyQuad: 10002
+dirtyView: 0
+dirtyWorld: 0
+fps: 60
+gameFrame: 391
+numChildren: 609042
+preRenderMs: 0.699999988079071
+processed: 10069
+renderMs: 0.4000000059604645
+rendered: 71
+updateMs: 1.4000000059604645
+updated: 10002
+
+----------------------------
+^^^ Using SpatialHasGrid ^^^
+----------------------------
+
+
+
+
+
 
 25k - worldSize: 49152
 
