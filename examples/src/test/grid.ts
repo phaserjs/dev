@@ -54,22 +54,7 @@ class Demo extends Scene
 
         const debugTexture = DebugSpriteIDTexture();
 
-        const grid = new SpatialHashGrid(0, 0, 800, 600, 100, 100);
-
-        const ddGrid = new DirectDraw();
-
-        ddGrid.render = () =>
-        {
-            grid.debug.forEach(cell => {
-
-                const { x, y, width, height } = cell;
-
-                ddGrid.box(x, y, width, height, 0.5, 0x00ff00);
-
-            });
-        };
-
-        AddChild(world, ddGrid);
+        const grid = new SpatialHashGrid(100, 100);
 
         const dd = new DirectDraw();
 
@@ -77,11 +62,6 @@ class Demo extends Scene
 
         const area = { x: 0, y: 0, width: 64, height: 22 };
 
-        // const area = { left: 0, top: 0, right: 0, bottom: 0, width: 16, height: 16 };
-        // area.right = area.left + area.width;
-        // area.bottom = area.top + area.height;
-
-        // let results = grid.intersects(area.left, area.top, area.right, area.bottom);
         let results;
 
         On(mouse, 'pointermove', (x: number, y: number, button: number) => {
@@ -91,23 +71,9 @@ class Demo extends Scene
 
             results = grid.inView(area.x, area.y, area.width, area.height);
 
-            // area.left = x;
-            // area.top = y;
-            // area.right = x + area.width;
-            // area.bottom = y + area.height;
-
-            // results = grid.intersects(area.left, area.top, area.right, area.bottom);
-
         });
 
         On(mouse, 'pointerdown', (x: number, y: number, button: number) => {
-
-            // area.left = x;
-            // area.top = y;
-            // area.right = x + area.width;
-            // area.bottom = y + area.height;
-
-            // results = grid.intersects(area.left, area.top, area.right, area.bottom);
 
             area.x = x;
             area.y = y;
@@ -120,6 +86,9 @@ class Demo extends Scene
 
         dd.render = () =>
         {
+            // grid.cells.forEach((key, cell))
+
+
             /*
             const key1 = grid.getKey(area.left, area.top);
             const key2 = grid.getKey(area.right, area.bottom);
@@ -150,9 +119,7 @@ class Demo extends Scene
             */
 
             dd.alpha = 1;
-            // dd.box(area.left, area.top, area.width, area.height, 1, 0xff0000);
             dd.box(area.x, area.y, area.width, area.height, 1, 0xff0000);
-
         };
 
         AddChild(world, dd);
@@ -171,12 +138,10 @@ class Demo extends Scene
             //  Because their transform is dirty right now
             UpdateTransforms(child.id, 0, 0, 800, 600, true);
 
-            grid.insert(child.id);
+            grid.add(child.id);
         }
 
         console.log(grid);
-
-        // results = grid.intersects(area.left, area.top, area.right, area.bottom);
 
         // StartStats(this.game);
     }
