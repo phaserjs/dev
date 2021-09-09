@@ -4,6 +4,7 @@ import { DownKey, LeftKey, RightKey, UpKey } from '../../../../phaser-genesis/sr
 
 import { AddChild } from '../../../../phaser-genesis/src/display';
 import { Between } from '../../../../phaser-genesis/src/math';
+import { DebugSpriteIDTexture } from '../../../../phaser-genesis/src/textures/types/DebugSpriteIDTexture';
 import { Game } from '../../../../phaser-genesis/src/Game';
 import { Keyboard } from '../../../../phaser-genesis/src/input/keyboard';
 import { LoadImageFile } from '../../../../phaser-genesis/src/loader/files/LoadImageFile';
@@ -45,13 +46,13 @@ class Demo extends Scene
         this.create();
     }
 
-    async create ()
+    create ()
     {
-        await LoadImageFile('mushroom', 'assets/mushroom-32x32.png');
-
         const world = new StaticWorld(this);
         
         this.camera = world.camera;
+
+        const debugTexture = DebugSpriteIDTexture();
 
         const grid = new SpatialHashGrid(0, 0, 800, 600, 100, 100);
 
@@ -74,46 +75,83 @@ class Demo extends Scene
 
         const mouse = new Mouse();
 
-        const area = { left: 80, top: 160, right: 300, bottom: 240, width: 220, height: 140 };
+        const area = { x: 0, y: 0, width: 64, height: 22 };
 
-        let results = grid.intersects(area.left, area.top, area.right, area.bottom);
+        // const area = { left: 0, top: 0, right: 0, bottom: 0, width: 16, height: 16 };
+        // area.right = area.left + area.width;
+        // area.bottom = area.top + area.height;
+
+        // let results = grid.intersects(area.left, area.top, area.right, area.bottom);
+        let results;
 
         On(mouse, 'pointermove', (x: number, y: number, button: number) => {
 
-            area.left = x;
-            area.top = y;
-            area.right = x + area.width;
-            area.bottom = y + area.height;
+            area.x = x;
+            area.y = y;
 
-            results = grid.intersects(area.left, area.top, area.right, area.bottom);
+            results = grid.inView(area.x, area.y, area.width, area.height);
+
+            // area.left = x;
+            // area.top = y;
+            // area.right = x + area.width;
+            // area.bottom = y + area.height;
+
+            // results = grid.intersects(area.left, area.top, area.right, area.bottom);
+
+        });
+
+        On(mouse, 'pointerdown', (x: number, y: number, button: number) => {
+
+            // area.left = x;
+            // area.top = y;
+            // area.right = x + area.width;
+            // area.bottom = y + area.height;
+
+            // results = grid.intersects(area.left, area.top, area.right, area.bottom);
+
+            area.x = x;
+            area.y = y;
+
+            results = grid.inView(area.x, area.y, area.width, area.height);
+
+            console.log(results);
 
         });
 
         dd.render = () =>
         {
+            /*
             const key1 = grid.getKey(area.left, area.top);
-            const key2 = grid.getKeyC(area.right, area.bottom);
+            const key2 = grid.getKey(area.right, area.bottom);
 
             let top;
 
             grid.debug.forEach(cell => {
 
-                const { key, x, y } = cell;
+                const { key, x, y, width, height } = cell;
 
                 if (key === key1)
                 {
                     top = { x, y };
+
+                    if (key === key2)
+                    {
+                        dd.alpha = 0.2;
+                        dd.rect(top.x, top.y, (x + width) - top.x, (y + height) - top.y, 0xffff00);
+                    }
                 }
                 else if (key === key2)
                 {
                     dd.alpha = 0.2;
-                    dd.rect(top.x, top.y, x - top.x, y - top.y, 0xffff00);
+                    dd.rect(top.x, top.y, (x + width) - top.x, (y + height) - top.y, 0xffff00);
                 }
 
             });
+            */
 
             dd.alpha = 1;
-            dd.box(area.left, area.top, area.width, area.height, 1, 0xff0000);
+            // dd.box(area.left, area.top, area.width, area.height, 1, 0xff0000);
+            dd.box(area.x, area.y, area.width, area.height, 1, 0xff0000);
 
         };
 
@@ -124,7 +162,11 @@ class Demo extends Scene
             const x = Between(0, 800);
             const y = Between(0, 600);
 
-            const child = AddChild(world, new Sprite(x, y, 'mushroom'));
+            const sprite = new Sprite(x, y, debugTexture);
+
+            sprite.setFrame(sprite.id);
+
+            const child = AddChild(world, sprite);
 
             //  Because their transform is dirty right now
             UpdateTransforms(child.id, 0, 0, 800, 600, true);
@@ -134,9 +176,9 @@ class Demo extends Scene
 
         console.log(grid);
 
-        results = grid.intersects(area.left, area.top, area.right, area.bottom);
+        // results = grid.intersects(area.left, area.top, area.right, area.bottom);
 
-        StartStats(this.game);
+        // StartStats(this.game);
     }
 
     update (): void
