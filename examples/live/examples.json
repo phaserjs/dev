@@ -9,26 +9,26 @@
         {
           "path": "examples/live/3d/edit cube.js",
           "name": "edit cube.js",
-          "size": 439048,
+          "size": 427734,
           "extension": ".js",
           "type": "file"
         },
         {
           "path": "examples/live/3d/primitives.js",
           "name": "primitives.js",
-          "size": 149836,
+          "size": 145072,
           "extension": ".js",
           "type": "file"
         },
         {
           "path": "examples/live/3d/rotating cube.js",
           "name": "rotating cube.js",
-          "size": 141041,
+          "size": 136511,
           "extension": ".js",
           "type": "file"
         }
       ],
-      "size": 729925,
+      "size": 709317,
       "type": "directory"
     },
     {
@@ -38,12 +38,19 @@
         {
           "path": "examples/live/camera/bounds performance test.js",
           "name": "bounds performance test.js",
-          "size": 177160,
+          "size": 197368,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/camera/performance test.js",
+          "name": "performance test.js",
+          "size": 197272,
           "extension": ".js",
           "type": "file"
         }
       ],
-      "size": 177160,
+      "size": 394640,
       "type": "directory"
     },
     {
@@ -208,7 +215,7 @@
         {
           "path": "examples/live/display/mass child test.js",
           "name": "mass child test.js",
-          "size": 177963,
+          "size": 172330,
           "extension": ".js",
           "type": "file"
         },
@@ -220,7 +227,7 @@
           "type": "file"
         }
       ],
-      "size": 1585669,
+      "size": 1580036,
       "type": "directory"
     },
     {
@@ -234,19 +241,19 @@
             {
               "path": "examples/live/gameobjects/animatedsprite/atlas animation.js",
               "name": "atlas animation.js",
-              "size": 191536,
+              "size": 185224,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/animatedsprite/create animation from atlas.js",
               "name": "create animation from atlas.js",
-              "size": 191004,
+              "size": 184690,
               "extension": ".js",
               "type": "file"
             }
           ],
-          "size": 382540,
+          "size": 369914,
           "type": "directory"
         },
         {
@@ -256,19 +263,19 @@
             {
               "path": "examples/live/gameobjects/container/add children.js",
               "name": "add children.js",
-              "size": 172854,
+              "size": 167174,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/container/banshee.js",
               "name": "banshee.js",
-              "size": 203138,
+              "size": 196676,
               "extension": ".js",
               "type": "file"
             }
           ],
-          "size": 375992,
+          "size": 363850,
           "type": "directory"
         },
         {
@@ -278,14 +285,14 @@
             {
               "path": "examples/live/gameobjects/directdraw/circle.js",
               "name": "circle.js",
-              "size": 184445,
+              "size": 178654,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/directdraw/circle.min.js",
               "name": "circle.min.js",
-              "size": 68503,
+              "size": 68399,
               "extension": ".js",
               "type": "file"
             },
@@ -320,33 +327,33 @@
             {
               "path": "examples/live/gameobjects/directdraw/shapes.js",
               "name": "shapes.js",
-              "size": 177516,
+              "size": 171725,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/directdraw/sprite bounds.js",
               "name": "sprite bounds.js",
-              "size": 201215,
+              "size": 194880,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/directdraw/tiles.js",
               "name": "tiles.js",
-              "size": 184628,
+              "size": 178607,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/directdraw/trail.js",
               "name": "trail.js",
-              "size": 200733,
+              "size": 194095,
               "extension": ".js",
               "type": "file"
             }
           ],
-          "size": 1730091,
+          "size": 1699411,
           "type": "directory"
         },
         {
@@ -356,26 +363,26 @@
             {
               "path": "examples/live/gameobjects/effectlayer/create effect layer.js",
               "name": "create effect layer.js",
-              "size": 194432,
+              "size": 188061,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/effectlayer/effect layer with sampler2d.js",
               "name": "effect layer with sampler2d.js",
-              "size": 175536,
+              "size": 169784,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/effectlayer/rectangle effect layer.js",
               "name": "rectangle effect layer.js",
-              "size": 184300,
+              "size": 178196,
               "extension": ".js",
               "type": "file"
             }
           ],
-          "size": 554268,
+          "size": 536041,
           "type": "directory"
         },
         {
@@ -385,12 +392,12 @@
             {
               "path": "examples/live/gameobjects/layer/create layer.js",
               "name": "create layer.js",
-              "size": 178365,
+              "size": 172512,
               "extension": ".js",
               "type": "file"
             }
           ],
-          "size": 178365,
+          "size": 172512,
           "type": "directory"
         },
         {
@@ -400,33 +407,33 @@
             {
               "path": "examples/live/gameobjects/rectangle/1024 rectangles.js",
               "name": "1024 rectangles.js",
-              "size": 168092,
+              "size": 162537,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/rectangle/create rectangle.js",
               "name": "create rectangle.js",
-              "size": 165462,
+              "size": 160024,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/rectangle/random rectangles.js",
               "name": "random rectangles.js",
-              "size": 167895,
+              "size": 162350,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/rectangle/transforming rectangles.js",
               "name": "transforming rectangles.js",
-              "size": 185201,
+              "size": 179034,
               "extension": ".js",
               "type": "file"
             }
           ],
-          "size": 686650,
+          "size": 663945,
           "type": "directory"
         },
         {
@@ -436,12 +443,12 @@
             {
               "path": "examples/live/gameobjects/renderlayer/create render layer.js",
               "name": "create render layer.js",
-              "size": 179424,
+              "size": 173530,
               "extension": ".js",
               "type": "file"
             }
           ],
-          "size": 179424,
+          "size": 173530,
           "type": "directory"
         },
         {
@@ -451,7 +458,7 @@
             {
               "path": "examples/live/gameobjects/sprite/add sprite on click.js",
               "name": "add sprite on click.js",
-              "size": 188279,
+              "size": 182324,
               "extension": ".js",
               "type": "file"
             },
@@ -465,7 +472,7 @@
             {
               "path": "examples/live/gameobjects/sprite/create sprite.js",
               "name": "create sprite.js",
-              "size": 180364,
+              "size": 174644,
               "extension": ".js",
               "type": "file"
             },
@@ -505,7 +512,7 @@
               "type": "file"
             }
           ],
-          "size": 1699919,
+          "size": 1688244,
           "type": "directory"
         },
         {
@@ -515,30 +522,30 @@
             {
               "path": "examples/live/gameobjects/text/create text.js",
               "name": "create text.js",
-              "size": 173502,
+              "size": 165477,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/text/fill style.js",
               "name": "fill style.js",
-              "size": 185480,
+              "size": 179655,
               "extension": ".js",
               "type": "file"
             },
             {
               "path": "examples/live/gameobjects/text/text stroke.js",
               "name": "text stroke.js",
-              "size": 173953,
+              "size": 168262,
               "extension": ".js",
               "type": "file"
             }
           ],
-          "size": 532935,
+          "size": 513394,
           "type": "directory"
         }
       ],
-      "size": 6320184,
+      "size": 6180841,
       "type": "directory"
     },
     {
@@ -629,6 +636,21 @@
       "type": "directory"
     },
     {
+      "path": "examples/live/test",
+      "name": "test",
+      "children": [
+        {
+          "path": "examples/live/test/grid.js",
+          "name": "grid.js",
+          "size": 200344,
+          "extension": ".js",
+          "type": "file"
+        }
+      ],
+      "size": 200344,
+      "type": "directory"
+    },
+    {
       "path": "examples/live/textures",
       "name": "textures",
       "children": [
@@ -693,6 +715,6 @@
       "type": "directory"
     }
   ],
-  "size": 13580070,
+  "size": 13832310,
   "type": "directory"
 }

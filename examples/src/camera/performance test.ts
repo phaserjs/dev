@@ -12,19 +12,18 @@ import { GetRandom } from '../../../../phaser-genesis/src/utils/array/GetRandom'
 import { Keyboard } from '../../../../phaser-genesis/src/input/keyboard';
 import { LoadAtlasFile } from '../../../../phaser-genesis/src/loader/files/LoadAtlasFile';
 import { LoadImageFile } from '../../../../phaser-genesis/src/loader/files/LoadImageFile';
+import { Mouse } from '../../../../phaser-genesis/src/input/mouse/Mouse';
+import { On } from '../../../../phaser-genesis/src/events/On';
 import { Play } from '../../../../phaser-genesis/src/animation/Play';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
 import { StartStats } from '../../live/libs/stats.js';
 import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
 import { WorldCamera } from '../../../../phaser-genesis/src/camera/WorldCamera';
 
-// const worldSize = 131072;
-// const worldSize = 98304;
-const worldSize = 65536;
-// const worldSize = 49152;
-// const worldSize = 32768;
-// const worldSize = 16384;
-// const worldSize = 8192;
+let worldX = 0;
+let worldY = 0;
+let worldWidth = 1024;
+let worldHeight = 1024;
 
 class Fireball extends AnimatedSprite
 {
@@ -33,7 +32,7 @@ class Fireball extends AnimatedSprite
 
     constructor (fireballAnimation)
     {
-        super(Between(0, worldSize), Between(0, worldSize), 'fireball');
+        super(Between(0, worldWidth), Between(0, worldHeight), 'fireball');
 
         this.speedX = Between(1, 8);
         this.speedY = Between(1, 8);
@@ -52,10 +51,10 @@ class Fireball extends AnimatedSprite
 
         if (this.x < 0)
         {
-            this.x = worldSize;
+            this.x = worldWidth;
         }
 
-        if (this.y > worldSize)
+        if (this.y > worldHeight)
         {
             this.y = 0;
         }
@@ -72,6 +71,9 @@ class Demo extends Scene
     camera: WorldCamera;
     world: StaticWorld;
     texture: Texture;
+
+    grassLayer: SpatialGridLayer;
+    itemsLayer: SpatialGridLayer;
 
     cameraSpeed: number = 16;
 
@@ -97,22 +99,27 @@ class Demo extends Scene
 
         await LoadAtlasFile('items', 'assets/land.png', 'assets/land.json');
         await LoadImageFile('grass', 'assets/textures/grass-plain.png');
-        await LoadImageFile('snow', 'assets/particle1.png');
         await LoadAtlasFile('fireball', 'assets/fireball.png', 'assets/fireball.json');
 
         console.log('Creating ...');
 
         const world = new StaticWorld(this);
         
+        this.grassLayer = new SpatialGridLayer(256, 256, false);
+        this.itemsLayer = new SpatialGridLayer(256, 256, false);
+
+        AddChild(world, this.grassLayer);
+        AddChild(world, this.itemsLayer);
+
         this.world = world;
 
         this.camera = this.world.camera;
 
         this.texture = GetTexture('items');
 
-        this.createGrass();
-        this.createLandscape();
-        
+        this.addLand();
+        // this.addLand();
+
         console.log('And I bring you, fire ...');
 
         const fireballAnimation = CreateAnimationFromAtlas({ key: 'fire', texture: 'fireball', prefix: 'trail_', start: 0, end: 12, zeroPad: 2 });
@@ -128,67 +135,60 @@ class Demo extends Scene
         
         console.log(`Created ${total} fireballs in`, (performance.now() - start), 'ms');
 
-        this.camera.setPosition(-(worldSize / 2), -(worldSize / 2));
+        const mouse = new Mouse();
+
+        On(mouse, 'pointerdown', () => {
+
+            console.log('add land');
+            this.addLand();
+
+        });
+
+        this.camera.setPosition(-(worldWidth / 2), -(worldHeight / 2));
 
         StartStats(this.game);
     }
 
-    createGrass ()
+    addLand ()
     {
+        const wx = worldX;
+        const wy = worldY;
+
         //  Grass texture is 512 x 512
-        //  World is 64 x 64 tiles = 32,768 x 32,768
-        
-        const layer = new SpatialGridLayer(256, 256, false);
 
-        const start = performance.now();
+        AddChild(this.grassLayer, new Sprite(wx, wy, 'grass').setOrigin(0, 0));
+        AddChild(this.grassLayer, new Sprite(wx + 512, wy, 'grass').setOrigin(0, 0));
+        AddChild(this.grassLayer, new Sprite(wx, wy + 512, 'grass').setOrigin(0, 0));
+        AddChild(this.grassLayer, new Sprite(wx + 512, wy + 512, 'grass').setOrigin(0, 0));
 
-        const size = worldSize / 512;
-
-        for (let y = 0; y < size; y++)
-        {
-            for (let x = 0; x < size; x++)
-            {
-                AddChild(layer, new Sprite(x * 512, y * 512, 'grass').setOrigin(0, 0));
-            }
-        }
-
-        console.log(`Created grass in ${(performance.now() - start)} ms`);
-
-        AddChild(this.world, layer);
-    }
-
-    createLandscape ()
-    {
         const frames = Array.from(this.texture.frames.keys());
 
         //  Remove __BASE texture
         frames.shift();
 
-        const layer = new SpatialGridLayer(256, 256, false);
+        const items = [];
 
-        const size = (worldSize / 512) * 8;
-
-        let total = 0;
-
-        console.log('Adding items ...');
-
-        const start = performance.now();
-
-        for (let y = 0; y < size; y++)
+        for (let y = 0; y < 6; y++)
         {
-            for (let x = 0; x < size; x++)
+            for (let x = 0; x < 6; x++)
             {
                 const frame = GetRandom(frames);
 
-                AddChild(layer, new Sprite(256 + (x * 128), size + (y * 128), 'items', frame).setOrigin(0.5, 1));
+                const rx = Between(-64, 64);
+                const ry = Between(-64, 64);
 
-                total++;
+                items.push(new Sprite(wx + 128 + rx + (x * 128), wy + 256 + ry + (y * 128), 'items', frame).setOrigin(0.5, 1));
             }
         }
 
-        console.log(`${total} items in ${(performance.now() - start)} ms`);
+        items.sort((a, b) => a.y - b.y);
 
-        AddChild(this.world, layer);
+        items.forEach(item => AddChild(this.itemsLayer, item));
+
+        console.log(items[0]);
+
+        worldX += 1024;
+        worldWidth += 1024;
     }
 
     update (): void
@@ -226,7 +226,8 @@ if (!total || total === 0)
 {
     // total = 25000;
     // total = 15000;
-    total = 10000;
+    // total = 10000;
+    total = 10;
     // total = 5000;
     // total = 1;
 }
