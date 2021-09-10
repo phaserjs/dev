@@ -3423,6 +3423,11 @@ void main (void)
     return !!DirtyComponent.data[id][DIRTY.WORLD_TRANSFORM];
   }
 
+  // ../phaser-genesis/src/components/dirty/SetDirtyChildColor.ts
+  function SetDirtyChildColor(id) {
+    DirtyComponent.data[id][DIRTY.CHILD_COLOR] = 1;
+  }
+
   // ../phaser-genesis/src/components/dirty/SetDirtyDisplayList.ts
   function SetDirtyDisplayList(id) {
     DirtyComponent.data[id][DIRTY.DISPLAY_LIST] = 1;
@@ -4967,12 +4972,14 @@ void main (void)
     cells;
     ids;
     index;
-    constructor(cellWidth, cellHeight) {
+    getBounds;
+    constructor(cellWidth, cellHeight, getBounds = GetLocalBounds) {
       this.cellWidth = Math.abs(cellWidth);
       this.cellHeight = Math.abs(cellHeight);
       this.cells = new Map();
       this.ids = [];
       this.index = 0;
+      this.getBounds = getBounds;
     }
     clear() {
       this.cells.forEach((cell) => cell.clear());
@@ -5050,7 +5057,7 @@ void main (void)
       return new Set(results);
     }
     add(id) {
-      const { left, top, right, bottom } = GetLocalBounds(id);
+      const { left, top, right, bottom } = this.getBounds(id);
       const topLeftX = this.getX(left);
       const topLeftY = this.getY(top);
       const bottomRightX = this.getXCeil(right);
@@ -5083,10 +5090,13 @@ void main (void)
     has(id) {
       return !!this.ids[id];
     }
+    getAll() {
+      return this.ids.filter((index, id) => id !== void 0);
+    }
     remove(id) {
       if (this.has(id)) {
         this.cells.forEach((cell) => cell.delete(id));
-        this.ids[id] = 0;
+        this.ids[id] = void 0;
       }
     }
   };
@@ -5095,6 +5105,7 @@ void main (void)
   var SpatialGridLayer = class extends GameObject {
     type = "SpatialGridLayer";
     hash;
+    onSortChildren;
     constructor(cellWidth = 512, cellHeight = 512, updateChildren = false) {
       super();
       this.hash = new SpatialHashGrid(cellWidth, cellHeight);
@@ -5104,6 +5115,7 @@ void main (void)
       SetWillUpdateChildren(id, updateChildren);
     }
     getChildren(renderPass) {
+      ClearDirtyDisplayList(this.id);
       const camera = renderPass.current2DCamera;
       const cx = camera.getBoundsX();
       const cy = camera.getBoundsY();
@@ -5114,19 +5126,22 @@ void main (void)
       childIDs.forEach((id) => {
         result.push(GameObjectCache.get(id));
       });
-      ClearDirtyDisplayList(this.id);
+      if (this.onSortChildren) {
+        result.sort(this.onSortChildren);
+      }
       return result;
     }
     onAddChild(childID) {
       if (!HasDirtyTransform(childID)) {
         this.hash.add(childID);
       }
+      const worldID = GetWorldID(this.id);
       SetDirtyDisplayList(this.id);
-      SetDirtyChildTransform(GetWorldID(this.id));
+      SetDirtyChildTransform(worldID);
+      SetDirtyChildColor(worldID);
     }
     onUpdateChild(childID) {
       this.hash.update(childID);
-      console.log("onUpdateChild", childID);
     }
     onRemoveChild(childID) {
       this.hash.remove(childID);
@@ -5137,15 +5152,6 @@ void main (void)
       super.destroy(reparentChildren);
     }
   };
-
-  // ../phaser-genesis/src/utils/array/GetRandom.ts
-  function GetRandom(array, startIndex = 0, length) {
-    if (!length) {
-      length = array.length;
-    }
-    const randomIndex = startIndex + Math.floor(Math.random() * length);
-    return array[randomIndex];
-  }
 
   // ../phaser-genesis/src/components/hierarchy/ClearSiblings.ts
   function ClearSiblings(childID) {
@@ -6933,11 +6939,9 @@ void main (void)
       this.create();
     }
     async create() {
-      console.log("Loading ...");
       await LoadAtlasFile("items", "assets/land.png", "assets/land.json");
       await LoadImageFile("grass", "assets/textures/grass-plain.png");
       await LoadAtlasFile("fireball", "assets/fireball.png", "assets/fireball.json");
-      console.log("Creating ...");
       const world2 = new StaticWorld(this);
       this.grassLayer = new SpatialGridLayer(256, 256, false);
       this.itemsLayer = new SpatialGridLayer(256, 256, false);
@@ -6947,45 +6951,38 @@ void main (void)
       this.camera = this.world.camera;
       this.texture = GetTexture("items");
       this.addLand();
-      console.log("And I bring you, fire ...");
       const fireballAnimation = CreateAnimationFromAtlas({ key: "fire", texture: "fireball", prefix: "trail_", start: 0, end: 12, zeroPad: 2 });
-      const start = performance.now();
       for (let i = 0; i < total; i++) {
         const fireball = new Fireball(fireballAnimation);
         AddChild(world2, fireball);
       }
-      console.log(`Created ${total} fireballs in`, performance.now() - start, "ms");
       const mouse = new Mouse();
       On(mouse, "pointerdown", () => {
-        console.log("add land");
         this.addLand();
       });
-      this.camera.setPosition(-(worldWidth / 2), -(worldHeight / 2));
       StartStats(this.game);
     }
     addLand() {
       const wx = worldX;
       const wy = worldY;
+      console.log("addLand", wx, wy);
       AddChild(this.grassLayer, new Sprite(wx, wy, "grass").setOrigin(0, 0));
-      AddChild(this.grassLayer, new Sprite(wx + 512, wy, "grass").setOrigin(0, 0));
-      AddChild(this.grassLayer, new Sprite(wx, wy + 512, "grass").setOrigin(0, 0));
-      AddChild(this.grassLayer, new Sprite(wx + 512, wy + 512, "grass").setOrigin(0, 0));
-      const frames = Array.from(this.texture.frames.keys());
-      frames.shift();
-      const items = [];
-      for (let y = 0; y < 6; y++) {
-        for (let x = 0; x < 6; x++) {
-          const frame2 = GetRandom(frames);
-          const rx = Between(-64, 64);
-          const ry = Between(-64, 64);
-          items.push(new Sprite(wx + 128 + rx + x * 128, wy + 256 + ry + y * 128, "items", frame2).setOrigin(0.5, 1));
-        }
-      }
-      items.sort((a, b) => a.y - b.y);
-      items.forEach((item) => AddChild(this.itemsLayer, item));
-      console.log(items[0]);
-      worldX += 1024;
-      worldWidth += 1024;
+      const frames = [
+        "SmallChest1",
+        "SmallChest2",
+        "SmallChest4",
+        "SmallChest5",
+        "SmallChest6",
+        "SmallChest7",
+        "SmallChest8",
+        "SmallChest9",
+        "SmallChest10"
+      ];
+      AddChild(this.itemsLayer, new Sprite(wx + 128, wy + 128, "items", "SmallChest1").setOrigin(0.5, 1));
+      AddChild(this.itemsLayer, new Sprite(wx + 336, wy + 128, "items", "SmallChest2").setOrigin(0.5, 1));
+      AddChild(this.itemsLayer, new Sprite(wx + 128, wy + 336, "items", "SmallChest4").setOrigin(0.5, 1));
+      AddChild(this.itemsLayer, new Sprite(wx + 336, wy + 336, "items", "SmallChest5").setOrigin(0.5, 1));
+      worldX += 512;
     }
     update() {
       if (!this.camera) {

@@ -45,12 +45,12 @@
         {
           "path": "examples/live/camera/performance test.js",
           "name": "performance test.js",
-          "size": 205009,
+          "size": 205400,
           "extension": ".js",
           "type": "file"
         }
       ],
-      "size": 402377,
+      "size": 402768,
       "type": "directory"
     },
     {
@@ -522,7 +522,7 @@
             {
               "path": "examples/live/gameobjects/text/create text.js",
               "name": "create text.js",
-              "size": 165477,
+              "size": 167824,
               "extension": ".js",
               "type": "file"
             },
@@ -541,11 +541,11 @@
               "type": "file"
             }
           ],
-          "size": 513394,
+          "size": 515741,
           "type": "directory"
         }
       ],
-      "size": 6180841,
+      "size": 6183188,
       "type": "directory"
     },
     {
@@ -649,12 +649,12 @@
         {
           "path": "examples/live/test/hash.js",
           "name": "hash.js",
-          "size": 189078,
+          "size": 189675,
           "extension": ".js",
           "type": "file"
         }
       ],
-      "size": 389422,
+      "size": 390019,
       "type": "directory"
     },
     {
@@ -722,6 +722,6 @@
       "type": "directory"
     }
   ],
-  "size": 14029125,
+  "size": 14032460,
   "type": "directory"
 }
