@@ -1,11 +1,12 @@
 import { BackgroundColor, BatchSize, GlobalVar, Parent, Scenes, WebGL } from '../../../../phaser-genesis/src/config';
-import { Between, Clamp } from '../../../../phaser-genesis/src/math';
 import { DownKey, LeftKey, RightKey, UpKey } from '../../../../phaser-genesis/src/input/keyboard/keys';
 import { GetTexture, Texture } from '../../../../phaser-genesis/src/textures';
-import { SpatialGridLayer, Sprite } from '../../../../phaser-genesis/src/gameobjects';
+import { SpatialGridLayer, Sprite, Text } from '../../../../phaser-genesis/src/gameobjects';
 
 import { AddChild } from '../../../../phaser-genesis/src/display';
 import { AnimatedSprite } from '../../../../phaser-genesis/src/gameobjects/animatedsprite/AnimatedSprite';
+import { Animation } from '../../../../phaser-genesis/src/animation/Animation';
+import { Between } from '../../../../phaser-genesis/src/math';
 import { CreateAnimationFromAtlas } from '../../../../phaser-genesis/src/animation/CreateAnimationFromAtlas';
 import { Game } from '../../../../phaser-genesis/src/Game';
 import { GetRandom } from '../../../../phaser-genesis/src/utils/array/GetRandom';
@@ -16,14 +17,20 @@ import { Mouse } from '../../../../phaser-genesis/src/input/mouse/Mouse';
 import { On } from '../../../../phaser-genesis/src/events/On';
 import { Play } from '../../../../phaser-genesis/src/animation/Play';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
+import { SetBackgroundStyle } from '../../../../phaser-genesis/src/gameobjects/text/SetBackgroundStyle';
+import { SetLineSpacing } from '../../../../phaser-genesis/src/gameobjects/text/SetLineSpacing';
+import { SetPadding } from '../../../../phaser-genesis/src/gameobjects/text/SetPadding';
 import { StartStats } from '../../live/libs/stats.js';
 import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
+import { World } from '../../../../phaser-genesis/src/world/World';
 import { WorldCamera } from '../../../../phaser-genesis/src/camera/WorldCamera';
 
-let worldX = 0;
-let worldY = 0;
-let worldWidth = 1024;
-let worldHeight = 1024;
+let worldWidth = 512;
+let worldHeight = 512;
+let gridSize = 512;
+let gridWidth = 0;
+
+// let gridSize = 32;
 
 class Fireball extends AnimatedSprite
 {
@@ -69,13 +76,15 @@ class Demo extends Scene
     downKey: RightKey;
 
     camera: WorldCamera;
-    world: StaticWorld;
+    world: World;
     texture: Texture;
 
     grassLayer: SpatialGridLayer;
     itemsLayer: SpatialGridLayer;
 
     cameraSpeed: number = 16;
+    fireballAnimation: Animation;
+    stats: Text;
 
     constructor ()
     {
@@ -98,16 +107,18 @@ class Demo extends Scene
         await LoadAtlasFile('items', 'assets/land.png', 'assets/land.json');
         await LoadImageFile('grass', 'assets/textures/grass-plain.png');
         await LoadAtlasFile('fireball', 'assets/fireball.png', 'assets/fireball.json');
+        await LoadImageFile('32', 'assets/32x32.png');
+        await LoadImageFile('322', 'assets/drawcursor.png');
 
-        const world = new StaticWorld(this);
+        const world = new World(this);
         
         this.grassLayer = new SpatialGridLayer(256, 256, false);
         this.itemsLayer = new SpatialGridLayer(256, 256, false);
 
-        // this.itemsLayer.onSortChildren = (a: Sprite, b: Sprite) =>
-        // {
-        //     return a.y - b.y;
-        // }
+        this.itemsLayer.onSortChildren = (a: Sprite, b: Sprite) =>
+        {
+            return a.y - b.y;
+        }
 
         AddChild(world, this.grassLayer);
         AddChild(world, this.itemsLayer);
@@ -118,92 +129,96 @@ class Demo extends Scene
 
         this.texture = GetTexture('items');
 
-        this.addLand();
+        this.fireballAnimation = CreateAnimationFromAtlas({ key: 'fire', texture: 'fireball', prefix: 'trail_', start: 0, end: 12, zeroPad: 2 });
 
-        const fireballAnimation = CreateAnimationFromAtlas({ key: 'fire', texture: 'fireball', prefix: 'trail_', start: 0, end: 12, zeroPad: 2 });
+        this.addGrid();
 
-        for (let i = 0; i < total; i++)
-        {
-            const fireball = new Fireball(fireballAnimation);
+        this.stats = new Text(0, 0, 'Click to expand the World\nCursors to scroll').setOrigin(0, 0);
 
-            AddChild(world, fireball);
-        }
-        
+        SetPadding(8, 8, 8, 8, this.stats);
+        SetLineSpacing(20, this.stats);
+        SetBackgroundStyle('rgba(0, 0, 0, 0.8)', 6, this.stats);
+
+        AddChild(world, this.stats);
+
         const mouse = new Mouse();
 
         On(mouse, 'pointerdown', () => {
 
-            this.addLand();
+            this.addGrid();
 
+            const total = window['game'].renderStats.numChildren;
+
+            this.stats.setText([
+                'Click to expand the World',
+                `World size: ${worldWidth} x ${worldHeight}`,
+                `Total sprites: ${total}`
+            ]);
         });
 
-        // this.camera.setPosition(-(worldWidth / 2), -(worldHeight / 2));
+        On(world, 'worldprerender', () =>
+        {
+            this.stats.x = this.camera.getBoundsX() + 16;
+            this.stats.y = this.camera.getBoundsBottom() - 108;
+        });
+
+        this.camera.setPosition(0, 100);
 
         StartStats(this.game);
     }
 
-    addLand ()
+    addGrid ()
     {
-        const wx = worldX;
-        const wy = worldY;
-        
-        console.log('addLand', wx, wy);
+        const startX = (gridWidth * gridSize);
+        const startY = (gridWidth * gridSize);
 
+        gridWidth++;
+
+        for (let i = 0; i < gridWidth; i++)
+        {
+            this.addLand(startX, gridSize * i);
+            // AddChild(this.grassLayer, new Sprite(startX, gridSize * i, '32').setOrigin(0, 0));
+        }
+
+        for (let i = 0; i < gridWidth - 1; i++)
+        {
+            this.addLand(gridSize * i, startY);
+            // AddChild(this.grassLayer, new Sprite(gridSize * i, startY, '322').setOrigin(0, 0));
+        }
+
+        for (let i = 0; i < 32; i++)
+        {
+            const fireball = new Fireball(this.fireballAnimation);
+
+            AddChild(this.world, fireball);
+        }
+
+        worldWidth += 512;
+        worldHeight += 512;
+    }
+
+    addLand (wx, wy)
+    {
         //  Grass texture is 512 x 512
-
         AddChild(this.grassLayer, new Sprite(wx, wy, 'grass').setOrigin(0, 0));
 
-        // const frames = Array.from(this.texture.frames.keys());
+        const frames = Array.from(this.texture.frames.keys());
 
         //  Remove __BASE texture
-        // frames.shift();
+        frames.shift();
 
-        // console.log(frames);
-
-        const frames = [
-            'SmallChest1',
-            'SmallChest2',
-            'SmallChest4',
-            'SmallChest5',
-            'SmallChest6',
-            'SmallChest7',
-            'SmallChest8',
-            'SmallChest9',
-            'SmallChest10',
-        ];
-
-        AddChild(this.itemsLayer, new Sprite(wx + 128, wy + 128, 'items', 'SmallChest1').setOrigin(0.5, 1));
-        AddChild(this.itemsLayer, new Sprite(wx + 336, wy + 128, 'items', 'SmallChest2').setOrigin(0.5, 1));
-        AddChild(this.itemsLayer, new Sprite(wx + 128, wy + 336, 'items', 'SmallChest4').setOrigin(0.5, 1));
-        AddChild(this.itemsLayer, new Sprite(wx + 336, wy + 336, 'items', 'SmallChest5').setOrigin(0.5, 1));
-
-        /*
-        for (let y = 0; y < 2; y++)
+        for (let y = 0; y < 8; y++)
         {
-            for (let x = 0; x < 2; x++)
+            for (let x = 0; x < 8; x++)
             {
                 const frame = GetRandom(frames);
 
-                AddChild(this.itemsLayer, new Sprite(wx, ry, 'items', frame).setOrigin(0.5, 1));
+                const rx = Between(wx + 48, wx + 464);
+                const ry = Between(wy + 48, wy + 464);
 
-
-                // const rx = Between(wx + 128, wx + 384);
-                // const ry = Between(wy + 128, wy + 384);
-
-                // const s = AddChild(this.itemsLayer, new Sprite(rx, ry, 'items', frame).setOrigin(0.5, 1));
-
-                const s = AddChild(this.itemsLayer, new Sprite(rx, ry, 'items', frame).setOrigin(0.5, 1));
-
-                // s.alpha = 0.5;
-
-                console.log(s.frame.key, s.x, s.y);
+                AddChild(this.itemsLayer, new Sprite(rx, ry, 'items', frame).setOrigin(0.5, 1));
             }
         }
-        */
-
-        worldX += 512;
-        // worldX += 1024;
-        // worldWidth += 1024;
     }
 
     update (): void
@@ -239,12 +254,7 @@ let total = parseInt(params.get('t'));
 
 if (!total || total === 0)
 {
-    // total = 25000;
-    // total = 15000;
-    // total = 10000;
-    total = 10;
-    // total = 5000;
-    // total = 1;
+    total = 16;
 }
 
 const game = new Game(
