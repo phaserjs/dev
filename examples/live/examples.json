@@ -45,12 +45,12 @@
         {
           "path": "examples/live/camera/performance test.js",
           "name": "performance test.js",
-          "size": 197272,
+          "size": 205009,
           "extension": ".js",
           "type": "file"
         }
       ],
-      "size": 394640,
+      "size": 402377,
       "type": "directory"
     },
     {
@@ -645,9 +645,16 @@
           "size": 200344,
           "extension": ".js",
           "type": "file"
+        },
+        {
+          "path": "examples/live/test/hash.js",
+          "name": "hash.js",
+          "size": 189078,
+          "extension": ".js",
+          "type": "file"
         }
       ],
-      "size": 200344,
+      "size": 389422,
       "type": "directory"
     },
     {
@@ -715,6 +722,6 @@
       "type": "directory"
     }
   ],
-  "size": 13832310,
+  "size": 14029125,
   "type": "directory"
 }
