@@ -45,12 +45,12 @@
         {
           "path": "examples/live/camera/performance test.js",
           "name": "performance test.js",
-          "size": 214499,
+          "size": 214612,
           "extension": ".js",
           "type": "file"
         }
       ],
-      "size": 411867,
+      "size": 411980,
       "type": "directory"
     },
     {
@@ -729,6 +729,6 @@
       "type": "directory"
     }
   ],
-  "size": 14216684,
+  "size": 14216797,
   "type": "directory"
 }

@@ -7226,10 +7226,13 @@ void main (void)
       this.stats = new Text(0, 0, "Click to expand the World\nCursors to scroll").setOrigin(0, 0);
       SetPadding(8, 8, 8, 8, this.stats);
       SetLineSpacing(20, this.stats);
-      SetBackgroundStyle("rgba(0, 0, 0, 0.8)", 6, this.stats);
+      SetBackgroundStyle("rgba(0, 0, 150, 0.8)", 6, this.stats);
       AddChild(world2, this.stats);
       const mouse = new Mouse();
       On(mouse, "pointerdown", () => {
+        if (window["game"].renderStats.numChildren > 15e5) {
+          return;
+        }
         this.addGrid();
         const total2 = window["game"].renderStats.numChildren;
         this.stats.setText([
@@ -7242,7 +7245,7 @@ void main (void)
         this.stats.x = this.camera.getBoundsX() + 16;
         this.stats.y = this.camera.getBoundsBottom() - 108;
       });
-      this.camera.setPosition(0, 100);
+      this.camera.setPosition(0, 50);
       StartStats(this.game);
     }
     addGrid() {

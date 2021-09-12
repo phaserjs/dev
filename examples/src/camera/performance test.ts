@@ -137,13 +137,18 @@ class Demo extends Scene
 
         SetPadding(8, 8, 8, 8, this.stats);
         SetLineSpacing(20, this.stats);
-        SetBackgroundStyle('rgba(0, 0, 0, 0.8)', 6, this.stats);
+        SetBackgroundStyle('rgba(0, 0, 150, 0.8)', 6, this.stats);
 
         AddChild(world, this.stats);
 
         const mouse = new Mouse();
 
         On(mouse, 'pointerdown', () => {
+
+            if (window['game'].renderStats.numChildren > 1500000)
+            {
+                return;
+            }
 
             this.addGrid();
 
@@ -162,7 +167,7 @@ class Demo extends Scene
             this.stats.y = this.camera.getBoundsBottom() - 108;
         });
 
-        this.camera.setPosition(0, 100);
+        this.camera.setPosition(0, 50);
 
         StartStats(this.game);
     }
