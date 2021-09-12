@@ -440,7 +440,6 @@
       if (!texture) {
         return CreateGLTexture(this);
       } else {
-        this.unbind();
         return UpdateGLTexture(this);
       }
     }
@@ -2459,13 +2458,13 @@ void main (void)
     constructor(renderPass) {
       this.renderPass = renderPass;
     }
-    bind(texture, index = 0) {
+    bind(texture, index = 1) {
       const binding = texture.binding;
       binding.bind(index);
       gl.activeTexture(gl.TEXTURE0 + index);
       gl.bindTexture(gl.TEXTURE_2D, binding.texture);
     }
-    unbind(index = 0) {
+    unbind(index = 1) {
       gl.activeTexture(gl.TEXTURE0 + index);
       gl.bindTexture(gl.TEXTURE_2D, this.tempTextures[index]);
     }
@@ -2510,10 +2509,12 @@ void main (void)
       this.tempTextures.forEach((texture, index) => {
         this.textureIndex.push(index);
       });
+      this.textures.set(0, this.tempTextures[0]);
     }
     clear() {
       this.textures.forEach((texture) => texture.binding.unbind());
       this.textures.clear();
+      this.textures.set(0, this.tempTextures[0]);
     }
     reset() {
       this.tempTextures.forEach((texture, index) => {
@@ -5398,6 +5399,7 @@ void main (void)
     antialias = false;
     constructor(x, y, text = "", font, fillStyle) {
       super(x, y, CanvasTexture());
+      this.texture.key = `Text${this.id}`;
       const renderer = RendererInstance.get();
       this.resolution = renderer.resolution;
       this.canvas = this.texture.image;

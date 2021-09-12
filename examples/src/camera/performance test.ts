@@ -207,16 +207,19 @@ class Demo extends Scene
         //  Remove __BASE texture
         frames.shift();
 
-        for (let y = 0; y < 8; y++)
+        for (let y = 0; y < 12; y++)
         {
-            for (let x = 0; x < 8; x++)
+            for (let x = 0; x < 12; x++)
             {
                 const frame = GetRandom(frames);
 
-                const rx = Between(wx + 48, wx + 464);
-                const ry = Between(wy + 48, wy + 464);
+                // const rx = Between(wx + 48, wx + 464);
+                // const ry = Between(wy + 48, wy + 464);
 
-                AddChild(this.itemsLayer, new Sprite(rx, ry, 'items', frame).setOrigin(0.5, 1));
+                const rx = Between(wx + 16, wx + 498);
+                const ry = Between(wy + 16, wy + 498);
+
+                AddChild(this.itemsLayer, new Sprite(rx, ry, 'items', frame).setOrigin(0.5, 1).setScale(0.35, 0.35));
             }
         }
     }

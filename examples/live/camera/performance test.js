@@ -447,7 +447,6 @@
       if (!texture) {
         return CreateGLTexture(this);
       } else {
-        this.unbind();
         return UpdateGLTexture(this);
       }
     }
@@ -2083,7 +2082,7 @@ void main (void)
   });
 
   // ../phaser-genesis/src/GameObjectWorld.ts
-  setDefaultSize(2e5);
+  setDefaultSize(2e6);
   var world = createWorld();
   var GameObjectWorld = world;
 
@@ -2466,13 +2465,13 @@ void main (void)
     constructor(renderPass) {
       this.renderPass = renderPass;
     }
-    bind(texture, index = 0) {
+    bind(texture, index = 1) {
       const binding = texture.binding;
       binding.bind(index);
       gl.activeTexture(gl.TEXTURE0 + index);
       gl.bindTexture(gl.TEXTURE_2D, binding.texture);
     }
-    unbind(index = 0) {
+    unbind(index = 1) {
       gl.activeTexture(gl.TEXTURE0 + index);
       gl.bindTexture(gl.TEXTURE_2D, this.tempTextures[index]);
     }
@@ -2517,10 +2516,12 @@ void main (void)
       this.tempTextures.forEach((texture, index) => {
         this.textureIndex.push(index);
       });
+      this.textures.set(0, this.tempTextures[0]);
     }
     clear() {
       this.textures.forEach((texture) => texture.binding.unbind());
       this.textures.clear();
+      this.textures.set(0, this.tempTextures[0]);
     }
     reset() {
       this.tempTextures.forEach((texture, index) => {
@@ -5377,6 +5378,7 @@ void main (void)
     antialias = false;
     constructor(x, y, text = "", font, fillStyle) {
       super(x, y, CanvasTexture());
+      this.texture.key = `Text${this.id}`;
       const renderer = RendererInstance.get();
       this.resolution = renderer.resolution;
       this.canvas = this.texture.image;
@@ -7264,12 +7266,12 @@ void main (void)
       AddChild(this.grassLayer, new Sprite(wx, wy, "grass").setOrigin(0, 0));
       const frames = Array.from(this.texture.frames.keys());
       frames.shift();
-      for (let y = 0; y < 8; y++) {
-        for (let x = 0; x < 8; x++) {
+      for (let y = 0; y < 12; y++) {
+        for (let x = 0; x < 12; x++) {
           const frame2 = GetRandom(frames);
-          const rx = Between(wx + 48, wx + 464);
-          const ry = Between(wy + 48, wy + 464);
-          AddChild(this.itemsLayer, new Sprite(rx, ry, "items", frame2).setOrigin(0.5, 1));
+          const rx = Between(wx + 16, wx + 498);
+          const ry = Between(wy + 16, wy + 498);
+          AddChild(this.itemsLayer, new Sprite(rx, ry, "items", frame2).setOrigin(0.5, 1).setScale(0.35, 0.35));
         }
       }
     }
