@@ -145,20 +145,20 @@ class Demo extends Scene
 
         On(mouse, 'pointerdown', () => {
 
-            if (window['game'].renderStats.numChildren > 1500000)
+            if (window['game'].renderStats.numChildren > 2000000)
             {
                 return;
             }
 
             this.addGrid();
 
-            const total = window['game'].renderStats.numChildren;
+            // const total = window['game'].renderStats.numChildren;
 
-            this.stats.setText([
-                'Click to expand the World',
-                `World size: ${worldWidth} x ${worldHeight}`,
-                `Total sprites: ${total}`
-            ]);
+            // this.stats.setText([
+            //     'Click to expand the World',
+            //     `World size: ${worldWidth} x ${worldHeight}`,
+            //     `Total sprites: ${total}`
+            // ]);
         });
 
         On(world, 'worldprerender', () =>
@@ -191,7 +191,7 @@ class Demo extends Scene
             // AddChild(this.grassLayer, new Sprite(gridSize * i, startY, '322').setOrigin(0, 0));
         }
 
-        for (let i = 0; i < 32; i++)
+        for (let i = 0; i < (gridWidth * 8); i++)
         {
             const fireball = new Fireball(this.fireballAnimation);
 
@@ -253,6 +253,15 @@ class Demo extends Scene
         {
             this.camera.y -= this.cameraSpeed;
         }
+
+        const total = window['game'].renderStats.numChildren;
+
+        this.stats.setText([
+            'Click to expand the World',
+            `World size: ${worldWidth} x ${worldHeight}`,
+            `Total sprites: ${total}`
+        ]);
+
     }
 }
 

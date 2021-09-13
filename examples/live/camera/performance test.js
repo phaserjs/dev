@@ -5974,7 +5974,6 @@ void main (void)
     renderData.dirtyQuad = 0;
     renderData.processed = 0;
     renderData.renderMs = 0;
-    renderData.numChildren = 0;
     renderData.preRenderMs = 0;
     renderData.updated = 0;
     renderData.updateMs = 0;
@@ -7055,7 +7054,7 @@ void main (void)
     gameStats.dirtyQuad += renderData.dirtyQuad;
     gameStats.processed += renderData.processed;
     gameStats.renderMs += renderData.renderMs;
-    gameStats.numChildren += renderData.numChildren;
+    gameStats.numChildren = renderData.numChildren;
     gameStats.preRenderMs += renderData.preRenderMs;
     gameStats.updated += renderData.updated;
     gameStats.updateMs += renderData.updateMs;
@@ -7230,16 +7229,10 @@ void main (void)
       AddChild(world2, this.stats);
       const mouse = new Mouse();
       On(mouse, "pointerdown", () => {
-        if (window["game"].renderStats.numChildren > 15e5) {
+        if (window["game"].renderStats.numChildren > 2e6) {
           return;
         }
         this.addGrid();
-        const total2 = window["game"].renderStats.numChildren;
-        this.stats.setText([
-          "Click to expand the World",
-          `World size: ${worldWidth} x ${worldHeight}`,
-          `Total sprites: ${total2}`
-        ]);
       });
       On(world2, "worldprerender", () => {
         this.stats.x = this.camera.getBoundsX() + 16;
@@ -7258,7 +7251,7 @@ void main (void)
       for (let i = 0; i < gridWidth - 1; i++) {
         this.addLand(gridSize * i, startY);
       }
-      for (let i = 0; i < 32; i++) {
+      for (let i = 0; i < gridWidth * 8; i++) {
         const fireball = new Fireball(this.fireballAnimation);
         AddChild(this.world, fireball);
       }
@@ -7292,6 +7285,12 @@ void main (void)
       } else if (this.downKey.isDown) {
         this.camera.y -= this.cameraSpeed;
       }
+      const total2 = window["game"].renderStats.numChildren;
+      this.stats.setText([
+        "Click to expand the World",
+        `World size: ${worldWidth} x ${worldHeight}`,
+        `Total sprites: ${total2}`
+      ]);
     }
   };
   var params = new URLSearchParams(document.location.search);
