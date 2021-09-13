@@ -45,12 +45,12 @@
         {
           "path": "examples/live/camera/performance test.js",
           "name": "performance test.js",
-          "size": 214612,
+          "size": 214584,
           "extension": ".js",
           "type": "file"
         }
       ],
-      "size": 411980,
+      "size": 411952,
       "type": "directory"
     },
     {
@@ -270,12 +270,12 @@
             {
               "path": "examples/live/gameobjects/container/banshee.js",
               "name": "banshee.js",
-              "size": 196676,
+              "size": 182778,
               "extension": ".js",
               "type": "file"
             }
           ],
-          "size": 363850,
+          "size": 349952,
           "type": "directory"
         },
         {
@@ -552,7 +552,7 @@
           "type": "directory"
         }
       ],
-      "size": 6358313,
+      "size": 6344415,
       "type": "directory"
     },
     {
@@ -729,6 +729,6 @@
       "type": "directory"
     }
   ],
-  "size": 14216797,
+  "size": 14202871,
   "type": "directory"
 }
