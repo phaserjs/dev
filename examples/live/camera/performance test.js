@@ -2082,7 +2082,7 @@ void main (void)
   });
 
   // ../phaser-genesis/src/GameObjectWorld.ts
-  setDefaultSize(2e6);
+  setDefaultSize(25e5);
   var world = createWorld();
   var GameObjectWorld = world;
 
@@ -5965,8 +5965,7 @@ void main (void)
   };
 
   // ../phaser-genesis/src/world/ResetWorldRenderData.ts
-  function ResetWorldRenderData(renderData, gameFrame) {
-    renderData.gameFrame = gameFrame;
+  function ResetWorldRenderData(renderData) {
     renderData.rendered = 0;
     renderData.dirtyColor = 0;
     renderData.dirtyLocal = 0;
@@ -6797,6 +6796,7 @@ void main (void)
       return this.totalChildren;
     }
     beforeUpdate(delta, time) {
+      ResetWorldRenderData(this.renderData);
       Emit(this, WorldBeforeUpdateEvent, delta, time, this);
     }
     update(delta, time) {
@@ -6946,7 +6946,7 @@ void main (void)
     const start = performance.now();
     const id = world2.id;
     const renderData = world2.renderData;
-    ResetWorldRenderData(renderData, gameFrame);
+    renderData.gameFrame = gameFrame;
     const camera = world2.camera;
     const cameraUpdated = camera.updateBounds();
     Emit(world2, WorldPreRenderEvent, world2);
@@ -6963,8 +6963,8 @@ void main (void)
     stack[0] = id;
     let stackIndex = 1;
     let parentNode = id;
-    let isDisplayList = false;
     let node = GetFirstChildID(id);
+    let isDisplayList = HasCustomDisplayList(node);
     stackBlock: {
       while (stackIndex > 0) {
         UpdateNode(node, parentNode, checkColor, checkTransform, cx, cy, cright, cbottom, cameraUpdated, isDisplayList, renderData);
