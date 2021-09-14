@@ -45,35 +45,17 @@ class Demo extends Scene
 
         const world = new StaticWorld(this);
 
-        let total = 0;
+        for (let i = 0; i < 50000; i++)
+        {
+            const x = Between(-200, 1000);
+            const y = Between(0, 600);
 
-        // const max = 25000;
-        const max = 5000;
-
-        setInterval(() => {
-
-            if (total === max)
-            {
-                return;
-            }
-
-            for (let i = 0; i < 1000; i++)
-            {
-                const x = Between(-200, 1000);
-                const y = Between(0, 600);
-    
-                AddChild(world, new Pixel(x, y));
-
-                total++;
-            }
-
-            console.log(`${total} sprites`);
-
-        }, 1000);
+            AddChild(world, new Pixel(x, y));
+        }
     }
 }
 
-new Game(
+window['game'] = new Game(
     WebGL(),
     Parent('gameParent'),
     GlobalVar('Phaser4'),
