@@ -1,14 +1,16 @@
 import * as Effects from '../../../../phaser-genesis/src/colormatrix/';
 
+import { AddChild, AddChildren } from '../../../../phaser-genesis/src/display/';
 import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../phaser-genesis/src/config';
 
-import { AddChildren } from '../../../../phaser-genesis/src/display/';
 import { Game } from '../../../../phaser-genesis/src/Game';
-import { ImageFile } from '../../../../phaser-genesis/src/loader/files/ImageFile';
+import { LoadImageFile } from '../../../../phaser-genesis/src/loader/files/LoadImageFile';
 import { On } from '../../../../phaser-genesis/src/events';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
-import { Sprite } from '../../../../phaser-genesis/src/gameobjects/';
+import { SetPadding } from '../../../../phaser-genesis/src/gameobjects/text/SetPadding';
+import { Sprite } from '../../../../phaser-genesis/src/gameobjects/sprite/Sprite';
 import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
+import { Text } from '../../../../phaser-genesis/src/gameobjects/text/Text';
 
 class Demo extends Scene
 {
@@ -21,7 +23,7 @@ class Demo extends Scene
 
     async create ()
     {
-        await ImageFile('pic', 'assets/traps.png').load();
+        await LoadImageFile('pic', 'assets/traps.png');
 
         const world = new StaticWorld(this);
 
@@ -35,6 +37,11 @@ class Demo extends Scene
         Effects.DesaturateLuminance(variation1);
         Effects.Grayscale(variation2, 1);
 
+        this.addLabel(world, original, 'Original');
+        this.addLabel(world, variation1, 'DesaturateLuminance');
+        this.addLabel(world, variation2, 'Grayscale');
+        this.addLabel(world, variation3, 'Hue');
+
         let h = 0;
 
         On(world, 'update', () => {
@@ -44,6 +51,17 @@ class Demo extends Scene
             h += 2;
 
         });
+    }
+
+    addLabel (world, sprite, label)
+    {
+        const text = new Text(sprite.x - 160, sprite.y + 108, label);
+
+        text.setOrigin(0, 0);
+        
+        SetPadding(0, 0, 8, 8, text);
+
+        AddChild(world, text);
     }
 }
 

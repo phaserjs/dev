@@ -4,10 +4,8 @@ import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../p
 
 import { AddChildren } from '../../../../phaser-genesis/src/display/';
 import { AddTween } from '../../../../phaser-genesis/src/motion/tween/nano/AddTween';
-import { Between } from '../../../../phaser-genesis/src/math';
 import { Game } from '../../../../phaser-genesis/src/Game';
-import { ImageFile } from '../../../../phaser-genesis/src/loader/files/ImageFile';
-import { On } from '../../../../phaser-genesis/src/events';
+import { LoadImageFile } from '../../../../phaser-genesis/src/loader/files/LoadImageFile';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
 import { Sprite } from '../../../../phaser-genesis/src/gameobjects/';
 import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
@@ -23,8 +21,8 @@ class Demo extends Scene
 
     async create ()
     {
-        await ImageFile('bg', 'assets/doom.png').load();
-        await ImageFile('sig', 'assets/sig.png').load();
+        await LoadImageFile('bg', 'assets/doom.png');
+        await LoadImageFile('sig', 'assets/sig.png');
 
         const world = new StaticWorld(this);
 
@@ -46,7 +44,6 @@ class Demo extends Scene
             Effects.Hue(world, t.amount);
 
         };
-
     }
 }
 

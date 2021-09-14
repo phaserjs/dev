@@ -231,6 +231,70 @@
       "type": "directory"
     },
     {
+      "path": "examples/live/effects",
+      "name": "effects",
+      "children": [
+        {
+          "path": "examples/live/effects/matrix effects 1.js",
+          "name": "matrix effects 1.js",
+          "size": 169611,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/effects/matrix effects 2.js",
+          "name": "matrix effects 2.js",
+          "size": 170055,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/effects/matrix effects 3.js",
+          "name": "matrix effects 3.js",
+          "size": 170371,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/effects/matrix effects 4.js",
+          "name": "matrix effects 4.js",
+          "size": 169522,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/effects/matrix effects 5.js",
+          "name": "matrix effects 5.js",
+          "size": 169780,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/effects/matrix effects 6.js",
+          "name": "matrix effects 6.js",
+          "size": 169437,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/effects/matrix effects 7.js",
+          "name": "matrix effects 7.js",
+          "size": 169939,
+          "extension": ".js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/effects/world color.js",
+          "name": "world color.js",
+          "size": 168463,
+          "extension": ".js",
+          "type": "file"
+        }
+      ],
+      "size": 1357178,
+      "type": "directory"
+    },
+    {
       "path": "examples/live/gameobjects",
       "name": "gameobjects",
       "children": [
@@ -270,12 +334,12 @@
             {
               "path": "examples/live/gameobjects/container/banshee.js",
               "name": "banshee.js",
-              "size": 182778,
+              "size": 182554,
               "extension": ".js",
               "type": "file"
             }
           ],
-          "size": 349952,
+          "size": 349728,
           "type": "directory"
         },
         {
@@ -552,7 +616,7 @@
           "type": "directory"
         }
       ],
-      "size": 6344415,
+      "size": 6344191,
       "type": "directory"
     },
     {
@@ -729,6 +793,6 @@
       "type": "directory"
     }
   ],
-  "size": 14202871,
+  "size": 15559825,
   "type": "directory"
 }
