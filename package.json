@@ -26,14 +26,14 @@
   "devDependencies": {
     "@tweakpane/core": "^1.0.6",
     "bitecs": "^0.3.21",
-    "boxen": "^5.1.0",
+    "boxen": "^5.1.1",
     "chalk": "^4.1.2",
     "directory-tree": "^2.3.1",
-    "esbuild": "^0.12.27",
+    "esbuild": "^0.12.28",
     "esbuild-plugin-ifdef": "^1.0.1",
     "esbuild-plugin-inline-worker": "^0.1.1",
     "esbuild-plugin-wat": "^0.2.7",
-    "filesize": "^8.0.2",
+    "filesize": "^8.0.3",
     "fs-extra": "^10.0.0",
     "gradient-string": "^1.2.0",
     "gzip-size": "^6.0.0",
@@ -43,7 +43,7 @@
   },
   "dependencies": {
     "@phaserjs/phaser": "^0.1.19",
-    "http-server": "^13.0.1",
+    "http-server": "^13.0.2",
     "terminal-kit": "^2.1.6",
     "tweakpane": "^3.0.5"
   }
