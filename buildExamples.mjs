@@ -7,6 +7,7 @@ const examplesJSON = './examples/live/examples.json';
 const filterConfig = {
     extensions: /\.js$/,
     normalizePath: true,
+    attributes: ["type"],
     exclude: [
         /examples\\live\\assets/,
         /examples\/live\/assets/,
