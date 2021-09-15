@@ -1,3 +1,5 @@
+import * as Effects from '../../../../../phaser-genesis/src/colormatrix/';
+
 import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../../phaser-genesis/src/config';
 import { RenderLayer, Sprite } from '../../../../../phaser-genesis/src/gameobjects/';
 
@@ -7,6 +9,7 @@ import { ImageFile } from '../../../../../phaser-genesis/src/loader/files/ImageF
 import { Loader } from '../../../../../phaser-genesis/src/loader/Loader';
 import { On } from '../../../../../phaser-genesis/src/events/On';
 import { Scene } from '../../../../../phaser-genesis/src/scenes/Scene';
+import { SetWillColorChildren } from '../../../../../phaser-genesis/src/components/permissions/SetWillColorChildren';
 import { StaticWorld } from '../../../../../phaser-genesis/src/world/StaticWorld';
 
 class Demo extends Scene
@@ -36,6 +39,8 @@ class Demo extends Scene
 
         const layer = new RenderLayer();
 
+        SetWillColorChildren(layer.id, true);
+
         const bg = new Sprite(400, 300, 'background');
         const logo = new Sprite(200, 300, 'logo');
         const ayu = new Sprite(600, 300, 'ayu');
@@ -51,9 +56,15 @@ class Demo extends Scene
         //  The display list consists of 'bg', 'layer' and finally 'star'
         AddChildren(world, bg, layer, star);
 
+        let h = 0;
+
         On(world, 'update', () =>
         {
-            if (rocket.x < 250)
+            Effects.Hue(layer, h);
+
+            h += 4;
+
+            if (rocket.x < 800)
             {
                 rocket.x += 1;
             }

@@ -1,4 +1,700 @@
 (() => {
+  // ../phaser-genesis/src/colormatrix/const.ts
+  var DEFAULT_COLOR_MATRIX = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
+  var DEFAULT_COLOR_OFFSET = new Float32Array(4);
+
+  // ../phaser-genesis/node_modules/bitecs/dist/index.mjs
+  var TYPES_ENUM = {
+    i8: "i8",
+    ui8: "ui8",
+    ui8c: "ui8c",
+    i16: "i16",
+    ui16: "ui16",
+    i32: "i32",
+    ui32: "ui32",
+    f32: "f32",
+    f64: "f64",
+    eid: "eid"
+  };
+  var TYPES_NAMES = {
+    i8: "Int8",
+    ui8: "Uint8",
+    ui8c: "Uint8Clamped",
+    i16: "Int16",
+    ui16: "Uint16",
+    i32: "Int32",
+    ui32: "Uint32",
+    eid: "Uint32",
+    f32: "Float32",
+    f64: "Float64"
+  };
+  var TYPES = {
+    i8: Int8Array,
+    ui8: Uint8Array,
+    ui8c: Uint8ClampedArray,
+    i16: Int16Array,
+    ui16: Uint16Array,
+    i32: Int32Array,
+    ui32: Uint32Array,
+    f32: Float32Array,
+    f64: Float64Array,
+    eid: Uint32Array
+  };
+  var UNSIGNED_MAX = {
+    uint8: 2 ** 8,
+    uint16: 2 ** 16,
+    uint32: 2 ** 32
+  };
+  var roundToMultiple = (mul) => (x) => Math.ceil(x / mul) * mul;
+  var roundToMultiple4 = roundToMultiple(4);
+  var $storeRef = Symbol("storeRef");
+  var $storeSize = Symbol("storeSize");
+  var $storeMaps = Symbol("storeMaps");
+  var $storeFlattened = Symbol("storeFlattened");
+  var $storeBase = Symbol("storeBase");
+  var $storeType = Symbol("storeType");
+  var $storeArrayCounts = Symbol("storeArrayCount");
+  var $storeSubarrays = Symbol("storeSubarrays");
+  var $subarrayCursors = Symbol("subarrayCursors");
+  var $subarray = Symbol("subarray");
+  var $subarrayFrom = Symbol("subarrayFrom");
+  var $subarrayTo = Symbol("subarrayTo");
+  var $parentArray = Symbol("subStore");
+  var $tagStore = Symbol("tagStore");
+  var $queryShadow = Symbol("queryShadow");
+  var $serializeShadow = Symbol("serializeShadow");
+  var $indexType = Symbol("indexType");
+  var $indexBytes = Symbol("indexBytes");
+  var $isEidType = Symbol("isEidType");
+  var stores = {};
+  var createShadow = (store, key) => {
+    if (!ArrayBuffer.isView(store)) {
+      const shadowStore = store[$parentArray].slice(0).fill(0);
+      store[key] = store.map((_, eid) => {
+        const from = store[eid][$subarrayFrom];
+        const to = store[eid][$subarrayTo];
+        return shadowStore.subarray(from, to);
+      });
+    } else {
+      store[key] = store.slice(0).fill(0);
+    }
+  };
+  var resetStoreFor = (store, eid) => {
+    if (store[$storeFlattened]) {
+      store[$storeFlattened].forEach((ta) => {
+        if (ArrayBuffer.isView(ta))
+          ta[eid] = 0;
+        else
+          ta[eid].fill(0);
+      });
+    }
+  };
+  var createTypeStore = (type, length) => {
+    const totalBytes = length * TYPES[type].BYTES_PER_ELEMENT;
+    const buffer = new ArrayBuffer(totalBytes);
+    const store = new TYPES[type](buffer);
+    store[$isEidType] = type === TYPES_ENUM.eid;
+    return store;
+  };
+  var createArrayStore = (metadata, type, length) => {
+    const size = metadata[$storeSize];
+    const store = Array(size).fill(0);
+    store[$storeType] = type;
+    store[$isEidType] = type === TYPES_ENUM.eid;
+    const cursors = metadata[$subarrayCursors];
+    const indexType = length < UNSIGNED_MAX.uint8 ? "ui8" : length < UNSIGNED_MAX.uint16 ? "ui16" : "ui32";
+    if (!length)
+      throw new Error("bitECS - Must define component array length");
+    if (!TYPES[type])
+      throw new Error(`bitECS - Invalid component array property type ${type}`);
+    if (!metadata[$storeSubarrays][type]) {
+      const arrayCount = metadata[$storeArrayCounts][type];
+      const summedLength = Array(arrayCount).fill(0).reduce((a, p) => a + length, 0);
+      const array = new TYPES[type](roundToMultiple4(summedLength * size));
+      metadata[$storeSubarrays][type] = array;
+      array[$indexType] = TYPES_NAMES[indexType];
+      array[$indexBytes] = TYPES[indexType].BYTES_PER_ELEMENT;
+    }
+    const start = cursors[type];
+    let end = 0;
+    for (let eid = 0; eid < size; eid++) {
+      const from = cursors[type] + eid * length;
+      const to = from + length;
+      store[eid] = metadata[$storeSubarrays][type].subarray(from, to);
+      store[eid][$subarrayFrom] = from;
+      store[eid][$subarrayTo] = to;
+      store[eid][$subarray] = true;
+      store[eid][$indexType] = TYPES_NAMES[indexType];
+      store[eid][$indexBytes] = TYPES[indexType].BYTES_PER_ELEMENT;
+      end = to;
+    }
+    cursors[type] = end;
+    store[$parentArray] = metadata[$storeSubarrays][type].subarray(start, end);
+    return store;
+  };
+  var isArrayType = (x) => Array.isArray(x) && typeof x[0] === "string" && typeof x[1] === "number";
+  var createStore = (schema, size) => {
+    const $store = Symbol("store");
+    if (!schema || !Object.keys(schema).length) {
+      stores[$store] = {
+        [$storeSize]: size,
+        [$tagStore]: true,
+        [$storeBase]: () => stores[$store]
+      };
+      return stores[$store];
+    }
+    schema = JSON.parse(JSON.stringify(schema));
+    const arrayCounts = {};
+    const collectArrayCounts = (s) => {
+      const keys = Object.keys(s);
+      for (const k of keys) {
+        if (isArrayType(s[k])) {
+          if (!arrayCounts[s[k][0]])
+            arrayCounts[s[k][0]] = 0;
+          arrayCounts[s[k][0]]++;
+        } else if (s[k] instanceof Object) {
+          collectArrayCounts(s[k]);
+        }
+      }
+    };
+    collectArrayCounts(schema);
+    const metadata = {
+      [$storeSize]: size,
+      [$storeMaps]: {},
+      [$storeSubarrays]: {},
+      [$storeRef]: $store,
+      [$subarrayCursors]: Object.keys(TYPES).reduce((a, type) => ({ ...a, [type]: 0 }), {}),
+      [$storeFlattened]: [],
+      [$storeArrayCounts]: arrayCounts
+    };
+    if (schema instanceof Object && Object.keys(schema).length) {
+      const recursiveTransform = (a, k) => {
+        if (typeof a[k] === "string") {
+          a[k] = createTypeStore(a[k], size);
+          a[k][$storeBase] = () => stores[$store];
+          metadata[$storeFlattened].push(a[k]);
+        } else if (isArrayType(a[k])) {
+          const [type, length] = a[k];
+          a[k] = createArrayStore(metadata, type, length);
+          a[k][$storeBase] = () => stores[$store];
+          metadata[$storeFlattened].push(a[k]);
+        } else if (a[k] instanceof Object) {
+          a[k] = Object.keys(a[k]).reduce(recursiveTransform, a[k]);
+        }
+        return a;
+      };
+      stores[$store] = Object.assign(Object.keys(schema).reduce(recursiveTransform, schema), metadata);
+      stores[$store][$storeBase] = () => stores[$store];
+      return stores[$store];
+    }
+  };
+  var SparseSet = () => {
+    const dense = [];
+    const sparse = [];
+    dense.sort = function(comparator) {
+      const result = Array.prototype.sort.call(this, comparator);
+      for (let i = 0; i < dense.length; i++) {
+        sparse[dense[i]] = i;
+      }
+      return result;
+    };
+    const has = (val) => dense[sparse[val]] === val;
+    const add = (val) => {
+      if (has(val))
+        return;
+      sparse[val] = dense.push(val) - 1;
+    };
+    const remove = (val) => {
+      if (!has(val))
+        return;
+      const index = sparse[val];
+      const swapped = dense.pop();
+      if (swapped !== val) {
+        dense[index] = swapped;
+        sparse[swapped] = index;
+      }
+    };
+    return {
+      add,
+      remove,
+      has,
+      sparse,
+      dense
+    };
+  };
+  var newEntities = new Map();
+  var $entityMasks = Symbol("entityMasks");
+  var $entityComponents = Symbol("entityComponents");
+  var $entitySparseSet = Symbol("entitySparseSet");
+  var $entityArray = Symbol("entityArray");
+  var $entityIndices = Symbol("entityIndices");
+  var $removedEntities = Symbol("removedEntities");
+  var defaultSize = 1e5;
+  var globalEntityCursor = 0;
+  var globalSize = defaultSize;
+  var getGlobalSize = () => globalSize;
+  var removed = [];
+  var getEntityCursor = () => globalEntityCursor;
+  var eidToWorld = new Map();
+  var addEntity = (world2) => {
+    if (globalEntityCursor + 1 >= defaultSize) {
+      console.error(`bitECS - max entities of ${defaultSize} reached, increase with setDefaultSize function.`);
+      return;
+    }
+    const eid = removed.length > 0 ? removed.shift() : globalEntityCursor++;
+    world2[$entitySparseSet].add(eid);
+    eidToWorld.set(eid, world2);
+    world2[$notQueries].forEach((q) => {
+      const match = queryCheckEntity(world2, q, eid);
+      if (match)
+        queryAddEntity(q, eid);
+    });
+    world2[$entityComponents].set(eid, new Set());
+    return eid;
+  };
+  var removeEntity = (world2, eid) => {
+    if (!world2[$entitySparseSet].has(eid))
+      return;
+    world2[$queries].forEach((q) => {
+      queryRemoveEntity(world2, q, eid);
+    });
+    removed.push(eid);
+    world2[$entitySparseSet].remove(eid);
+    world2[$entityComponents].delete(eid);
+    world2[$localEntities].delete(world2[$localEntityLookup].get(eid));
+    world2[$localEntityLookup].delete(eid);
+    for (let i = 0; i < world2[$entityMasks].length; i++)
+      world2[$entityMasks][i][eid] = 0;
+  };
+  function Any(...comps) {
+    return function QueryAny() {
+      return comps;
+    };
+  }
+  function All(...comps) {
+    return function QueryAll() {
+      return comps;
+    };
+  }
+  function None(...comps) {
+    return function QueryNone() {
+      return comps;
+    };
+  }
+  var $queries = Symbol("queries");
+  var $notQueries = Symbol("notQueries");
+  var $queryAny = Symbol("queryAny");
+  var $queryAll = Symbol("queryAll");
+  var $queryNone = Symbol("queryNone");
+  var $queryMap = Symbol("queryMap");
+  var $dirtyQueries = Symbol("$dirtyQueries");
+  var $queryComponents = Symbol("queryComponents");
+  var $enterQuery = Symbol("enterQuery");
+  var $exitQuery = Symbol("exitQuery");
+  var registerQuery = (world2, query) => {
+    const components2 = [];
+    const notComponents = [];
+    const changedComponents = [];
+    query[$queryComponents].forEach((c) => {
+      if (typeof c === "function") {
+        const [comp, mod] = c();
+        if (!world2[$componentMap].has(comp))
+          registerComponent(world2, comp);
+        if (mod === "not") {
+          notComponents.push(comp);
+        }
+        if (mod === "changed") {
+          changedComponents.push(comp);
+          components2.push(comp);
+        }
+      } else {
+        if (!world2[$componentMap].has(c))
+          registerComponent(world2, c);
+        components2.push(c);
+      }
+    });
+    const mapComponents = (c) => world2[$componentMap].get(c);
+    const allComponents = components2.concat(notComponents).map(mapComponents);
+    const sparseSet = SparseSet();
+    const archetypes = [];
+    const changed = [];
+    const toRemove = SparseSet();
+    const entered = [];
+    const exited = [];
+    const generations = allComponents.map((c) => c.generationId).reduce((a, v) => {
+      if (a.includes(v))
+        return a;
+      a.push(v);
+      return a;
+    }, []);
+    const reduceBitflags = (a, c) => {
+      if (!a[c.generationId])
+        a[c.generationId] = 0;
+      a[c.generationId] |= c.bitflag;
+      return a;
+    };
+    const masks = components2.map(mapComponents).reduce(reduceBitflags, {});
+    const notMasks = notComponents.map(mapComponents).reduce(reduceBitflags, {});
+    const hasMasks = allComponents.reduce(reduceBitflags, {});
+    const flatProps = components2.filter((c) => !c[$tagStore]).map((c) => Object.getOwnPropertySymbols(c).includes($storeFlattened) ? c[$storeFlattened] : [c]).reduce((a, v) => a.concat(v), []);
+    const shadows = flatProps.map((prop) => {
+      const $ = Symbol();
+      createShadow(prop, $);
+      return prop[$];
+    }, []);
+    const q = Object.assign(sparseSet, {
+      archetypes,
+      changed,
+      components: components2,
+      notComponents,
+      changedComponents,
+      allComponents,
+      masks,
+      notMasks,
+      hasMasks,
+      generations,
+      flatProps,
+      toRemove,
+      entered,
+      exited,
+      shadows
+    });
+    world2[$queryMap].set(query, q);
+    world2[$queries].add(q);
+    allComponents.forEach((c) => {
+      c.queries.add(q);
+    });
+    if (notComponents.length)
+      world2[$notQueries].add(q);
+    for (let eid = 0; eid < getEntityCursor(); eid++) {
+      if (!world2[$entitySparseSet].has(eid))
+        continue;
+      const match = queryCheckEntity(world2, q, eid);
+      if (match)
+        queryAddEntity(q, eid);
+    }
+  };
+  var diff = (q, clearDiff) => {
+    if (clearDiff)
+      q.changed = [];
+    const { flatProps, shadows } = q;
+    for (let i = 0; i < q.dense.length; i++) {
+      const eid = q.dense[i];
+      let dirty = false;
+      for (let pid = 0; pid < flatProps.length; pid++) {
+        const prop = flatProps[pid];
+        const shadow = shadows[pid];
+        if (ArrayBuffer.isView(prop[eid])) {
+          for (let i2 = 0; i2 < prop[eid].length; i2++) {
+            if (prop[eid][i2] !== shadow[eid][i2]) {
+              dirty = true;
+              shadow[eid][i2] = prop[eid][i2];
+              break;
+            }
+          }
+        } else {
+          if (prop[eid] !== shadow[eid]) {
+            dirty = true;
+            shadow[eid] = prop[eid];
+          }
+        }
+      }
+      if (dirty)
+        q.changed.push(eid);
+    }
+    return q.changed;
+  };
+  var flatten = (a, v) => a.concat(v);
+  var aggregateComponentsFor = (mod) => (x) => x.filter((f) => f.name === mod().constructor.name).reduce(flatten);
+  var getAnyComponents = aggregateComponentsFor(Any);
+  var getAllComponents = aggregateComponentsFor(All);
+  var getNoneComponents = aggregateComponentsFor(None);
+  var defineQuery = (...args) => {
+    let components2;
+    let any, all, none;
+    if (Array.isArray(args[0])) {
+      components2 = args[0];
+    } else {
+      any = getAnyComponents(args);
+      all = getAllComponents(args);
+      none = getNoneComponents(args);
+    }
+    if (components2 === void 0 || components2[$componentMap] !== void 0) {
+      return (world2) => world2 ? world2[$entityArray] : components2[$entityArray];
+    }
+    const query = function(world2, clearDiff = true) {
+      if (!world2[$queryMap].has(query))
+        registerQuery(world2, query);
+      const q = world2[$queryMap].get(query);
+      commitRemovals(world2);
+      if (q.changedComponents.length)
+        return diff(q, clearDiff);
+      return q.dense;
+    };
+    query[$queryComponents] = components2;
+    query[$queryAny] = any;
+    query[$queryAll] = all;
+    query[$queryNone] = none;
+    return query;
+  };
+  var queryCheckEntity = (world2, q, eid) => {
+    const { masks, notMasks, generations } = q;
+    let or = 0;
+    for (let i = 0; i < generations.length; i++) {
+      const generationId = generations[i];
+      const qMask = masks[generationId];
+      const qNotMask = notMasks[generationId];
+      const eMask = world2[$entityMasks][generationId][eid];
+      if (qNotMask && (eMask & qNotMask) !== 0) {
+        return false;
+      }
+      if (qMask && (eMask & qMask) !== qMask) {
+        return false;
+      }
+    }
+    return true;
+  };
+  var queryAddEntity = (q, eid) => {
+    if (q.has(eid))
+      return;
+    q.add(eid);
+    q.entered.push(eid);
+  };
+  var queryCommitRemovals = (q) => {
+    for (let i = q.toRemove.dense.length - 1; i >= 0; i--) {
+      const eid = q.toRemove.dense[i];
+      q.toRemove.remove(eid);
+      q.remove(eid);
+    }
+  };
+  var commitRemovals = (world2) => {
+    if (!world2[$dirtyQueries].size)
+      return;
+    world2[$dirtyQueries].forEach(queryCommitRemovals);
+    world2[$dirtyQueries].clear();
+  };
+  var queryRemoveEntity = (world2, q, eid) => {
+    if (!q.has(eid) || q.toRemove.has(eid))
+      return;
+    q.toRemove.add(eid);
+    world2[$dirtyQueries].add(q);
+    q.exited.push(eid);
+  };
+  var $componentMap = Symbol("componentMap");
+  var components = [];
+  var defineComponent = (schema) => {
+    const component = createStore(schema, getGlobalSize());
+    if (schema && Object.keys(schema).length)
+      components.push(component);
+    return component;
+  };
+  var incrementBitflag = (world2) => {
+    world2[$bitflag] *= 2;
+    if (world2[$bitflag] >= 2 ** 31) {
+      world2[$bitflag] = 1;
+      world2[$entityMasks].push(new Uint32Array(world2[$size]));
+    }
+  };
+  var registerComponent = (world2, component) => {
+    if (!component)
+      throw new Error(`bitECS - Cannot register null or undefined component`);
+    const queries = new Set();
+    const notQueries = new Set();
+    const changedQueries = new Set();
+    world2[$queries].forEach((q) => {
+      if (q.allComponents.includes(component)) {
+        queries.add(q);
+      }
+    });
+    world2[$componentMap].set(component, {
+      generationId: world2[$entityMasks].length - 1,
+      bitflag: world2[$bitflag],
+      store: component,
+      queries,
+      notQueries,
+      changedQueries
+    });
+    incrementBitflag(world2);
+  };
+  var hasComponent = (world2, component, eid) => {
+    const registeredComponent = world2[$componentMap].get(component);
+    if (!registeredComponent)
+      return;
+    const { generationId, bitflag } = registeredComponent;
+    const mask = world2[$entityMasks][generationId][eid];
+    return (mask & bitflag) === bitflag;
+  };
+  var addComponent = (world2, component, eid, reset = true) => {
+    if (eid === void 0)
+      throw new Error("bitECS - entity is undefined.");
+    if (!world2[$entitySparseSet].has(eid))
+      throw new Error("bitECS - entity does not exist in the world.");
+    if (!world2[$componentMap].has(component))
+      registerComponent(world2, component);
+    if (hasComponent(world2, component, eid))
+      return;
+    const c = world2[$componentMap].get(component);
+    const { generationId, bitflag, queries, notQueries } = c;
+    world2[$entityMasks][generationId][eid] |= bitflag;
+    queries.forEach((q) => {
+      if (q.toRemove.has(eid))
+        q.toRemove.remove(eid);
+      const match = queryCheckEntity(world2, q, eid);
+      if (match)
+        queryAddEntity(q, eid);
+      if (!match)
+        queryRemoveEntity(world2, q, eid);
+    });
+    world2[$entityComponents].get(eid).add(component);
+    if (reset)
+      resetStoreFor(component, eid);
+  };
+  var removeComponent = (world2, component, eid, reset = false) => {
+    const c = world2[$componentMap].get(component);
+    const { generationId, bitflag, queries, notQueries } = c;
+    if (!(world2[$entityMasks][generationId][eid] & bitflag))
+      return;
+    world2[$entityMasks][generationId][eid] &= ~bitflag;
+    queries.forEach((q) => {
+      if (q.toRemove.has(eid))
+        q.toRemove.remove(eid);
+      const match = queryCheckEntity(world2, q, eid);
+      if (match)
+        queryAddEntity(q, eid);
+      if (!match)
+        queryRemoveEntity(world2, q, eid);
+    });
+    world2[$entityComponents].get(eid).delete(component);
+    if (reset)
+      resetStoreFor(component, eid);
+  };
+  var $size = Symbol("size");
+  var $resizeThreshold = Symbol("resizeThreshold");
+  var $bitflag = Symbol("bitflag");
+  var $archetypes = Symbol("archetypes");
+  var $localEntities = Symbol("localEntities");
+  var $localEntityLookup = Symbol("localEntityLookp");
+  var worlds = [];
+  var createWorld = () => {
+    const world2 = {};
+    resetWorld(world2);
+    worlds.push(world2);
+    return world2;
+  };
+  var resetWorld = (world2) => {
+    const size = getGlobalSize();
+    world2[$size] = size;
+    if (world2[$entityArray])
+      world2[$entityArray].forEach((eid) => removeEntity(world2, eid));
+    world2[$entityMasks] = [new Uint32Array(size)];
+    world2[$entityComponents] = new Map();
+    world2[$archetypes] = [];
+    world2[$entitySparseSet] = SparseSet();
+    world2[$entityArray] = world2[$entitySparseSet].dense;
+    world2[$bitflag] = 1;
+    world2[$componentMap] = new Map();
+    world2[$queryMap] = new Map();
+    world2[$queries] = new Set();
+    world2[$notQueries] = new Set();
+    world2[$dirtyQueries] = new Set();
+    world2[$localEntities] = new Map();
+    world2[$localEntityLookup] = new Map();
+    return world2;
+  };
+  var Types = TYPES_ENUM;
+
+  // ../phaser-genesis/src/components/color/ColorComponent.ts
+  var ColorComponent = defineComponent({
+    r: Types.ui8c,
+    g: Types.ui8c,
+    b: Types.ui8c,
+    a: Types.f32,
+    colorMatrix: [Types.f32, 16],
+    colorOffset: [Types.f32, 4]
+  });
+
+  // ../phaser-genesis/src/GameObjectWorld.ts
+  var world = createWorld();
+  var GameObjectWorld = world;
+
+  // ../phaser-genesis/src/colormatrix/SetColorMatrix.ts
+  function SetColorMatrix(id, values, constants, multiply) {
+    if (hasComponent(GameObjectWorld, ColorComponent, id)) {
+      const colorMatrix = ColorComponent.colorMatrix[id];
+      const colorOffset = ColorComponent.colorOffset[id];
+      if (!multiply) {
+        colorMatrix.set(values);
+        if (constants) {
+          colorOffset.set(constants);
+        }
+      } else {
+        const copy = Float32Array.from(colorMatrix);
+        let c = 0;
+        let offset = 0;
+        copy.forEach((v, i) => {
+          colorMatrix[i] = copy[offset] * values[c] + copy[offset + 1] * values[c + 4] + copy[offset + 2] * values[c + 8] + copy[offset + 3] * values[c + 12];
+          c++;
+          if (i === 3 || i === 7 || i === 11) {
+            offset += 4;
+            c = 0;
+          }
+        });
+        if (constants) {
+          const r = constants[0];
+          const g = constants[1];
+          const b = constants[2];
+          const a = constants[3];
+          colorOffset[0] = copy[0] * r + copy[1] * g + copy[2] * b + copy[3] * a + colorOffset[0];
+          colorOffset[1] = copy[4] * r + copy[5] * g + copy[6] * b + copy[7] * a + colorOffset[1];
+          colorOffset[2] = copy[8] * r + copy[9] * g + copy[10] * b + copy[11] * a + colorOffset[2];
+          colorOffset[3] = copy[12] * r + copy[13] * g + copy[14] * b + copy[15] * a + colorOffset[3];
+        }
+      }
+      return true;
+    }
+    return false;
+  }
+
+  // ../phaser-genesis/src/colormatrix/Hue.ts
+  function Hue(gameObject, rotation = 0, multiply = false) {
+    rotation /= 180 * Math.PI;
+    const cosR = Math.cos(rotation);
+    const sinR = Math.sin(rotation);
+    const w = 1 / 3;
+    const sqrW = Math.sqrt(w);
+    const a00 = cosR + (1 - cosR) * w;
+    const a01 = w * (1 - cosR) - sqrW * sinR;
+    const a02 = w * (1 - cosR) + sqrW * sinR;
+    const a10 = w * (1 - cosR) + sqrW * sinR;
+    const a11 = cosR + w * (1 - cosR);
+    const a12 = w * (1 - cosR) - sqrW * sinR;
+    const a20 = w * (1 - cosR) - sqrW * sinR;
+    const a21 = w * (1 - cosR) + sqrW * sinR;
+    const a22 = cosR + w * (1 - cosR);
+    const values = [
+      a00,
+      a01,
+      a02,
+      0,
+      a10,
+      a11,
+      a12,
+      0,
+      a20,
+      a21,
+      a22,
+      0,
+      0,
+      0,
+      0,
+      1
+    ];
+    if (SetColorMatrix(gameObject.id, values, DEFAULT_COLOR_OFFSET, multiply)) {
+      gameObject.color.colorMatrixEnabled = true;
+    }
+    return gameObject;
+  }
+
   // ../phaser-genesis/src/config/const.ts
   var CONFIG_DEFAULTS = {
     AUTO: "Auto",
@@ -472,10 +1168,6 @@
     });
     BindingQueue.clear();
   }
-
-  // ../phaser-genesis/src/colormatrix/const.ts
-  var DEFAULT_COLOR_MATRIX = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
-  var DEFAULT_COLOR_OFFSET = new Float32Array(4);
 
   // ../phaser-genesis/src/renderer/webgl1/renderpass/BlendModeStack.ts
   var BlendModeStack = class {
@@ -1376,606 +2068,6 @@ void main (void)
     }
   };
 
-  // ../phaser-genesis/node_modules/bitecs/dist/index.mjs
-  var TYPES_ENUM = {
-    i8: "i8",
-    ui8: "ui8",
-    ui8c: "ui8c",
-    i16: "i16",
-    ui16: "ui16",
-    i32: "i32",
-    ui32: "ui32",
-    f32: "f32",
-    f64: "f64",
-    eid: "eid"
-  };
-  var TYPES_NAMES = {
-    i8: "Int8",
-    ui8: "Uint8",
-    ui8c: "Uint8Clamped",
-    i16: "Int16",
-    ui16: "Uint16",
-    i32: "Int32",
-    ui32: "Uint32",
-    eid: "Uint32",
-    f32: "Float32",
-    f64: "Float64"
-  };
-  var TYPES = {
-    i8: Int8Array,
-    ui8: Uint8Array,
-    ui8c: Uint8ClampedArray,
-    i16: Int16Array,
-    ui16: Uint16Array,
-    i32: Int32Array,
-    ui32: Uint32Array,
-    f32: Float32Array,
-    f64: Float64Array,
-    eid: Uint32Array
-  };
-  var UNSIGNED_MAX = {
-    uint8: 2 ** 8,
-    uint16: 2 ** 16,
-    uint32: 2 ** 32
-  };
-  var roundToMultiple = (mul) => (x) => Math.ceil(x / mul) * mul;
-  var roundToMultiple4 = roundToMultiple(4);
-  var $storeRef = Symbol("storeRef");
-  var $storeSize = Symbol("storeSize");
-  var $storeMaps = Symbol("storeMaps");
-  var $storeFlattened = Symbol("storeFlattened");
-  var $storeBase = Symbol("storeBase");
-  var $storeType = Symbol("storeType");
-  var $storeArrayCounts = Symbol("storeArrayCount");
-  var $storeSubarrays = Symbol("storeSubarrays");
-  var $subarrayCursors = Symbol("subarrayCursors");
-  var $subarray = Symbol("subarray");
-  var $subarrayFrom = Symbol("subarrayFrom");
-  var $subarrayTo = Symbol("subarrayTo");
-  var $parentArray = Symbol("subStore");
-  var $tagStore = Symbol("tagStore");
-  var $queryShadow = Symbol("queryShadow");
-  var $serializeShadow = Symbol("serializeShadow");
-  var $indexType = Symbol("indexType");
-  var $indexBytes = Symbol("indexBytes");
-  var $isEidType = Symbol("isEidType");
-  var stores = {};
-  var createShadow = (store, key) => {
-    if (!ArrayBuffer.isView(store)) {
-      const shadowStore = store[$parentArray].slice(0).fill(0);
-      store[key] = store.map((_, eid) => {
-        const from = store[eid][$subarrayFrom];
-        const to = store[eid][$subarrayTo];
-        return shadowStore.subarray(from, to);
-      });
-    } else {
-      store[key] = store.slice(0).fill(0);
-    }
-  };
-  var resetStoreFor = (store, eid) => {
-    if (store[$storeFlattened]) {
-      store[$storeFlattened].forEach((ta) => {
-        if (ArrayBuffer.isView(ta))
-          ta[eid] = 0;
-        else
-          ta[eid].fill(0);
-      });
-    }
-  };
-  var createTypeStore = (type, length) => {
-    const totalBytes = length * TYPES[type].BYTES_PER_ELEMENT;
-    const buffer = new ArrayBuffer(totalBytes);
-    const store = new TYPES[type](buffer);
-    store[$isEidType] = type === TYPES_ENUM.eid;
-    return store;
-  };
-  var createArrayStore = (metadata, type, length) => {
-    const size = metadata[$storeSize];
-    const store = Array(size).fill(0);
-    store[$storeType] = type;
-    store[$isEidType] = type === TYPES_ENUM.eid;
-    const cursors = metadata[$subarrayCursors];
-    const indexType = length < UNSIGNED_MAX.uint8 ? "ui8" : length < UNSIGNED_MAX.uint16 ? "ui16" : "ui32";
-    if (!length)
-      throw new Error("bitECS - Must define component array length");
-    if (!TYPES[type])
-      throw new Error(`bitECS - Invalid component array property type ${type}`);
-    if (!metadata[$storeSubarrays][type]) {
-      const arrayCount = metadata[$storeArrayCounts][type];
-      const summedLength = Array(arrayCount).fill(0).reduce((a, p) => a + length, 0);
-      const array = new TYPES[type](roundToMultiple4(summedLength * size));
-      metadata[$storeSubarrays][type] = array;
-      array[$indexType] = TYPES_NAMES[indexType];
-      array[$indexBytes] = TYPES[indexType].BYTES_PER_ELEMENT;
-    }
-    const start = cursors[type];
-    let end = 0;
-    for (let eid = 0; eid < size; eid++) {
-      const from = cursors[type] + eid * length;
-      const to = from + length;
-      store[eid] = metadata[$storeSubarrays][type].subarray(from, to);
-      store[eid][$subarrayFrom] = from;
-      store[eid][$subarrayTo] = to;
-      store[eid][$subarray] = true;
-      store[eid][$indexType] = TYPES_NAMES[indexType];
-      store[eid][$indexBytes] = TYPES[indexType].BYTES_PER_ELEMENT;
-      end = to;
-    }
-    cursors[type] = end;
-    store[$parentArray] = metadata[$storeSubarrays][type].subarray(start, end);
-    return store;
-  };
-  var isArrayType = (x) => Array.isArray(x) && typeof x[0] === "string" && typeof x[1] === "number";
-  var createStore = (schema, size) => {
-    const $store = Symbol("store");
-    if (!schema || !Object.keys(schema).length) {
-      stores[$store] = {
-        [$storeSize]: size,
-        [$tagStore]: true,
-        [$storeBase]: () => stores[$store]
-      };
-      return stores[$store];
-    }
-    schema = JSON.parse(JSON.stringify(schema));
-    const arrayCounts = {};
-    const collectArrayCounts = (s) => {
-      const keys = Object.keys(s);
-      for (const k of keys) {
-        if (isArrayType(s[k])) {
-          if (!arrayCounts[s[k][0]])
-            arrayCounts[s[k][0]] = 0;
-          arrayCounts[s[k][0]]++;
-        } else if (s[k] instanceof Object) {
-          collectArrayCounts(s[k]);
-        }
-      }
-    };
-    collectArrayCounts(schema);
-    const metadata = {
-      [$storeSize]: size,
-      [$storeMaps]: {},
-      [$storeSubarrays]: {},
-      [$storeRef]: $store,
-      [$subarrayCursors]: Object.keys(TYPES).reduce((a, type) => ({ ...a, [type]: 0 }), {}),
-      [$storeFlattened]: [],
-      [$storeArrayCounts]: arrayCounts
-    };
-    if (schema instanceof Object && Object.keys(schema).length) {
-      const recursiveTransform = (a, k) => {
-        if (typeof a[k] === "string") {
-          a[k] = createTypeStore(a[k], size);
-          a[k][$storeBase] = () => stores[$store];
-          metadata[$storeFlattened].push(a[k]);
-        } else if (isArrayType(a[k])) {
-          const [type, length] = a[k];
-          a[k] = createArrayStore(metadata, type, length);
-          a[k][$storeBase] = () => stores[$store];
-          metadata[$storeFlattened].push(a[k]);
-        } else if (a[k] instanceof Object) {
-          a[k] = Object.keys(a[k]).reduce(recursiveTransform, a[k]);
-        }
-        return a;
-      };
-      stores[$store] = Object.assign(Object.keys(schema).reduce(recursiveTransform, schema), metadata);
-      stores[$store][$storeBase] = () => stores[$store];
-      return stores[$store];
-    }
-  };
-  var SparseSet = () => {
-    const dense = [];
-    const sparse = [];
-    dense.sort = function(comparator) {
-      const result = Array.prototype.sort.call(this, comparator);
-      for (let i = 0; i < dense.length; i++) {
-        sparse[dense[i]] = i;
-      }
-      return result;
-    };
-    const has = (val) => dense[sparse[val]] === val;
-    const add = (val) => {
-      if (has(val))
-        return;
-      sparse[val] = dense.push(val) - 1;
-    };
-    const remove = (val) => {
-      if (!has(val))
-        return;
-      const index = sparse[val];
-      const swapped = dense.pop();
-      if (swapped !== val) {
-        dense[index] = swapped;
-        sparse[swapped] = index;
-      }
-    };
-    return {
-      add,
-      remove,
-      has,
-      sparse,
-      dense
-    };
-  };
-  var newEntities = new Map();
-  var $entityMasks = Symbol("entityMasks");
-  var $entityComponents = Symbol("entityComponents");
-  var $entitySparseSet = Symbol("entitySparseSet");
-  var $entityArray = Symbol("entityArray");
-  var $entityIndices = Symbol("entityIndices");
-  var $removedEntities = Symbol("removedEntities");
-  var defaultSize = 1e5;
-  var globalEntityCursor = 0;
-  var globalSize = defaultSize;
-  var getGlobalSize = () => globalSize;
-  var removed = [];
-  var getEntityCursor = () => globalEntityCursor;
-  var eidToWorld = new Map();
-  var addEntity = (world2) => {
-    if (globalEntityCursor + 1 >= defaultSize) {
-      console.error(`bitECS - max entities of ${defaultSize} reached, increase with setDefaultSize function.`);
-      return;
-    }
-    const eid = removed.length > 0 ? removed.shift() : globalEntityCursor++;
-    world2[$entitySparseSet].add(eid);
-    eidToWorld.set(eid, world2);
-    world2[$notQueries].forEach((q) => {
-      const match = queryCheckEntity(world2, q, eid);
-      if (match)
-        queryAddEntity(q, eid);
-    });
-    world2[$entityComponents].set(eid, new Set());
-    return eid;
-  };
-  var removeEntity = (world2, eid) => {
-    if (!world2[$entitySparseSet].has(eid))
-      return;
-    world2[$queries].forEach((q) => {
-      queryRemoveEntity(world2, q, eid);
-    });
-    removed.push(eid);
-    world2[$entitySparseSet].remove(eid);
-    world2[$entityComponents].delete(eid);
-    world2[$localEntities].delete(world2[$localEntityLookup].get(eid));
-    world2[$localEntityLookup].delete(eid);
-    for (let i = 0; i < world2[$entityMasks].length; i++)
-      world2[$entityMasks][i][eid] = 0;
-  };
-  function Any(...comps) {
-    return function QueryAny() {
-      return comps;
-    };
-  }
-  function All(...comps) {
-    return function QueryAll() {
-      return comps;
-    };
-  }
-  function None(...comps) {
-    return function QueryNone() {
-      return comps;
-    };
-  }
-  var $queries = Symbol("queries");
-  var $notQueries = Symbol("notQueries");
-  var $queryAny = Symbol("queryAny");
-  var $queryAll = Symbol("queryAll");
-  var $queryNone = Symbol("queryNone");
-  var $queryMap = Symbol("queryMap");
-  var $dirtyQueries = Symbol("$dirtyQueries");
-  var $queryComponents = Symbol("queryComponents");
-  var $enterQuery = Symbol("enterQuery");
-  var $exitQuery = Symbol("exitQuery");
-  var registerQuery = (world2, query) => {
-    const components2 = [];
-    const notComponents = [];
-    const changedComponents = [];
-    query[$queryComponents].forEach((c) => {
-      if (typeof c === "function") {
-        const [comp, mod] = c();
-        if (!world2[$componentMap].has(comp))
-          registerComponent(world2, comp);
-        if (mod === "not") {
-          notComponents.push(comp);
-        }
-        if (mod === "changed") {
-          changedComponents.push(comp);
-          components2.push(comp);
-        }
-      } else {
-        if (!world2[$componentMap].has(c))
-          registerComponent(world2, c);
-        components2.push(c);
-      }
-    });
-    const mapComponents = (c) => world2[$componentMap].get(c);
-    const allComponents = components2.concat(notComponents).map(mapComponents);
-    const sparseSet = SparseSet();
-    const archetypes = [];
-    const changed = [];
-    const toRemove = SparseSet();
-    const entered = [];
-    const exited = [];
-    const generations = allComponents.map((c) => c.generationId).reduce((a, v) => {
-      if (a.includes(v))
-        return a;
-      a.push(v);
-      return a;
-    }, []);
-    const reduceBitflags = (a, c) => {
-      if (!a[c.generationId])
-        a[c.generationId] = 0;
-      a[c.generationId] |= c.bitflag;
-      return a;
-    };
-    const masks = components2.map(mapComponents).reduce(reduceBitflags, {});
-    const notMasks = notComponents.map(mapComponents).reduce(reduceBitflags, {});
-    const hasMasks = allComponents.reduce(reduceBitflags, {});
-    const flatProps = components2.filter((c) => !c[$tagStore]).map((c) => Object.getOwnPropertySymbols(c).includes($storeFlattened) ? c[$storeFlattened] : [c]).reduce((a, v) => a.concat(v), []);
-    const shadows = flatProps.map((prop) => {
-      const $ = Symbol();
-      createShadow(prop, $);
-      return prop[$];
-    }, []);
-    const q = Object.assign(sparseSet, {
-      archetypes,
-      changed,
-      components: components2,
-      notComponents,
-      changedComponents,
-      allComponents,
-      masks,
-      notMasks,
-      hasMasks,
-      generations,
-      flatProps,
-      toRemove,
-      entered,
-      exited,
-      shadows
-    });
-    world2[$queryMap].set(query, q);
-    world2[$queries].add(q);
-    allComponents.forEach((c) => {
-      c.queries.add(q);
-    });
-    if (notComponents.length)
-      world2[$notQueries].add(q);
-    for (let eid = 0; eid < getEntityCursor(); eid++) {
-      if (!world2[$entitySparseSet].has(eid))
-        continue;
-      const match = queryCheckEntity(world2, q, eid);
-      if (match)
-        queryAddEntity(q, eid);
-    }
-  };
-  var diff = (q, clearDiff) => {
-    if (clearDiff)
-      q.changed = [];
-    const { flatProps, shadows } = q;
-    for (let i = 0; i < q.dense.length; i++) {
-      const eid = q.dense[i];
-      let dirty = false;
-      for (let pid = 0; pid < flatProps.length; pid++) {
-        const prop = flatProps[pid];
-        const shadow = shadows[pid];
-        if (ArrayBuffer.isView(prop[eid])) {
-          for (let i2 = 0; i2 < prop[eid].length; i2++) {
-            if (prop[eid][i2] !== shadow[eid][i2]) {
-              dirty = true;
-              shadow[eid][i2] = prop[eid][i2];
-              break;
-            }
-          }
-        } else {
-          if (prop[eid] !== shadow[eid]) {
-            dirty = true;
-            shadow[eid] = prop[eid];
-          }
-        }
-      }
-      if (dirty)
-        q.changed.push(eid);
-    }
-    return q.changed;
-  };
-  var flatten = (a, v) => a.concat(v);
-  var aggregateComponentsFor = (mod) => (x) => x.filter((f) => f.name === mod().constructor.name).reduce(flatten);
-  var getAnyComponents = aggregateComponentsFor(Any);
-  var getAllComponents = aggregateComponentsFor(All);
-  var getNoneComponents = aggregateComponentsFor(None);
-  var defineQuery = (...args) => {
-    let components2;
-    let any, all, none;
-    if (Array.isArray(args[0])) {
-      components2 = args[0];
-    } else {
-      any = getAnyComponents(args);
-      all = getAllComponents(args);
-      none = getNoneComponents(args);
-    }
-    if (components2 === void 0 || components2[$componentMap] !== void 0) {
-      return (world2) => world2 ? world2[$entityArray] : components2[$entityArray];
-    }
-    const query = function(world2, clearDiff = true) {
-      if (!world2[$queryMap].has(query))
-        registerQuery(world2, query);
-      const q = world2[$queryMap].get(query);
-      commitRemovals(world2);
-      if (q.changedComponents.length)
-        return diff(q, clearDiff);
-      return q.dense;
-    };
-    query[$queryComponents] = components2;
-    query[$queryAny] = any;
-    query[$queryAll] = all;
-    query[$queryNone] = none;
-    return query;
-  };
-  var queryCheckEntity = (world2, q, eid) => {
-    const { masks, notMasks, generations } = q;
-    let or = 0;
-    for (let i = 0; i < generations.length; i++) {
-      const generationId = generations[i];
-      const qMask = masks[generationId];
-      const qNotMask = notMasks[generationId];
-      const eMask = world2[$entityMasks][generationId][eid];
-      if (qNotMask && (eMask & qNotMask) !== 0) {
-        return false;
-      }
-      if (qMask && (eMask & qMask) !== qMask) {
-        return false;
-      }
-    }
-    return true;
-  };
-  var queryAddEntity = (q, eid) => {
-    if (q.has(eid))
-      return;
-    q.add(eid);
-    q.entered.push(eid);
-  };
-  var queryCommitRemovals = (q) => {
-    for (let i = q.toRemove.dense.length - 1; i >= 0; i--) {
-      const eid = q.toRemove.dense[i];
-      q.toRemove.remove(eid);
-      q.remove(eid);
-    }
-  };
-  var commitRemovals = (world2) => {
-    if (!world2[$dirtyQueries].size)
-      return;
-    world2[$dirtyQueries].forEach(queryCommitRemovals);
-    world2[$dirtyQueries].clear();
-  };
-  var queryRemoveEntity = (world2, q, eid) => {
-    if (!q.has(eid) || q.toRemove.has(eid))
-      return;
-    q.toRemove.add(eid);
-    world2[$dirtyQueries].add(q);
-    q.exited.push(eid);
-  };
-  var $componentMap = Symbol("componentMap");
-  var components = [];
-  var defineComponent = (schema) => {
-    const component = createStore(schema, getGlobalSize());
-    if (schema && Object.keys(schema).length)
-      components.push(component);
-    return component;
-  };
-  var incrementBitflag = (world2) => {
-    world2[$bitflag] *= 2;
-    if (world2[$bitflag] >= 2 ** 31) {
-      world2[$bitflag] = 1;
-      world2[$entityMasks].push(new Uint32Array(world2[$size]));
-    }
-  };
-  var registerComponent = (world2, component) => {
-    if (!component)
-      throw new Error(`bitECS - Cannot register null or undefined component`);
-    const queries = new Set();
-    const notQueries = new Set();
-    const changedQueries = new Set();
-    world2[$queries].forEach((q) => {
-      if (q.allComponents.includes(component)) {
-        queries.add(q);
-      }
-    });
-    world2[$componentMap].set(component, {
-      generationId: world2[$entityMasks].length - 1,
-      bitflag: world2[$bitflag],
-      store: component,
-      queries,
-      notQueries,
-      changedQueries
-    });
-    incrementBitflag(world2);
-  };
-  var hasComponent = (world2, component, eid) => {
-    const registeredComponent = world2[$componentMap].get(component);
-    if (!registeredComponent)
-      return;
-    const { generationId, bitflag } = registeredComponent;
-    const mask = world2[$entityMasks][generationId][eid];
-    return (mask & bitflag) === bitflag;
-  };
-  var addComponent = (world2, component, eid, reset = true) => {
-    if (eid === void 0)
-      throw new Error("bitECS - entity is undefined.");
-    if (!world2[$entitySparseSet].has(eid))
-      throw new Error("bitECS - entity does not exist in the world.");
-    if (!world2[$componentMap].has(component))
-      registerComponent(world2, component);
-    if (hasComponent(world2, component, eid))
-      return;
-    const c = world2[$componentMap].get(component);
-    const { generationId, bitflag, queries, notQueries } = c;
-    world2[$entityMasks][generationId][eid] |= bitflag;
-    queries.forEach((q) => {
-      if (q.toRemove.has(eid))
-        q.toRemove.remove(eid);
-      const match = queryCheckEntity(world2, q, eid);
-      if (match)
-        queryAddEntity(q, eid);
-      if (!match)
-        queryRemoveEntity(world2, q, eid);
-    });
-    world2[$entityComponents].get(eid).add(component);
-    if (reset)
-      resetStoreFor(component, eid);
-  };
-  var removeComponent = (world2, component, eid, reset = false) => {
-    const c = world2[$componentMap].get(component);
-    const { generationId, bitflag, queries, notQueries } = c;
-    if (!(world2[$entityMasks][generationId][eid] & bitflag))
-      return;
-    world2[$entityMasks][generationId][eid] &= ~bitflag;
-    queries.forEach((q) => {
-      if (q.toRemove.has(eid))
-        q.toRemove.remove(eid);
-      const match = queryCheckEntity(world2, q, eid);
-      if (match)
-        queryAddEntity(q, eid);
-      if (!match)
-        queryRemoveEntity(world2, q, eid);
-    });
-    world2[$entityComponents].get(eid).delete(component);
-    if (reset)
-      resetStoreFor(component, eid);
-  };
-  var $size = Symbol("size");
-  var $resizeThreshold = Symbol("resizeThreshold");
-  var $bitflag = Symbol("bitflag");
-  var $archetypes = Symbol("archetypes");
-  var $localEntities = Symbol("localEntities");
-  var $localEntityLookup = Symbol("localEntityLookp");
-  var worlds = [];
-  var createWorld = () => {
-    const world2 = {};
-    resetWorld(world2);
-    worlds.push(world2);
-    return world2;
-  };
-  var resetWorld = (world2) => {
-    const size = getGlobalSize();
-    world2[$size] = size;
-    if (world2[$entityArray])
-      world2[$entityArray].forEach((eid) => removeEntity(world2, eid));
-    world2[$entityMasks] = [new Uint32Array(size)];
-    world2[$entityComponents] = new Map();
-    world2[$archetypes] = [];
-    world2[$entitySparseSet] = SparseSet();
-    world2[$entityArray] = world2[$entitySparseSet].dense;
-    world2[$bitflag] = 1;
-    world2[$componentMap] = new Map();
-    world2[$queryMap] = new Map();
-    world2[$queries] = new Set();
-    world2[$notQueries] = new Set();
-    world2[$dirtyQueries] = new Set();
-    world2[$localEntities] = new Map();
-    world2[$localEntityLookup] = new Map();
-    return world2;
-  };
-  var Types = TYPES_ENUM;
-
   // ../phaser-genesis/src/components/transform/Transform2DComponent.ts
   var TRANSFORM = {
     IS_ROOT: 0,
@@ -2017,10 +2109,6 @@ void main (void)
   var Transform2DComponent = defineComponent({
     data: [Types.f32, 35]
   });
-
-  // ../phaser-genesis/src/GameObjectWorld.ts
-  var world = createWorld();
-  var GameObjectWorld = world;
 
   // ../phaser-genesis/src/components/transform/AddTransform2DComponent.ts
   function AddTransform2DComponent(id) {
@@ -2932,16 +3020,6 @@ void main (void)
   function SetWebGLContext(contextAttributes) {
     ConfigStore.set(CONFIG_DEFAULTS.WEBGL_CONTEXT, contextAttributes);
   }
-
-  // ../phaser-genesis/src/components/color/ColorComponent.ts
-  var ColorComponent = defineComponent({
-    r: Types.ui8c,
-    g: Types.ui8c,
-    b: Types.ui8c,
-    a: Types.f32,
-    colorMatrix: [Types.f32, 16],
-    colorOffset: [Types.f32, 4]
-  });
 
   // ../phaser-genesis/src/components/color/AddColorComponent.ts
   function AddColorComponent(id) {
@@ -5744,7 +5822,7 @@ void main (void)
     }
   };
 
-  // examples/src/gameobjects/renderlayer/create render layer.ts
+  // examples/src/gameobjects/renderlayer/render layer with color matrix.ts
   var Demo = class extends Scene {
     constructor() {
       super();
@@ -5762,6 +5840,7 @@ void main (void)
     create() {
       const world2 = new StaticWorld(this);
       const layer = new RenderLayer();
+      SetWillColorChildren(layer.id, true);
       const bg = new Sprite(400, 300, "background");
       const logo = new Sprite(200, 300, "logo");
       const ayu = new Sprite(600, 300, "ayu");
@@ -5771,8 +5850,11 @@ void main (void)
       const star = new Sprite(650, 500, "star");
       AddChildren(layer, ayu, logo, farm, rocket, bubble);
       AddChildren(world2, bg, layer, star);
+      let h = 0;
       On(world2, "update", () => {
-        if (rocket.x < 250) {
+        Hue(layer, h);
+        h += 4;
+        if (rocket.x < 800) {
           rocket.x += 1;
         }
       });
@@ -5785,4 +5867,4 @@ void main (void)
  * @copyright    2020 Photon Storm Ltd.
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
  */
-//# sourceMappingURL=create render layer.js.map
+//# sourceMappingURL=render layer with color matrix.js.map
