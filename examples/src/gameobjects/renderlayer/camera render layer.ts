@@ -2,18 +2,43 @@ import { BackgroundColor, GlobalVar, Parent, Scenes, WebGL } from '../../../../.
 import { RenderLayer, Sprite } from '../../../../../phaser-genesis/src/gameobjects/';
 
 import { AddChildren } from '../../../../../phaser-genesis/src/display/AddChildren';
+import { DownKey } from '../../../../../phaser-genesis/src/input/keyboard/keys/DownKey';
 import { Game } from '../../../../../phaser-genesis/src/Game';
 import { ImageFile } from '../../../../../phaser-genesis/src/loader/files/ImageFile';
+import { Keyboard } from '../../../../../phaser-genesis/src/input/keyboard/Keyboard';
+import { LeftKey } from '../../../../../phaser-genesis/src/input/keyboard/keys/LeftKey';
 import { Loader } from '../../../../../phaser-genesis/src/loader/Loader';
 import { On } from '../../../../../phaser-genesis/src/events/On';
+import { RightKey } from '../../../../../phaser-genesis/src/input/keyboard/keys/RightKey';
 import { Scene } from '../../../../../phaser-genesis/src/scenes/Scene';
-import { StaticWorld } from '../../../../../phaser-genesis/src/world/StaticWorld';
+import { UpKey } from '../../../../../phaser-genesis/src/input/keyboard/keys/UpKey';
+import { World } from '../../../../../phaser-genesis/src/world/World';
+import { WorldCamera } from '../../../../../phaser-genesis/src/camera/WorldCamera';
 
 class Demo extends Scene
 {
+    leftKey: LeftKey;
+    rightKey: RightKey;
+    upKey: RightKey;
+    downKey: RightKey;
+
+    camera: WorldCamera;
+    world: World;
+
+    cameraSpeed: number = 4;
+
     constructor ()
     {
         super();
+
+        const keyboard = new Keyboard();
+
+        this.leftKey = new LeftKey();
+        this.rightKey = new RightKey();
+        this.upKey = new UpKey();
+        this.downKey = new DownKey();
+
+        keyboard.addKeys(this.leftKey, this.rightKey, this.upKey, this.downKey);
 
         const loader = new Loader();
 
@@ -32,7 +57,9 @@ class Demo extends Scene
 
     create ()
     {
-        const world = new StaticWorld(this);
+        const world = new World(this);
+
+        this.camera = world.camera;
 
         const layer = new RenderLayer();
 
@@ -44,20 +71,35 @@ class Demo extends Scene
         const bubble = new Sprite(400, 450, 'bubble');
         const star = new Sprite(650, 500, 'star');
 
-        //  Add these 5 children to the RenderLayer
-        //  These will render to their own fbo, not on their own
         AddChildren(layer, ayu, logo, farm, rocket, bubble);
 
-        //  The display list consists of 'bg', 'layer' and finally 'star'
         AddChildren(world, bg, layer, star);
+    }
 
-        On(world, 'update', () =>
+    update (): void
+    {
+        if (!this.camera)
         {
-            if (rocket.x < 300)
-            {
-                rocket.x += 1;
-            }
-        });
+            return;
+        }
+
+        if (this.leftKey.isDown)
+        {
+            this.camera.x += this.cameraSpeed;
+        }
+        else if (this.rightKey.isDown)
+        {
+            this.camera.x -= this.cameraSpeed;
+        }
+
+        if (this.upKey.isDown)
+        {
+            this.camera.y += this.cameraSpeed;
+        }
+        else if (this.downKey.isDown)
+        {
+            this.camera.y -= this.cameraSpeed;
+        }
     }
 }
 

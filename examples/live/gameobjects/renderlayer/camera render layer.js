@@ -4693,42 +4693,6 @@ void main (void)
     }
   };
 
-  // ../phaser-genesis/src/gameobjects/effectlayer/EffectLayer.ts
-  var EffectLayer = class extends RenderLayer {
-    type = "EffectLayer";
-    filterArea;
-    shaders = [];
-    constructor(...shaders) {
-      super();
-      if (Array.isArray(shaders)) {
-        this.shaders = shaders;
-      }
-      FlipFrameUVs(this.texture.getFrame());
-    }
-    postRenderGL(renderPass) {
-      const id = this.id;
-      const shaders = this.shaders;
-      const texture = this.texture;
-      if (renderPass.isCameraDirty() || WillCacheChildren(id) && HasDirtyChildCache(id)) {
-        Flush(renderPass);
-        renderPass.framebuffer.pop();
-        ClearDirtyChildCache(id);
-        SetDirtyParents(id);
-      }
-      if (shaders.length === 0) {
-        BatchTexturedQuadBuffer(texture, id, renderPass);
-      } else {
-        let prevTexture = texture;
-        for (let i = 0; i < shaders.length; i++) {
-          const shader = shaders[i];
-          DrawTexturedQuad(renderPass, prevTexture, shader);
-          prevTexture = shader.texture;
-        }
-        DrawTexturedQuad(renderPass, prevTexture);
-      }
-    }
-  };
-
   // ../phaser-genesis/src/textures/CreateCanvas.ts
   function CreateCanvas(width, height) {
     const canvas = document.createElement("canvas");
@@ -4806,60 +4770,114 @@ void main (void)
     return children;
   }
 
-  // ../phaser-genesis/src/display/RemoveChild.ts
-  function RemoveChild(parent, child) {
-    const childID = child.id;
-    const parentID = parent.id;
-    if (child.hasParent(parentID)) {
-      RemoveChildID(childID);
-      DecreaseNumChildren(parentID);
-      parent.onRemoveChild(childID);
+  // ../phaser-genesis/src/events/Emit.ts
+  function Emit(emitter, event, ...args) {
+    if (emitter.events.size === 0 || !emitter.events.has(event)) {
+      return false;
     }
-    return child;
+    const listeners = emitter.events.get(event);
+    const handlers = [...listeners];
+    for (const ee of handlers) {
+      ee.callback.apply(ee.context, args);
+      if (ee.once) {
+        listeners.delete(ee);
+      }
+    }
+    if (listeners.size === 0) {
+      emitter.events.delete(event);
+    }
+    return true;
   }
 
-  // ../phaser-genesis/src/display/RemoveChildren.ts
-  function RemoveChildren(parent, ...children) {
-    children.forEach((child) => {
-      RemoveChild(parent, child);
-    });
-    return children;
-  }
-
-  // ../phaser-genesis/src/renderer/webgl1/shaders/FXShader.ts
-  var FXShader = class extends QuadShader {
-    timeVar;
-    resolutionVar;
-    timeScale;
-    constructor(config = {}) {
-      config.attributes = config?.attributes || DefaultQuadAttributes;
-      config.renderToFramebuffer = true;
-      super(config);
-      const {
-        timeUniform = "uTime",
-        resolutionUniform = "uResolution",
-        timeScale = 1
-      } = config;
-      const uniforms = [...this.uniformSetters.keys()];
-      this.timeVar = uniforms.includes(timeUniform) ? timeUniform : "time";
-      this.resolutionVar = uniforms.includes(resolutionUniform) ? resolutionUniform : "resolution";
-      if (!uniforms.includes(this.timeVar)) {
-        this.timeVar = void 0;
-      }
-      if (!uniforms.includes(this.resolutionVar)) {
-        this.resolutionVar = void 0;
-      }
-      this.timeScale = timeScale;
+  // ../phaser-genesis/src/input/keyboard/Key.ts
+  var Key = class {
+    value;
+    events;
+    capture = true;
+    isDown = false;
+    enabled = true;
+    repeatRate = 0;
+    canRepeat = true;
+    timeDown = 0;
+    timeUpdated = 0;
+    timeUp = 0;
+    shiftKey;
+    ctrlKey;
+    altKey;
+    downCallback;
+    upCallback;
+    constructor(value) {
+      this.value = value;
+      this.events = new Map();
     }
-    bind(renderPass) {
-      const renderer = renderPass.renderer;
-      if (this.timeVar) {
-        this.uniforms.set(this.timeVar, performance.now() * this.timeScale);
+    getValue() {
+      return this.value;
+    }
+    down(event) {
+      if (!this.enabled) {
+        return;
       }
-      if (this.resolutionVar) {
-        this.uniforms.set(this.resolutionVar, [renderer.width, renderer.height]);
+      if (this.capture) {
+        event.preventDefault();
       }
-      return super.bind(renderPass);
+      this.shiftKey = event.shiftKey;
+      this.ctrlKey = event.ctrlKey;
+      this.altKey = event.altKey;
+      if (this.isDown && this.canRepeat) {
+        this.timeUpdated = event.timeStamp;
+        const delay = this.timeUpdated - this.timeDown;
+        if (delay >= this.repeatRate) {
+          Emit(this, "keydown", this);
+          if (this.downCallback) {
+            this.downCallback(this);
+          }
+        }
+      } else {
+        this.isDown = true;
+        this.timeDown = event.timeStamp;
+        this.timeUpdated = event.timeStamp;
+        Emit(this, "keydown", this);
+        if (this.downCallback) {
+          this.downCallback(this);
+        }
+      }
+    }
+    up(event) {
+      if (!this.enabled) {
+        return;
+      }
+      if (this.capture) {
+        event.preventDefault();
+      }
+      this.shiftKey = event.shiftKey;
+      this.ctrlKey = event.ctrlKey;
+      this.altKey = event.altKey;
+      if (this.isDown) {
+        this.isDown = false;
+        this.timeUp = event.timeStamp;
+        this.timeUpdated = event.timeStamp;
+        Emit(this, "keyup", this);
+        if (this.upCallback) {
+          this.upCallback(this);
+        }
+      }
+    }
+    reset() {
+      this.isDown = false;
+      this.timeUpdated = this.timeDown;
+      this.timeUp = this.timeDown;
+    }
+    destroy() {
+      this.downCallback = null;
+      this.upCallback = null;
+      this.events.clear();
+    }
+  };
+
+  // ../phaser-genesis/src/input/keyboard/keys/DownKey.ts
+  var DownKey = class extends Key {
+    constructor() {
+      super("ArrowDown");
     }
   };
 
@@ -5065,25 +5083,6 @@ void main (void)
       document.addEventListener("DOMContentLoaded", check, true);
       window.addEventListener("load", check, true);
     }
-  }
-
-  // ../phaser-genesis/src/events/Emit.ts
-  function Emit(emitter, event, ...args) {
-    if (emitter.events.size === 0 || !emitter.events.has(event)) {
-      return false;
-    }
-    const listeners = emitter.events.get(event);
-    const handlers = [...listeners];
-    for (const ee of handlers) {
-      ee.callback.apply(ee.context, args);
-      if (ee.once) {
-        listeners.delete(ee);
-      }
-    }
-    if (listeners.size === 0) {
-      emitter.events.delete(event);
-    }
-    return true;
   }
 
   // ../phaser-genesis/src/events/EventEmitter.ts
@@ -5391,6 +5390,92 @@ void main (void)
     };
   }
 
+  // ../phaser-genesis/src/input/keyboard/Keyboard.ts
+  var Keyboard = class extends EventEmitter {
+    keys;
+    keydownHandler;
+    keyupHandler;
+    blurHandler;
+    keyConversion = {
+      Up: "ArrowUp",
+      Down: "ArrowDown",
+      Left: "ArrowLeft",
+      Right: "ArrowRight",
+      Spacebar: " ",
+      Win: "Meta",
+      Scroll: "ScrollLock",
+      Del: "Delete",
+      Apps: "ContextMenu",
+      Esc: "Escape",
+      Add: "+",
+      Subtract: "-",
+      Multiply: "*",
+      Decimal: ".",
+      Divide: "/"
+    };
+    constructor() {
+      super();
+      this.keydownHandler = (event) => this.onKeyDown(event);
+      this.keyupHandler = (event) => this.onKeyUp(event);
+      this.blurHandler = () => this.onBlur();
+      window.addEventListener("keydown", this.keydownHandler);
+      window.addEventListener("keyup", this.keyupHandler);
+      window.addEventListener("blur", this.blurHandler);
+      this.keys = new Map();
+    }
+    addKeys(...keys) {
+      keys.forEach((key) => {
+        this.keys.set(key.getValue(), key);
+      });
+    }
+    clearKeys() {
+      this.keys.clear();
+    }
+    onBlur() {
+      this.keys.forEach((key) => {
+        key.reset();
+      });
+    }
+    getKeyValue(key) {
+      if (this.keyConversion.hasOwnProperty(key)) {
+        return this.keyConversion[key];
+      } else {
+        return key;
+      }
+    }
+    onKeyDown(event) {
+      const value = this.getKeyValue(event.key);
+      if (this.keys.has(value)) {
+        const key = this.keys.get(value);
+        key.down(event);
+      }
+      Emit(this, "keydown-" + value, event);
+      Emit(this, "keydown", event);
+    }
+    onKeyUp(event) {
+      const value = this.getKeyValue(event.key);
+      if (this.keys.has(value)) {
+        const key = this.keys.get(value);
+        key.up(event);
+      }
+      Emit(this, "keyup-" + value, event);
+      Emit(this, "keyup", event);
+    }
+    destroy() {
+      window.removeEventListener("keydown", this.keydownHandler);
+      window.removeEventListener("keyup", this.keyupHandler);
+      window.removeEventListener("blur", this.blurHandler);
+      Emit(this, "destroy");
+    }
+  };
+
+  // ../phaser-genesis/src/input/keyboard/keys/LeftKey.ts
+  var LeftKey = class extends Key {
+    constructor() {
+      super("ArrowLeft");
+    }
+  };
+
   // ../phaser-genesis/src/loader/Loader.ts
   var Loader = class extends EventEmitter {
     baseURL = "";
@@ -5518,6 +5603,20 @@ void main (void)
     }
   };
 
+  // ../phaser-genesis/src/input/keyboard/keys/RightKey.ts
+  var RightKey = class extends Key {
+    constructor() {
+      super("ArrowRight");
+    }
+  };
+
+  // ../phaser-genesis/src/input/keyboard/keys/UpKey.ts
+  var UpKey = class extends Key {
+    constructor() {
+      super("ArrowUp");
+    }
+  };
+
   // ../phaser-genesis/src/world/events/WorldAfterUpdateEvent.ts
   var WorldAfterUpdateEvent = "afterupdate";
 
@@ -5538,6 +5637,26 @@ void main (void)
 
   // ../phaser-genesis/src/world/events/WorldUpdateEvent.ts
   var WorldUpdateEvent = "update";
+
+  // ../phaser-genesis/src/display/RemoveChild.ts
+  function RemoveChild(parent, child) {
+    const childID = child.id;
+    const parentID = parent.id;
+    if (child.hasParent(parentID)) {
+      RemoveChildID(childID);
+      DecreaseNumChildren(parentID);
+      parent.onRemoveChild(childID);
+    }
+    return child;
+  }
+
+  // ../phaser-genesis/src/display/RemoveChildren.ts
+  function RemoveChildren(parent, ...children) {
+    children.forEach((child) => {
+      RemoveChild(parent, child);
+    });
+    return children;
+  }
 
   // ../phaser-genesis/src/scenes/events/SceneDestroyEvent.ts
   var SceneDestroyEvent = "destroy";
@@ -5866,13 +5985,60 @@ void main (void)
     Emit(world2, WorldPostRenderEvent, renderPass, world2);
   }
 
-  // ../phaser-genesis/src/world/StaticWorld.ts
-  var StaticWorld = class extends BaseWorld {
-    type = "StaticWorld";
+  // ../phaser-genesis/src/camera/WorldCamera.ts
+  var WorldCamera = class extends BaseCamera {
+    type = "WorldCamera";
+    position;
+    constructor(width, height) {
+      super(width, height);
+      this.position = new Position(this.id, 0, 0);
+    }
+    set x(value) {
+      this.position.x = value;
+    }
+    get x() {
+      return this.position.x;
+    }
+    set y(value) {
+      this.position.y = value;
+    }
+    get y() {
+      return this.position.y;
+    }
+    setPosition(x, y) {
+      this.position.set(x, y);
+      return this;
+    }
+    preRender() {
+      const id = this.id;
+      if (HasDirtyTransform(id)) {
+        const x = this.x;
+        const y = this.y;
+        const w = this.size.width;
+        const h = this.size.height;
+        const ox = -x + w / 2;
+        const oy = -y + h / 2;
+        const bx = ox - w / 2;
+        const by = oy - h / 2;
+        SetBounds(id, bx, by, bx + w, by + h);
+        const data = this.matrix.data;
+        data[12] = this.x;
+        data[13] = this.y;
+        ClearDirtyTransform(id);
+        this.isDirty = true;
+        return true;
+      }
+      return false;
+    }
+  };
+
+  // ../phaser-genesis/src/world/World.ts
+  var World = class extends BaseWorld {
+    type = "World";
     constructor(scene) {
       super(scene);
       const renderer = RendererInstance.get();
-      this.camera = new StaticCamera(renderer.width, renderer.height);
+      this.camera = new WorldCamera(renderer.width, renderer.height);
     }
     preRender(gameFrame) {
       return PreRenderWorld(this, gameFrame);
@@ -5885,427 +6051,32 @@ void main (void)
     }
   };
 
-  // examples/src/gameobjects/effectlayer/create effect layer.ts
-  var cloudsFragmentShader = `
-#define SHADER_NAME CLOUDS_FRAG
-
-/*
- * Original shader from: https://www.shadertoy.com/view/MtjGRK
- */
-
-precision mediump float;
-
-varying vec2 vTextureCoord;
-varying float vTextureId;
-varying vec4 vTintColor;
-
-uniform sampler2D uTexture;
-uniform float uTime;
-uniform vec2 uResolution;
-
-#define PI 3.14159265358979323
-
-//Random
-float rand(vec2 uv)
-{
-    float dt = dot(uv, vec2(12.9898, 78.233));
-	return fract(sin(mod(dt, PI / 2.0)) * 43758.5453);
-}
-
-//Clouds from (https://www.shadertoy.com/view/MlS3z1)
-const int iter = 8;
-
-float turbulence(vec2 fragCoord, float octave, int id)
-{
-    float col = 0.0;
-    vec2 xy;
-    vec2 frac;
-    vec2 tmp1;
-    vec2 tmp2;
-    float i2;
-    float amp;
-    float maxOct = octave;
-    float time = uTime / 1000.0;
-    for (int i = 0; i < iter; i++)
-    {
-        amp = maxOct / octave;
-        i2 = float(i);
-        xy = id == 1 || id == 4? (fragCoord + 50.0 * float(id) * time / (4.0 + i2)) / octave : fragCoord / octave;
-        frac = fract(xy);
-        tmp1 = mod(floor(xy) + uResolution.xy, uResolution.xy);
-        tmp2 = mod(tmp1 + uResolution.xy - 1.0, uResolution.xy);
-        col += frac.x * frac.y * rand(tmp1) / amp;
-        col += frac.x * (1.0 - frac.y) * rand(vec2(tmp1.x, tmp2.y)) / amp;
-        col += (1.0 - frac.x) * frac.y * rand(vec2(tmp2.x, tmp1.y)) / amp;
-        col += (1.0 - frac.x) * (1.0 - frac.y) * rand(tmp2) / amp;
-        octave /= 2.0;
-    }
-    return (col);
-}
-//____________________________________________________
-
-void mainImage( out vec4 fragColor, in vec2 fragCoord )
-{
-	vec2 uv = fragCoord.xy / uResolution.xy;
-
-    vec3 sky = clamp(vec3(0.2, sin(uv.y), 1.0) + 0.3, 0.0, 1.0);
-
-    vec4 color = texture2D(uTexture, vTextureCoord);
-
-    // vec4 skyandtexture = mix(sky, color);
-
-    float cloud1 = turbulence(fragCoord, 128.0, 1);
-    float cloud2 = turbulence(fragCoord + 2000.0, 128.0, 1);
-    float cloudss = clamp(pow(mix(cloud1, cloud2, 0.5), 30.0) / 9.0, 0.0, 1.0);
-
-	// fragColor = sky + color + vec4(cloudss, 1.0);
-
-    fragColor = color * vec4(sky + cloudss, 1.0);
-}
-
-void main(void)
-{
-    mainImage(gl_FragColor, gl_FragCoord.xy);
-}
-`;
-  var verticalBarsFragmentShader = `
-#define SHADER_NAME BARS_FRAG
-
-precision mediump float;
-
-varying vec2 vTextureCoord;
-varying float vTextureId;
-varying vec4 vTintColor;
-
-uniform sampler2D uTexture;
-uniform float uTime;
-uniform vec2 uResolution;
-
-#define PI 0.01
-
-void main (void)
-{
-    vec4 color = texture2D(uTexture, vTextureCoord);
-
-    vec2 p = (gl_FragCoord.xy / uResolution.xy) - 0.5;
-
-    float sx = 0.4 * sin(25.0 * p.y - (uTime * 0.001) * 2.0);
-
-    float dy = 2.0 / (5.0 * abs(p.y - sx));
-
-    gl_FragColor = color * vec4((p.x + 0.5) * dy, 0.5 * dy, dy - 1.65, 0.5);
-}`;
-  var vduNoiseFragmentShader = `
-precision mediump float;
-
-varying vec2 vTextureCoord;
-varying float vTextureId;
-varying vec4 vTintColor;
-
-uniform sampler2D uTexture;
-uniform float uTime;
-uniform vec2 uResolution;
-
-float noise(vec2 pos) {
-    return fract(sin(dot(pos, vec2(12.9898 - (uTime * 0.001) ,78.233 + (uTime * 0.001)))) * 43758.5453);
-}
-
-void main (void)
-{
-    vec2 normalPos = gl_FragCoord.xy / uResolution.xy;
-    float pos = (gl_FragCoord.y / uResolution.y);
-    //float mouse_dist = length(vec2((mouse.x - normalPos.x) * (uResolution.x / uResolution.y) , mouse.y - normalPos.y));
-    float mouse_dist = 1.0;
-    float distortion = clamp(1.0 - (mouse_dist + 0.1) * 3.0, 0.0, 1.0);
-
-    pos -= (distortion * distortion) * 0.1;
-
-    float c = sin(pos * 400.0) * 0.4 + 0.4;
-    c = pow(c, 0.2);
-    c *= 0.2;
-
-    float band_pos = fract(uTime * 0.0001) * 3.0 - 1.0;
-    c += clamp( (1.0 - abs(band_pos - pos) * 10.0), 0.0, 1.0) * 0.1;
-
-    c += distortion * 0.08;
-    // noise
-    c += (noise(gl_FragCoord.xy) - 0.5) * (0.09);
-
-    vec4 color = texture2D(uTexture, vTextureCoord);
-
-    gl_FragColor = color + vec4( 0.0, c, 0.0, 1.0 );
-
-}`;
-  var underwaterFragmentShader = `
-precision mediump float;
-
-varying vec2 vTextureCoord;
-varying float vTextureId;
-varying vec4 vTintColor;
-
-uniform sampler2D uTexture;
-uniform float uTime;
-uniform vec2 uResolution;
-
-#define MAX_ITER 4
-
-void main (void)
-{
-    vec2 v_texCoord = gl_FragCoord.xy / uResolution;
-
-    vec2 p =  v_texCoord * 8.0 - vec2(20.0);
-    vec2 i = p;
-    float c = 1.0;
-    float inten = .05;
-
-    for (int n = 0; n < MAX_ITER; n++)
-    {
-        float t = (uTime * 0.0001) * (1.0 - (3.0 / float(n+1)));
-
-        i = p + vec2(cos(t - i.x) + sin(t + i.y),
-        sin(t - i.y) + cos(t + i.x));
-
-        c += 1.0/length(vec2(p.x / (sin(i.x+t)/inten),
-        p.y / (cos(i.y+t)/inten)));
-    }
-
-    c /= float(MAX_ITER);
-    c = 1.5 - sqrt(c);
-
-    vec4 texColor = vec4(0.0, 0.01, 0.015, 1.0);
-
-    texColor.rgb *= (1.0 / (1.0 - (c + 0.05)));
-
-    gl_FragColor = texture2D(uTexture, vTextureCoord) * texColor;
-}`;
-  var sineWaveFragmentShader2 = `
-precision mediump float;
-
-varying vec2 vTextureCoord;
-varying float vTextureId;
-varying vec4 vTintColor;
-
-uniform sampler2D uTexture;
-uniform float uTime;
-uniform vec2 uResolution;
-
-void main (void)
-{
-    vec2 uv = gl_FragCoord.xy / uResolution.xy;
-    uv.y += (sin((uv.x + (uTime * 0.0005)) * 10.0) * 0.1) + (sin((uv.x + (uTime * 0.0002)) * 32.0) * 0.01);
-    gl_FragColor = texture2D(uTexture, uv);
-}`;
-  var sineWaveFragmentShader = `
-precision mediump float;
-
-varying vec2 vTextureCoord;
-varying float vTextureId;
-varying vec4 vTintColor;
-
-uniform sampler2D uTexture;
-uniform float uTime;
-uniform vec2 uResolution;
-
-void main (void)
-{
-    vec2 uv = gl_FragCoord.xy / uResolution.xy;
-
-    // Represents the v/y coord(0 to 1) that will not sway.
-    float fixedBasePosY = 0.0;
-
-    // Configs for you to get the sway just right.
-    float speed = 3.0;
-    float verticleDensity = 6.0;
-    float swayIntensity = 0.2;
-
-    // Putting it all together.
-    float offsetX = sin(uv.y * verticleDensity + (uTime * 0.001) * speed) * swayIntensity;
-
-    // Offsettin the u/x coord.
-    uv.x += offsetX * (uv.y - fixedBasePosY);
-
-    gl_FragColor = texture2D(uTexture, uv);
-}`;
-  var pixelateFragmentShader = `
-precision mediump float;
-
-varying vec2 vTextureCoord;
-varying float vTextureId;
-varying vec4 vTintColor;
-
-uniform sampler2D uTexture;
-uniform float uTime;
-uniform vec2 uResolution;
-
-void main (void)
-{
-    vec2 pixelSize = vec2(4.0, 4.0);
-    vec2 size = uResolution.xy / pixelSize;
-    vec2 color = floor((vTextureCoord * size)) / size + pixelSize / uResolution.xy * 0.5;
-
-    gl_FragColor = texture2D(uTexture, color);
-}`;
-  var plasmaFragmentShader = `
-precision mediump float;
-
-varying vec2 vTextureCoord;
-varying float vTextureId;
-varying vec4 vTintColor;
-
-uniform sampler2D uTexture;
-uniform float uTime;
-uniform vec2 uResolution;
-
-const float PI = 3.14159265;
-float ptime = uTime * 0.0001;
-float alpha = 1.0;
-float size = 0.03;
-float redShift = 0.5;
-float greenShift = 0.5;
-float blueShift = 0.9;
-
-void main (void)
-{
-    vec4 tcolor = texture2D(uTexture, vTextureCoord);
-
-    float color1, color2, color;
-
-    color1 = (sin(dot(gl_FragCoord.xy, vec2(sin(ptime * 3.0), cos(ptime * 3.0))) * 0.02 + ptime * 3.0) + 1.0) / 2.0;
-    vec2 center = vec2(640.0 / 2.0, 360.0 / 2.0) + vec2(640.0 / 2.0 * sin(-ptime * 3.0), 360.0 / 2.0 * cos(-ptime * 3.0));
-    color2 = (cos(length(gl_FragCoord.xy - center) * size) + 1.0) / 2.0;
-    color = (color1 + color2) / 2.0;
-
-    float red = (cos(PI * color / redShift + ptime * 3.0) + 1.0) / 2.0;
-    float green = (sin(PI * color / greenShift + ptime * 3.0) + 1.0) / 2.0;
-    float blue = (sin(PI * color / blueShift + ptime * 3.0) + 1.0) / 2.0;
-
-    gl_FragColor = tcolor * vec4(red, green, blue, alpha);
-}`;
-  var lazerBeamFragmentShader = `
-precision highp float;
-
-varying vec2 vTextureCoord;
-varying float vTextureId;
-varying vec4 vTintColor;
-
-uniform sampler2D uTexture;
-uniform float uTime;
-uniform vec2 uResolution;
-
-void main (void)
-{
-    vec4 color = texture2D(uTexture, vTextureCoord);
-
-    vec2 p = (gl_FragCoord.yx / uResolution.yx) - 0.5;
-
-    float sx = 0.3 * (p.x + 0.8) * sin(900.0 * p.x - 1.0 * pow(uTime / 1000.0, 0.55) * 5.0);
-    float dy = 4.0 / (500.0 * abs(p.y - sx));
-
-    dy += 1.0 / (25.0 * length(p - vec2(p.x, 0.0)));
-
-    gl_FragColor = color * vec4((p.x + 0.1) * dy, 0.3 * dy, dy, 1.1);
-}`;
-  var redFragmentShader = `
-precision highp float;
-
-varying vec2 vTextureCoord;
-varying float vTextureId;
-varying vec4 vTintColor;
-
-uniform sampler2D uTexture;
-
-void main (void)
-{
-    vec4 color = texture2D(uTexture, vTextureCoord);
-
-    gl_FragColor = color * vec4(1.0, 0.0, 0.0, 1.0);
-}`;
-  var blurXFragmentShader = `
-precision mediump float;
-
-varying vec2 vTextureCoord;
-varying float vTextureId;
-varying vec4 vTintColor;
-
-uniform sampler2D uTexture;
-
-void main (void)
-{
-    vec4 sum = vec4(0.0);
-    float blur = 0.001953125;
-
-    sum += texture2D(uTexture, vec2(vTextureCoord.x - 4.0 * blur, vTextureCoord.y)) * 0.05;
-    sum += texture2D(uTexture, vec2(vTextureCoord.x - 3.0 * blur, vTextureCoord.y)) * 0.09;
-    sum += texture2D(uTexture, vec2(vTextureCoord.x - 2.0 * blur, vTextureCoord.y)) * 0.12;
-    sum += texture2D(uTexture, vec2(vTextureCoord.x - blur, vTextureCoord.y)) * 0.15;
-    sum += texture2D(uTexture, vec2(vTextureCoord.x, vTextureCoord.y)) * 0.16;
-    sum += texture2D(uTexture, vec2(vTextureCoord.x + blur, vTextureCoord.y)) * 0.15;
-    sum += texture2D(uTexture, vec2(vTextureCoord.x + 2.0 * blur, vTextureCoord.y)) * 0.12;
-    sum += texture2D(uTexture, vec2(vTextureCoord.x + 3.0 * blur, vTextureCoord.y)) * 0.09;
-    sum += texture2D(uTexture, vec2(vTextureCoord.x + 4.0 * blur, vTextureCoord.y)) * 0.05;
-
-    gl_FragColor = sum;
-}`;
-  var blurYFragmentShader = `
-precision mediump float;
-
-varying vec2 vTextureCoord;
-varying float vTextureId;
-varying vec4 vTintColor;
-
-uniform sampler2D uTexture;
-
-void main (void)
-{
-    vec4 sum = vec4(0.0);
-    float blur = 0.001953125;
-
-    sum += texture2D(uTexture, vec2(vTextureCoord.x, vTextureCoord.y - 4.0 * blur)) * 0.05;
-    sum += texture2D(uTexture, vec2(vTextureCoord.x, vTextureCoord.y - 3.0 * blur)) * 0.09;
-    sum += texture2D(uTexture, vec2(vTextureCoord.x, vTextureCoord.y - 2.0 * blur)) * 0.12;
-    sum += texture2D(uTexture, vec2(vTextureCoord.x, vTextureCoord.y - blur)) * 0.15;
-    sum += texture2D(uTexture, vec2(vTextureCoord.x, vTextureCoord.y)) * 0.16;
-    sum += texture2D(uTexture, vec2(vTextureCoord.x, vTextureCoord.y + blur)) * 0.15;
-    sum += texture2D(uTexture, vec2(vTextureCoord.x, vTextureCoord.y + 2.0 * blur)) * 0.12;
-    sum += texture2D(uTexture, vec2(vTextureCoord.x, vTextureCoord.y + 3.0 * blur)) * 0.09;
-    sum += texture2D(uTexture, vec2(vTextureCoord.x, vTextureCoord.y + 4.0 * blur)) * 0.05;
-
-    gl_FragColor = sum;
-}`;
+  // examples/src/gameobjects/renderlayer/camera render layer.ts
   var Demo = class extends Scene {
     constructor() {
       super();
-      this.preload();
-    }
-    async preload() {
+      this.cameraSpeed = 4;
+      const keyboard = new Keyboard();
+      this.leftKey = new LeftKey();
+      this.rightKey = new RightKey();
+      this.upKey = new UpKey();
+      this.downKey = new DownKey();
+      keyboard.addKeys(this.leftKey, this.rightKey, this.upKey, this.downKey);
       const loader = new Loader();
-      loader.add(ImageFile("background", "assets/farm-background.png"), ImageFile("ayu", "assets/ayu.png"), ImageFile("logo", "assets/logo.png"), ImageFile("rocket", "assets/rocket.png"), ImageFile("farm", "assets/farm-logo.png"), ImageFile("star", "assets/star.png"), ImageFile("bubble", "assets/bubble256.png"));
-      await loader.start();
-      this.create();
+      loader.setPath("assets/");
+      loader.add(ImageFile("background", "farm-background.png"));
+      loader.add(ImageFile("ayu", "ayu.png"));
+      loader.add(ImageFile("logo", "logo.png"));
+      loader.add(ImageFile("rocket", "rocket.png"));
+      loader.add(ImageFile("farm", "farm-logo.png"));
+      loader.add(ImageFile("star", "star.png"));
+      loader.add(ImageFile("bubble", "bubble256.png"));
+      loader.start().then(() => this.create());
     }
     create() {
-      const red = new Shader({ fragmentShader: redFragmentShader, renderToFramebuffer: true });
-      const blurX = new Shader({ fragmentShader: blurXFragmentShader, renderToFramebuffer: true });
-      const blurY = new Shader({ fragmentShader: blurYFragmentShader, renderToFramebuffer: true });
-      const lazer = new FXShader({ fragmentShader: lazerBeamFragmentShader, renderToFramebuffer: true });
-      const plasma = new FXShader({ fragmentShader: plasmaFragmentShader, renderToFramebuffer: true });
-      const pixel = new FXShader({ fragmentShader: pixelateFragmentShader, renderToFramebuffer: true });
-      const sine = new FXShader({ fragmentShader: sineWaveFragmentShader, renderToFramebuffer: true });
-      const sine2 = new FXShader({ fragmentShader: sineWaveFragmentShader2, renderToFramebuffer: true });
-      const underwater = new FXShader({ fragmentShader: underwaterFragmentShader, renderToFramebuffer: true });
-      const vdu = new FXShader({ fragmentShader: vduNoiseFragmentShader, renderToFramebuffer: true });
-      const bars = new FXShader({ fragmentShader: verticalBarsFragmentShader, renderToFramebuffer: true });
-      const clouds = new FXShader({ fragmentShader: cloudsFragmentShader, renderToFramebuffer: true });
-      const empty = new Shader();
-      const world2 = new StaticWorld(this);
-      const layer = new EffectLayer();
-      const layer2 = new EffectLayer();
-      const layer3 = new EffectLayer();
-      layer.shaders.push(clouds);
-      layer2.shaders.push(sine);
-      layer2.shaders.push(plasma);
-      layer3.shaders.push(sine);
-      layer3.shaders.push(lazer);
+      const world2 = new World(this);
+      this.camera = world2.camera;
+      const layer = new RenderLayer();
       const bg = new Sprite(400, 300, "background");
       const logo = new Sprite(200, 300, "logo");
       const ayu = new Sprite(600, 300, "ayu");
@@ -6313,10 +6084,23 @@ void main (void)
       const rocket = new Sprite(150, 500, "rocket");
       const bubble = new Sprite(400, 450, "bubble");
       const star = new Sprite(650, 500, "star");
-      AddChildren(layer, ayu, logo, rocket);
-      AddChildren(layer3, bubble);
-      AddChildren(layer2, farm);
-      AddChildren(world2, bg, layer, layer2, layer3, star);
+      AddChildren(layer, ayu, logo, farm, rocket, bubble);
+      AddChildren(world2, bg, layer, star);
+    }
+    update() {
+      if (!this.camera) {
+        return;
+      }
+      if (this.leftKey.isDown) {
+        this.camera.x += this.cameraSpeed;
+      } else if (this.rightKey.isDown) {
+        this.camera.x -= this.cameraSpeed;
+      }
+      if (this.upKey.isDown) {
+        this.camera.y += this.cameraSpeed;
+      } else if (this.downKey.isDown) {
+        this.camera.y -= this.cameraSpeed;
+      }
     }
   };
   new Game(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(2960685), Scenes(Demo));
@@ -6326,4 +6110,4 @@ void main (void)
  * @copyright    2020 Photon Storm Ltd.
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
  */
-//# sourceMappingURL=create effect layer.js.map
+//# sourceMappingURL=camera render layer.js.map

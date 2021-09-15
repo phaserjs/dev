@@ -1440,6 +1440,12 @@ void main (void)
   var $indexBytes = Symbol("indexBytes");
   var $isEidType = Symbol("isEidType");
   var stores = {};
+  var resize = (ta, size) => {
+    const newBuffer = new ArrayBuffer(size * ta.BYTES_PER_ELEMENT);
+    const newTa = new ta.constructor(newBuffer);
+    newTa.set(ta, 0);
+    return newTa;
+  };
   var createShadow = (store, key) => {
     if (!ArrayBuffer.isView(store)) {
       const shadowStore = store[$parentArray].slice(0).fill(0);
@@ -1451,6 +1457,58 @@ void main (void)
     } else {
       store[key] = store.slice(0).fill(0);
     }
+  };
+  var resizeSubarray = (metadata, store, size) => {
+    const cursors = metadata[$subarrayCursors];
+    let type = store[$storeType];
+    const length = store[0].length;
+    const indexType = length <= UNSIGNED_MAX.uint8 ? "ui8" : length <= UNSIGNED_MAX.uint16 ? "ui16" : "ui32";
+    const arrayCount = metadata[$storeArrayCounts][type];
+    const summedLength = Array(arrayCount).fill(0).reduce((a, p) => a + length, 0);
+    const array = new TYPES[type](roundToMultiple4(summedLength * size));
+    array.set(metadata[$storeSubarrays][type]);
+    metadata[$storeSubarrays][type] = array;
+    array[$indexType] = TYPES_NAMES[indexType];
+    array[$indexBytes] = TYPES[indexType].BYTES_PER_ELEMENT;
+    const start = cursors[type];
+    let end = 0;
+    for (let eid = 0; eid < size; eid++) {
+      const from = cursors[type] + eid * length;
+      const to = from + length;
+      store[eid] = metadata[$storeSubarrays][type].subarray(from, to);
+      store[eid][$subarrayFrom] = from;
+      store[eid][$subarrayTo] = to;
+      store[eid][$subarray] = true;
+      store[eid][$indexType] = TYPES_NAMES[indexType];
+      store[eid][$indexBytes] = TYPES[indexType].BYTES_PER_ELEMENT;
+      end = to;
+    }
+    cursors[type] = end;
+    store[$parentArray] = metadata[$storeSubarrays][type].subarray(start, end);
+  };
+  var resizeRecursive = (metadata, store, size) => {
+    Object.keys(store).forEach((key) => {
+      const ta = store[key];
+      if (Array.isArray(ta)) {
+        resizeSubarray(metadata, ta, size);
+        store[$storeFlattened].push(ta);
+      } else if (ArrayBuffer.isView(ta)) {
+        store[key] = resize(ta, size);
+        store[$storeFlattened].push(store[key]);
+      } else if (typeof ta === "object") {
+        resizeRecursive(metadata, store[key], size);
+      }
+    });
+  };
+  var resizeStore = (store, size) => {
+    if (store[$tagStore])
+      return;
+    store[$storeSize] = size;
+    store[$storeFlattened].length = 0;
+    Object.keys(store[$subarrayCursors]).forEach((k) => {
+      store[$subarrayCursors][k] = 0;
+    });
+    resizeRecursive(store, store, size);
   };
   var resetStoreFor = (store, eid) => {
     if (store[$storeFlattened]) {
@@ -1887,6 +1945,9 @@ void main (void)
       notQueries,
       changedQueries
     });
+    if (component[$storeSize] < getGlobalSize()) {
+      resizeStore(component, getGlobalSize());
+    }
     incrementBitflag(world2);
   };
   var hasComponent = (world2, component, eid) => {
@@ -2413,14 +2474,14 @@ void main (void)
     }
     unbind(index = 1) {
       gl.activeTexture(gl.TEXTURE0 + index);
-      gl.bindTexture(gl.TEXTURE_2D, this.tempTextures[index]);
+      gl.bindTexture(gl.TEXTURE_2D, this.tempTextures.get(index));
     }
     unbindTexture(texture) {
       const index = texture.binding.textureUnit;
       const binding = texture.binding;
       binding.unbind();
       gl.activeTexture(gl.TEXTURE0 + index);
-      gl.bindTexture(gl.TEXTURE_2D, this.tempTextures[index]);
+      gl.bindTexture(gl.TEXTURE_2D, this.tempTextures.get(index));
     }
     setWhite() {
       return this.set(WhiteTexture.get());
@@ -2456,7 +2517,6 @@ void main (void)
       this.tempTextures.forEach((texture, index) => {
         this.textureIndex.push(index);
       });
-      this.textures.set(0, this.tempTextures[0]);
     }
     clear() {
       this.textures.forEach((texture) => {
@@ -2465,7 +2525,6 @@ void main (void)
         }
       });
       this.textures.clear();
-      this.textures.set(0, this.tempTextures[0]);
     }
     reset() {
       this.tempTextures.forEach((texture, index) => {
@@ -3028,6 +3087,11 @@ void main (void)
     return !!DirtyComponent.data[id][DIRTY.WORLD_TRANSFORM];
   }
 
+  // ../phaser-genesis/src/components/dirty/SetDirtyChildColor.ts
+  function SetDirtyChildColor(id) {
+    DirtyComponent.data[id][DIRTY.CHILD_COLOR] = 1;
+  }
+
   // ../phaser-genesis/src/components/dirty/SetDirtyWorldTransform.ts
   function SetDirtyWorldTransform(id) {
     DirtyComponent.data[id][DIRTY.WORLD_TRANSFORM] = 1;
@@ -3467,6 +3531,7 @@ void main (void)
       SetWorldID(childID, worldID);
     });
     world2.updateDisplayList = true;
+    SetDirtyChildColor(worldID);
   }
 
   // ../phaser-genesis/src/components/hierarchy/SetAndUpdateParent.ts
@@ -4605,7 +4670,10 @@ void main (void)
       const id = this.id;
       SetColor(renderPass, this.color);
       if (renderPass.isCameraDirty() || WillCacheChildren(id) && HasDirtyChildCache(id)) {
-        renderPass.textures.unbindTexture(this.texture);
+        const texture = this.texture;
+        if (texture.binding.isBound) {
+          renderPass.textures.unbindTexture(texture);
+        }
         Flush(renderPass);
         renderPass.framebuffer.set(this.framebuffer, true);
       }
@@ -5772,7 +5840,7 @@ void main (void)
       AddChildren(layer, ayu, logo, farm, rocket, bubble);
       AddChildren(world2, bg, layer, star);
       On(world2, "update", () => {
-        if (rocket.x < 250) {
+        if (rocket.x < 300) {
           rocket.x += 1;
         }
       });
