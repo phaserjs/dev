@@ -28,7 +28,7 @@
     "bitecs": "^0.3.21",
     "boxen": "^5.1.1",
     "chalk": "^4.1.2",
-    "directory-tree": "^2.3.1",
+    "directory-tree": "^2.4.0",
     "esbuild": "^0.12.28",
     "esbuild-plugin-ifdef": "^1.0.1",
     "esbuild-plugin-inline-worker": "^0.1.1",
