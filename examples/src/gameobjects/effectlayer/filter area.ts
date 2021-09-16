@@ -4,7 +4,7 @@ import { EffectLayer, Rectangle, Sprite } from '../../../../../phaser-genesis/sr
 import { AddChildren } from '../../../../../phaser-genesis/src/display';
 import { FXShader } from '../../../../../phaser-genesis/src/renderer/webgl1/shaders/FXShader';
 import { Game } from '../../../../../phaser-genesis/src/Game';
-import { ImageFile } from '../../../../../phaser-genesis/src/loader/files';
+import { LoadImageFile } from '../../../../../phaser-genesis/src/loader/files';
 import { Scene } from '../../../../../phaser-genesis/src/scenes/Scene';
 import { StaticWorld } from '../../../../../phaser-genesis/src/world/StaticWorld';
 
@@ -64,19 +64,23 @@ class Demo extends Scene
     {
         const world = new StaticWorld(this);
 
-        await ImageFile('girl', 'assets/amitie1.png').load();
-        await ImageFile('lemming', 'assets/lemming.png').load();
+        await LoadImageFile('girl', 'assets/amitie1.png');
+        await LoadImageFile('lemming', 'assets/lemming.png');
 
-        const flower = new FXShader({ fragmentShader, timeScale: 0.005 });
+        const flower = new FXShader({ fragmentShader, timeScale: 0.002 });
 
-        const layer = new EffectLayer(flower);
+        const layer = new EffectLayer(700, 500, 1, flower);
 
+        layer.x = 50;
+        layer.y = 50;
+
+        const rect = new Rectangle(400, 300, 800, 600, 0xffffff);
         const ami = new Sprite(400, 300, 'girl');
         const lem = new Sprite(500, 500, 'lemming');
 
-        AddChildren(layer, ami);
+        AddChildren(layer, rect);
 
-        AddChildren(world, layer, lem);
+        AddChildren(world, layer, ami, lem);
     }
 }
 

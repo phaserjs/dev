@@ -103,8 +103,6 @@ class Demo extends Scene
 
         const layer = new EffectLayer();
 
-        wiggles.timeScale = 0.001;
-
         layer.shaders.push(wiggles);
 
         const rect = new Rectangle(400, 300, 512, 512);

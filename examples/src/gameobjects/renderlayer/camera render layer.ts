@@ -27,7 +27,7 @@ class Demo extends Scene
     camera: WorldCamera;
     world: World;
 
-    cameraSpeed: number = 4;
+    cameraSpeed: number = 8;
 
     constructor ()
     {
@@ -63,33 +63,22 @@ class Demo extends Scene
 
         this.camera = world.camera;
 
+        // const layer = new RenderLayer(100, 64, 700, 400);
         const layer = new RenderLayer();
 
         const bg = new Sprite(400, 300, 'background');
-
-        /*
-        bg.scale.y = -1;
-
-        AddChildren(world, bg);
-        */
-
-        setTimeout(() => {
-
-            // console.log(QuadVertexComponent.values[bg.id]);
-            console.log(GetQuadVertices(layer.id));
-
-        }, 2000);
-
         const logo = new Sprite(200, 300, 'logo');
         const ayu = new Sprite(600, 300, 'ayu');
         const farm = new Sprite(200, 150, 'farm');
         const rocket = new Sprite(150, 500, 'rocket');
         const bubble = new Sprite(400, 450, 'bubble');
         const star = new Sprite(650, 500, 'star');
+        const rocket2 = new Sprite(-300, 400, 'rocket');
+        const rocket3 = new Sprite(300, -300, 'rocket');
 
-        AddChildren(layer, ayu, logo, farm, rocket, bubble);
+        AddChildren(layer, bg, ayu, logo, farm, rocket, rocket2, rocket3, bubble);
 
-        AddChildren(world, bg, layer, star);
+        AddChildren(world, layer, star);
     }
 
     update (): void
