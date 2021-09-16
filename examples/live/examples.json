@@ -317,6 +317,11 @@
           "name": "effectlayer",
           "children": [
             {
+              "path": "examples/live/gameobjects/effectlayer/checkerboard.js",
+              "name": "checkerboard.js",
+              "type": "file"
+            },
+            {
               "path": "examples/live/gameobjects/effectlayer/create effect layer.js",
               "name": "create effect layer.js",
               "type": "file"
@@ -324,6 +329,11 @@
             {
               "path": "examples/live/gameobjects/effectlayer/effect layer with sampler2d.js",
               "name": "effect layer with sampler2d.js",
+              "type": "file"
+            },
+            {
+              "path": "examples/live/gameobjects/effectlayer/gradient.js",
+              "name": "gradient.js",
               "type": "file"
             },
             {

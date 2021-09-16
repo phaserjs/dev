@@ -4,11 +4,13 @@ import { RenderLayer, Sprite } from '../../../../../phaser-genesis/src/gameobjec
 import { AddChildren } from '../../../../../phaser-genesis/src/display/AddChildren';
 import { DownKey } from '../../../../../phaser-genesis/src/input/keyboard/keys/DownKey';
 import { Game } from '../../../../../phaser-genesis/src/Game';
+import { GetQuadVertices } from '../../../../../phaser-genesis/src/components/vertices/GetQuadVertices';
 import { ImageFile } from '../../../../../phaser-genesis/src/loader/files/ImageFile';
 import { Keyboard } from '../../../../../phaser-genesis/src/input/keyboard/Keyboard';
 import { LeftKey } from '../../../../../phaser-genesis/src/input/keyboard/keys/LeftKey';
 import { Loader } from '../../../../../phaser-genesis/src/loader/Loader';
 import { On } from '../../../../../phaser-genesis/src/events/On';
+import { QuadVertexComponent } from '../../../../../phaser-genesis/src/components/vertices/QuadVertexComponent';
 import { RightKey } from '../../../../../phaser-genesis/src/input/keyboard/keys/RightKey';
 import { Scene } from '../../../../../phaser-genesis/src/scenes/Scene';
 import { UpKey } from '../../../../../phaser-genesis/src/input/keyboard/keys/UpKey';
@@ -64,6 +66,20 @@ class Demo extends Scene
         const layer = new RenderLayer();
 
         const bg = new Sprite(400, 300, 'background');
+
+        /*
+        bg.scale.y = -1;
+
+        AddChildren(world, bg);
+        */
+
+        setTimeout(() => {
+
+            // console.log(QuadVertexComponent.values[bg.id]);
+            console.log(GetQuadVertices(layer.id));
+
+        }, 2000);
+
         const logo = new Sprite(200, 300, 'logo');
         const ayu = new Sprite(600, 300, 'ayu');
         const farm = new Sprite(200, 150, 'farm');
