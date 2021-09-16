@@ -4,6 +4,7 @@ import { EffectLayer, Layer, Rectangle, RenderLayer, Sprite } from '../../../../
 import { AddChildren } from '../../../../../phaser-genesis/src/display';
 import { FXShader } from '../../../../../phaser-genesis/src/renderer/webgl1/shaders/FXShader';
 import { Game } from '../../../../../phaser-genesis/src/Game';
+import { LoadImageFile } from '../../../../../phaser-genesis/src/loader/files/LoadImageFile';
 import { On } from '../../../../../phaser-genesis/src/events';
 import { Scene } from '../../../../../phaser-genesis/src/scenes/Scene';
 import { StaticWorld } from '../../../../../phaser-genesis/src/world/StaticWorld';
@@ -65,19 +66,21 @@ void main (void)
 
     vec4 color = texture2D(uTexture, uv);
 
+    //  -2 = scroll forwards, 2 = scroll backwards
+    //  can set x to scroll horizontally
     vec2 offs = vec2(0.0, uTime * 0.1 * -2.0);
 
     vec2 pos = uv - vec2(0.5, 0.5);
 
     //  no discard = top and bottom
-    //  < 0 = bottom
-    //  > 0 = top
+    //  > 0 = show bottom
+    //  < 0 = show top
     if (pos.y > 0.0)
     {
         discard;
     }
 
-    float horizon = 0.1;
+    float horizon = 0.01;
     float fov = 0.5; 
 
 	float scaling = 0.05;
@@ -88,8 +91,8 @@ void main (void)
 	//  checkboard texture
 	float bcolor = sign((mod(s.x + offs.x, 0.1) - 0.05) * (mod(s.y + offs.y, 0.1) - 0.05));
 
-    //  fading
-	bcolor *= p.z * p.z * 10.0;
+    //  fading (55, 10, etc for distance of fade based on horizon)
+	bcolor *= p.z * p.z * 50.0;
 	
 	gl_FragColor = color * vec4(vec3(bcolor), 1.0);
 }`;
@@ -99,6 +102,13 @@ class Demo extends Scene
     constructor ()
     {
         super();
+
+        this.create();
+    }
+
+    async create ()
+    {
+        // await LoadImageFile('bg', 'assets/textures/stone.png');
 
         const floor = new FXShader({ fragmentShader: checkerboardFragmentShader });
 
@@ -110,8 +120,10 @@ class Demo extends Scene
 
         fxlayer.shaders.push(floor);
 
+        // const bg = new Sprite(400, 300, 'bg');
         const rect = new Rectangle(400, 300, 800, 600, 0xff00ff);
 
+        // AddChildren(fxlayer, bg);
         AddChildren(fxlayer, rect);
         AddChildren(world, fxlayer);
     }

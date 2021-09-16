@@ -24,6 +24,14 @@ import { StaticWorld } from '../../../../../phaser-genesis/src/world/StaticWorld
 // https://glslsandbox.com/e#73884.0 - electric lines
 // https://glslsandbox.com/e#72942.0 - glowing snake
 
+// https://www.shadertoy.com/view/4ljGD1 - music waves
+// https://www.shadertoy.com/view/Md23DV - 2d tut
+// https://www.shadertoy.com/view/Ms3XWN - iq pacman (glow)
+// https://www.shadertoy.com/view/4tdSWr - lovely clouds
+// https://www.shadertoy.com/view/XsjGDt - circle
+// https://www.shadertoy.com/view/Mdf3zr - edge glow
+
+
 const gradientFragmentShader = `
 precision mediump float;
 

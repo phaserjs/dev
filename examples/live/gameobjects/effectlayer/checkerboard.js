@@ -4051,14 +4051,10 @@ void main (void)
   }
 
   // ../phaser-genesis/src/components/vertices/AddQuadVertex.ts
-  function AddQuadVertex(id, width = 0, height = 0, flipY = true) {
+  function AddQuadVertex(id, width = 0, height = 0) {
     addComponent(GameObjectWorld, QuadVertexComponent, id);
     if (width || height) {
-      if (flipY) {
-        SetUV(id, 0, 1, 1, 0);
-      } else {
-        SetUV(id, 0, 0, 1, 1);
-      }
+      SetUV(id, 0, 0, 1, 1);
       SetQuadColor(id, 1, 1, 1, 1);
       SetQuadPosition(id, 0, 0, 0, height, width, height, width, 0);
     }
@@ -4495,14 +4491,14 @@ void main (void)
     return offset + 54;
   }
 
-  // ../phaser-genesis/src/renderer/webgl1/draw/BatchSingleQuad.ts
-  function BatchSingleQuad(renderPass, x, y, width, height, u0, v0, u1, v1, textureIndex = 0) {
+  // ../phaser-genesis/src/renderer/webgl1/draw/BatchSingleQuadFlipped.ts
+  function BatchSingleQuadFlipped(renderPass, x, y, width, height, u0, v0, u1, v1, textureIndex = 0) {
     const { F32, offset } = GetVertexBufferEntry(renderPass, 2);
-    BatchTexturedQuad(F32, offset, textureIndex, x, y, x, y + height, x + width, y + height, x + width, y, u0, v0, u1, v1, 1, 1, 1, 1);
+    BatchTexturedQuad(F32, offset, textureIndex, x, y + height, x, y, x + width, y, x + width, y + height, u0, v0, u1, v1, 1, 1, 1, 1);
   }
 
-  // ../phaser-genesis/src/renderer/webgl1/draw/DrawTexturedQuad.ts
-  function DrawTexturedQuad(renderPass, texture, shader) {
+  // ../phaser-genesis/src/renderer/webgl1/draw/DrawTexturedQuadFlipped.ts
+  function DrawTexturedQuadFlipped(renderPass, texture, shader) {
     if (!shader) {
       shader = renderPass.quadShader;
     }
@@ -4514,17 +4510,10 @@ void main (void)
     const camera = renderPass.current2DCamera;
     const x = camera.getBoundsX();
     const y = camera.getBoundsY();
-    BatchSingleQuad(renderPass, x, y, texture.width, texture.height, u0, v0, u1, v1, 0);
+    BatchSingleQuadFlipped(renderPass, x, y, texture.width, texture.height, u0, v0, u1, v1, 0);
     Flush(renderPass);
     renderPass.textures.unbindTexture(texture);
     renderPass.shader.pop();
-  }
-
-  // ../phaser-genesis/src/textures/FlipFrameUVs.ts
-  function FlipFrameUVs(frame2) {
-    frame2.v0 = 1 - frame2.v0;
-    frame2.v1 = 1 - frame2.v1;
-    return frame2;
   }
 
   // ../phaser-genesis/src/gameobjects/layer/Layer.ts
@@ -4558,8 +4547,8 @@ void main (void)
         createFramebuffer: true,
         flipY: true
       });
-      AddQuadVertex(id, width, height, true);
-      FlipFrameUVs(texture.getFrame());
+      AddQuadVertex(id, width, height);
+      SetQuadPosition(id, 0, height, 0, 0, width, 0, width, height);
       this.texture = texture;
       this.framebuffer = binding.framebuffer;
       this.color = new Color(id);
@@ -4583,7 +4572,7 @@ void main (void)
         renderPass.framebuffer.pop();
         ClearDirtyChildCache(id);
         SetDirtyParents(id);
-        DrawTexturedQuad(renderPass, this.texture);
+        DrawTexturedQuadFlipped(renderPass, this.texture);
       } else {
         BatchTexturedQuadBuffer(this.texture, id, renderPass);
       }
@@ -4601,7 +4590,6 @@ void main (void)
       if (Array.isArray(shaders)) {
         this.shaders = shaders;
       }
-      FlipFrameUVs(this.texture.getFrame());
     }
     postRenderGL(renderPass) {
       const id = this.id;
@@ -4619,10 +4607,10 @@ void main (void)
         let prevTexture = texture;
         for (let i = 0; i < shaders.length; i++) {
           const shader = shaders[i];
-          DrawTexturedQuad(renderPass, prevTexture, shader);
+          DrawTexturedQuadFlipped(renderPass, prevTexture, shader);
           prevTexture = shader.texture;
         }
-        DrawTexturedQuad(renderPass, prevTexture);
+        DrawTexturedQuadFlipped(renderPass, prevTexture);
       }
     }
   };
@@ -5623,19 +5611,21 @@ void main (void)
 
     vec4 color = texture2D(uTexture, uv);
 
+    //  -2 = scroll forwards, 2 = scroll backwards
+    //  can set x to scroll horizontally
     vec2 offs = vec2(0.0, uTime * 0.1 * -2.0);
 
     vec2 pos = uv - vec2(0.5, 0.5);
 
     //  no discard = top and bottom
-    //  < 0 = bottom
-    //  > 0 = top
+    //  > 0 = show bottom
+    //  < 0 = show top
     if (pos.y > 0.0)
     {
         discard;
     }
 
-    float horizon = 0.1;
+    float horizon = 0.01;
     float fov = 0.5; 
 
 	float scaling = 0.05;
@@ -5646,14 +5636,17 @@ void main (void)
 	//  checkboard texture
 	float bcolor = sign((mod(s.x + offs.x, 0.1) - 0.05) * (mod(s.y + offs.y, 0.1) - 0.05));
 
-    //  fading
-	bcolor *= p.z * p.z * 10.0;
+    //  fading (55, 10, etc for distance of fade based on horizon)
+	bcolor *= p.z * p.z * 50.0;
 	
 	gl_FragColor = color * vec4(vec3(bcolor), 1.0);
 }`;
   var Demo = class extends Scene {
     constructor() {
       super();
+      this.create();
+    }
+    async create() {
       const floor = new FXShader({ fragmentShader: checkerboardFragmentShader });
       const world2 = new StaticWorld(this);
       const fxlayer = new EffectLayer();
