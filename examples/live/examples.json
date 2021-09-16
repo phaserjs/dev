@@ -317,6 +317,16 @@
           "name": "effectlayer",
           "children": [
             {
+              "path": "examples/live/gameobjects/effectlayer/blur layer.js",
+              "name": "blur layer.js",
+              "type": "file"
+            },
+            {
+              "path": "examples/live/gameobjects/effectlayer/camera effect layer.js",
+              "name": "camera effect layer.js",
+              "type": "file"
+            },
+            {
               "path": "examples/live/gameobjects/effectlayer/checkerboard.js",
               "name": "checkerboard.js",
               "type": "file"
@@ -329,6 +339,11 @@
             {
               "path": "examples/live/gameobjects/effectlayer/effect layer with sampler2d.js",
               "name": "effect layer with sampler2d.js",
+              "type": "file"
+            },
+            {
+              "path": "examples/live/gameobjects/effectlayer/full screen fx.js",
+              "name": "full screen fx.js",
               "type": "file"
             },
             {

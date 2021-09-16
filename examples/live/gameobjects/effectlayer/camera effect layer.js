@@ -4441,25 +4441,6 @@ void main (void)
     return frame2;
   }
 
-  // ../phaser-genesis/src/gameobjects/sprite/SetFrame.ts
-  function SetFrame(texture, key, ...children) {
-    const frame2 = texture.getFrame(key);
-    const pivot = frame2.pivot;
-    children.forEach((child) => {
-      if (!child || frame2 === child.frame) {
-        return;
-      }
-      child.frame = frame2;
-      child.hasTexture = true;
-      if (pivot) {
-        child.origin.set(pivot.x, pivot.y);
-      }
-      SetExtentFromFrame(child, frame2);
-      SetVertexUVsFromFrame(child.id, frame2);
-    });
-    return children;
-  }
-
   // ../phaser-genesis/src/textures/TextureManagerInstance.ts
   var instance5;
   var TextureManagerInstance = {
@@ -4471,89 +4452,6 @@ void main (void)
         throw new Error("Cannot instantiate TextureManager more than once");
       }
       instance5 = manager;
-    }
-  };
-
-  // ../phaser-genesis/src/textures/GetTexture.ts
-  function GetTexture(key) {
-    return TextureManagerInstance.get().get(key);
-  }
-
-  // ../phaser-genesis/src/gameobjects/sprite/SetTexture.ts
-  function SetTexture(key, frame2, ...children) {
-    if (!key) {
-      children.forEach((child) => {
-        child.texture = null;
-        child.frame = null;
-        child.hasTexture = false;
-      });
-    } else {
-      let texture;
-      if (key instanceof Frame) {
-        frame2 = key;
-        texture = key.texture;
-      } else if (key instanceof Texture) {
-        texture = key;
-      } else {
-        texture = GetTexture(key);
-      }
-      if (!texture) {
-        console.warn(`Invalid Texture key: ${key}`);
-      } else {
-        children.forEach((child) => {
-          child.texture = texture;
-        });
-        SetFrame(texture, frame2, ...children);
-      }
-    }
-    return children;
-  }
-
-  // ../phaser-genesis/src/gameobjects/sprite/Sprite.ts
-  var Sprite = class extends Container {
-    type = "Sprite";
-    texture;
-    frame;
-    hasTexture = false;
-    constructor(x, y, texture = "__BLANK", frame2) {
-      super(x, y);
-      AddQuadVertex(this.id);
-      this.setTexture(texture, frame2);
-    }
-    setTexture(key, frame2) {
-      SetTexture(key, frame2, this);
-      return this;
-    }
-    setFrame(key) {
-      SetFrame(this.texture, key, this);
-      return this;
-    }
-    isRenderable() {
-      return this.visible && this.hasTexture && WillRender(this.id) && this.alpha > 0;
-    }
-    renderGL(renderPass) {
-      const color = this.color;
-      if (this.shader) {
-        Flush(renderPass);
-        renderPass.shader.set(this.shader, 0);
-      }
-      if (color.colorMatrixEnabled) {
-        renderPass.colorMatrix.set(color);
-      }
-      this.preRenderGL(renderPass);
-      BatchTexturedQuadBuffer(this.texture, this.id, renderPass);
-      if (color.colorMatrixEnabled && !color.willColorChildren) {
-        Flush(renderPass);
-        renderPass.colorMatrix.pop();
-      }
-    }
-    renderCanvas(renderer) {
-    }
-    destroy(reparentChildren) {
-      super.destroy(reparentChildren);
-      this.texture = null;
-      this.frame = null;
-      this.hasTexture = false;
     }
   };
 
@@ -4731,6 +4629,44 @@ void main (void)
     }
   };
 
+  // ../phaser-genesis/src/gameobjects/effectlayer/EffectLayer.ts
+  var EffectLayer = class extends RenderLayer {
+    type = "EffectLayer";
+    shaders = [];
+    constructor(width = GetWidth(), height = GetHeight(), resolution = GetResolution(), ...shaders) {
+      super(0, 0, width, height, resolution);
+      if (Array.isArray(shaders)) {
+        this.shaders = shaders;
+      }
+    }
+    postRenderGL(renderPass) {
+      const id = this.id;
+      const shaders = this.shaders;
+      const texture = this.texture;
+      if (IsDirty(id)) {
+        Flush(renderPass);
+        renderPass.framebuffer.pop();
+        ClearDirty(id);
+        ClearDirtyChildCache(id);
+        SetDirtyParents(id);
+        SetInversedQuadFromCamera(id, renderPass.current2DCamera, this.x, this.y, texture.width, texture.height);
+      }
+      if (shaders.length === 0) {
+        BatchTexturedQuadBuffer(texture, id, renderPass);
+      } else {
+        const x = this.x;
+        const y = this.y;
+        let prevTexture = texture;
+        for (let i = 0; i < shaders.length; i++) {
+          const shader = shaders[i];
+          DrawTexturedQuadFlipped(renderPass, prevTexture, x, y, shader);
+          prevTexture = shader.texture;
+        }
+        DrawTexturedQuadFlipped(renderPass, prevTexture, x, y);
+      }
+    }
+  };
+
   // ../phaser-genesis/src/textures/CreateCanvas.ts
   function CreateCanvas(width, height) {
     const canvas = document.createElement("canvas");
@@ -4800,10 +4736,74 @@ void main (void)
     new TextureManager();
   }
 
+  // ../phaser-genesis/src/gameobjects/rectangle/Rectangle.ts
+  var Rectangle2 = class extends Container {
+    type = "Rectangle";
+    texture;
+    frame;
+    constructor(x, y, width = 64, height = 64, color = 16777215) {
+      super(x, y);
+      const id = this.id;
+      AddQuadVertex(id);
+      this.texture = WhiteTexture.get();
+      this.frame = this.texture.getFrame();
+      SetExtentFromFrame(this, this.frame);
+      SetVertexUVsFromFrame(id, this.frame);
+      this.size.set(width, height);
+      this.color.tint = color;
+    }
+    isRenderable() {
+      return this.visible && WillRender(this.id) && this.alpha > 0;
+    }
+    renderGL(renderPass) {
+      const color = this.color;
+      if (this.shader) {
+        Flush(renderPass);
+        renderPass.shader.set(this.shader, 0);
+      }
+      if (color.colorMatrixEnabled) {
+        renderPass.colorMatrix.set(color);
+      }
+      this.preRenderGL(renderPass);
+      BatchTexturedQuadBuffer(this.texture, this.id, renderPass);
+      if (color.colorMatrixEnabled && !color.willColorChildren) {
+        Flush(renderPass);
+        renderPass.colorMatrix.pop();
+      }
+    }
+    renderCanvas(renderer) {
+    }
+    destroy(reparentChildren) {
+      super.destroy(reparentChildren);
+      this.texture = null;
+      this.frame = null;
+    }
+  };
+
   // ../phaser-genesis/src/display/AddChildren.ts
   function AddChildren(parent, ...children) {
     children.forEach((child) => {
       AddChild(parent, child);
+    });
+    return children;
+  }
+
+  // ../phaser-genesis/src/display/RemoveChild.ts
+  function RemoveChild(parent, child) {
+    const childID = child.id;
+    const parentID = parent.id;
+    if (child.hasParent(parentID)) {
+      RemoveChildID(childID);
+      DecreaseNumChildren(parentID);
+      parent.onRemoveChild(childID);
+    }
+    return child;
+  }
+
+  // ../phaser-genesis/src/display/RemoveChildren.ts
+  function RemoveChildren(parent, ...children) {
+    children.forEach((child) => {
+      RemoveChild(parent, child);
     });
     return children;
   }
@@ -4916,6 +4916,43 @@ void main (void)
   var DownKey = class extends Key {
     constructor() {
       super("ArrowDown");
+    }
+  };
+
+  // ../phaser-genesis/src/renderer/webgl1/shaders/FXShader.ts
+  var FXShader = class extends QuadShader {
+    timeVar;
+    resolutionVar;
+    timeScale;
+    constructor(config = {}) {
+      config.attributes = config?.attributes || DefaultQuadAttributes;
+      config.renderToFramebuffer = true;
+      super(config);
+      const {
+        timeUniform = "uTime",
+        resolutionUniform = "uResolution",
+        timeScale = 1
+      } = config;
+      const uniforms = [...this.uniformSetters.keys()];
+      this.timeVar = uniforms.includes(timeUniform) ? timeUniform : "time";
+      this.resolutionVar = uniforms.includes(resolutionUniform) ? resolutionUniform : "resolution";
+      if (!uniforms.includes(this.timeVar)) {
+        this.timeVar = void 0;
+      }
+      if (!uniforms.includes(this.resolutionVar)) {
+        this.resolutionVar = void 0;
+      }
+      this.timeScale = timeScale;
+    }
+    bind(renderPass) {
+      const renderer = renderPass.renderer;
+      if (this.timeVar) {
+        this.uniforms.set(this.timeVar, performance.now() * this.timeScale);
+      }
+      if (this.resolutionVar) {
+        this.uniforms.set(this.resolutionVar, [renderer.width, renderer.height]);
+      }
+      return super.bind(renderPass);
     }
   };
 
@@ -5333,6 +5370,92 @@ void main (void)
     }
   };
 
+  // ../phaser-genesis/src/input/keyboard/Keyboard.ts
+  var Keyboard = class extends EventEmitter {
+    keys;
+    keydownHandler;
+    keyupHandler;
+    blurHandler;
+    keyConversion = {
+      Up: "ArrowUp",
+      Down: "ArrowDown",
+      Left: "ArrowLeft",
+      Right: "ArrowRight",
+      Spacebar: " ",
+      Win: "Meta",
+      Scroll: "ScrollLock",
+      Del: "Delete",
+      Apps: "ContextMenu",
+      Esc: "Escape",
+      Add: "+",
+      Subtract: "-",
+      Multiply: "*",
+      Decimal: ".",
+      Divide: "/"
+    };
+    constructor() {
+      super();
+      this.keydownHandler = (event) => this.onKeyDown(event);
+      this.keyupHandler = (event) => this.onKeyUp(event);
+      this.blurHandler = () => this.onBlur();
+      window.addEventListener("keydown", this.keydownHandler);
+      window.addEventListener("keyup", this.keyupHandler);
+      window.addEventListener("blur", this.blurHandler);
+      this.keys = new Map();
+    }
+    addKeys(...keys) {
+      keys.forEach((key) => {
+        this.keys.set(key.getValue(), key);
+      });
+    }
+    clearKeys() {
+      this.keys.clear();
+    }
+    onBlur() {
+      this.keys.forEach((key) => {
+        key.reset();
+      });
+    }
+    getKeyValue(key) {
+      if (this.keyConversion.hasOwnProperty(key)) {
+        return this.keyConversion[key];
+      } else {
+        return key;
+      }
+    }
+    onKeyDown(event) {
+      const value = this.getKeyValue(event.key);
+      if (this.keys.has(value)) {
+        const key = this.keys.get(value);
+        key.down(event);
+      }
+      Emit(this, "keydown-" + value, event);
+      Emit(this, "keydown", event);
+    }
+    onKeyUp(event) {
+      const value = this.getKeyValue(event.key);
+      if (this.keys.has(value)) {
+        const key = this.keys.get(value);
+        key.up(event);
+      }
+      Emit(this, "keyup-" + value, event);
+      Emit(this, "keyup", event);
+    }
+    destroy() {
+      window.removeEventListener("keydown", this.keydownHandler);
+      window.removeEventListener("keyup", this.keyupHandler);
+      window.removeEventListener("blur", this.blurHandler);
+      Emit(this, "destroy");
+    }
+  };
+
+  // ../phaser-genesis/src/input/keyboard/keys/LeftKey.ts
+  var LeftKey = class extends Key {
+    constructor() {
+      super("ArrowLeft");
+    }
+  };
+
   // ../phaser-genesis/src/loader/CreateFile.ts
   function CreateFile(key, url, skipCache = false) {
     return {
@@ -5428,218 +5551,11 @@ void main (void)
     };
   }
 
-  // ../phaser-genesis/src/input/keyboard/Keyboard.ts
-  var Keyboard = class extends EventEmitter {
-    keys;
-    keydownHandler;
-    keyupHandler;
-    blurHandler;
-    keyConversion = {
-      Up: "ArrowUp",
-      Down: "ArrowDown",
-      Left: "ArrowLeft",
-      Right: "ArrowRight",
-      Spacebar: " ",
-      Win: "Meta",
-      Scroll: "ScrollLock",
-      Del: "Delete",
-      Apps: "ContextMenu",
-      Esc: "Escape",
-      Add: "+",
-      Subtract: "-",
-      Multiply: "*",
-      Decimal: ".",
-      Divide: "/"
-    };
-    constructor() {
-      super();
-      this.keydownHandler = (event) => this.onKeyDown(event);
-      this.keyupHandler = (event) => this.onKeyUp(event);
-      this.blurHandler = () => this.onBlur();
-      window.addEventListener("keydown", this.keydownHandler);
-      window.addEventListener("keyup", this.keyupHandler);
-      window.addEventListener("blur", this.blurHandler);
-      this.keys = new Map();
-    }
-    addKeys(...keys) {
-      keys.forEach((key) => {
-        this.keys.set(key.getValue(), key);
-      });
-    }
-    clearKeys() {
-      this.keys.clear();
-    }
-    onBlur() {
-      this.keys.forEach((key) => {
-        key.reset();
-      });
-    }
-    getKeyValue(key) {
-      if (this.keyConversion.hasOwnProperty(key)) {
-        return this.keyConversion[key];
-      } else {
-        return key;
-      }
-    }
-    onKeyDown(event) {
-      const value = this.getKeyValue(event.key);
-      if (this.keys.has(value)) {
-        const key = this.keys.get(value);
-        key.down(event);
-      }
-      Emit(this, "keydown-" + value, event);
-      Emit(this, "keydown", event);
-    }
-    onKeyUp(event) {
-      const value = this.getKeyValue(event.key);
-      if (this.keys.has(value)) {
-        const key = this.keys.get(value);
-        key.up(event);
-      }
-      Emit(this, "keyup-" + value, event);
-      Emit(this, "keyup", event);
-    }
-    destroy() {
-      window.removeEventListener("keydown", this.keydownHandler);
-      window.removeEventListener("keyup", this.keyupHandler);
-      window.removeEventListener("blur", this.blurHandler);
-      Emit(this, "destroy");
-    }
-  };
-
-  // ../phaser-genesis/src/input/keyboard/keys/LeftKey.ts
-  var LeftKey = class extends Key {
-    constructor() {
-      super("ArrowLeft");
-    }
-  };
-
-  // ../phaser-genesis/src/loader/Loader.ts
-  var Loader = class extends EventEmitter {
-    baseURL = "";
-    path = "";
-    crossOrigin = "anonymous";
-    maxParallelDownloads = -1;
-    isLoading = false;
-    progress;
-    queue;
-    inflight;
-    completed;
-    onComplete;
-    onError;
-    constructor() {
-      super();
-      this.reset();
-    }
-    reset() {
-      this.isLoading = false;
-      this.queue = new Set();
-      this.inflight = new Set();
-      this.completed = new Set();
-      this.progress = 0;
-    }
-    add(...file) {
-      file.forEach((entity) => {
-        this.queue.add(entity);
-      });
-      return this;
-    }
-    start() {
-      if (this.isLoading) {
-        return null;
-      }
-      return new Promise((resolve, reject) => {
-        this.completed.clear();
-        this.progress = 0;
-        if (this.queue.size > 0) {
-          this.isLoading = true;
-          this.onComplete = resolve;
-          this.onError = reject;
-          Emit(this, "start");
-          this.nextFile();
-        } else {
-          this.progress = 1;
-          Emit(this, "complete");
-          resolve(this);
-        }
-      });
-    }
-    nextFile() {
-      let limit = this.queue.size;
-      if (this.maxParallelDownloads !== -1) {
-        limit = Math.min(limit, this.maxParallelDownloads) - this.inflight.size;
-      }
-      if (limit) {
-        const iterator = this.queue.values();
-        while (limit > 0) {
-          const loadFile = iterator.next().value;
-          this.inflight.add(loadFile);
-          this.queue.delete(loadFile);
-          loadFile(this).then((file) => {
-            this.fileComplete(file);
-            this.updateProgress(file, loadFile);
-          }).catch((file) => {
-            this.fileError(file);
-            this.updateProgress(file, loadFile);
-          });
-          limit--;
-        }
-      } else if (this.inflight.size === 0) {
-        this.stop();
-      }
-    }
-    stop() {
-      if (!this.isLoading) {
-        return;
-      }
-      this.isLoading = false;
-      Emit(this, "complete", this.completed);
-      this.onComplete();
-      this.completed.clear();
-    }
-    updateProgress(file, queueEntry) {
-      this.inflight.delete(queueEntry);
-      this.completed.add(file);
-      const totalCompleted = this.completed.size;
-      const totalQueued = this.queue.size + this.inflight.size;
-      if (totalCompleted > 0) {
-        this.progress = totalCompleted / (totalCompleted + totalQueued);
-      }
-      Emit(this, "progress", this.progress, totalCompleted, totalQueued);
-      this.nextFile();
-    }
-    fileComplete(file) {
-      Emit(this, "filecomplete", file);
-    }
-    fileError(file) {
-      Emit(this, "fileerror", file);
-    }
-    totalFilesToLoad() {
-      return this.queue.size + this.inflight.size;
-    }
-    setBaseURL(url = "") {
-      if (url !== "" && url.substr(-1) !== "/") {
-        url = url.concat("/");
-      }
-      this.baseURL = url;
-      return this;
-    }
-    setPath(path = "") {
-      if (path !== "" && path.substr(-1) !== "/") {
-        path = path.concat("/");
-      }
-      this.path = path;
-      return this;
-    }
-    setCORS(crossOrigin) {
-      this.crossOrigin = crossOrigin;
-      return this;
-    }
-    setMaxParallelDownloads(max) {
-      this.maxParallelDownloads = max;
-      return this;
-    }
-  };
+  // ../phaser-genesis/src/loader/files/LoadImageFile.ts
+  async function LoadImageFile(key, url, fileData = {}) {
+    const load = ImageFile(key, url, fileData);
+    return load();
+  }
 
   // ../phaser-genesis/src/input/keyboard/keys/RightKey.ts
   var RightKey = class extends Key {
@@ -5675,26 +5591,6 @@ void main (void)
 
   // ../phaser-genesis/src/world/events/WorldUpdateEvent.ts
   var WorldUpdateEvent = "update";
-
-  // ../phaser-genesis/src/display/RemoveChild.ts
-  function RemoveChild(parent, child) {
-    const childID = child.id;
-    const parentID = parent.id;
-    if (child.hasParent(parentID)) {
-      RemoveChildID(childID);
-      DecreaseNumChildren(parentID);
-      parent.onRemoveChild(childID);
-    }
-    return child;
-  }
-
-  // ../phaser-genesis/src/display/RemoveChildren.ts
-  function RemoveChildren(parent, ...children) {
-    children.forEach((child) => {
-      RemoveChild(parent, child);
-    });
-    return children;
-  }
 
   // ../phaser-genesis/src/scenes/events/SceneDestroyEvent.ts
   var SceneDestroyEvent = "destroy";
@@ -6089,7 +5985,53 @@ void main (void)
     }
   };
 
-  // examples/src/gameobjects/renderlayer/camera render layer.ts
+  // examples/src/gameobjects/effectlayer/camera effect layer.ts
+  var debugFragmentShader = `
+/*
+ * Original shader from:https://www.shadertoy.com/view/ldX3Rr
+ */
+
+// Created by inigo quilez - iq/2013
+// License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+
+precision mediump float;
+
+uniform vec2 uResolution;
+
+varying vec2 vTextureCoord;
+varying float vTextureId;
+varying vec4 vTintColor;
+
+uniform sampler2D uTexture;
+
+#define iResolution vec3(uResolution, 0.1)
+
+void mainImage (out vec4 fragColor, in vec2 fragCoord)
+{
+    vec4 color = texture2D(uTexture, vTextureCoord);
+
+    vec2 p = 1.1 * (2.0 * fragCoord - iResolution.xy) / min(iResolution.y, iResolution.x);
+
+    float h = dot(p,p);
+    float d = abs(p.y)-h;
+    float a = d-.23;
+    float b = h-1.00;
+    float c = sign(a*b*(p.y+p.x + (p.y-p.x)*sign(d)));
+		
+    c = mix( c, 0.0, smoothstep(0.98,1.00,h) );
+    c = mix( c, 0.6, smoothstep(1.00,1.02,h) );
+    
+	// fragColor = color * vec4(c, c, c, 1.0);
+
+    fragColor = vec4(c, c, c, 1.0);
+}
+
+void main(void)
+{
+    mainImage(gl_FragColor, gl_FragCoord.xy);
+
+    gl_FragColor.a = 1.;
+}`;
   var Demo = class extends Scene {
     constructor() {
       super();
@@ -6100,32 +6042,17 @@ void main (void)
       this.upKey = new UpKey();
       this.downKey = new DownKey();
       keyboard.addKeys(this.leftKey, this.rightKey, this.upKey, this.downKey);
-      const loader = new Loader();
-      loader.setPath("assets/");
-      loader.add(ImageFile("background", "farm-background.png"));
-      loader.add(ImageFile("ayu", "ayu.png"));
-      loader.add(ImageFile("logo", "logo.png"));
-      loader.add(ImageFile("rocket", "rocket.png"));
-      loader.add(ImageFile("farm", "farm-logo.png"));
-      loader.add(ImageFile("star", "star.png"));
-      loader.add(ImageFile("bubble", "bubble256.png"));
-      loader.start().then(() => this.create());
+      this.create();
     }
-    create() {
+    async create() {
+      await LoadImageFile("bg", "assets/farm-background.png");
+      const debug = new FXShader({ fragmentShader: debugFragmentShader });
       const world2 = new World(this);
       this.camera = world2.camera;
-      const layer = new RenderLayer();
-      const bg = new Sprite(400, 300, "background");
-      const logo = new Sprite(200, 300, "logo");
-      const ayu = new Sprite(600, 300, "ayu");
-      const farm = new Sprite(200, 150, "farm");
-      const rocket = new Sprite(150, 500, "rocket");
-      const bubble = new Sprite(400, 450, "bubble");
-      const star = new Sprite(650, 500, "star");
-      const rocket2 = new Sprite(-300, 400, "rocket");
-      const rocket3 = new Sprite(300, -300, "rocket");
-      AddChildren(layer, bg, ayu, logo, farm, rocket, rocket2, rocket3, bubble);
-      AddChildren(world2, layer, star);
+      const fxlayer = new EffectLayer();
+      fxlayer.shaders.push(debug);
+      const rect = new Rectangle2(400, 300, 800, 600, 16777215);
+      AddChildren(world2, fxlayer);
     }
     update() {
       if (!this.camera) {
@@ -6150,4 +6077,4 @@ void main (void)
  * @copyright    2020 Photon Storm Ltd.
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
  */
-//# sourceMappingURL=camera render layer.js.map
+//# sourceMappingURL=camera effect layer.js.map
