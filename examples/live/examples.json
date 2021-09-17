@@ -615,6 +615,11 @@
           "type": "file"
         },
         {
+          "path": "examples/live/textures/shader texture.js",
+          "name": "shader texture.js",
+          "type": "file"
+        },
+        {
           "path": "examples/live/textures/texture atlas.js",
           "name": "texture atlas.js",
           "type": "file"
