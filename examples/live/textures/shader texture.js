@@ -511,7 +511,7 @@
       if (entry.enable) {
         if (!gl.isEnabled(gl.BLEND) || (this.current.sfactor !== entry.sfactor || this.current.dfactor !== entry.dfactor)) {
           gl.enable(gl.BLEND);
-          gl.blendFunc(entry.sfactor, entry.dfactor);
+          gl.blendFuncSeparate(entry.sfactor, entry.dfactor, gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
         }
       } else {
         gl.disable(gl.BLEND);
@@ -1002,12 +1002,12 @@ void main (void)
   function CreateShader(shader, fragmentShaderSource, vertexShaderSource, uniforms, attribs) {
     const maxTextures = GetMaxTextures();
     fragmentShaderSource = fragmentShaderSource.replace(/%count%/gi, `${maxTextures}`);
-    const fragmentShader2 = CompileShader(fragmentShaderSource, gl.FRAGMENT_SHADER);
+    const fragmentShader = CompileShader(fragmentShaderSource, gl.FRAGMENT_SHADER);
     const vertexShader = CompileShader(vertexShaderSource, gl.VERTEX_SHADER);
-    if (!fragmentShader2 || !vertexShader) {
+    if (!fragmentShader || !vertexShader) {
       return;
     }
-    const program = CreateProgram(fragmentShader2, vertexShader);
+    const program = CreateProgram(fragmentShader, vertexShader);
     if (!program) {
       return;
     }
@@ -1300,7 +1300,7 @@ void main (void)
   function SetShaderFromConfig(shader, config) {
     const {
       attributes = DefaultQuadAttributes,
-      fragmentShader: fragmentShader2 = SINGLE_QUAD_FRAG,
+      fragmentShader = SINGLE_QUAD_FRAG,
       height = GetHeight(),
       renderToFramebuffer = false,
       renderToDepthbuffer = false,
@@ -1309,7 +1309,7 @@ void main (void)
       width = GetWidth(),
       uniforms = DefaultQuadUniforms
     } = config;
-    CreateShader(shader, fragmentShader2, vertexShader, uniforms, attributes);
+    CreateShader(shader, fragmentShader, vertexShader, uniforms, attributes);
     if (renderToFramebuffer) {
       shader.renderToFramebuffer = true;
       const texture = new Texture(null, width * resolution, height * resolution);
@@ -4419,12 +4419,9 @@ void main (void)
     renderPass.shader.set(shader, 0);
     const view = shader.viewport;
     BatchSingleQuad(renderPass, 0, 0, view.width, view.height, 0, 0, 1, 1, 0);
-    const gl2 = renderPass.renderer.gl;
-    renderPass.blendMode.set(true, gl2.ONE_MINUS_SRC_ALPHA, gl2.ONE_MINUS_DST_ALPHA);
     Flush(renderPass);
     renderPass.textures.unbindTexture(alpha);
     renderPass.shader.pop();
-    renderPass.blendMode.pop();
   }
 
   // ../phaser-genesis/src/config/banner/AddBanner.ts
@@ -4930,6 +4927,107 @@ void main (void)
     }
   };
 
+  // ../phaser-genesis/src/loader/CreateFile.ts
+  function CreateFile(key, url, skipCache = false) {
+    return {
+      key,
+      url,
+      skipCache
+    };
+  }
+
+  // ../phaser-genesis/src/loader/IsAbsoluteURI.ts
+  function IsAbsoluteURI(url) {
+    return /^(?:blob:|data:|http:\/\/|https:\/\/|\/\/)/.test(url);
+  }
+
+  // ../phaser-genesis/src/loader/GetURL.ts
+  function GetURL(key, url, extension, loader) {
+    if (!url) {
+      url = `${key}.${extension}`;
+    }
+    if (IsAbsoluteURI(url)) {
+      return url;
+    } else if (loader) {
+      return `${loader.baseURL}${loader.path}${url}`;
+    } else {
+      return url;
+    }
+  }
+
+  // ../phaser-genesis/src/loader/RequestFile.ts
+  async function RequestFile(file, preload, onload, fileData) {
+    if (!preload(file)) {
+      return Promise.reject(file);
+    }
+    try {
+      const request = new Request(file.url, fileData?.requestInit);
+      file.response = await fetch(request);
+      if (file.response.ok && await onload(file)) {
+        return Promise.resolve(file);
+      } else {
+        return Promise.reject(file);
+      }
+    } catch (error) {
+      file.error = error;
+      return Promise.reject(file);
+    }
+  }
+
+  // ../phaser-genesis/src/loader/files/ImageFile.ts
+  function ImageFile(key, url, fileData = {}) {
+    return (loader) => {
+      const file = CreateFile(key, GetURL(key, url, "png", loader), fileData?.skipCache);
+      const textureManager = TextureManagerInstance.get();
+      const preload = () => {
+        return textureManager && (!textureManager.has(key) || !textureManager.get(key).locked);
+      };
+      const onload = async (file2) => {
+        const blob = await file2.response.blob();
+        let image;
+        if (window && "createImageBitmap" in window && !fileData?.getImage) {
+          image = await createImageBitmap(blob);
+        } else {
+          image = await new Promise((resolve, reject) => {
+            const url2 = URL.createObjectURL(blob);
+            const img = new Image();
+            img.onload = () => {
+              URL.revokeObjectURL(url2);
+              resolve(img);
+            };
+            img.onerror = () => {
+              reject();
+            };
+            img.src = url2;
+            if (img.complete && img.width && img.height) {
+              img.onload = null;
+              img.onerror = null;
+              resolve(img);
+            }
+          });
+        }
+        if (!image) {
+          return false;
+        }
+        if (fileData.skipCache) {
+          file2.data = image;
+        } else if (textureManager.has(key)) {
+          file2.data = textureManager.update(key, image, fileData?.glConfig);
+        } else {
+          file2.data = textureManager.add(key, image, fileData?.glConfig);
+        }
+        return true;
+      };
+      return RequestFile(file, preload, onload, fileData);
+    };
+  }
+
+  // ../phaser-genesis/src/loader/files/LoadImageFile.ts
+  async function LoadImageFile(key, url, fileData = {}) {
+    const load = ImageFile(key, url, fileData);
+    return load();
+  }
+
   // ../phaser-genesis/src/components/permissions/HasCustomDisplayList.ts
   function HasCustomDisplayList(id) {
     return !!PermissionsComponent.data[id][PERMISSION.CUSTOM_DISPLAY_LIST];
@@ -5148,6 +5246,13 @@ void main (void)
     }
   }
 
+  // ../phaser-genesis/src/textures/FlipFrameUVs.ts
+  function FlipFrameUVs(frame2) {
+    frame2.v0 = 1 - frame2.v0;
+    frame2.v1 = 1 - frame2.v1;
+    return frame2;
+  }
+
   // ../phaser-genesis/src/renderer/webgl1/shaders/TextureShader.ts
   var TextureShader = class extends Shader {
     cameraMatrix;
@@ -5158,6 +5263,7 @@ void main (void)
       this.cameraMatrix = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
       this.projectionMatrix = new Float32Array(16);
       Mat4Ortho(this.projectionMatrix, 0, this.viewport.width, this.viewport.height, 0, -1, 1);
+      FlipFrameUVs(this.texture.firstFrame);
     }
     bind(renderPass) {
       const uniforms = this.uniforms;
@@ -5583,50 +5689,94 @@ void main (void)
   };
 
   // examples/src/textures/shader texture.ts
-  var fragmentShader = `
+  var fragmentShaderFire = `
+/*
+ * Original shader from:https://www.shadertoy.com/view/MdX3zr
+ */
+
 precision mediump float;
 
+// glslsandbox uniforms
 uniform float time;
 uniform vec2 resolution;
 
-float circle(in vec2 _st, in float _radius){
-    vec2 dist = _st-vec2(0.5);
-	return 1.-smoothstep(_radius-(_radius*0.01),
-                         _radius+(_radius*0.01),
-                         dot(dist,dist)*4.0);
+// shadertoy emulation
+#define iTime time
+#define iResolution vec3(resolution ,900000000000.0)
+
+// --------[ Original ShaderToy begins here ]---------- //
+float noise(vec3 p) //Thx to Las^Mercury
+{
+	vec3 i = floor(p);
+	vec4 a = dot(i, vec3(1., 57., 21.)) + vec4(0., 57., 21., 78.);
+	vec3 f = cos((p-i)*acos(-1.))*(-.5)+.5;
+	a = mix(sin(cos(a)*a),sin(cos(1.+a)*(1.+a)), f.x);
+	a.xy = mix(a.xz, a.yw, f.y);
+	return mix(a.x, a.y, f.z);
+}
+
+float sphere(vec3 p, vec4 spr)
+{
+	return length(spr.xyz-p) - spr.w;
+}
+
+float flame(vec3 p)
+{
+	float d = sphere(p*vec3(1.,.5,1.), vec4(.0,-1.,.0,1.));
+	return d + (noise(p+vec3(.0,iTime*2.,.0)) + noise(p*3.)*.5)*.25*(p.y) ;
+}
+
+float scene(vec3 p)
+{
+	return min(100.-length(p) , abs(flame(p)) );
+}
+
+vec4 raymarch(vec3 org, vec3 dir)
+{
+	float d = 0.0, glow = 0.0, eps = 0.02;
+	vec3  p = org;
+	bool glowed = false;
+	
+	for(int i=0; i<64; i++)
+	{
+		d = scene(p) + eps;
+		p += d * dir;
+		if( d>eps )
+		{
+			if(flame(p) < .0)
+				glowed=true;
+			if(glowed)
+       			glow = float(i)/64.;
+		}
+	}
+	return vec4(p,glow);
 }
 
 void main (void)
 {
-	vec2 st = gl_FragCoord.xy / resolution;
-
-    float pct = 0.0;
-
-    // a. The DISTANCE from the pixel to the center
-    pct = distance(st, vec2(0.5));
-
-    // b. The LENGTH of the vector from the pixel to the center
-    // vec2 toCenter = vec2(0.5)-st;
-    // pct = length(toCenter);
-
-    // c. The SQUARE ROOT of the vector from the pixel to the center
-    // vec2 tC = vec2(0.5)-st;
-    // pct = sqrt(tC.x*tC.x+tC.y*tC.y);
-
-    // vec3 color = vec3(pct);
-
-    vec3 color = vec3(circle(st, 0.8));
-
-    // float alpha = 1.0;
-
-    gl_FragColor = vec4(color, pct);
+	vec2 v = -1.0 + 2.0 * gl_FragCoord.xy / iResolution.xy;
+	v.x *= iResolution.x / iResolution.y;
+	
+	vec3 org = vec3(0., -2., 4.);
+	vec3 dir = normalize(vec3(v.x*1.6, -v.y, -1.5));
+	
+	vec4 p = raymarch(org, dir);
+	float glow = p.w;
+	
+	vec4 col = mix(vec4(1.,.5,.1,1.), vec4(0.1,.5,1.,1.), p.y*.02+.4);
+	
+	gl_FragColor = mix(vec4(0.), col, pow(glow*2.,4.));
 }`;
   var Demo = class extends Scene {
     constructor() {
       super();
+      this.create();
+    }
+    async create() {
+      await LoadImageFile("bg", "assets/checker.png");
       const world2 = new World(this);
       const fx = new TextureShader({
-        fragmentShader,
+        fragmentShader: fragmentShaderFire,
         width: 256,
         height: 256,
         uniforms: {
