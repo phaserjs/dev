@@ -536,6 +536,11 @@
           "type": "file"
         },
         {
+          "path": "examples/live/loader/binary.js",
+          "name": "binary.js",
+          "type": "file"
+        },
+        {
           "path": "examples/live/loader/csv.js",
           "name": "csv.js",
           "type": "file"
