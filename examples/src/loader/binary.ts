@@ -22,11 +22,7 @@ class Demo extends Scene
 
         const buffer = new Uint8Array(file.data as ArrayBuffer);
 
-        //   getString scans the binary file between the two values given, 
-        //   returning the characters it finds there as a string
-
         const signature = this.getString(buffer, 1080, 1084);
-
         const text = new Text(32, 32, `Signature: ${signature}`);
 
         const title = this.getString(buffer, 0, 20)
@@ -49,11 +45,12 @@ class Demo extends Scene
         AddChild(world, text);
         AddChild(world, text2);
         AddChild(world, text3);
-
-        console.log(file);
     }
 
-    getString (buffer, start: number, end: number): string
+    //   getString scans the binary file between the two values given, 
+    //   returning the characters it finds there as a string
+
+    getString (buffer: Uint8Array, start: number, end: number): string
     {
         let output = '';
     
