@@ -3,9 +3,9 @@ import { Sprite, Text } from '../../../../phaser-genesis/src/gameobjects/';
 
 import { AddChild } from '../../../../phaser-genesis/src/display/';
 import { Game } from '../../../../phaser-genesis/src/Game';
+import { LoadTextureFile } from '../../../../phaser-genesis/src/loader/files';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
 import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
-import { TextureFile } from '../../../../phaser-genesis/src/loader/files';
 
 class Demo extends Scene
 {
@@ -18,12 +18,14 @@ class Demo extends Scene
 
     async create ()
     {
-        await TextureFile('test', {
-            'ASTC': { type: 'PVR', textureURL: 'assets/compressed/astc-4x4-unorm-linear.pvr' },
-            'PVRTC': { type: 'PVR', textureURL: 'assets/compressed/atlas-pvr-pvrtci2bpp-rgba.pvr' },
-            'S3TC': { type: 'PVR', textureURL: 'assets/compressed/atlas-pvr-dxt5.pvr', atlasURL: 'assets/compressed/atlas-pvr-dxt5.json' },
-            'IMG': { textureURL: 'assets/compressed/atlas-png.png', atlasURL: 'assets/compressed/atlas-png.json' }
-        }).load();
+        const path = 'assets/compressed';
+
+        await LoadTextureFile('test', {
+            'ASTC': { type: 'PVR', textureURL: `${path}/textures-astc-4x4.pvr`, atlasURL: `${path}/textures.json` },
+            'PVRTC': { type: 'PVR', textureURL: `${path}/textures-pvrtc-4bpp-rgba.pvr`, atlasURL: `${path}/textures-pvrtc-4bpp-rgba.json` },
+            'S3TC': { type: 'PVR', textureURL: `${path}/textures-dxt5.pvr`, atlasURL: `${path}/textures-dxt5.json` },
+            'IMG': { textureURL: `${path}/textures.png`, atlasURL: `${path}/textures.json` }
+        });
 
         const world = new StaticWorld(this);
 

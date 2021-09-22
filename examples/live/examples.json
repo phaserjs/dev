@@ -590,6 +590,16 @@
       "name": "textures",
       "children": [
         {
+          "path": "examples/live/textures/compressed texture atlas.js",
+          "name": "compressed texture atlas.js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/textures/compressed textures.js",
+          "name": "compressed textures.js",
+          "type": "file"
+        },
+        {
           "path": "examples/live/textures/linear gradient texture 1.js",
           "name": "linear gradient texture 1.js",
           "type": "file"

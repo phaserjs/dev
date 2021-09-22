@@ -3,9 +3,9 @@ import { Sprite, Text } from '../../../../phaser-genesis/src/gameobjects/';
 
 import { AddChild } from '../../../../phaser-genesis/src/display/';
 import { Game } from '../../../../phaser-genesis/src/Game';
+import { LoadTextureFile } from '../../../../phaser-genesis/src/loader/files';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
 import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
-import { TextureFile } from '../../../../phaser-genesis/src/loader/files';
 
 class Demo extends Scene
 {
@@ -18,13 +18,13 @@ class Demo extends Scene
 
     async create ()
     {
-        await TextureFile('labs', {
+        await LoadTextureFile('labs', {
             'ASTC': 'assets/compressed/labs-astc-4x4.pvr',
             'ETC1': 'assets/compressed/labs-etc1.pvr',
             'PVRTC': 'assets/compressed/labs-pvrtc-4bpp-rgba-srgb.pvr',
             'S3TC': 'assets/compressed/labs-bc3-srgb.pvr',
             'IMG': 'assets/compressed/labs.png'
-        }).load();
+        });
 
         const world = new StaticWorld(this);
 
