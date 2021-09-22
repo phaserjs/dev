@@ -600,6 +600,11 @@
           "type": "file"
         },
         {
+          "path": "examples/live/textures/flame shader.js",
+          "name": "flame shader.js",
+          "type": "file"
+        },
+        {
           "path": "examples/live/textures/linear gradient texture 1.js",
           "name": "linear gradient texture 1.js",
           "type": "file"
