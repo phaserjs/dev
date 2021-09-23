@@ -17,7 +17,11 @@ import { World } from '../../../../phaser-genesis/src/world/World';
 // https://www.shadertoy.com/view/3t2yWz - toon flame
 // https://www.shadertoy.com/view/4tXXRn - flame in the wind
 // https://www.shadertoy.com/view/7tXXDH - simplex flames (complex)
-
+// https://www.shadertoy.com/view/4t33D2 - light flares
+// https://www.shadertoy.com/view/tdj3W3 - curl noise
+// https://www.shadertoy.com/view/ld2cW1 - light map?
+// https://www.shadertoy.com/view/Wt23D3 - 3d plasma cube :)
+// https://www.shadertoy.com/view/lt33RH - pixel implode / explode effect
 
 const fragmentShaderCircle = `
 precision mediump float;

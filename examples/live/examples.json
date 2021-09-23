@@ -355,6 +355,11 @@
               "path": "examples/live/gameobjects/effectlayer/rectangle effect layer.js",
               "name": "rectangle effect layer.js",
               "type": "file"
+            },
+            {
+              "path": "examples/live/gameobjects/effectlayer/wormhole.js",
+              "name": "wormhole.js",
+              "type": "file"
             }
           ],
           "type": "directory"
@@ -590,6 +595,11 @@
       "name": "textures",
       "children": [
         {
+          "path": "examples/live/textures/ball shader.js",
+          "name": "ball shader.js",
+          "type": "file"
+        },
+        {
           "path": "examples/live/textures/compressed texture atlas.js",
           "name": "compressed texture atlas.js",
           "type": "file"
@@ -602,6 +612,11 @@
         {
           "path": "examples/live/textures/flame shader.js",
           "name": "flame shader.js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/textures/flares.js",
+          "name": "flares.js",
           "type": "file"
         },
         {
