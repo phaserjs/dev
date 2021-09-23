@@ -620,6 +620,11 @@
           "type": "file"
         },
         {
+          "path": "examples/live/textures/get sprites with texture.js",
+          "name": "get sprites with texture.js",
+          "type": "file"
+        },
+        {
           "path": "examples/live/textures/linear gradient texture 1.js",
           "name": "linear gradient texture 1.js",
           "type": "file"
