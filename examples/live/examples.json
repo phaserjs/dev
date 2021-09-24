@@ -377,6 +377,18 @@
           "type": "directory"
         },
         {
+          "path": "examples/live/gameobjects/parallaxlayer",
+          "name": "parallaxlayer",
+          "children": [
+            {
+              "path": "examples/live/gameobjects/parallaxlayer/create parallax laye.js",
+              "name": "create parallax laye.js",
+              "type": "file"
+            }
+          ],
+          "type": "directory"
+        },
+        {
           "path": "examples/live/gameobjects/rectangle",
           "name": "rectangle",
           "children": [

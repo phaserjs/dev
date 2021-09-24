@@ -98,7 +98,7 @@ class Demo extends Scene
             AddChild(world, flake);
         }
 
-        const parallax = new ParallaxLayer(this.camera);
+        const parallax = new ParallaxLayer(this.camera, 0.5, 0.5);
 
         AddChild(parallax, new Sprite(400, 300, 'logo'));
 
@@ -130,8 +130,8 @@ class Demo extends Scene
             this.camera.y -= this.cameraSpeed;
         }
 
-        this.camera.x = Clamp(this.camera.x, -1600, 0);
-        this.camera.y = Clamp(this.camera.y, -1600, 0);
+        // this.camera.x = Clamp(this.camera.x, -1600, 0);
+        // this.camera.y = Clamp(this.camera.y, -1600, 0);
     }
 }
 

@@ -76,6 +76,13 @@
     ConfigStore.set(CONFIG_DEFAULTS.DEFAULT_ORIGIN, { x, y });
   }
 
+  // ../phaser-genesis/src/config/defaultorigin/DefaultOrigin.ts
+  function DefaultOrigin(x = 0.5, y = x) {
+    return () => {
+      SetDefaultOrigin(x, y);
+    };
+  }
+
   // ../phaser-genesis/src/config/globalvar/SetGlobalVar.ts
   function SetGlobalVar(name) {
     ConfigStore.set(CONFIG_DEFAULTS.GLOBAL_VAR, name);
@@ -3069,11 +3076,6 @@ void main (void)
     ConfigStore.set(CONFIG_DEFAULTS.WEBGL_CONTEXT, contextAttributes);
   }
 
-  // ../phaser-genesis/src/math/Between.ts
-  function Between(min, max) {
-    return Math.floor(Math.random() * (max - min + 1) + min);
-  }
-
   // ../phaser-genesis/src/events/Emit.ts
   function Emit(emitter, event, ...args) {
     if (emitter.events.size === 0 || !emitter.events.has(event)) {
@@ -5866,24 +5868,7 @@ void main (void)
     }
   };
 
-  // examples/src/test/parallax.ts
-  var Snowflake = class extends Sprite {
-    constructor() {
-      super(Between(0, 1600), Between(0, 1600), "snow");
-      this.speedX = Between(1, 8);
-      this.speedY = Between(1, 8);
-    }
-    update() {
-      this.x -= this.speedX;
-      this.y += this.speedY;
-      if (this.x < 0) {
-        this.x = 1600;
-      }
-      if (this.y > 1600) {
-        this.y = 0;
-      }
-    }
-  };
+  // examples/src/gameobjects/parallaxlayer/create parallax laye.ts
   var Demo = class extends Scene {
     constructor() {
       super();
@@ -5897,25 +5882,32 @@ void main (void)
       this.create();
     }
     async create() {
-      await LoadImageFile("grass", "assets/textures/grass.png");
-      await LoadImageFile("snow", "assets/snowflake-pixel.png");
-      await LoadImageFile("logo", "assets/logo.png");
+      await LoadImageFile("sky", "assets/parallax/sky.png");
+      await LoadImageFile("moon", "assets/parallax/moon.png");
+      await LoadImageFile("trees", "assets/parallax/trees.png");
+      await LoadImageFile("middle", "assets/parallax/middle.png");
+      await LoadImageFile("ground", "assets/parallax/ground.png");
       const world2 = new World(this);
       this.world = world2;
       this.camera = this.world.camera;
-      AddChild(world2, new Sprite(0, 0, "grass").setOrigin(0));
-      AddChild(world2, new Sprite(512, 0, "grass").setOrigin(0));
-      AddChild(world2, new Sprite(1024, 0, "grass").setOrigin(0));
-      AddChild(world2, new Sprite(0, 512, "grass").setOrigin(0));
-      AddChild(world2, new Sprite(512, 512, "grass").setOrigin(0));
-      AddChild(world2, new Sprite(1024, 512, "grass").setOrigin(0));
-      for (let i = 0; i < 64; i++) {
-        const flake = new Snowflake();
-        AddChild(world2, flake);
-      }
-      const parallax = new ParallaxLayer(this.camera, 0.5, 0.5);
-      AddChild(parallax, new Sprite(400, 300, "logo"));
-      AddChild(world2, parallax);
+      const background = new ParallaxLayer(this.camera, 0.9, 0.9);
+      const middleGround = new ParallaxLayer(this.camera, 0.8, 0.8);
+      const foreGround = new ParallaxLayer(this.camera, 0.75, 0.75);
+      const floor = new ParallaxLayer(this.camera, 0.5, 0.5);
+      AddChild(background, new Sprite(0, 0, "sky"));
+      AddChild(background, new Sprite(960, 0, "sky"));
+      AddChild(background, new Sprite(300, 100, "moon"));
+      AddChild(middleGround, new Sprite(0, 0, "trees"));
+      AddChild(middleGround, new Sprite(960, 0, "trees"));
+      AddChild(foreGround, new Sprite(0, 30, "middle"));
+      AddChild(foreGround, new Sprite(960, 30, "middle"));
+      AddChild(floor, new Sprite(0, 496, "ground"));
+      AddChild(floor, new Sprite(960, 496, "ground"));
+      AddChild(floor, new Sprite(1920, 496, "ground"));
+      AddChild(world2, background);
+      AddChild(world2, middleGround);
+      AddChild(world2, foreGround);
+      AddChild(world2, floor);
     }
     update() {
       if (!this.camera) {
@@ -5933,11 +5925,11 @@ void main (void)
       }
     }
   };
-  var game = new Game(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(657930), Scenes(Demo));
+  var game = new Game(WebGL(), DefaultOrigin(0, 0), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(657930), Scenes(Demo));
 })();
 /**
  * @author       Richard Davey <rich@photonstorm.com>
  * @copyright    2020 Photon Storm Ltd.
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
  */
-//# sourceMappingURL=parallax.js.map
+//# sourceMappingURL=create parallax laye.js.map
