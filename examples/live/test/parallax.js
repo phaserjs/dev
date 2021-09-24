@@ -543,14 +543,6 @@
     BindViewport(ViewportStack.default);
   }
 
-  // ../phaser-genesis/src/renderer/webgl1/renderpass/BindWebGLTexture.ts
-  function BindWebGLTexture(texture, index = 1) {
-    const binding = texture.binding;
-    binding.bind(index);
-    gl.activeTexture(gl.TEXTURE0 + index);
-    gl.bindTexture(gl.TEXTURE_2D, binding.texture);
-  }
-
   // ../phaser-genesis/src/renderer/webgl1/renderpass/TextureStack.ts
   var TextureStack = {
     renderPass: null,
@@ -1183,12 +1175,12 @@ void main (void)
   function CreateShader(shader, fragmentShaderSource, vertexShaderSource, uniforms, attribs) {
     const maxTextures = GetMaxTextures();
     fragmentShaderSource = fragmentShaderSource.replace(/%count%/gi, `${maxTextures}`);
-    const fragmentShader2 = CompileShader(fragmentShaderSource, gl.FRAGMENT_SHADER);
+    const fragmentShader = CompileShader(fragmentShaderSource, gl.FRAGMENT_SHADER);
     const vertexShader = CompileShader(vertexShaderSource, gl.VERTEX_SHADER);
-    if (!fragmentShader2 || !vertexShader) {
+    if (!fragmentShader || !vertexShader) {
       return;
     }
-    const program = CreateProgram(fragmentShader2, vertexShader);
+    const program = CreateProgram(fragmentShader, vertexShader);
     if (!program) {
       return;
     }
@@ -2106,7 +2098,7 @@ void main (void)
   function SetShaderFromConfig(shader, config) {
     const {
       attributes = DefaultQuadAttributes,
-      fragmentShader: fragmentShader2 = SINGLE_QUAD_FRAG,
+      fragmentShader = SINGLE_QUAD_FRAG,
       height = GetHeight(),
       renderToFramebuffer = false,
       renderToDepthbuffer = false,
@@ -2115,7 +2107,7 @@ void main (void)
       width = GetWidth(),
       uniforms = DefaultQuadUniforms
     } = config;
-    CreateShader(shader, fragmentShader2, vertexShader, uniforms, attributes);
+    CreateShader(shader, fragmentShader, vertexShader, uniforms, attributes);
     if (renderToFramebuffer) {
       shader.renderToFramebuffer = true;
       const texture = new Texture(null, width * resolution, height * resolution);
@@ -2393,8 +2385,8 @@ void main (void)
     get: () => {
       return instance;
     },
-    set: (game) => {
-      instance = game;
+    set: (game2) => {
+      instance = game2;
     },
     getFrame: () => {
       return frame;
@@ -2856,15 +2848,6 @@ void main (void)
     return renderPass;
   }
 
-  // ../phaser-genesis/src/renderer/webgl1/renderpass/UnbindTexture.ts
-  function UnbindTexture(texture) {
-    const index = texture.binding.textureUnit;
-    const binding = texture.binding;
-    binding.unbind();
-    gl.activeTexture(gl.TEXTURE0 + index);
-    gl.bindTexture(gl.TEXTURE_2D, TextureStack.tempTextures.get(index));
-  }
-
   // ../phaser-genesis/src/renderer/webgl1/renderpass/Draw.ts
   function Draw(renderPass) {
     const count = renderPass.count;
@@ -3084,6 +3067,148 @@ void main (void)
   function SetWebGLContext(contextAttributes) {
     ConfigStore.set(CONFIG_DEFAULTS.WEBGL_CONTEXT, contextAttributes);
   }
+
+  // ../phaser-genesis/src/math/Clamp.ts
+  function Clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+  }
+
+  // ../phaser-genesis/src/math/Between.ts
+  function Between(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min);
+  }
+
+  // ../phaser-genesis/src/events/Emit.ts
+  function Emit(emitter, event, ...args) {
+    if (emitter.events.size === 0 || !emitter.events.has(event)) {
+      return false;
+    }
+    const listeners = emitter.events.get(event);
+    const handlers = [...listeners];
+    for (const ee of handlers) {
+      ee.callback.apply(ee.context, args);
+      if (ee.once) {
+        listeners.delete(ee);
+      }
+    }
+    if (listeners.size === 0) {
+      emitter.events.delete(event);
+    }
+    return true;
+  }
+
+  // ../phaser-genesis/src/input/keyboard/Key.ts
+  var Key = class {
+    value;
+    events;
+    capture = true;
+    isDown = false;
+    enabled = true;
+    repeatRate = 0;
+    canRepeat = true;
+    timeDown = 0;
+    timeUpdated = 0;
+    timeUp = 0;
+    shiftKey;
+    ctrlKey;
+    altKey;
+    downCallback;
+    upCallback;
+    constructor(value) {
+      this.value = value;
+      this.events = new Map();
+    }
+    getValue() {
+      return this.value;
+    }
+    down(event) {
+      if (!this.enabled) {
+        return;
+      }
+      if (this.capture) {
+        event.preventDefault();
+      }
+      this.shiftKey = event.shiftKey;
+      this.ctrlKey = event.ctrlKey;
+      this.altKey = event.altKey;
+      if (this.isDown && this.canRepeat) {
+        this.timeUpdated = event.timeStamp;
+        const delay = this.timeUpdated - this.timeDown;
+        if (delay >= this.repeatRate) {
+          Emit(this, "keydown", this);
+          if (this.downCallback) {
+            this.downCallback(this);
+          }
+        }
+      } else {
+        this.isDown = true;
+        this.timeDown = event.timeStamp;
+        this.timeUpdated = event.timeStamp;
+        Emit(this, "keydown", this);
+        if (this.downCallback) {
+          this.downCallback(this);
+        }
+      }
+    }
+    up(event) {
+      if (!this.enabled) {
+        return;
+      }
+      if (this.capture) {
+        event.preventDefault();
+      }
+      this.shiftKey = event.shiftKey;
+      this.ctrlKey = event.ctrlKey;
+      this.altKey = event.altKey;
+      if (this.isDown) {
+        this.isDown = false;
+        this.timeUp = event.timeStamp;
+        this.timeUpdated = event.timeStamp;
+        Emit(this, "keyup", this);
+        if (this.upCallback) {
+          this.upCallback(this);
+        }
+      }
+    }
+    reset() {
+      this.isDown = false;
+      this.timeUpdated = this.timeDown;
+      this.timeUp = this.timeDown;
+    }
+    destroy() {
+      this.downCallback = null;
+      this.upCallback = null;
+      this.events.clear();
+    }
+  };
+
+  // ../phaser-genesis/src/input/keyboard/keys/DownKey.ts
+  var DownKey = class extends Key {
+    constructor() {
+      super("ArrowDown");
+    }
+  };
+
+  // ../phaser-genesis/src/input/keyboard/keys/LeftKey.ts
+  var LeftKey = class extends Key {
+    constructor() {
+      super("ArrowLeft");
+    }
+  };
+
+  // ../phaser-genesis/src/input/keyboard/keys/RightKey.ts
+  var RightKey = class extends Key {
+    constructor() {
+      super("ArrowRight");
+    }
+  };
+
+  // ../phaser-genesis/src/input/keyboard/keys/UpKey.ts
+  var UpKey = class extends Key {
+    constructor() {
+      super("ArrowUp");
+    }
+  };
 
   // ../phaser-genesis/src/components/hierarchy/GetLastChildID.ts
   function GetLastChildID(parentID) {
@@ -4400,96 +4525,6 @@ void main (void)
     }
   };
 
-  // ../phaser-genesis/src/textures/AlphaTexture.ts
-  var instance6;
-  var AlphaTexture = {
-    get: () => {
-      return instance6;
-    },
-    set: (texture) => {
-      instance6 = texture;
-    }
-  };
-
-  // ../phaser-genesis/src/renderer/webgl1/draw/BatchTexturedQuad.ts
-  function BatchTexturedQuad(F32, offset, textureIndex, x1, y1, x2, y2, x3, y3, x4, y4, u0, v0, u1, v1, r, g, b, a) {
-    F32[offset + 0] = x1;
-    F32[offset + 1] = y1;
-    F32[offset + 2] = u0;
-    F32[offset + 3] = v0;
-    F32[offset + 4] = textureIndex;
-    F32[offset + 5] = r;
-    F32[offset + 6] = g;
-    F32[offset + 7] = b;
-    F32[offset + 8] = a;
-    F32[offset + 9] = x2;
-    F32[offset + 10] = y2;
-    F32[offset + 11] = u0;
-    F32[offset + 12] = v1;
-    F32[offset + 13] = textureIndex;
-    F32[offset + 14] = r;
-    F32[offset + 15] = g;
-    F32[offset + 16] = b;
-    F32[offset + 17] = a;
-    F32[offset + 18] = x3;
-    F32[offset + 19] = y3;
-    F32[offset + 20] = u1;
-    F32[offset + 21] = v1;
-    F32[offset + 22] = textureIndex;
-    F32[offset + 23] = r;
-    F32[offset + 24] = g;
-    F32[offset + 25] = b;
-    F32[offset + 26] = a;
-    F32[offset + 27] = x1;
-    F32[offset + 28] = y1;
-    F32[offset + 29] = u0;
-    F32[offset + 30] = v0;
-    F32[offset + 31] = textureIndex;
-    F32[offset + 32] = r;
-    F32[offset + 33] = g;
-    F32[offset + 34] = b;
-    F32[offset + 35] = a;
-    F32[offset + 36] = x3;
-    F32[offset + 37] = y3;
-    F32[offset + 38] = u1;
-    F32[offset + 39] = v1;
-    F32[offset + 40] = textureIndex;
-    F32[offset + 41] = r;
-    F32[offset + 42] = g;
-    F32[offset + 43] = b;
-    F32[offset + 44] = a;
-    F32[offset + 45] = x4;
-    F32[offset + 46] = y4;
-    F32[offset + 47] = u1;
-    F32[offset + 48] = v0;
-    F32[offset + 49] = textureIndex;
-    F32[offset + 50] = r;
-    F32[offset + 51] = g;
-    F32[offset + 52] = b;
-    F32[offset + 53] = a;
-    return offset + 54;
-  }
-
-  // ../phaser-genesis/src/renderer/webgl1/draw/BatchSingleQuad.ts
-  function BatchSingleQuad(renderPass, x, y, width, height, u0, v0, u1, v1, textureIndex = 0) {
-    const { F32, offset } = GetVertexBufferEntry(renderPass, 2);
-    BatchTexturedQuad(F32, offset, textureIndex, x, y, x, y + height, x + width, y + height, x + width, y, u0, v0, u1, v1, 1, 1, 1, 1);
-  }
-
-  // ../phaser-genesis/src/renderer/webgl1/draw/DrawShaderQuad.ts
-  function DrawShaderQuad(renderPass, shader) {
-    Flush(renderPass);
-    ClearWebGLTextures();
-    const alpha = AlphaTexture.get();
-    BindWebGLTexture(alpha, 0);
-    SetShader(shader, 0);
-    const view = shader.viewport;
-    BatchSingleQuad(renderPass, 0, 0, view.width, view.height, 0, 0, 1, 1, 0);
-    Flush(renderPass);
-    UnbindTexture(alpha);
-    PopShader();
-  }
-
   // ../phaser-genesis/src/config/banner/AddBanner.ts
   function AddBanner() {
     const { title, version, url, color, background } = ConfigStore.get(CONFIG_DEFAULTS.BANNER);
@@ -4500,10 +4535,10 @@ void main (void)
   }
 
   // ../phaser-genesis/src/config/globalvar/AddGlobalVar.ts
-  function AddGlobalVar(game) {
+  function AddGlobalVar(game2) {
     const globalVar = ConfigStore.get(CONFIG_DEFAULTS.GLOBAL_VAR);
     if (globalVar && window) {
-      window[globalVar] = game;
+      window[globalVar] = game2;
     }
   }
 
@@ -4569,16 +4604,16 @@ void main (void)
   }
 
   // ../phaser-genesis/src/scenes/SceneManagerInstance.ts
-  var instance7;
+  var instance6;
   var SceneManagerInstance = {
     get: () => {
-      return instance7;
+      return instance6;
     },
     set: (manager) => {
-      if (instance7) {
+      if (instance6) {
         throw new Error("Cannot instantiate SceneManager more than once");
       }
-      instance7 = manager;
+      instance6 = manager;
     }
   };
 
@@ -4649,6 +4684,17 @@ void main (void)
   function CreateSceneManager() {
     new SceneManager();
   }
+
+  // ../phaser-genesis/src/textures/AlphaTexture.ts
+  var instance7;
+  var AlphaTexture = {
+    get: () => {
+      return instance7;
+    },
+    set: (texture) => {
+      instance7 = texture;
+    }
+  };
 
   // ../phaser-genesis/src/textures/CreateCanvas.ts
   function CreateCanvas(width, height) {
@@ -4762,25 +4808,6 @@ void main (void)
       document.addEventListener("DOMContentLoaded", check, true);
       window.addEventListener("load", check, true);
     }
-  }
-
-  // ../phaser-genesis/src/events/Emit.ts
-  function Emit(emitter, event, ...args) {
-    if (emitter.events.size === 0 || !emitter.events.has(event)) {
-      return false;
-    }
-    const listeners = emitter.events.get(event);
-    const handlers = [...listeners];
-    for (const ee of handlers) {
-      ee.callback.apply(ee.context, args);
-      if (ee.once) {
-        listeners.delete(ee);
-      }
-    }
-    if (listeners.size === 0) {
-      emitter.events.delete(event);
-    }
-    return true;
   }
 
   // ../phaser-genesis/src/events/EventEmitter.ts
@@ -4993,6 +5020,85 @@ void main (void)
     }
   };
 
+  // ../phaser-genesis/src/input/keyboard/Keyboard.ts
+  var Keyboard = class extends EventEmitter {
+    keys;
+    keydownHandler;
+    keyupHandler;
+    blurHandler;
+    keyConversion = {
+      Up: "ArrowUp",
+      Down: "ArrowDown",
+      Left: "ArrowLeft",
+      Right: "ArrowRight",
+      Spacebar: " ",
+      Win: "Meta",
+      Scroll: "ScrollLock",
+      Del: "Delete",
+      Apps: "ContextMenu",
+      Esc: "Escape",
+      Add: "+",
+      Subtract: "-",
+      Multiply: "*",
+      Decimal: ".",
+      Divide: "/"
+    };
+    constructor() {
+      super();
+      this.keydownHandler = (event) => this.onKeyDown(event);
+      this.keyupHandler = (event) => this.onKeyUp(event);
+      this.blurHandler = () => this.onBlur();
+      window.addEventListener("keydown", this.keydownHandler);
+      window.addEventListener("keyup", this.keyupHandler);
+      window.addEventListener("blur", this.blurHandler);
+      this.keys = new Map();
+    }
+    addKeys(...keys) {
+      keys.forEach((key) => {
+        this.keys.set(key.getValue(), key);
+      });
+    }
+    clearKeys() {
+      this.keys.clear();
+    }
+    onBlur() {
+      this.keys.forEach((key) => {
+        key.reset();
+      });
+    }
+    getKeyValue(key) {
+      if (this.keyConversion.hasOwnProperty(key)) {
+        return this.keyConversion[key];
+      } else {
+        return key;
+      }
+    }
+    onKeyDown(event) {
+      const value = this.getKeyValue(event.key);
+      if (this.keys.has(value)) {
+        const key = this.keys.get(value);
+        key.down(event);
+      }
+      Emit(this, "keydown-" + value, event);
+      Emit(this, "keydown", event);
+    }
+    onKeyUp(event) {
+      const value = this.getKeyValue(event.key);
+      if (this.keys.has(value)) {
+        const key = this.keys.get(value);
+        key.up(event);
+      }
+      Emit(this, "keyup-" + value, event);
+      Emit(this, "keyup", event);
+    }
+    destroy() {
+      window.removeEventListener("keydown", this.keydownHandler);
+      window.removeEventListener("keyup", this.keyupHandler);
+      window.removeEventListener("blur", this.blurHandler);
+      Emit(this, "destroy");
+    }
+  };
+
   // ../phaser-genesis/src/loader/CreateFile.ts
   function CreateFile(key, url, skipCache = false) {
     return {
@@ -5094,6 +5200,74 @@ void main (void)
     return load();
   }
 
+  // ../phaser-genesis/src/components/permissions/SetWillCacheChildren.ts
+  function SetWillCacheChildren(id, value) {
+    PermissionsComponent.data[id][PERMISSION.WILL_CACHE_CHILDREN] = Number(value);
+  }
+
+  // ../phaser-genesis/src/components/permissions/SetWillTransformChildren.ts
+  function SetWillTransformChildren(id, value) {
+    PermissionsComponent.data[id][PERMISSION.WILL_TRANSFORM_CHILDREN] = Number(value);
+  }
+
+  // ../phaser-genesis/src/components/permissions/SetWillUpdate.ts
+  function SetWillUpdate(id, value) {
+    PermissionsComponent.data[id][PERMISSION.WILL_UPDATE] = Number(value);
+  }
+
+  // ../phaser-genesis/src/gameobjects/parallaxlayer/ParallaxLayer.ts
+  var ParallaxLayer = class extends GameObject {
+    type = "ParallaxLayer";
+    camera;
+    scrollFactorX;
+    scrollFactorY;
+    _x;
+    _y;
+    _data;
+    constructor(camera, x = 0, y = x) {
+      super();
+      this.camera = camera;
+      this.scrollFactorX = x;
+      this.scrollFactorY = y;
+      const id = this.id;
+      AddTransform2DComponent(id);
+      this._data = Transform2DComponent.data[id];
+      SetWillTransformChildren(id, true);
+      SetWillCacheChildren(id, false);
+      SetWillUpdate(id, true);
+    }
+    update() {
+      const camera = this.camera;
+      this.x = camera.getBoundsX();
+      this.y = camera.getBoundsY();
+    }
+    set(x, y = x) {
+      this.x = x;
+      this.y = y;
+      return this;
+    }
+    set x(value) {
+      this._x = value;
+      this._data[TRANSFORM.X] = value;
+      SetDirtyTransform(this.id);
+    }
+    get x() {
+      return this._x;
+    }
+    set y(value) {
+      this._y = value;
+      this._data[TRANSFORM.Y] = value;
+      SetDirtyTransform(this.id);
+    }
+    get y() {
+      return this._y;
+    }
+    destroy(reparentChildren) {
+      super.destroy(reparentChildren);
+      this._data = null;
+    }
+  };
+
   // ../phaser-genesis/src/components/permissions/HasCustomDisplayList.ts
   function HasCustomDisplayList(id) {
     return !!PermissionsComponent.data[id][PERMISSION.CUSTOM_DISPLAY_LIST];
@@ -5109,16 +5283,6 @@ void main (void)
       return numChildren;
     }
     return 0;
-  }
-
-  // ../phaser-genesis/src/components/permissions/SetWillCacheChildren.ts
-  function SetWillCacheChildren(id, value) {
-    PermissionsComponent.data[id][PERMISSION.WILL_CACHE_CHILDREN] = Number(value);
-  }
-
-  // ../phaser-genesis/src/components/permissions/SetWillTransformChildren.ts
-  function SetWillTransformChildren(id, value) {
-    PermissionsComponent.data[id][PERMISSION.WILL_TRANSFORM_CHILDREN] = Number(value);
   }
 
   // ../phaser-genesis/src/components/permissions/WillUpdate.ts
@@ -5311,34 +5475,6 @@ void main (void)
       SetDirtyWorldTransform(id);
     }
   }
-
-  // ../phaser-genesis/src/textures/FlipFrameUVs.ts
-  function FlipFrameUVs(frame2) {
-    frame2.v0 = 1 - frame2.v0;
-    frame2.v1 = 1 - frame2.v1;
-    return frame2;
-  }
-
-  // ../phaser-genesis/src/renderer/webgl1/shaders/TextureShader.ts
-  var TextureShader = class extends Shader {
-    cameraMatrix;
-    projectionMatrix;
-    constructor(config = {}) {
-      config.renderToFramebuffer = true;
-      super(config);
-      this.cameraMatrix = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
-      this.projectionMatrix = new Float32Array(16);
-      Mat4Ortho(this.projectionMatrix, 0, this.viewport.width, this.viewport.height, 0, -1, 1);
-      FlipFrameUVs(this.texture.firstFrame);
-    }
-    bind(renderPass) {
-      const uniforms = this.uniforms;
-      uniforms.set("uProjectionMatrix", this.projectionMatrix);
-      uniforms.set("uCameraMatrix", this.cameraMatrix);
-      this.updateUniforms(renderPass);
-      return SetUniforms(this, renderPass);
-    }
-  };
 
   // ../phaser-genesis/src/world/events/WorldAfterUpdateEvent.ts
   var WorldAfterUpdateEvent = "afterupdate";
@@ -5736,117 +5872,80 @@ void main (void)
     }
   };
 
-  // examples/src/textures/flares.ts
-  var fragmentShader = `
-precision mediump float;
-
-uniform vec2 resolution;
-
-const vec2 light_dir = vec2(0.1, 1.0);
-const float PI = 3.1415926535897932384626433832795;
-
-float udLine (vec2 p, vec2 a, vec2 b)
-{
-	vec2 pa = p - a, ba = b - a;
-
-    return length(pa - ba * dot(pa, ba) / dot(ba, ba));
-}
-
-float glyph_dist (in vec2 pt)
-{
-	float rad = 1.0 - length(pt);
-
-    //  rad + 1.0 = darker
-    return rad;
-}
-
-vec2 gradient (vec2 pt, float dist)
-{
-	float dfdu = glyph_dist(pt + vec2(1.01, 0.0)) - dist / 1.01;
-	float dfdv = glyph_dist(pt + vec2(0.0, 0.01)) - dist / 1.01;
-
-    return normalize(vec2(dfdu, -dfdv));
-}
-
-float bevelShade (vec2 pt)
-{
-	return clamp(1.0 * dot(gradient(pt, glyph_dist(pt)), light_dir) * 0.5 + 0.5, 0.0, 1.0);
-}
-
-void main ()
-{
-	vec2 uv = gl_FragCoord.xy / resolution.xy;
-
-    float aspect = resolution.x / resolution.y;
-
-    vec2 pt = (uv * 2.0 - 1.0) * vec2(aspect, 1.0) * 1.0;
-
-    vec2 glintPos = vec2(0.0, 0.01);
-
-    float dist = distance(pt, glintPos);
-
-    float bevelMul = 1.8760002;
-    float lineMul = 1.06;
-
-    //  change these 2 to modify flare shape
-    float line1Mul = -1.0;
-    float line2Mul = -1.0;
-
-    float bevelExp = 0.772;
-    float lineExp = 4.0;
-    float glareMul = 0.95;
-
-    float line1 = udLine(pt, glintPos, glintPos + vec2(1, +1)) * line1Mul;
-    float line2 = udLine(pt, glintPos, glintPos + vec2(1, -1)) * line2Mul;
-
-    float bevel = bevelShade(glintPos) * bevelMul;
-
-    float lines = 1.0 + (line1 + line2) * lineMul;
-
-    float glare = pow(bevel, bevelExp) * pow(lines, lineExp);
-
-    vec4 color = vec4(0) + glare * glareMul;
-
-	gl_FragColor = vec4(color.rgb, 1.0) * color.a;
-}
-`;
+  // examples/src/test/parallax.ts
+  var Snowflake = class extends Sprite {
+    constructor() {
+      super(Between(0, 1600), Between(0, 1600), "snow");
+      this.speedX = Between(1, 8);
+      this.speedY = Between(1, 8);
+    }
+    update() {
+      this.x -= this.speedX;
+      this.y += this.speedY;
+      if (this.x < 0) {
+        this.x = 1600;
+      }
+      if (this.y > 1600) {
+        this.y = 0;
+      }
+    }
+  };
   var Demo = class extends Scene {
     constructor() {
       super();
+      this.cameraSpeed = 16;
+      const keyboard = new Keyboard();
+      this.leftKey = new LeftKey();
+      this.rightKey = new RightKey();
+      this.upKey = new UpKey();
+      this.downKey = new DownKey();
+      keyboard.addKeys(this.leftKey, this.rightKey, this.upKey, this.downKey);
       this.create();
     }
     async create() {
-      await LoadImageFile("bg", "assets/checker.png");
+      await LoadImageFile("grass", "assets/textures/grass.png");
+      await LoadImageFile("snow", "assets/snowflake-pixel.png");
+      await LoadImageFile("logo", "assets/logo.png");
       const world2 = new World(this);
-      AddChild(world2, new Sprite(0, 0, "bg").setOrigin(0, 0).setAlpha(0.1));
-      AddChild(world2, new Sprite(512, 0, "bg").setOrigin(0, 0).setAlpha(0.1));
-      AddChild(world2, new Sprite(0, 512, "bg").setOrigin(0, 0).setAlpha(0.1));
-      AddChild(world2, new Sprite(512, 512, "bg").setOrigin(0, 0).setAlpha(0.1));
-      const fx = new TextureShader({
-        fragmentShader,
-        width: 256,
-        height: 256,
-        uniforms: {
-          time: 0,
-          resolution: [256, 256]
-        }
-      });
-      const sprite1 = new Sprite(200, 200, fx.texture);
-      const sprite2 = new Sprite(400, 300, fx.texture);
-      const sprite3 = new Sprite(600, 400, fx.texture);
-      On(world2, "render", (renderPass) => {
-        DrawShaderQuad(renderPass, fx);
-      });
-      AddChild(world2, sprite1);
-      AddChild(world2, sprite2);
-      AddChild(world2, sprite3);
+      this.world = world2;
+      this.camera = this.world.camera;
+      AddChild(world2, new Sprite(0, 0, "grass").setOrigin(0));
+      AddChild(world2, new Sprite(512, 0, "grass").setOrigin(0));
+      AddChild(world2, new Sprite(1024, 0, "grass").setOrigin(0));
+      AddChild(world2, new Sprite(0, 512, "grass").setOrigin(0));
+      AddChild(world2, new Sprite(512, 512, "grass").setOrigin(0));
+      AddChild(world2, new Sprite(1024, 512, "grass").setOrigin(0));
+      for (let i = 0; i < 64; i++) {
+        const flake = new Snowflake();
+        AddChild(world2, flake);
+      }
+      const parallax = new ParallaxLayer(this.camera);
+      AddChild(parallax, new Sprite(400, 300, "logo"));
+      AddChild(world2, parallax);
+    }
+    update() {
+      if (!this.camera) {
+        return;
+      }
+      if (this.leftKey.isDown) {
+        this.camera.x += this.cameraSpeed;
+      } else if (this.rightKey.isDown) {
+        this.camera.x -= this.cameraSpeed;
+      }
+      if (this.upKey.isDown) {
+        this.camera.y += this.cameraSpeed;
+      } else if (this.downKey.isDown) {
+        this.camera.y -= this.cameraSpeed;
+      }
+      this.camera.x = Clamp(this.camera.x, -1600, 0);
+      this.camera.y = Clamp(this.camera.y, -1600, 0);
     }
   };
-  new Game(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(0), Scenes(Demo));
+  var game = new Game(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(657930), Scenes(Demo));
 })();
 /**
  * @author       Richard Davey <rich@photonstorm.com>
  * @copyright    2020 Photon Storm Ltd.
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
  */
-//# sourceMappingURL=flares.js.map
+//# sourceMappingURL=parallax.js.map

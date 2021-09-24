@@ -543,14 +543,6 @@
     BindViewport(ViewportStack.default);
   }
 
-  // ../phaser-genesis/src/renderer/webgl1/renderpass/BindWebGLTexture.ts
-  function BindWebGLTexture(texture, index = 1) {
-    const binding = texture.binding;
-    binding.bind(index);
-    gl.activeTexture(gl.TEXTURE0 + index);
-    gl.bindTexture(gl.TEXTURE_2D, binding.texture);
-  }
-
   // ../phaser-genesis/src/renderer/webgl1/renderpass/TextureStack.ts
   var TextureStack = {
     renderPass: null,
@@ -1183,12 +1175,12 @@ void main (void)
   function CreateShader(shader, fragmentShaderSource, vertexShaderSource, uniforms, attribs) {
     const maxTextures = GetMaxTextures();
     fragmentShaderSource = fragmentShaderSource.replace(/%count%/gi, `${maxTextures}`);
-    const fragmentShader2 = CompileShader(fragmentShaderSource, gl.FRAGMENT_SHADER);
+    const fragmentShader = CompileShader(fragmentShaderSource, gl.FRAGMENT_SHADER);
     const vertexShader = CompileShader(vertexShaderSource, gl.VERTEX_SHADER);
-    if (!fragmentShader2 || !vertexShader) {
+    if (!fragmentShader || !vertexShader) {
       return;
     }
-    const program = CreateProgram(fragmentShader2, vertexShader);
+    const program = CreateProgram(fragmentShader, vertexShader);
     if (!program) {
       return;
     }
@@ -2106,7 +2098,7 @@ void main (void)
   function SetShaderFromConfig(shader, config) {
     const {
       attributes = DefaultQuadAttributes,
-      fragmentShader: fragmentShader2 = SINGLE_QUAD_FRAG,
+      fragmentShader = SINGLE_QUAD_FRAG,
       height = GetHeight(),
       renderToFramebuffer = false,
       renderToDepthbuffer = false,
@@ -2115,7 +2107,7 @@ void main (void)
       width = GetWidth(),
       uniforms = DefaultQuadUniforms
     } = config;
-    CreateShader(shader, fragmentShader2, vertexShader, uniforms, attributes);
+    CreateShader(shader, fragmentShader, vertexShader, uniforms, attributes);
     if (renderToFramebuffer) {
       shader.renderToFramebuffer = true;
       const texture = new Texture(null, width * resolution, height * resolution);
@@ -2854,15 +2846,6 @@ void main (void)
     BindDefaultShader();
     BindDefaultColorMatrix();
     return renderPass;
-  }
-
-  // ../phaser-genesis/src/renderer/webgl1/renderpass/UnbindTexture.ts
-  function UnbindTexture(texture) {
-    const index = texture.binding.textureUnit;
-    const binding = texture.binding;
-    binding.unbind();
-    gl.activeTexture(gl.TEXTURE0 + index);
-    gl.bindTexture(gl.TEXTURE_2D, TextureStack.tempTextures.get(index));
   }
 
   // ../phaser-genesis/src/renderer/webgl1/renderpass/Draw.ts
@@ -4109,6 +4092,15 @@ void main (void)
     }
   };
 
+  // ../phaser-genesis/src/utils/array/GetRandom.ts
+  function GetRandom(array, startIndex = 0, length) {
+    if (!length) {
+      length = array.length;
+    }
+    const randomIndex = startIndex + Math.floor(Math.random() * length);
+    return array[randomIndex];
+  }
+
   // ../phaser-genesis/src/textures/TextureManagerInstance.ts
   var instance5;
   var TextureManagerInstance = {
@@ -4400,94 +4392,9 @@ void main (void)
     }
   };
 
-  // ../phaser-genesis/src/textures/AlphaTexture.ts
-  var instance6;
-  var AlphaTexture = {
-    get: () => {
-      return instance6;
-    },
-    set: (texture) => {
-      instance6 = texture;
-    }
-  };
-
-  // ../phaser-genesis/src/renderer/webgl1/draw/BatchTexturedQuad.ts
-  function BatchTexturedQuad(F32, offset, textureIndex, x1, y1, x2, y2, x3, y3, x4, y4, u0, v0, u1, v1, r, g, b, a) {
-    F32[offset + 0] = x1;
-    F32[offset + 1] = y1;
-    F32[offset + 2] = u0;
-    F32[offset + 3] = v0;
-    F32[offset + 4] = textureIndex;
-    F32[offset + 5] = r;
-    F32[offset + 6] = g;
-    F32[offset + 7] = b;
-    F32[offset + 8] = a;
-    F32[offset + 9] = x2;
-    F32[offset + 10] = y2;
-    F32[offset + 11] = u0;
-    F32[offset + 12] = v1;
-    F32[offset + 13] = textureIndex;
-    F32[offset + 14] = r;
-    F32[offset + 15] = g;
-    F32[offset + 16] = b;
-    F32[offset + 17] = a;
-    F32[offset + 18] = x3;
-    F32[offset + 19] = y3;
-    F32[offset + 20] = u1;
-    F32[offset + 21] = v1;
-    F32[offset + 22] = textureIndex;
-    F32[offset + 23] = r;
-    F32[offset + 24] = g;
-    F32[offset + 25] = b;
-    F32[offset + 26] = a;
-    F32[offset + 27] = x1;
-    F32[offset + 28] = y1;
-    F32[offset + 29] = u0;
-    F32[offset + 30] = v0;
-    F32[offset + 31] = textureIndex;
-    F32[offset + 32] = r;
-    F32[offset + 33] = g;
-    F32[offset + 34] = b;
-    F32[offset + 35] = a;
-    F32[offset + 36] = x3;
-    F32[offset + 37] = y3;
-    F32[offset + 38] = u1;
-    F32[offset + 39] = v1;
-    F32[offset + 40] = textureIndex;
-    F32[offset + 41] = r;
-    F32[offset + 42] = g;
-    F32[offset + 43] = b;
-    F32[offset + 44] = a;
-    F32[offset + 45] = x4;
-    F32[offset + 46] = y4;
-    F32[offset + 47] = u1;
-    F32[offset + 48] = v0;
-    F32[offset + 49] = textureIndex;
-    F32[offset + 50] = r;
-    F32[offset + 51] = g;
-    F32[offset + 52] = b;
-    F32[offset + 53] = a;
-    return offset + 54;
-  }
-
-  // ../phaser-genesis/src/renderer/webgl1/draw/BatchSingleQuad.ts
-  function BatchSingleQuad(renderPass, x, y, width, height, u0, v0, u1, v1, textureIndex = 0) {
-    const { F32, offset } = GetVertexBufferEntry(renderPass, 2);
-    BatchTexturedQuad(F32, offset, textureIndex, x, y, x, y + height, x + width, y + height, x + width, y, u0, v0, u1, v1, 1, 1, 1, 1);
-  }
-
-  // ../phaser-genesis/src/renderer/webgl1/draw/DrawShaderQuad.ts
-  function DrawShaderQuad(renderPass, shader) {
-    Flush(renderPass);
-    ClearWebGLTextures();
-    const alpha = AlphaTexture.get();
-    BindWebGLTexture(alpha, 0);
-    SetShader(shader, 0);
-    const view = shader.viewport;
-    BatchSingleQuad(renderPass, 0, 0, view.width, view.height, 0, 0, 1, 1, 0);
-    Flush(renderPass);
-    UnbindTexture(alpha);
-    PopShader();
+  // ../phaser-genesis/src/math/Between.ts
+  function Between(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min);
   }
 
   // ../phaser-genesis/src/config/banner/AddBanner.ts
@@ -4569,16 +4476,16 @@ void main (void)
   }
 
   // ../phaser-genesis/src/scenes/SceneManagerInstance.ts
-  var instance7;
+  var instance6;
   var SceneManagerInstance = {
     get: () => {
-      return instance7;
+      return instance6;
     },
     set: (manager) => {
-      if (instance7) {
+      if (instance6) {
         throw new Error("Cannot instantiate SceneManager more than once");
       }
-      instance7 = manager;
+      instance6 = manager;
     }
   };
 
@@ -4649,6 +4556,17 @@ void main (void)
   function CreateSceneManager() {
     new SceneManager();
   }
+
+  // ../phaser-genesis/src/textures/AlphaTexture.ts
+  var instance7;
+  var AlphaTexture = {
+    get: () => {
+      return instance7;
+    },
+    set: (texture) => {
+      instance7 = texture;
+    }
+  };
 
   // ../phaser-genesis/src/textures/CreateCanvas.ts
   function CreateCanvas(width, height) {
@@ -5088,10 +5006,146 @@ void main (void)
     };
   }
 
-  // ../phaser-genesis/src/loader/files/LoadImageFile.ts
-  async function LoadImageFile(key, url, fileData = {}) {
-    const load = ImageFile(key, url, fileData);
-    return load();
+  // ../phaser-genesis/src/loader/Loader.ts
+  var Loader = class extends EventEmitter {
+    baseURL = "";
+    path = "";
+    crossOrigin = "anonymous";
+    maxParallelDownloads = -1;
+    isLoading = false;
+    progress;
+    queue;
+    inflight;
+    completed;
+    onComplete;
+    onError;
+    constructor() {
+      super();
+      this.reset();
+    }
+    reset() {
+      this.isLoading = false;
+      this.queue = new Set();
+      this.inflight = new Set();
+      this.completed = new Set();
+      this.progress = 0;
+    }
+    add(...file) {
+      file.forEach((entity) => {
+        this.queue.add(entity);
+      });
+      return this;
+    }
+    start() {
+      if (this.isLoading) {
+        return null;
+      }
+      return new Promise((resolve, reject) => {
+        this.completed.clear();
+        this.progress = 0;
+        if (this.queue.size > 0) {
+          this.isLoading = true;
+          this.onComplete = resolve;
+          this.onError = reject;
+          Emit(this, "start");
+          this.nextFile();
+        } else {
+          this.progress = 1;
+          Emit(this, "complete");
+          resolve(this);
+        }
+      });
+    }
+    nextFile() {
+      let limit = this.queue.size;
+      if (this.maxParallelDownloads !== -1) {
+        limit = Math.min(limit, this.maxParallelDownloads) - this.inflight.size;
+      }
+      if (limit) {
+        const iterator = this.queue.values();
+        while (limit > 0) {
+          const loadFile = iterator.next().value;
+          this.inflight.add(loadFile);
+          this.queue.delete(loadFile);
+          loadFile(this).then((file) => {
+            this.fileComplete(file);
+            this.updateProgress(file, loadFile);
+          }).catch((file) => {
+            this.fileError(file);
+            this.updateProgress(file, loadFile);
+          });
+          limit--;
+        }
+      } else if (this.inflight.size === 0) {
+        this.stop();
+      }
+    }
+    stop() {
+      if (!this.isLoading) {
+        return;
+      }
+      this.isLoading = false;
+      Emit(this, "complete", this.completed);
+      this.onComplete();
+      this.completed.clear();
+    }
+    updateProgress(file, queueEntry) {
+      this.inflight.delete(queueEntry);
+      this.completed.add(file);
+      const totalCompleted = this.completed.size;
+      const totalQueued = this.queue.size + this.inflight.size;
+      if (totalCompleted > 0) {
+        this.progress = totalCompleted / (totalCompleted + totalQueued);
+      }
+      Emit(this, "progress", this.progress, totalCompleted, totalQueued);
+      this.nextFile();
+    }
+    fileComplete(file) {
+      Emit(this, "filecomplete", file);
+    }
+    fileError(file) {
+      Emit(this, "fileerror", file);
+    }
+    totalFilesToLoad() {
+      return this.queue.size + this.inflight.size;
+    }
+    setBaseURL(url = "") {
+      if (url !== "" && url.substr(-1) !== "/") {
+        url = url.concat("/");
+      }
+      this.baseURL = url;
+      return this;
+    }
+    setPath(path = "") {
+      if (path !== "" && path.substr(-1) !== "/") {
+        path = path.concat("/");
+      }
+      this.path = path;
+      return this;
+    }
+    setCORS(crossOrigin) {
+      this.crossOrigin = crossOrigin;
+      return this;
+    }
+    setMaxParallelDownloads(max) {
+      this.maxParallelDownloads = max;
+      return this;
+    }
+  };
+
+  // ../phaser-genesis/src/textures/RemoveTexture.ts
+  function RemoveTexture(texture, replacementTexture = "__WHITE") {
+    const { texture: srcTexture } = ReturnTexture(texture);
+    if (srcTexture) {
+      const eids = srcTexture.inUseQuery(GameObjectWorld);
+      eids.forEach((id) => {
+        const sprite = GameObjectCache.get(id);
+        RemoveTextureFromGameObject(sprite);
+        if (replacementTexture) {
+          SetTexture(replacementTexture, null, sprite);
+        }
+      });
+    }
   }
 
   // ../phaser-genesis/src/components/permissions/HasCustomDisplayList.ts
@@ -5311,34 +5365,6 @@ void main (void)
       SetDirtyWorldTransform(id);
     }
   }
-
-  // ../phaser-genesis/src/textures/FlipFrameUVs.ts
-  function FlipFrameUVs(frame2) {
-    frame2.v0 = 1 - frame2.v0;
-    frame2.v1 = 1 - frame2.v1;
-    return frame2;
-  }
-
-  // ../phaser-genesis/src/renderer/webgl1/shaders/TextureShader.ts
-  var TextureShader = class extends Shader {
-    cameraMatrix;
-    projectionMatrix;
-    constructor(config = {}) {
-      config.renderToFramebuffer = true;
-      super(config);
-      this.cameraMatrix = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
-      this.projectionMatrix = new Float32Array(16);
-      Mat4Ortho(this.projectionMatrix, 0, this.viewport.width, this.viewport.height, 0, -1, 1);
-      FlipFrameUVs(this.texture.firstFrame);
-    }
-    bind(renderPass) {
-      const uniforms = this.uniforms;
-      uniforms.set("uProjectionMatrix", this.projectionMatrix);
-      uniforms.set("uCameraMatrix", this.cameraMatrix);
-      this.updateUniforms(renderPass);
-      return SetUniforms(this, renderPass);
-    }
-  };
 
   // ../phaser-genesis/src/world/events/WorldAfterUpdateEvent.ts
   var WorldAfterUpdateEvent = "afterupdate";
@@ -5670,60 +5696,13 @@ void main (void)
     Emit(world2, WorldPostRenderEvent, renderPass, world2);
   }
 
-  // ../phaser-genesis/src/camera/WorldCamera.ts
-  var WorldCamera = class extends BaseCamera {
-    type = "WorldCamera";
-    position;
-    constructor(width, height) {
-      super(width, height);
-      this.position = new Position(this.id, 0, 0);
-    }
-    set x(value) {
-      this.position.x = value;
-    }
-    get x() {
-      return this.position.x;
-    }
-    set y(value) {
-      this.position.y = value;
-    }
-    get y() {
-      return this.position.y;
-    }
-    setPosition(x, y) {
-      this.position.set(x, y);
-      return this;
-    }
-    preRender() {
-      const id = this.id;
-      if (HasDirtyTransform(id)) {
-        const x = this.x;
-        const y = this.y;
-        const w = this.size.width;
-        const h = this.size.height;
-        const ox = -x + w / 2;
-        const oy = -y + h / 2;
-        const bx = ox - w / 2;
-        const by = oy - h / 2;
-        SetBounds(id, bx, by, bx + w, by + h);
-        const data = this.matrix.data;
-        data[12] = this.x;
-        data[13] = this.y;
-        ClearDirtyTransform(id);
-        this.isDirty = true;
-        return true;
-      }
-      return false;
-    }
-  };
-
-  // ../phaser-genesis/src/world/World.ts
-  var World = class extends BaseWorld {
-    type = "World";
+  // ../phaser-genesis/src/world/StaticWorld.ts
+  var StaticWorld = class extends BaseWorld {
+    type = "StaticWorld";
     constructor(scene) {
       super(scene);
       const renderer = RendererInstance.get();
-      this.camera = new WorldCamera(renderer.width, renderer.height);
+      this.camera = new StaticCamera(renderer.width, renderer.height);
     }
     preRender(gameFrame) {
       return PreRenderWorld(this, gameFrame);
@@ -5736,117 +5715,39 @@ void main (void)
     }
   };
 
-  // examples/src/textures/flares.ts
-  var fragmentShader = `
-precision mediump float;
-
-uniform vec2 resolution;
-
-const vec2 light_dir = vec2(0.1, 1.0);
-const float PI = 3.1415926535897932384626433832795;
-
-float udLine (vec2 p, vec2 a, vec2 b)
-{
-	vec2 pa = p - a, ba = b - a;
-
-    return length(pa - ba * dot(pa, ba) / dot(ba, ba));
-}
-
-float glyph_dist (in vec2 pt)
-{
-	float rad = 1.0 - length(pt);
-
-    //  rad + 1.0 = darker
-    return rad;
-}
-
-vec2 gradient (vec2 pt, float dist)
-{
-	float dfdu = glyph_dist(pt + vec2(1.01, 0.0)) - dist / 1.01;
-	float dfdv = glyph_dist(pt + vec2(0.0, 0.01)) - dist / 1.01;
-
-    return normalize(vec2(dfdu, -dfdv));
-}
-
-float bevelShade (vec2 pt)
-{
-	return clamp(1.0 * dot(gradient(pt, glyph_dist(pt)), light_dir) * 0.5 + 0.5, 0.0, 1.0);
-}
-
-void main ()
-{
-	vec2 uv = gl_FragCoord.xy / resolution.xy;
-
-    float aspect = resolution.x / resolution.y;
-
-    vec2 pt = (uv * 2.0 - 1.0) * vec2(aspect, 1.0) * 1.0;
-
-    vec2 glintPos = vec2(0.0, 0.01);
-
-    float dist = distance(pt, glintPos);
-
-    float bevelMul = 1.8760002;
-    float lineMul = 1.06;
-
-    //  change these 2 to modify flare shape
-    float line1Mul = -1.0;
-    float line2Mul = -1.0;
-
-    float bevelExp = 0.772;
-    float lineExp = 4.0;
-    float glareMul = 0.95;
-
-    float line1 = udLine(pt, glintPos, glintPos + vec2(1, +1)) * line1Mul;
-    float line2 = udLine(pt, glintPos, glintPos + vec2(1, -1)) * line2Mul;
-
-    float bevel = bevelShade(glintPos) * bevelMul;
-
-    float lines = 1.0 + (line1 + line2) * lineMul;
-
-    float glare = pow(bevel, bevelExp) * pow(lines, lineExp);
-
-    vec4 color = vec4(0) + glare * glareMul;
-
-	gl_FragColor = vec4(color.rgb, 1.0) * color.a;
-}
-`;
+  // examples/src/textures/change sprites with texture.ts
   var Demo = class extends Scene {
     constructor() {
       super();
       this.create();
     }
     async create() {
-      await LoadImageFile("bg", "assets/checker.png");
-      const world2 = new World(this);
-      AddChild(world2, new Sprite(0, 0, "bg").setOrigin(0, 0).setAlpha(0.1));
-      AddChild(world2, new Sprite(512, 0, "bg").setOrigin(0, 0).setAlpha(0.1));
-      AddChild(world2, new Sprite(0, 512, "bg").setOrigin(0, 0).setAlpha(0.1));
-      AddChild(world2, new Sprite(512, 512, "bg").setOrigin(0, 0).setAlpha(0.1));
-      const fx = new TextureShader({
-        fragmentShader,
-        width: 256,
-        height: 256,
-        uniforms: {
-          time: 0,
-          resolution: [256, 256]
-        }
+      const loader = new Loader();
+      loader.add(ImageFile("disk", "assets/items/disk1.png"), ImageFile("floppy", "assets/items/floppy2.png"), ImageFile("tape", "assets/items/tape3.png"), ImageFile("golem", "assets/golem.png"));
+      await loader.start();
+      const world2 = new StaticWorld(this);
+      const frames = ["disk", "floppy", "tape"];
+      for (let i = 0; i < 64; i++) {
+        const x = Between(0, 800);
+        const y = Between(0, 600);
+        AddChild(world2, new Sprite(x, y, GetRandom(frames)));
+      }
+      const sprites = GetChildrenFromParentID(world2.id);
+      On(world2, "update", () => {
+        sprites.forEach((sprite) => {
+          sprite.rotation += 0.01;
+        });
       });
-      const sprite1 = new Sprite(200, 200, fx.texture);
-      const sprite2 = new Sprite(400, 300, fx.texture);
-      const sprite3 = new Sprite(600, 400, fx.texture);
-      On(world2, "render", (renderPass) => {
-        DrawShaderQuad(renderPass, fx);
-      });
-      AddChild(world2, sprite1);
-      AddChild(world2, sprite2);
-      AddChild(world2, sprite3);
+      setTimeout(() => {
+        RemoveTexture("floppy", "golem");
+      }, 2e3);
     }
   };
-  new Game(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(0), Scenes(Demo));
+  new Game(WebGL(), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(2960685), Scenes(Demo));
 })();
 /**
  * @author       Richard Davey <rich@photonstorm.com>
  * @copyright    2020 Photon Storm Ltd.
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
  */
-//# sourceMappingURL=flares.js.map
+//# sourceMappingURL=change sprites with texture.js.map

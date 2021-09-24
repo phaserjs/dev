@@ -586,6 +586,11 @@
           "path": "examples/live/test/hash.js",
           "name": "hash.js",
           "type": "file"
+        },
+        {
+          "path": "examples/live/test/parallax.js",
+          "name": "parallax.js",
+          "type": "file"
         }
       ],
       "type": "directory"
@@ -597,6 +602,11 @@
         {
           "path": "examples/live/textures/ball shader.js",
           "name": "ball shader.js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/textures/change sprites with texture.js",
+          "name": "change sprites with texture.js",
           "type": "file"
         },
         {
@@ -617,6 +627,11 @@
         {
           "path": "examples/live/textures/flares.js",
           "name": "flares.js",
+          "type": "file"
+        },
+        {
+          "path": "examples/live/textures/get sprites with frame.js",
+          "name": "get sprites with frame.js",
           "type": "file"
         },
         {
