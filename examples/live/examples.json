@@ -632,6 +632,11 @@
           "type": "file"
         },
         {
+          "path": "examples/live/textures/cube shader.js",
+          "name": "cube shader.js",
+          "type": "file"
+        },
+        {
           "path": "examples/live/textures/flame shader.js",
           "name": "flame shader.js",
           "type": "file"
