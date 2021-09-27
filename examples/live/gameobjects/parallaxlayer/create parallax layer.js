@@ -3076,138 +3076,6 @@ void main (void)
     ConfigStore.set(CONFIG_DEFAULTS.WEBGL_CONTEXT, contextAttributes);
   }
 
-  // ../phaser-genesis/src/events/Emit.ts
-  function Emit(emitter, event, ...args) {
-    if (emitter.events.size === 0 || !emitter.events.has(event)) {
-      return false;
-    }
-    const listeners = emitter.events.get(event);
-    const handlers = [...listeners];
-    for (const ee of handlers) {
-      ee.callback.apply(ee.context, args);
-      if (ee.once) {
-        listeners.delete(ee);
-      }
-    }
-    if (listeners.size === 0) {
-      emitter.events.delete(event);
-    }
-    return true;
-  }
-
-  // ../phaser-genesis/src/input/keyboard/Key.ts
-  var Key = class {
-    value;
-    events;
-    capture = true;
-    isDown = false;
-    enabled = true;
-    repeatRate = 0;
-    canRepeat = true;
-    timeDown = 0;
-    timeUpdated = 0;
-    timeUp = 0;
-    shiftKey;
-    ctrlKey;
-    altKey;
-    downCallback;
-    upCallback;
-    constructor(value) {
-      this.value = value;
-      this.events = new Map();
-    }
-    getValue() {
-      return this.value;
-    }
-    down(event) {
-      if (!this.enabled) {
-        return;
-      }
-      if (this.capture) {
-        event.preventDefault();
-      }
-      this.shiftKey = event.shiftKey;
-      this.ctrlKey = event.ctrlKey;
-      this.altKey = event.altKey;
-      if (this.isDown && this.canRepeat) {
-        this.timeUpdated = event.timeStamp;
-        const delay = this.timeUpdated - this.timeDown;
-        if (delay >= this.repeatRate) {
-          Emit(this, "keydown", this);
-          if (this.downCallback) {
-            this.downCallback(this);
-          }
-        }
-      } else {
-        this.isDown = true;
-        this.timeDown = event.timeStamp;
-        this.timeUpdated = event.timeStamp;
-        Emit(this, "keydown", this);
-        if (this.downCallback) {
-          this.downCallback(this);
-        }
-      }
-    }
-    up(event) {
-      if (!this.enabled) {
-        return;
-      }
-      if (this.capture) {
-        event.preventDefault();
-      }
-      this.shiftKey = event.shiftKey;
-      this.ctrlKey = event.ctrlKey;
-      this.altKey = event.altKey;
-      if (this.isDown) {
-        this.isDown = false;
-        this.timeUp = event.timeStamp;
-        this.timeUpdated = event.timeStamp;
-        Emit(this, "keyup", this);
-        if (this.upCallback) {
-          this.upCallback(this);
-        }
-      }
-    }
-    reset() {
-      this.isDown = false;
-      this.timeUpdated = this.timeDown;
-      this.timeUp = this.timeDown;
-    }
-    destroy() {
-      this.downCallback = null;
-      this.upCallback = null;
-      this.events.clear();
-    }
-  };
-
-  // ../phaser-genesis/src/input/keyboard/keys/DownKey.ts
-  var DownKey = class extends Key {
-    constructor() {
-      super("ArrowDown");
-    }
-  };
-
-  // ../phaser-genesis/src/input/keyboard/keys/LeftKey.ts
-  var LeftKey = class extends Key {
-    constructor() {
-      super("ArrowLeft");
-    }
-  };
-
-  // ../phaser-genesis/src/input/keyboard/keys/RightKey.ts
-  var RightKey = class extends Key {
-    constructor() {
-      super("ArrowRight");
-    }
-  };
-
-  // ../phaser-genesis/src/input/keyboard/keys/UpKey.ts
-  var UpKey = class extends Key {
-    constructor() {
-      super("ArrowUp");
-    }
-  };
-
   // ../phaser-genesis/src/components/hierarchy/GetLastChildID.ts
   function GetLastChildID(parentID) {
     return HierarchyComponent.data[parentID][HIERARCHY.LAST];
@@ -4535,6 +4403,324 @@ void main (void)
     }
   };
 
+  // ../phaser-genesis/src/events/Emit.ts
+  function Emit(emitter, event, ...args) {
+    if (emitter.events.size === 0 || !emitter.events.has(event)) {
+      return false;
+    }
+    const listeners = emitter.events.get(event);
+    const handlers = [...listeners];
+    for (const ee of handlers) {
+      ee.callback.apply(ee.context, args);
+      if (ee.once) {
+        listeners.delete(ee);
+      }
+    }
+    if (listeners.size === 0) {
+      emitter.events.delete(event);
+    }
+    return true;
+  }
+
+  // ../phaser-genesis/src/input/keyboard/Key.ts
+  var Key = class {
+    value;
+    events;
+    capture = true;
+    isDown = false;
+    enabled = true;
+    repeatRate = 0;
+    canRepeat = true;
+    timeDown = 0;
+    timeUpdated = 0;
+    timeUp = 0;
+    shiftKey;
+    ctrlKey;
+    altKey;
+    downCallback;
+    upCallback;
+    constructor(value) {
+      this.value = value;
+      this.events = new Map();
+    }
+    getValue() {
+      return this.value;
+    }
+    down(event) {
+      if (!this.enabled) {
+        return;
+      }
+      if (this.capture) {
+        event.preventDefault();
+      }
+      this.shiftKey = event.shiftKey;
+      this.ctrlKey = event.ctrlKey;
+      this.altKey = event.altKey;
+      if (this.isDown && this.canRepeat) {
+        this.timeUpdated = event.timeStamp;
+        const delay = this.timeUpdated - this.timeDown;
+        if (delay >= this.repeatRate) {
+          Emit(this, "keydown", this);
+          if (this.downCallback) {
+            this.downCallback(this);
+          }
+        }
+      } else {
+        this.isDown = true;
+        this.timeDown = event.timeStamp;
+        this.timeUpdated = event.timeStamp;
+        Emit(this, "keydown", this);
+        if (this.downCallback) {
+          this.downCallback(this);
+        }
+      }
+    }
+    up(event) {
+      if (!this.enabled) {
+        return;
+      }
+      if (this.capture) {
+        event.preventDefault();
+      }
+      this.shiftKey = event.shiftKey;
+      this.ctrlKey = event.ctrlKey;
+      this.altKey = event.altKey;
+      if (this.isDown) {
+        this.isDown = false;
+        this.timeUp = event.timeStamp;
+        this.timeUpdated = event.timeStamp;
+        Emit(this, "keyup", this);
+        if (this.upCallback) {
+          this.upCallback(this);
+        }
+      }
+    }
+    reset() {
+      this.isDown = false;
+      this.timeUpdated = this.timeDown;
+      this.timeUp = this.timeDown;
+    }
+    destroy() {
+      this.downCallback = null;
+      this.upCallback = null;
+      this.events.clear();
+    }
+  };
+
+  // ../phaser-genesis/src/input/keyboard/keys/DownKey.ts
+  var DownKey = class extends Key {
+    constructor() {
+      super("ArrowDown");
+    }
+  };
+
+  // ../phaser-genesis/src/events/EventEmitter.ts
+  var EventEmitter = class {
+    events;
+    constructor() {
+      this.events = new Map();
+    }
+  };
+
+  // ../phaser-genesis/src/input/keyboard/Keyboard.ts
+  var Keyboard = class extends EventEmitter {
+    keys;
+    keydownHandler;
+    keyupHandler;
+    blurHandler;
+    keyConversion = {
+      Up: "ArrowUp",
+      Down: "ArrowDown",
+      Left: "ArrowLeft",
+      Right: "ArrowRight",
+      Spacebar: " ",
+      Win: "Meta",
+      Scroll: "ScrollLock",
+      Del: "Delete",
+      Apps: "ContextMenu",
+      Esc: "Escape",
+      Add: "+",
+      Subtract: "-",
+      Multiply: "*",
+      Decimal: ".",
+      Divide: "/"
+    };
+    constructor() {
+      super();
+      this.keydownHandler = (event) => this.onKeyDown(event);
+      this.keyupHandler = (event) => this.onKeyUp(event);
+      this.blurHandler = () => this.onBlur();
+      window.addEventListener("keydown", this.keydownHandler);
+      window.addEventListener("keyup", this.keyupHandler);
+      window.addEventListener("blur", this.blurHandler);
+      this.keys = new Map();
+    }
+    addKeys(...keys) {
+      keys.forEach((key) => {
+        this.keys.set(key.getValue(), key);
+      });
+    }
+    clearKeys() {
+      this.keys.clear();
+    }
+    onBlur() {
+      this.keys.forEach((key) => {
+        key.reset();
+      });
+    }
+    getKeyValue(key) {
+      if (this.keyConversion.hasOwnProperty(key)) {
+        return this.keyConversion[key];
+      } else {
+        return key;
+      }
+    }
+    onKeyDown(event) {
+      const value = this.getKeyValue(event.key);
+      if (this.keys.has(value)) {
+        const key = this.keys.get(value);
+        key.down(event);
+      }
+      Emit(this, "keydown-" + value, event);
+      Emit(this, "keydown", event);
+    }
+    onKeyUp(event) {
+      const value = this.getKeyValue(event.key);
+      if (this.keys.has(value)) {
+        const key = this.keys.get(value);
+        key.up(event);
+      }
+      Emit(this, "keyup-" + value, event);
+      Emit(this, "keyup", event);
+    }
+    destroy() {
+      this.clearKeys();
+      window.removeEventListener("keydown", this.keydownHandler);
+      window.removeEventListener("keyup", this.keyupHandler);
+      window.removeEventListener("blur", this.blurHandler);
+      Emit(this, "destroy");
+    }
+  };
+
+  // ../phaser-genesis/src/input/keyboard/keys/LeftKey.ts
+  var LeftKey = class extends Key {
+    constructor() {
+      super("ArrowLeft");
+    }
+  };
+
+  // ../phaser-genesis/src/events/EventInstance.ts
+  var EventInstance = class {
+    callback;
+    context;
+    once;
+    constructor(callback, context, once = false) {
+      this.callback = callback;
+      this.context = context;
+      this.once = once;
+    }
+  };
+
+  // ../phaser-genesis/src/events/Off.ts
+  function Off(emitter, event, callback, context, once) {
+    const events = emitter.events;
+    const listeners = events.get(event);
+    if (!callback) {
+      events.delete(event);
+    } else if (callback instanceof EventInstance) {
+      listeners.delete(callback);
+    } else {
+      const hasContext = !context;
+      const hasOnce = once !== void 0;
+      for (const listener of listeners) {
+        if (listener.callback === callback && (hasContext && listener.context === context) && (hasOnce && listener.once === once)) {
+          listeners.delete(listener);
+        }
+      }
+    }
+    if (listeners.size === 0) {
+      events.delete(event);
+    }
+    return emitter;
+  }
+
+  // ../phaser-genesis/src/events/On.ts
+  function On(emitter, event, callback, context = emitter, once = false) {
+    if (typeof callback !== "function") {
+      throw new TypeError("Listener not a function");
+    }
+    const listener = new EventInstance(callback, context, once);
+    const listeners = emitter.events.get(event);
+    if (!listeners) {
+      emitter.events.set(event, new Set([listener]));
+    } else {
+      listeners.add(listener);
+    }
+    return listener;
+  }
+
+  // ../phaser-genesis/src/input/keyboard/keys/RightKey.ts
+  var RightKey = class extends Key {
+    constructor() {
+      super("ArrowRight");
+    }
+  };
+
+  // ../phaser-genesis/src/input/keyboard/keys/UpKey.ts
+  var UpKey = class extends Key {
+    constructor() {
+      super("ArrowUp");
+    }
+  };
+
+  // ../phaser-genesis/src/camera/controls/CursorKeyCameraControls.ts
+  var CursorKeyCameraControls = class {
+    keyboard;
+    leftKey;
+    rightKey;
+    upKey;
+    downKey;
+    camera;
+    world;
+    cameraSpeedX;
+    cameraSpeedY;
+    listener;
+    constructor(world2, speedX = 2, speedY = 2) {
+      if (!world2.camera) {
+        throw new Error("World has no camera");
+      }
+      this.world = world2;
+      this.camera = world2.camera;
+      this.cameraSpeedX = speedX;
+      this.cameraSpeedY = speedY;
+      this.keyboard = new Keyboard();
+      this.leftKey = new LeftKey();
+      this.rightKey = new RightKey();
+      this.upKey = new UpKey();
+      this.downKey = new DownKey();
+      this.keyboard.addKeys(this.leftKey, this.rightKey, this.upKey, this.downKey);
+      this.listener = On(world2, "update", this.update.bind(this));
+    }
+    update() {
+      if (this.leftKey.isDown) {
+        this.camera.x += this.cameraSpeedX;
+      } else if (this.rightKey.isDown) {
+        this.camera.x -= this.cameraSpeedX;
+      }
+      if (this.upKey.isDown) {
+        this.camera.y += this.cameraSpeedY;
+      } else if (this.downKey.isDown) {
+        this.camera.y -= this.cameraSpeedY;
+      }
+    }
+    destroy() {
+      Off(this.world, "update", this.listener);
+      this.keyboard.destroy();
+      this.world = null;
+      this.camera = null;
+    }
+  };
+
   // ../phaser-genesis/src/config/banner/AddBanner.ts
   function AddBanner() {
     const { title, version, url, color, background } = ConfigStore.get(CONFIG_DEFAULTS.BANNER);
@@ -4579,33 +4765,6 @@ void main (void)
   // ../phaser-genesis/src/config/scenes/GetScenes.ts
   function GetScenes() {
     return ConfigStore.get(CONFIG_DEFAULTS.SCENES);
-  }
-
-  // ../phaser-genesis/src/events/EventInstance.ts
-  var EventInstance = class {
-    callback;
-    context;
-    once;
-    constructor(callback, context, once = false) {
-      this.callback = callback;
-      this.context = context;
-      this.once = once;
-    }
-  };
-
-  // ../phaser-genesis/src/events/On.ts
-  function On(emitter, event, callback, context = emitter, once = false) {
-    if (typeof callback !== "function") {
-      throw new TypeError("Listener not a function");
-    }
-    const listener = new EventInstance(callback, context, once);
-    const listeners = emitter.events.get(event);
-    if (!listeners) {
-      emitter.events.set(event, new Set([listener]));
-    } else {
-      listeners.add(listener);
-    }
-    return listener;
   }
 
   // ../phaser-genesis/src/events/Once.ts
@@ -4820,14 +4979,6 @@ void main (void)
     }
   }
 
-  // ../phaser-genesis/src/events/EventEmitter.ts
-  var EventEmitter = class {
-    events;
-    constructor() {
-      this.events = new Map();
-    }
-  };
-
   // ../phaser-genesis/src/world/ResetWorldRenderData.ts
   function ResetWorldRenderData(renderData) {
     renderData.rendered = 0;
@@ -5027,85 +5178,6 @@ void main (void)
       requestAnimationFrame((now2) => this.step(now2));
     }
     destroy() {
-    }
-  };
-
-  // ../phaser-genesis/src/input/keyboard/Keyboard.ts
-  var Keyboard = class extends EventEmitter {
-    keys;
-    keydownHandler;
-    keyupHandler;
-    blurHandler;
-    keyConversion = {
-      Up: "ArrowUp",
-      Down: "ArrowDown",
-      Left: "ArrowLeft",
-      Right: "ArrowRight",
-      Spacebar: " ",
-      Win: "Meta",
-      Scroll: "ScrollLock",
-      Del: "Delete",
-      Apps: "ContextMenu",
-      Esc: "Escape",
-      Add: "+",
-      Subtract: "-",
-      Multiply: "*",
-      Decimal: ".",
-      Divide: "/"
-    };
-    constructor() {
-      super();
-      this.keydownHandler = (event) => this.onKeyDown(event);
-      this.keyupHandler = (event) => this.onKeyUp(event);
-      this.blurHandler = () => this.onBlur();
-      window.addEventListener("keydown", this.keydownHandler);
-      window.addEventListener("keyup", this.keyupHandler);
-      window.addEventListener("blur", this.blurHandler);
-      this.keys = new Map();
-    }
-    addKeys(...keys) {
-      keys.forEach((key) => {
-        this.keys.set(key.getValue(), key);
-      });
-    }
-    clearKeys() {
-      this.keys.clear();
-    }
-    onBlur() {
-      this.keys.forEach((key) => {
-        key.reset();
-      });
-    }
-    getKeyValue(key) {
-      if (this.keyConversion.hasOwnProperty(key)) {
-        return this.keyConversion[key];
-      } else {
-        return key;
-      }
-    }
-    onKeyDown(event) {
-      const value = this.getKeyValue(event.key);
-      if (this.keys.has(value)) {
-        const key = this.keys.get(value);
-        key.down(event);
-      }
-      Emit(this, "keydown-" + value, event);
-      Emit(this, "keydown", event);
-    }
-    onKeyUp(event) {
-      const value = this.getKeyValue(event.key);
-      if (this.keys.has(value)) {
-        const key = this.keys.get(value);
-        key.up(event);
-      }
-      Emit(this, "keyup-" + value, event);
-      Emit(this, "keyup", event);
-    }
-    destroy() {
-      window.removeEventListener("keydown", this.keydownHandler);
-      window.removeEventListener("keyup", this.keyupHandler);
-      window.removeEventListener("blur", this.blurHandler);
-      Emit(this, "destroy");
     }
   };
 
@@ -5868,17 +5940,10 @@ void main (void)
     }
   };
 
-  // examples/src/gameobjects/parallaxlayer/create parallax laye.ts
+  // examples/src/gameobjects/parallaxlayer/create parallax layer.ts
   var Demo = class extends Scene {
     constructor() {
       super();
-      this.cameraSpeed = 16;
-      const keyboard = new Keyboard();
-      this.leftKey = new LeftKey();
-      this.rightKey = new RightKey();
-      this.upKey = new UpKey();
-      this.downKey = new DownKey();
-      keyboard.addKeys(this.leftKey, this.rightKey, this.upKey, this.downKey);
       this.create();
     }
     async create() {
@@ -5888,12 +5953,12 @@ void main (void)
       await LoadImageFile("middle", "assets/parallax/middle.png");
       await LoadImageFile("ground", "assets/parallax/ground.png");
       const world2 = new World(this);
-      this.world = world2;
-      this.camera = this.world.camera;
-      const background = new ParallaxLayer(this.camera, 0.9, 0.9);
-      const middleGround = new ParallaxLayer(this.camera, 0.8, 0.8);
-      const foreGround = new ParallaxLayer(this.camera, 0.75, 0.75);
-      const floor = new ParallaxLayer(this.camera, 0.5, 0.5);
+      const camera = world2.camera;
+      const controls = new CursorKeyCameraControls(world2, 16, 0);
+      const background = new ParallaxLayer(camera, 0.9, 0.9);
+      const middleGround = new ParallaxLayer(camera, 0.8, 0.8);
+      const foreGround = new ParallaxLayer(camera, 0.75, 0.75);
+      const floor = new ParallaxLayer(camera, 0.5, 0.5);
       AddChild(background, new Sprite(0, 0, "sky"));
       AddChild(background, new Sprite(960, 0, "sky"));
       AddChild(background, new Sprite(300, 100, "moon"));
@@ -5909,21 +5974,6 @@ void main (void)
       AddChild(world2, foreGround);
       AddChild(world2, floor);
     }
-    update() {
-      if (!this.camera) {
-        return;
-      }
-      if (this.leftKey.isDown) {
-        this.camera.x += this.cameraSpeed;
-      } else if (this.rightKey.isDown) {
-        this.camera.x -= this.cameraSpeed;
-      }
-      if (this.upKey.isDown) {
-        this.camera.y += this.cameraSpeed;
-      } else if (this.downKey.isDown) {
-        this.camera.y -= this.cameraSpeed;
-      }
-    }
   };
   var game = new Game(WebGL(), DefaultOrigin(0, 0), Parent("gameParent"), GlobalVar("Phaser4"), BackgroundColor(657930), Scenes(Demo));
 })();
@@ -5932,4 +5982,4 @@ void main (void)
  * @copyright    2020 Photon Storm Ltd.
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
  */
-//# sourceMappingURL=create parallax laye.js.map
+//# sourceMappingURL=create parallax layer.js.map

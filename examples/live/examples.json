@@ -381,8 +381,8 @@
           "name": "parallaxlayer",
           "children": [
             {
-              "path": "examples/live/gameobjects/parallaxlayer/create parallax laye.js",
-              "name": "create parallax laye.js",
+              "path": "examples/live/gameobjects/parallaxlayer/create parallax layer.js",
+              "name": "create parallax layer.js",
               "type": "file"
             }
           ],
