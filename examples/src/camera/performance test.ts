@@ -1,7 +1,7 @@
 import { BackgroundColor, BatchSize, GlobalVar, Parent, Scenes, WebGL } from '../../../../phaser-genesis/src/config';
 import { DownKey, LeftKey, RightKey, UpKey } from '../../../../phaser-genesis/src/input/keyboard/keys';
 import { GetTexture, Texture } from '../../../../phaser-genesis/src/textures';
-import { SpatialGridLayer, Sprite, Text } from '../../../../phaser-genesis/src/gameobjects';
+import { Layer, SpatialGridLayer, Sprite, Text } from '../../../../phaser-genesis/src/gameobjects';
 
 import { AddChild } from '../../../../phaser-genesis/src/display';
 import { AnimatedSprite } from '../../../../phaser-genesis/src/gameobjects/animatedsprite/AnimatedSprite';
@@ -15,13 +15,15 @@ import { LoadAtlasFile } from '../../../../phaser-genesis/src/loader/files/LoadA
 import { LoadImageFile } from '../../../../phaser-genesis/src/loader/files/LoadImageFile';
 import { Mouse } from '../../../../phaser-genesis/src/input/mouse/Mouse';
 import { On } from '../../../../phaser-genesis/src/events/On';
+import { ParallaxLayer } from '../../../../phaser-genesis/src/gameobjects/parallaxlayer/ParallaxLayer';
 import { Play } from '../../../../phaser-genesis/src/animation/Play';
 import { Scene } from '../../../../phaser-genesis/src/scenes/Scene';
 import { SetBackgroundStyle } from '../../../../phaser-genesis/src/gameobjects/text/SetBackgroundStyle';
+import { SetCustomDisplayList } from '../../../../phaser-genesis/src/components/permissions/SetCustomDisplayList';
 import { SetLineSpacing } from '../../../../phaser-genesis/src/gameobjects/text/SetLineSpacing';
 import { SetPadding } from '../../../../phaser-genesis/src/gameobjects/text/SetPadding';
 import { StartStats } from '../../live/libs/stats.js';
-import { StaticWorld } from '../../../../phaser-genesis/src/world/StaticWorld';
+import { StaticLayer } from '../../../../phaser-genesis/src/gameobjects/staticlayer/StaticLayer';
 import { World } from '../../../../phaser-genesis/src/world/World';
 import { WorldCamera } from '../../../../phaser-genesis/src/camera/WorldCamera';
 
@@ -107,8 +109,7 @@ class Demo extends Scene
         await LoadAtlasFile('items', 'assets/land.png', 'assets/land.json');
         await LoadImageFile('grass', 'assets/textures/grass-plain.png');
         await LoadAtlasFile('fireball', 'assets/fireball.png', 'assets/fireball.json');
-        await LoadImageFile('32', 'assets/32x32.png');
-        await LoadImageFile('322', 'assets/drawcursor.png');
+        await LoadImageFile('logo', 'assets/logo.png');
 
         const world = new World(this);
         
@@ -120,8 +121,8 @@ class Demo extends Scene
             return a.y - b.y;
         }
 
-        AddChild(world, this.grassLayer);
-        AddChild(world, this.itemsLayer);
+        // AddChild(world, this.grassLayer);
+        // AddChild(world, this.itemsLayer);
 
         this.world = world;
 
@@ -131,15 +132,35 @@ class Demo extends Scene
 
         this.fireballAnimation = CreateAnimationFromAtlas({ key: 'fire', texture: 'fireball', prefix: 'trail_', start: 0, end: 12, zeroPad: 2 });
 
-        this.addGrid();
+        // this.addGrid();
 
-        this.stats = new Text(0, 0, 'Click to expand the World\nCursors to scroll').setOrigin(0, 0);
+        const bob = new SpatialGridLayer(512, 512, false);
+        // const bob = new Layer();
+        // SetCustomDisplayList(bob.id, false);
+        AddChild(bob, new Sprite(0, 0, 'grass'));
+        AddChild(world, bob);
 
-        SetPadding(8, 8, 8, 8, this.stats);
-        SetLineSpacing(20, this.stats);
-        SetBackgroundStyle('rgba(0, 0, 150, 0.8)', 6, this.stats);
+        const staticLayer = new StaticLayer(world.camera);
 
-        AddChild(world, this.stats);
+        console.log('static', staticLayer.id);
+
+        // this.stats = new Text(20, 450, 'Click to expand the World\nCursors to scroll').setOrigin(0, 0);
+
+        // SetPadding(8, 8, 8, 8, this.stats);
+        // SetLineSpacing(20, this.stats);
+        // SetBackgroundStyle('rgba(0, 0, 150, 0.8)', 6, this.stats);
+
+        // AddChild(staticLayer, this.stats);
+
+        const bill = new Sprite(300, 300, 'logo');
+
+        AddChild(staticLayer, bill);
+
+        console.log('bill', bill.id);
+
+        AddChild(world, staticLayer);
+
+        AddChild(world, new Sprite(400, 100, 'logo'));
 
         const mouse = new Mouse();
 
@@ -150,24 +171,10 @@ class Demo extends Scene
                 return;
             }
 
-            this.addGrid();
-
-            // const total = window['game'].renderStats.numChildren;
-
-            // this.stats.setText([
-            //     'Click to expand the World',
-            //     `World size: ${worldWidth} x ${worldHeight}`,
-            //     `Total sprites: ${total}`
-            // ]);
+            // this.addGrid();
         });
 
-        On(world, 'worldprerender', () =>
-        {
-            this.stats.x = this.camera.getBoundsX() + 16;
-            this.stats.y = this.camera.getBoundsBottom() - 108;
-        });
-
-        this.camera.setPosition(0, 50);
+        // this.camera.setPosition(0, 50);
 
         StartStats(this.game);
     }
@@ -256,12 +263,11 @@ class Demo extends Scene
 
         const total = window['game'].renderStats.numChildren;
 
-        this.stats.setText([
-            'Click to expand the World',
-            `World size: ${worldWidth} x ${worldHeight}`,
-            `Total sprites: ${total}`
-        ]);
-
+        // this.stats.setText([
+        //     'Click to expand the World',
+        //     `World size: ${worldWidth} x ${worldHeight}`,
+        //     `Total sprites: ${total}`
+        // ]);
     }
 }
 
