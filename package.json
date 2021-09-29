@@ -29,7 +29,7 @@
     "boxen": "^5.1.2",
     "chalk": "^4.1.2",
     "directory-tree": "^3.0.0",
-    "esbuild": "^0.13.2",
+    "esbuild": "^0.13.3",
     "esbuild-plugin-ifdef": "^1.0.1",
     "esbuild-plugin-inline-worker": "^0.1.1",
     "esbuild-plugin-wat": "^0.2.7",
