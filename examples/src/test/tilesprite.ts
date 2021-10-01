@@ -43,8 +43,29 @@ class Demo extends Scene
 
         On(mouse, 'pointerdown', () => {
 
-            bob.setTexture('beball');
+            bob.frameScale.set(3, 3);
 
+            // bob.setTileDistortion(2, 0.3, 2);
+
+            // bob.tileDistortion = 2;
+            // bob.tileSway = 0.5;
+            // bob.tileSpeed = 3;
+
+            // bob.tileScale.set(0.2, 0.2);
+            // bob.tileAngle = 0.2;
+            // bob.setTexture('beball');
+
+        });
+
+        // bob.tileDistortion = 2;
+        // bob.tileSway = 0.2;
+
+        On(world, 'update', () =>
+        {
+            bob.tileAngle += 0.005;
+
+            // bob.tileDistortion += 0.01;
+            // bob.tileSway += 0.01;
         });
 
         // const bob = new TileSprite(400, 300, 512, 512, 'atlas', 'brain');
